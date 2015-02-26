@@ -32,6 +32,7 @@ public class DTSCodeGenerator extends CodeGenerator {
       // Same impl as superclass except print "interface" instead of "class"
       case Token.CLASS:
         Preconditions.checkState(childCount == 3);
+        add("export declare ");
         boolean classNeedsParens = (context == Context.START_OF_EXPR);
         if (classNeedsParens) {
           add("(");
@@ -70,6 +71,7 @@ public class DTSCodeGenerator extends CodeGenerator {
         for (Node c = first; c != null; c = c.getNext()) {
           add(c);
           if (c.getType() == Token.MEMBER_FUNCTION_DEF) {
+            add(";");
             cc.endLine();
           }
         }

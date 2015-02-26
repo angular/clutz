@@ -27,8 +27,7 @@ public class MoveMembersOutOfConstructor
       Node enclosingClassMembers = NodeUtil.getEnclosingType(n, Token.CLASS_MEMBERS);
 
       if (enclosingClassMemberFunction != null) {
-        Node newMember = null;
-        Node identifier;
+        Node newMember, identifier;
         if (NodeUtil.isExprAssign(n)) {
           Node exprResult = n.getFirstChild();
           identifier = exprResult.getFirstChild();
@@ -42,7 +41,7 @@ public class MoveMembersOutOfConstructor
           newIdentifier.setDeclaredTypeExpression(identifier.getDeclaredTypeExpression());
           newMember = IR.exprResult(newIdentifier);
         }
-        if (identifier.getQualifiedName().startsWith("this.")) {
+        if (identifier.isQualifiedName() && identifier.getQualifiedName().startsWith("this.")) {
           enclosingClassMembers.addChildToBack(newMember);
           parent.removeChild(n);
           if (NodeUtil.isEmptyBlock(enclosingClassMemberFunction.getFirstChild().getLastChild())) {
