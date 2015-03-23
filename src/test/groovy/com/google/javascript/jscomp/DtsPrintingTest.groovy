@@ -18,9 +18,8 @@ class DtsPrintingTest extends GroovyTestCase {
  */
 function Shape() {};
 Shape.prototype.draw = function() {};
-"""))).is("""interface Shape {
-  draw() {
-  }
+"""))).is("""export declare interface Shape {
+  draw();
 }
 """)
   }
@@ -33,9 +32,8 @@ Shape.prototype.draw = function() {};
  */
 function Square() {};
 Square.prototype.draw = function() {};
-"""))).is("""class Square implements Shape {
-  draw() {
-  }
+"""))).is("""export declare class Square implements Shape {
+  draw();
 }
 """)
   }
@@ -46,7 +44,7 @@ Square.prototype.draw = function() {};
  * @constructor
  */
 function MyClass() {};
-"""))).is("""class MyClass {
+"""))).is("""export declare class MyClass {
 }
 """)
   }
@@ -58,9 +56,8 @@ function MyClass() {};
  * @param {number|string} x
  */
 function Square(x) {};
-"""))).is("""class Square {
-  constructor(x: number | string) {
-  }
+"""))).is("""export declare class Square {
+  constructor(x: number | string);
 }
 """)
   }
@@ -74,7 +71,7 @@ function MyClass() {
     /** @type {string} */
     this.thisAssignment = 'x'
 }
-"""))).is("""class MyClass {
+"""))).is("""export declare class MyClass {
   thisAssignment: string = "x";
 }
 """);
@@ -89,7 +86,7 @@ function MyClass() {
     /** @type {number} */
     this.thisDeclaration
 }
-"""))).is("""class MyClass {
+"""))).is("""export declare class MyClass {
   thisDeclaration: number;
 }
 """)
@@ -103,11 +100,23 @@ function MyClass() {
 function MyClass() {}
 /** @param {number} x */
 MyClass.prototype.aMethod = function(x) {};
-"""))).is("""class MyClass {
-  aMethod(x: number) {
-  }
+"""))).is("""export declare class MyClass {
+  aMethod(x: number);
 }
 """)
+  }
+
+  void testOmitFunctionBody() {
+    assertThat(converter.translate(SourceFile.fromCode("classes.js", """
+/** @constructor */ function MyClass() {}
+MyClass.prototype.aMethod = function() {
+  console.log("hello world");
+}
+"""))).is("""export declare class MyClass {
+  aMethod();
+}
+""");
+
   }
 
   void xtestRealExample() {
