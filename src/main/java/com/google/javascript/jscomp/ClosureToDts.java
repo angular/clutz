@@ -47,12 +47,12 @@ public class ClosureToDts {
     Node scriptNode = Iterables.getOnlyElement(compiler.getJsRoot().children());
     final CodePrinter.Builder builder = new CodePrinter.Builder(scriptNode);
     builder.setCompilerOptions(options);
-    builder.setCodeGeneratorFactory(new CodeGeneratorFactory() {
-      @Override
-      public CodeGenerator getCodeGenerator(Format outputFormat, CodeConsumer mcp) {
-        return new DTSCodeGenerator(mcp, options);
-      }
-    });
+//    builder.setCodeGeneratorFactory(new CodeGeneratorFactory() {
+//      @Override
+//      public CodeGenerator getCodeGenerator(Format outputFormat, CodeConsumer mcp) {
+//        return new DTSCodeGenerator(mcp, options);
+//      }
+//    });
     return builder.build();
   }
 }
