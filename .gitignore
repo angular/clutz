@@ -3,3 +3,9 @@ build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
+
+# Ignore Eclipse output directory & files
+bin/
+.classpath
+.project
+.settings
