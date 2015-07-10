@@ -9,3 +9,9 @@ bin/
 .classpath
 .project
 .settings
+
+# IntelliJ
+.idea
+
+# Installed node_modules for tsc.
+node_modules/
