@@ -16,7 +16,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * A test that checks the syntax of all {@code .d.ts} files using {@code tsc}, as a sanity check.
@@ -54,11 +53,10 @@ public class DeclarationSyntaxTest {
   }
 
   private static void runChecked(final List<String> command) throws Exception {
-    Process tsc = new ProcessBuilder().command(command).redirectErrorStream(true).start();
-    if (!tsc.waitFor(5, TimeUnit.SECONDS)) {
-      tsc.destroyForcibly();
-      fail(command + ": process timed out");
-    } else if (tsc.exitValue() != 0) {
+    // TODO(martinprobst): Use waitFor(n, TimeUnit.SECONDS) and .destroyForcibly once we moved to
+    // Java 1.8.
+    final Process tsc = new ProcessBuilder().command(command).redirectErrorStream(true).start();
+    if (tsc.waitFor() != 0) {
       InputStreamReader isr = new InputStreamReader(tsc.getInputStream(), Charsets.UTF_8);
       String consoleOut = CharStreams.toString(isr);
       fail(command + ": exited abnormally: " + tsc.exitValue() + " - " + consoleOut);

@@ -158,6 +158,8 @@ public class DeclarationGenerator {
         emit("string");
       } else if (type.isNumber()) {
         emit("number");
+      } else {
+        throw new IllegalArgumentException("Unsupported type: " + type);
       }
     }
   }
