@@ -1,4 +1,6 @@
-# Experimental: do not use yet
+# Closure to `.d.ts` generator. <img src="https://magnum.travis-ci.com/angular/closure-to-dts.svg?token=9vdUxrDAzb8YJaFstxmz">
+
+**Experimental: do not use yet**
 
 This project builds on the
 [Closure Compiler](https://developers.google.com/closure/compiler/docs/js-for-compiler)
