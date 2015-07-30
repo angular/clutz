@@ -14,7 +14,4 @@ dependencies {
 
   testCompile 'junit:junit:4.11'
   testCompile 'com.google.truth:truth:0.25'
-
-  testRuntime 'org.codehaus.groovy:groovy:2.4.0'
-  testRuntime 'org.codehaus.groovy:groovy-test:2.4.0'
 }
