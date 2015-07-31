@@ -1,4 +1,4 @@
-# Closure to `.d.ts` generator. <img src="https://magnum.travis-ci.com/angular/closure-to-dts.svg?token=9vdUxrDAzb8YJaFstxmz">
+# Closure to `.d.ts` generator. [![Build Status](https://magnum.travis-ci.com/angular/closure-to-dts.svg?token=9vdUxrDAzb8YJaFstxmz&branch=master)](https://magnum.travis-ci.com/angular/closure-to-dts)
 
 **Experimental: do not use yet**
 
