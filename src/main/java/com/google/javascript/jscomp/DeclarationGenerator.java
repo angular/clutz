@@ -2,6 +2,7 @@ package com.google.javascript.jscomp;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.ImmutableList;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.jstype.FunctionType;
 import com.google.javascript.rhino.jstype.JSType;
@@ -24,6 +25,11 @@ public class DeclarationGenerator {
   private static final Logger logger = Logger.getLogger(DeclarationGenerator.class.getName());
 
   private StringWriter out = new StringWriter();
+  private final boolean parseExterns;
+
+  DeclarationGenerator(boolean parseExterns) {
+    this.parseExterns = parseExterns;
+  }
 
   String generateDeclarations(String sourceContents) {
     Compiler compiler = new Compiler();
@@ -50,15 +56,8 @@ public class DeclarationGenerator {
     });
 
     SourceFile sourceFile = SourceFile.fromCode("test.js", sourceContents);
-    List<SourceFile> defaultExterns;
-    try {
-      defaultExterns = CommandLineRunner.getDefaultExterns();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-
     Result compilationResult =
-        compiler.compile(defaultExterns, Collections.singletonList(sourceFile), options);
+        compiler.compile(getExterns(), Collections.singletonList(sourceFile), options);
     if (compiler.hasErrors()) {
       throw new AssertionError("Compile failed: " + Arrays.toString(compilationResult.errors));
     }
@@ -88,6 +87,17 @@ public class DeclarationGenerator {
     }
 
     return out.toString();
+  }
+
+  private List<SourceFile> getExterns() {
+    if (!parseExterns) {
+      return ImmutableList.of();
+    }
+    try {
+      return CommandLineRunner.getDefaultExterns();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private int indent = 0;

@@ -32,7 +32,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
   }
 
   public void generatesDeclarations(String... lines) {
-    DeclarationGenerator dct = new DeclarationGenerator();
+    DeclarationGenerator dct = new DeclarationGenerator(false);
     String actual = dct.generateDeclarations(getSubject().code);
     String expected = LINE_JOINER.join(lines);
     if (!actual.equals(expected)) {
