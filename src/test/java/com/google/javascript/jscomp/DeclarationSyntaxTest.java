@@ -43,7 +43,8 @@ public class DeclarationSyntaxTest {
       goldenFilePaths.add(DeclarationGeneratorTests.getGoldenFile(input).getPath());
     }
 
-    final List<String> tscCommand = Lists.newArrayList(TSC.toString(), "--noEmit");
+    final List<String> tscCommand =
+        Lists.newArrayList(TSC.toString(), "--noEmit", "--skipDefaultLibCheck");
     tscCommand.addAll(goldenFilePaths);
     runChecked(tscCommand);
   }

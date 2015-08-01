@@ -2,6 +2,7 @@ package com.google.javascript.jscomp;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.ImmutableList;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.jstype.FunctionType;
 import com.google.javascript.rhino.jstype.JSType;
@@ -97,7 +98,7 @@ public class DeclarationGenerator {
 
   private List<SourceFile> getExterns() {
     if (!parseExterns) {
-      return Collections.emptyList();
+      return ImmutableList.of();
     }
     try {
       return CommandLineRunner.getDefaultExterns();
