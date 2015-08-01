@@ -1,16 +1,21 @@
 package com.google.javascript.jscomp;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.jstype.FunctionType;
 import com.google.javascript.rhino.jstype.JSType;
 import com.google.javascript.rhino.jstype.ObjectType;
+import com.google.javascript.rhino.jstype.UnionType;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -76,6 +81,7 @@ public class DeclarationGenerator {
       indent();
       emitBreak();
       TypedVar symbol = topScope.getOwnSlot(provide);
+      checkArgument(symbol != null, "goog.provide not defined: %s", provide);
       if (symbol.getType() != null) {
         walkScope(symbol);
       } else {
@@ -166,7 +172,7 @@ public class DeclarationGenerator {
     } else {
       emit("var");
       emit(getUnqualifiedName(symbol));
-      visitType(type);
+      visitTypeDeclaration(type);
       emit(";");
       emitBreak();
     }
@@ -181,19 +187,54 @@ public class DeclarationGenerator {
     return qualifiedName.substring(dotIdx + 1, qualifiedName.length());
   }
 
-  private void visitType(JSType type) {
+  private void visitTypeDeclaration(JSType type) {
     if (type != null) {
       emit(":");
-      if (type.isString()) {
-        emit("string");
-      } else if (type.isNumber()) {
-        emit("number");
-      } else if (type.isBooleanValueType()) {
-        emit("boolean");
-      } else {
-        throw new IllegalArgumentException("Unsupported type: " + type);
+      visitType(type);
+    }
+  }
+
+  private void visitType(JSType type) {
+    // See also JsdocToEs6TypedConverter in the Closure code base. This code is implementing the
+    // same algorithm starting from JSType nodes (as opposed to JSDocInfo), and directly generating
+    // textual output. Otherwise both algorithms should produce the same output.
+    if (type.isString()) {
+      emit("string");
+    } else if (type.isNumber()) {
+      emit("number");
+    } else if (type.isBooleanValueType()) {
+      emit("boolean");
+    } else if (type.isUnionType()) {
+      visitUnionType((UnionType) type);
+    } else if (type.isNominalType()) {
+      ObjectType ot = (ObjectType) type;
+      this.emit(ot.getReferenceName());
+    } else {
+      throw new IllegalArgumentException("Unsupported type: " + type);
+    }
+  }
+
+  private void visitUnionType(UnionType ut) {
+    Collection<JSType> alts = Collections2.filter(ut.getAlternates(), new Predicate<JSType>() {
+      @Override
+      public boolean apply(JSType input) {
+        // Skip - JSCompiler does not have explicit null types.
+        return !input.isNullable();
+      }
+    });
+    if (alts.size() == 1) {
+      visitType(alts.iterator().next());
+      return;
+    }
+    this.emit("(");
+    Iterator<JSType> it = alts.iterator();
+    while (it.hasNext()) {
+      visitType(it.next());
+      if (it.hasNext()) {
+        this.emit("|");
       }
     }
+    this.emit(")");
   }
 
   private void visitObjectType(ObjectType type, ObjectType prototype) {
@@ -229,7 +270,7 @@ public class DeclarationGenerator {
       if (propertyType.isFunctionType()) {
         visitFunctionDeclaration((FunctionType) propertyType);
       } else {
-        visitType(propertyType);
+        visitTypeDeclaration(propertyType);
       }
       emit(";");
       emitBreak();
@@ -249,13 +290,13 @@ public class DeclarationGenerator {
       if (param.isOptionalArg()) {
         emit("?");
       }
-      visitType(param.getJSType());
+      visitTypeDeclaration(param.getJSType());
       if (parameters.hasNext()) {
         emit(", ");
       }
     }
     emit(")");
-    visitType(ftype.getReturnType());
+    visitTypeDeclaration(ftype.getReturnType());
   }
 
   static class CollectGoogProvides implements NodeTraversal.Callback {
