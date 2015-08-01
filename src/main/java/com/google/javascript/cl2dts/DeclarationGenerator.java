@@ -256,10 +256,8 @@ public class DeclarationGenerator {
     emitBreak();
     // Fields.
     JSType instanceType = type.getTypeOfThis();
-    if (!instanceType.isObject()) {
-      throw new IllegalArgumentException("expected an ObjectType for this, but got " + instanceType
-          + " which is a " + instanceType.getClass().getSimpleName());
-    }
+    checkArgument(instanceType.isObject(), "expected an ObjectType for this, but got "
+        + instanceType + " which is a " + instanceType.getClass().getSimpleName());
     visitProperties((ObjectType) instanceType, false);
     // Methods.
     visitProperties(prototype, false);
