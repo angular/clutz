@@ -1,4 +1,4 @@
-package com.google.javascript.jscomp;
+package com.google.javascript.cl2dts;
 
 import static com.google.common.truth.Truth.assert_;
 
@@ -6,6 +6,7 @@ import com.google.common.base.Joiner;
 import com.google.common.truth.FailureStrategy;
 import com.google.common.truth.Subject;
 import com.google.common.truth.SubjectFactory;
+import com.google.javascript.cl2dts.DeclarationGenerator;
 
 /**
  * A subject that supports assertions on {@link DeclarationGenerator}'s results.

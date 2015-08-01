@@ -1,6 +1,6 @@
-package com.google.javascript.jscomp;
+package com.google.javascript.cl2dts;
 
-import static com.google.javascript.jscomp.ProgramSubject.assertThatProgram;
+import static com.google.javascript.cl2dts.ProgramSubject.assertThatProgram;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;

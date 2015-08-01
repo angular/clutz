@@ -1,4 +1,4 @@
-package com.google.javascript.jscomp;
+package com.google.javascript.cl2dts;
 
 import static org.junit.Assert.fail;
 

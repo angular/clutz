@@ -1,4 +1,4 @@
-package com.google.javascript.jscomp;
+package com.google.javascript.cl2dts;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
@@ -6,6 +6,19 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.javascript.jscomp.BasicErrorManager;
+import com.google.javascript.jscomp.CheckLevel;
+import com.google.javascript.jscomp.CommandLineRunner;
+import com.google.javascript.jscomp.Compiler;
+import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.DefaultPassConfig;
+import com.google.javascript.jscomp.ErrorHandler;
+import com.google.javascript.jscomp.JSError;
+import com.google.javascript.jscomp.NodeTraversal;
+import com.google.javascript.jscomp.Result;
+import com.google.javascript.jscomp.SourceFile;
+import com.google.javascript.jscomp.TypedScope;
+import com.google.javascript.jscomp.TypedVar;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.jstype.FunctionType;
 import com.google.javascript.rhino.jstype.JSType;
@@ -67,7 +80,7 @@ public class DeclarationGenerator {
       throw new AssertionError("Compile failed: " + Arrays.toString(compilationResult.errors));
     }
 
-    Node root = compiler.getJsRoot();
+    Node root = compiler.getRoot();
     CollectGoogProvides collector = new CollectGoogProvides();
     NodeTraversal.traverse(compiler, root, collector);
     logger.fine("Generating declarations for " + collector.googProvides);
