@@ -2,7 +2,6 @@ package com.google.javascript.jscomp;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.collect.ImmutableList;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.jstype.FunctionType;
 import com.google.javascript.rhino.jstype.JSType;
@@ -76,22 +75,29 @@ public class DeclarationGenerator {
       indent();
       emitBreak();
       TypedVar symbol = topScope.getOwnSlot(provide);
-      walkScope(symbol);
+      if (symbol.getType() != null) {
+        walkScope(symbol);
+      } else {
+        // JSCompiler treats "foo.x" as one variable name, so collect all provides that start with
+        // $provide + ".".
+        String prefix = provide + ".";
+        for (TypedVar other : topScope.getAllSymbols()) {
+          if (other.getName().startsWith(prefix) && other.getType() != null) {
+            walkScope(other);
+          }
+        }
+      }
       unindent();
       emit("}");
       emitBreak();
     }
-
-    if (indent != 0) {
-      throw new IllegalStateException("indent must be zero after printing, but is " + indent);
-    }
-
+    checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
   }
 
   private List<SourceFile> getExterns() {
     if (!parseExterns) {
-      return ImmutableList.of();
+      return Collections.emptyList();
     }
     try {
       return CommandLineRunner.getDefaultExterns();
@@ -157,8 +163,21 @@ public class DeclarationGenerator {
       }
       visitObjectType(ftype, ftype.getPrototype());
     } else {
-      throw new IllegalArgumentException("Unexpected non-object type in top level: " + symbol);
+      emit("var");
+      emit(getUnqualifiedName(symbol));
+      visitType(type);
+      emit(";");
+      emitBreak();
     }
+  }
+
+  private String getUnqualifiedName(TypedVar symbol) {
+    String qualifiedName = symbol.getName();
+    int dotIdx = qualifiedName.lastIndexOf('.');
+    if (dotIdx == -1) {
+      return qualifiedName;
+    }
+    return qualifiedName.substring(dotIdx + 1, qualifiedName.length());
   }
 
   private void visitType(JSType type) {
@@ -168,6 +187,8 @@ public class DeclarationGenerator {
         emit("string");
       } else if (type.isNumber()) {
         emit("number");
+      } else if (type.isBooleanValueType()) {
+        emit("boolean");
       } else {
         throw new IllegalArgumentException("Unsupported type: " + type);
       }

@@ -11,7 +11,7 @@ foo.bar.Baz = function() {
  * @return {number}
  */
 foo.bar.Baz.staticMethod = function(a) {
-  return Number(a)
+  return Number(a);
 };
 
 /**
@@ -19,5 +19,5 @@ foo.bar.Baz.staticMethod = function(a) {
  * @return {number}
  */
 foo.bar.Baz.prototype.method = function(a) {
-  return Number(a)
+  return Number(a);
 };
