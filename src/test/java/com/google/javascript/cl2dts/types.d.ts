@@ -1,5 +1,5 @@
 declare module 'goog:types' {
-  var a : number ;
-  var b : boolean ;
-  var c : string ;
+  export var a : number ;
+  export var b : boolean ;
+  export var c : string ;
 }

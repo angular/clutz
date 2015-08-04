@@ -1,4 +1,4 @@
 declare module 'goog:union' {
-  var x : ( boolean | string ) ;
-  var nullableUnion : ( Object | number ) ;
+  export var x : ( boolean | string ) ;
+  export var nullableUnion : ( Object | number ) ;
 }

@@ -96,14 +96,16 @@ public class DeclarationGenerator {
       TypedVar symbol = topScope.getOwnSlot(provide);
       checkArgument(symbol != null, "goog.provide not defined: %s", provide);
       if (symbol.getType() != null) {
-        walkScope(symbol);
+        walkScope(symbol, true);
       } else {
         // JSCompiler treats "foo.x" as one variable name, so collect all provides that start with
         // $provide + ".".
         String prefix = provide + ".";
         for (TypedVar other : topScope.getAllSymbols()) {
-          if (other.getName().startsWith(prefix) && other.getType() != null) {
-            walkScope(other);
+          String otherName = other.getName();
+          if (otherName.startsWith(prefix) && other.getType() != null
+              && !other.getType().isFunctionPrototypeType()) {
+            walkScope(other, false);
           }
         }
       }
@@ -166,24 +168,49 @@ public class DeclarationGenerator {
     startOfLine = true;
   }
 
-  private void walkScope(TypedVar symbol) {
+  private void walkScope(TypedVar symbol, boolean isDefault) {
     JSType type = symbol.getType();
     if (type.isFunctionType()) {
-      emit("export default");
       FunctionType ftype = (FunctionType) type;
+      if (isDefault && ftype.isInterface()) {
+        // Have to produce a named interface and export that.
+        // https://github.com/Microsoft/TypeScript/issues/3194
+        emit("interface");
+        emit(getUnqualifiedName(symbol));
+        visitObjectType(ftype, ftype.getPrototype());
+        emit("export default");
+        emit(getUnqualifiedName(symbol));
+        emit(";");
+        emitBreak();
+        return;
+      }
+      emit("export");
+      if (isDefault) {
+        emit("default");
+      }
       if (type.isOrdinaryFunction()) {
         emit("function");
+        if (!isDefault) {
+          emit(getUnqualifiedName(symbol));
+        }
         visitFunctionDeclaration(ftype);
+        emit(";");
+        emitBreak();
         return;
       }
       if (type.isConstructor()) {
         emit("class");
       } else if (type.isInterface()) {
         emit("interface");
+      } else {
+        checkState(false, "Unexpected function type " + type);
+      }
+      if (!isDefault) {
+        emit(getUnqualifiedName(symbol));
       }
       visitObjectType(ftype, ftype.getPrototype());
     } else {
-      emit("var");
+      emit("export var");
       emit(getUnqualifiedName(symbol));
       visitTypeDeclaration(type);
       emit(";");
@@ -231,8 +258,9 @@ public class DeclarationGenerator {
     Collection<JSType> alts = Collections2.filter(ut.getAlternates(), new Predicate<JSType>() {
       @Override
       public boolean apply(JSType input) {
-        // Skip - JSCompiler does not have explicit null types.
-        return !input.isNullable();
+        // Skip - TypeScript does not have explicit null or optional types.
+        // Optional types must be handled at the declaration name (`foo?` syntax).
+        return !input.isNullable() && !input.isVoidType();
       }
     });
     if (alts.size() == 1) {
@@ -302,6 +330,9 @@ public class DeclarationGenerator {
         emit("?");
       }
       visitTypeDeclaration(param.getJSType());
+      if (param.isVarArgs()) {
+        emit("[]");
+      }
       if (parameters.hasNext()) {
         emit(", ");
       }

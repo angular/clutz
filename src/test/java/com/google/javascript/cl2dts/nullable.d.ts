@@ -1,6 +1,6 @@
 declare module 'goog:nullable' {
-  var w : boolean ;
-  var x : Object ;
-  var y : Object ;
-  var z : Object ;
+  export var w : boolean ;
+  export var x : Object ;
+  export var y : Object ;
+  export var z : Object ;
 }
