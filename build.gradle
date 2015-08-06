@@ -1,9 +1,18 @@
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: "jacoco"
+plugins {
+  id 'java'
+  id 'eclipse'
+
+  // Generate coverage during tests.
+  id 'jacoco'
+
+  // Generate an executable, combined .jar file.
+  id 'application'
+  id 'com.github.johnrengelman.shadow' version '1.2.2'
+}
 
 sourceCompatibility = 1.7
 version = '1.0'
+mainClassName = 'com.google.javascript.cl2dts.DeclarationGenerator'
 
 repositories {
   mavenCentral()

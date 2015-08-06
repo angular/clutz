@@ -25,8 +25,10 @@ import com.google.javascript.rhino.jstype.JSType;
 import com.google.javascript.rhino.jstype.ObjectType;
 import com.google.javascript.rhino.jstype.UnionType;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,8 +51,33 @@ public class DeclarationGenerator {
     this.parseExterns = parseExterns;
   }
 
+  public static void main(String[] args) {
+    if (args.length == 0) {
+      System.err.println("Usage: c2dts [FILES...]");
+      System.exit(1);
+    }
+    List<SourceFile> sources = new ArrayList<>();
+    for (String arg : args) {
+      File f = new File(arg);
+      if (!f.exists()) {
+        System.err.println("Input file not found: " + f.getPath());
+        System.exit(1);
+      }
+      sources.add(SourceFile.fromFile(f));
+    }
+    DeclarationGenerator generator = new DeclarationGenerator(true);
+    System.out.println(generator.generateDeclarations(sources));
+  }
+
   String generateDeclarations(String sourceContents) {
+    SourceFile sourceFile = SourceFile.fromCode("test.js", sourceContents);
+    List<SourceFile> sourceFiles = Collections.singletonList(sourceFile);
+    return generateDeclarations(sourceFiles);
+  }
+
+  private String generateDeclarations(List<SourceFile> sourceFiles) throws AssertionError {
     Compiler compiler = new Compiler();
+    compiler.disableThreads();
     final CompilerOptions options = new CompilerOptions();
     options.setCheckGlobalNamesLevel(CheckLevel.ERROR);
     options.setCheckGlobalThisLevel(CheckLevel.ERROR);
@@ -73,9 +100,8 @@ public class DeclarationGenerator {
       protected void printSummary() {}
     });
 
-    SourceFile sourceFile = SourceFile.fromCode("test.js", sourceContents);
     Result compilationResult =
-        compiler.compile(getExterns(), Collections.singletonList(sourceFile), options);
+        compiler.compile(getExterns(), sourceFiles, options);
     if (compiler.hasErrors()) {
       throw new AssertionError("Compile failed: " + Arrays.toString(compilationResult.errors));
     }
