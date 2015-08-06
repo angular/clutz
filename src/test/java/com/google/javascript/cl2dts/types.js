@@ -8,3 +8,6 @@ types.b = false;
 
 /** @type {string} */
 types.c = 's';
+
+/** @type {Object} */
+types.d = {};

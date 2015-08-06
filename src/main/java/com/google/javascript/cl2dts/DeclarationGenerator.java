@@ -20,10 +20,17 @@ import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.TypedScope;
 import com.google.javascript.jscomp.TypedVar;
 import com.google.javascript.rhino.Node;
+import com.google.javascript.rhino.jstype.EnumElementType;
 import com.google.javascript.rhino.jstype.FunctionType;
 import com.google.javascript.rhino.jstype.JSType;
+import com.google.javascript.rhino.jstype.NamedType;
+import com.google.javascript.rhino.jstype.NoType;
 import com.google.javascript.rhino.jstype.ObjectType;
+import com.google.javascript.rhino.jstype.ProxyObjectType;
+import com.google.javascript.rhino.jstype.TemplateType;
+import com.google.javascript.rhino.jstype.TemplatizedType;
 import com.google.javascript.rhino.jstype.UnionType;
+import com.google.javascript.rhino.jstype.Visitor;
 
 import java.io.File;
 import java.io.IOException;
@@ -264,20 +271,105 @@ public class DeclarationGenerator {
     // See also JsdocToEs6TypedConverter in the Closure code base. This code is implementing the
     // same algorithm starting from JSType nodes (as opposed to JSDocInfo), and directly generating
     // textual output. Otherwise both algorithms should produce the same output.
-    if (type.isString()) {
-      emit("string");
-    } else if (type.isNumber()) {
-      emit("number");
-    } else if (type.isBooleanValueType()) {
-      emit("boolean");
-    } else if (type.isUnionType()) {
-      visitUnionType((UnionType) type);
-    } else if (type.isNominalType()) {
-      ObjectType ot = (ObjectType) type;
-      this.emit(ot.getReferenceName());
-    } else {
-      throw new IllegalArgumentException("Unsupported type: " + type);
-    }
+    type.visit(new Visitor<Void>() {
+      @Override
+      public Void caseBooleanType() {
+        emit("boolean");
+        return null;
+      }
+
+      @Override
+      public Void caseNumberType() {
+        emit("number");
+        return null;
+      }
+
+      @Override
+      public Void caseStringType() {
+        emit("string");
+        return null;
+      }
+
+      @Override
+      public Void caseObjectType(ObjectType type) {
+        emit("Object");
+        return null;
+      }
+
+      @Override
+      public Void caseUnionType(UnionType type) {
+        visitUnionType(type);
+        return null;
+      }
+
+      @Override
+      public Void caseNamedType(NamedType type) {
+        emit(type.getReferenceName());
+        return null;
+      }
+
+      @Override
+      public Void caseTemplatizedType(TemplatizedType type) {
+        throw new IllegalArgumentException("unsupported " + type);
+      }
+
+      @Override
+      public Void caseTemplateType(TemplateType templateType) {
+        throw new IllegalArgumentException("unsupported " + templateType);
+      }
+
+      @Override
+      public Void caseNoType(NoType type) {
+        emit("any");
+        return null;
+      }
+
+      @Override
+      public Void caseAllType() {
+        emit("any");
+        return null;
+      }
+
+      @Override
+      public Void caseNoObjectType() {
+        emit("any");
+        return null;
+      }
+
+      @Override
+      public Void caseUnknownType() {
+        emit("any");
+        return null;
+      }
+
+      @Override
+      public Void caseNullType() {
+        emit("any");
+        return null;
+      }
+
+      @Override
+      public Void caseVoidType() {
+        emit("void");
+        return null;
+      }
+
+      @Override
+      public Void caseEnumElementType(EnumElementType type) {
+        throw new IllegalArgumentException("unsupported " + type);
+      }
+
+      @Override
+      public Void caseFunctionType(FunctionType type) {
+        throw new IllegalArgumentException("unsupported " + type);
+      }
+
+      @Override
+      public Void caseProxyObjectType(ProxyObjectType type) {
+        type.visitReferenceType(this);
+        return null;
+      }
+    });
   }
 
   private void visitUnionType(UnionType ut) {

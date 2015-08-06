@@ -21,8 +21,6 @@ fn_params.optionalNullable = function(a, opt_b) {
 /**
  * @param {string} a
  * @param {...number} b
- * @return {number}
  */
 fn_params.varargs = function(a, b) {
-  return 1;
 };
