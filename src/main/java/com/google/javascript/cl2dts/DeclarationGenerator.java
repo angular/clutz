@@ -21,6 +21,7 @@ import com.google.javascript.jscomp.TypedScope;
 import com.google.javascript.jscomp.TypedVar;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.jstype.EnumElementType;
+import com.google.javascript.rhino.jstype.EnumType;
 import com.google.javascript.rhino.jstype.FunctionType;
 import com.google.javascript.rhino.jstype.JSType;
 import com.google.javascript.rhino.jstype.NamedType;
@@ -243,6 +244,10 @@ public class DeclarationGenerator {
       }
       visitObjectType(ftype, ftype.getPrototype());
     } else {
+      if (type.isEnumType()) {
+        declareEnumType((EnumType) type);
+        return;
+      }
       if (!isDefault) {
         emit("export");
       }
@@ -258,6 +263,35 @@ public class DeclarationGenerator {
         emitBreak();
       }
     }
+  }
+
+  private void declareEnumType(EnumType type) {
+    // Enums are top level vars, but also declare a corresponding type:
+    // /** @enum {ValueType} */ var MyEnum = {A: ..., B: ...};
+    // type MyEnum = EnumValueType;
+    // var MyEnum: {A: MyEnum, B: MyEnum, ...};
+    // TODO(martinprobst): Special case number enums to map to plain TS enums?
+    emit("type");
+    emit(type.getDisplayName());
+    emit("=");
+    visitType(type.getElementsType().getPrimitiveType());
+    emit(";");
+    emitBreak();
+    emit("export var");
+    emit(type.getDisplayName());
+    emit(": {");
+    emitBreak();
+    indent();
+    for (String elem : type.getElements()) {
+      emit(elem);
+      emit(":");
+      visitType(type.getElementsType());
+      emit(",");
+      emitBreak();
+    }
+    unindent();
+    emit("};");
+    emitBreak();
   }
 
   private String getUnqualifiedName(TypedVar symbol) {
@@ -365,7 +399,8 @@ public class DeclarationGenerator {
 
       @Override
       public Void caseEnumElementType(EnumElementType type) {
-        throw new IllegalArgumentException("unsupported " + type);
+        emit(type.getReferenceName());
+        return null;
       }
 
       @Override
