@@ -243,11 +243,20 @@ public class DeclarationGenerator {
       }
       visitObjectType(ftype, ftype.getPrototype());
     } else {
-      emit("export var");
+      if (!isDefault) {
+        emit("export");
+      }
+      emit("var");
       emit(getUnqualifiedName(symbol));
       visitTypeDeclaration(type);
       emit(";");
       emitBreak();
+      if (isDefault) {
+        emit("export default");
+        emit(getUnqualifiedName(symbol));
+        emit(";");
+        emitBreak();
+      }
     }
   }
 
