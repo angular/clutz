@@ -15,7 +15,6 @@ import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DefaultPassConfig;
 import com.google.javascript.jscomp.ErrorHandler;
 import com.google.javascript.jscomp.JSError;
-import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.jscomp.Result;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.TypedScope;
@@ -53,6 +52,7 @@ import java.util.logging.Logger;
 public class DeclarationGenerator {
 
   private static final Logger logger = Logger.getLogger(DeclarationGenerator.class.getName());
+  private static final String INTERNAL_NAMESPACE = "ಠ_ಠ.cl2dts_internal.";
 
   private StringWriter out = new StringWriter();
   private final boolean parseExterns;
@@ -130,9 +130,10 @@ public class DeclarationGenerator {
     out = new StringWriter();
     TypedScope topScope = compiler.getTopScope();
     for (String provide : provides) {
-      emitNoSpace("declare module 'goog:");
+      emitNoSpace("declare module ");
+      emitNoSpace(INTERNAL_NAMESPACE);
       emitNoSpace(provide);
-      emitNoSpace("' {");
+      emitNoSpace(" {");
       indent();
       emitBreak();
       TypedVar symbol = topScope.getOwnSlot(provide);
@@ -154,9 +155,26 @@ public class DeclarationGenerator {
       unindent();
       emit("}");
       emitBreak();
+      defineExternalModule(provide);
     }
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
+  }
+
+  private void defineExternalModule(String provide) {
+    emitNoSpace("declare module 'goog:");
+    emitNoSpace(provide);
+    emitNoSpace("' {");
+    indent();
+    emitBreak();
+    emit("export = ");
+    emitNoSpace(INTERNAL_NAMESPACE);
+    emitNoSpace(provide);
+    emitNoSpace(";");
+    emitBreak();
+    unindent();
+    emit("}");
+    emitBreak();
   }
 
   private List<SourceFile> getExterns() {
@@ -249,6 +267,13 @@ public class DeclarationGenerator {
       }
       if (!isDefault) {
         emit(getUnqualifiedName(symbol));
+      }
+      FunctionType superClass = ftype.getSuperClassConstructor();
+      if (superClass != null && !"Object".equals(superClass.getReferenceName())) {
+        emit("extends");
+        // FIXME: need a scoped name
+
+        emit(superClass.getDisplayName());
       }
       visitObjectType(ftype, ftype.getPrototype());
     } else {
