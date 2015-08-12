@@ -22,13 +22,14 @@ import java.util.List;
  */
 public class DeclarationSyntaxTest {
 
-  static final Path TSC = FileSystems.getDefault().getPath("node_modules", "tsc", "bin", "tsc");
+  static final Path TSC = FileSystems.getDefault()
+      .getPath("node_modules", "typescript", "bin", "tsc");
 
   @BeforeClass
   public static void setUpTsc() throws Exception {
     if (!TSC.toFile().exists()) {
-      System.err.println("Installing tsc...");
-      runChecked("npm", "install", "tsc");
+      System.err.println("Installing typescript...");
+      runChecked("npm", "install", "typescript@next");
     }
   }
 
