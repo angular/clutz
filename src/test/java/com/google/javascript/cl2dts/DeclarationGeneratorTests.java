@@ -24,10 +24,23 @@ import java.util.List;
 @RunWith(AllTests.class)
 public class DeclarationGeneratorTests {
 
+  public static final FilenameFilter JS = new FilenameFilter() {
+    @Override
+    public boolean accept(File dir, String name) {
+      return name.endsWith(".js");
+    }
+  };
+  public static final FilenameFilter TS_SOURCES = new FilenameFilter() {
+    @Override
+    public boolean accept(File dir, String name) {
+      return name.endsWith(".ts") && !name.endsWith(".d.ts");
+    }
+  };
+
   public static TestSuite suite() throws IOException {
     TestSuite suite = new TestSuite(DeclarationGeneratorTests.class.getName());
 
-    List<File> testFiles = getTestInputFiles();
+    List<File> testFiles = getTestInputFiles(JS);
     for (final File input : testFiles) {
       File golden = getGoldenFile(input);
       final String inputText = getTestFileText(input);
@@ -41,17 +54,12 @@ public class DeclarationGeneratorTests {
     return new File(input.getPath().replaceAll("\\.js$", ".d.ts"));
   }
 
-  static List<File> getTestInputFiles() {
+  static List<File> getTestInputFiles(FilenameFilter filter) {
     Path testDir = FileSystems.getDefault().getPath("src", "test", "java");
     String packageName = DeclarationGeneratorTests.class.getPackage().getName();
     Path testPackage = testDir.resolve(packageName.replace('.', File.separatorChar));
 
-    File[] testFiles = testPackage.toFile().listFiles(new FilenameFilter() {
-      @Override
-      public boolean accept(File dir, String name) {
-        return name.endsWith(".js");
-      }
-    });
+    File[] testFiles = testPackage.toFile().listFiles(filter);
     return Arrays.asList(testFiles);
   }
 

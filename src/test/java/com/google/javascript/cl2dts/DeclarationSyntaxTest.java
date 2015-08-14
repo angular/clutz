@@ -1,5 +1,7 @@
 package com.google.javascript.cl2dts;
 
+import static com.google.javascript.cl2dts.DeclarationGeneratorTests.JS;
+import static com.google.javascript.cl2dts.DeclarationGeneratorTests.TS_SOURCES;
 import static org.junit.Assert.fail;
 
 import com.google.common.base.Charsets;
@@ -38,7 +40,7 @@ public class DeclarationSyntaxTest {
     // This currently runs *all* test files as one test case. This gives less insight into errors,
     // but improves runtime as TypeScript only has to read its lib.d.ts once, amortizing the cost
     // across test cases.
-    List<File> inputs = DeclarationGeneratorTests.getTestInputFiles();
+    List<File> inputs = DeclarationGeneratorTests.getTestInputFiles(JS);
     List<String> goldenFilePaths = new ArrayList<>();
     for (File input : inputs) {
       goldenFilePaths.add(DeclarationGeneratorTests.getGoldenFile(input).getPath());
@@ -47,6 +49,17 @@ public class DeclarationSyntaxTest {
     final List<String> tscCommand =
         Lists.newArrayList(TSC.toString(), "--noEmit", "--skipDefaultLibCheck");
     tscCommand.addAll(goldenFilePaths);
+    runChecked(tscCommand);
+  }
+
+  @Test
+  public void testDeclarationUsage() throws Exception {
+    List<File> inputs = DeclarationGeneratorTests.getTestInputFiles(TS_SOURCES);
+    final List<String> tscCommand =
+        Lists.newArrayList(TSC.toString(), "--noEmit", "--skipDefaultLibCheck", "-m", "commonjs");
+    for (File input : inputs) {
+      tscCommand.add(input.getPath());
+    }
     runChecked(tscCommand);
   }
 
