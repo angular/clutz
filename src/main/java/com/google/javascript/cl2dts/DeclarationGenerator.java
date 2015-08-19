@@ -15,7 +15,6 @@ import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DefaultPassConfig;
 import com.google.javascript.jscomp.ErrorHandler;
 import com.google.javascript.jscomp.JSError;
-import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.jscomp.Result;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.TypedScope;
@@ -53,6 +52,7 @@ import java.util.logging.Logger;
 public class DeclarationGenerator {
 
   private static final Logger logger = Logger.getLogger(DeclarationGenerator.class.getName());
+  private static final String INTERNAL_NAMESPACE = "ಠ_ಠ.cl2dts_internal";
 
   private StringWriter out = new StringWriter();
   private final boolean parseExterns;
@@ -130,15 +130,32 @@ public class DeclarationGenerator {
     out = new StringWriter();
     TypedScope topScope = compiler.getTopScope();
     for (String provide : provides) {
-      emitNoSpace("declare module 'goog:");
-      emitNoSpace(provide);
-      emitNoSpace("' {");
-      indent();
-      emitBreak();
       TypedVar symbol = topScope.getOwnSlot(provide);
       checkArgument(symbol != null, "goog.provide not defined: %s", provide);
+      String namespace = provide;
+      boolean isDefault = false;
       if (symbol.getType() != null) {
-        walkScope(symbol, true);
+        // These types are not expected to have nested properties
+        // so we declare it as a default export
+        if (!symbol.getType().isObject() ||
+            symbol.getType().isInterface() ||
+            symbol.getType().isFunctionType()) {
+          int lastDot = symbol.getName().lastIndexOf('.');
+          namespace = lastDot >= 0 ? symbol.getName().substring(0, lastDot) : "";
+          isDefault = true;
+        }
+      }
+      emitNoSpace("declare namespace ");
+      emitNoSpace(INTERNAL_NAMESPACE);
+      if (!namespace.isEmpty()) {
+        emitNoSpace("." + namespace);
+      }
+      emitNoSpace(" {");
+      indent();
+      emitBreak();
+
+      if (symbol.getType() != null) {
+        walkScope(symbol, isDefault);
       } else {
         // JSCompiler treats "foo.x" as one variable name, so collect all provides that start with
         // $provide + ".".
@@ -154,9 +171,33 @@ public class DeclarationGenerator {
       unindent();
       emit("}");
       emitBreak();
+      declareModule(provide, isDefault);
     }
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
+  }
+
+  private void declareModule(String name, Boolean isDefault) {
+    emitNoSpace("declare module '");
+    emitNoSpace("goog:" + name);
+    emitNoSpace("' {");
+    indent();
+    emitBreak();
+    // workaround for https://github.com/Microsoft/TypeScript/issues/4325
+    emit("import alias = ");
+    emitNoSpace(INTERNAL_NAMESPACE);
+    emitNoSpace("." + name);
+    emitNoSpace(";");
+    emitBreak();
+    if (isDefault) {
+      emit("export default alias;");
+    } else {
+      emit("export = alias;");
+    }
+    emitBreak();
+    unindent();
+    emit("}");
+    emitBreak();
   }
 
   private List<SourceFile> getExterns() {
@@ -220,21 +261,11 @@ public class DeclarationGenerator {
         emit("interface");
         emit(getUnqualifiedName(symbol));
         visitObjectType(ftype, ftype.getPrototype());
-        emit("export default");
-        emit(getUnqualifiedName(symbol));
-        emit(";");
-        emitBreak();
         return;
-      }
-      emit("export");
-      if (isDefault) {
-        emit("default");
       }
       if (type.isOrdinaryFunction()) {
         emit("function");
-        if (!isDefault) {
           emit(getUnqualifiedName(symbol));
-        }
         visitFunctionDeclaration(ftype);
         emit(";");
         emitBreak();
@@ -247,29 +278,18 @@ public class DeclarationGenerator {
       } else {
         checkState(false, "Unexpected function type " + type);
       }
-      if (!isDefault) {
-        emit(getUnqualifiedName(symbol));
-      }
+      emit(getUnqualifiedName(symbol));
       visitObjectType(ftype, ftype.getPrototype());
     } else {
       if (type.isEnumType()) {
         declareEnumType((EnumType) type);
         return;
       }
-      if (!isDefault) {
-        emit("export");
-      }
       emit("var");
       emit(getUnqualifiedName(symbol));
       visitTypeDeclaration(type);
       emit(";");
       emitBreak();
-      if (isDefault) {
-        emit("export default");
-        emit(getUnqualifiedName(symbol));
-        emit(";");
-        emitBreak();
-      }
     }
   }
 
@@ -285,7 +305,7 @@ public class DeclarationGenerator {
     visitType(type.getElementsType().getPrimitiveType());
     emit(";");
     emitBreak();
-    emit("export var");
+    emit("var");
     emit(type.getDisplayName());
     emit(": {");
     emitBreak();

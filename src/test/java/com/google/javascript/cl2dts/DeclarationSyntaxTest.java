@@ -74,7 +74,7 @@ public class DeclarationSyntaxTest {
     if (tsc.waitFor() != 0) {
       InputStreamReader isr = new InputStreamReader(tsc.getInputStream(), Charsets.UTF_8);
       String consoleOut = CharStreams.toString(isr);
-      fail(command + ": exited abnormally: " + tsc.exitValue() + " - " + consoleOut);
+      fail(command + ": exited abnormally with code " + tsc.exitValue() + "\n" + consoleOut);
     }
   }
 }

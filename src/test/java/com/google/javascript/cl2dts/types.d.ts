@@ -1,6 +1,10 @@
+declare namespace ಠ_ಠ.cl2dts_internal.types {
+  var a : number ;
+  var b : boolean ;
+  var c : string ;
+  var d : Object ;
+}
 declare module 'goog:types' {
-  export var a : number ;
-  export var b : boolean ;
-  export var c : string ;
-  export var d : Object ;
+  import alias = ಠ_ಠ.cl2dts_internal.types;
+  export = alias;
 }
