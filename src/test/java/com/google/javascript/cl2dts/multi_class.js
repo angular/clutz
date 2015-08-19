@@ -6,7 +6,12 @@ multi_class.A = function() {
   this.a;
 };
 
-/** @constructor */
+/**
+ * @constructor
+ * @extends {multi_class.A}
+ * @implements {multi_class.I}
+ * @implements {multi_class.I2}
+ */
 multi_class.B = function() {
   /** @type {number} */
   this.b;
@@ -14,3 +19,9 @@ multi_class.B = function() {
 
 /** @interface */
 multi_class.I = function() {};
+
+/**
+ * @interface
+ * @extends {multi_class.I}
+ */
+multi_class.I2 = function() {};

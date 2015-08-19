@@ -3,8 +3,11 @@ package com.google.javascript.cl2dts;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.javascript.jscomp.BasicErrorManager;
 import com.google.javascript.jscomp.CheckLevel;
@@ -53,6 +56,7 @@ public class DeclarationGenerator {
 
   private static final Logger logger = Logger.getLogger(DeclarationGenerator.class.getName());
   private static final String INTERNAL_NAMESPACE = "ಠ_ಠ.cl2dts_internal";
+  public static final Joiner ON_COMMA = Joiner.on(", ");
 
   private StringWriter out = new StringWriter();
   private final boolean parseExterns;
@@ -152,9 +156,8 @@ public class DeclarationGenerator {
       emitNoSpace(" {");
       indent();
       emitBreak();
-
       if (symbol.getType() != null) {
-        walkScope(symbol, isDefault);
+        walkScope(symbol, namespace, isDefault);
       } else {
         // JSCompiler treats "foo.x" as one variable name, so collect all provides that start with
         // $provide + ".".
@@ -163,7 +166,7 @@ public class DeclarationGenerator {
           String otherName = other.getName();
           if (otherName.startsWith(prefix) && other.getType() != null
               && !other.getType().isFunctionPrototypeType()) {
-            walkScope(other, false);
+            walkScope(other, namespace, false);
           }
         }
       }
@@ -250,7 +253,7 @@ public class DeclarationGenerator {
     startOfLine = true;
   }
 
-  private void walkScope(TypedVar symbol, boolean isDefault) {
+  private void walkScope(TypedVar symbol, final String namespace, boolean isDefault) {
     JSType type = symbol.getType();
     if (type.isFunctionType()) {
       FunctionType ftype = (FunctionType) type;
@@ -264,7 +267,7 @@ public class DeclarationGenerator {
       }
       if (type.isOrdinaryFunction()) {
         emit("function");
-          emit(getUnqualifiedName(symbol));
+        emit(getUnqualifiedName(symbol));
         visitFunctionDeclaration(ftype);
         emit(";");
         emitBreak();
@@ -278,6 +281,37 @@ public class DeclarationGenerator {
         checkState(false, "Unexpected function type " + type);
       }
       emit(getUnqualifiedName(symbol));
+
+      Function<ObjectType, String> relativeName = new Function<ObjectType, String>() {
+        @Override
+        public String apply(ObjectType input) {
+          if (input.getDisplayName().startsWith(namespace)) {
+            return input.getDisplayName().substring(namespace.length() + 1);
+          }
+          return input.getDisplayName();
+        }
+      };
+
+      // Interface extends another interface
+      if (ftype.getExtendedInterfacesCount() > 0) {
+        emit("extends");
+        emit(FluentIterable.from(ftype.getExtendedInterfaces())
+            .transform(relativeName)
+            .join(ON_COMMA));
+      }
+      // Class extends another class
+      if (getSuperType(ftype) != null) {
+        emit("extends");
+        emit(relativeName.apply(getSuperType(ftype)));
+      }
+
+      if (ftype.hasImplementedInterfaces()) {
+        emit("implements");
+        emit(FluentIterable.from(ftype.getOwnImplementedInterfaces())
+            .transform(relativeName)
+            .join(ON_COMMA));
+      }
+
       visitObjectType(ftype, ftype.getPrototype());
     } else {
       if (type.isEnumType()) {
@@ -290,6 +324,13 @@ public class DeclarationGenerator {
       emit(";");
       emitBreak();
     }
+  }
+
+  private ObjectType getSuperType(FunctionType type) {
+    FunctionType superClassConstructor = type.getSuperClassConstructor();
+    return superClassConstructor == null ? null
+        : superClassConstructor.getDisplayName().equals("Object") ? null
+            : superClassConstructor;
   }
 
   private void declareEnumType(EnumType type) {
