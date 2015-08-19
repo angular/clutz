@@ -1,6 +1,10 @@
+declare namespace ಠ_ಠ.cl2dts_internal.nullable {
+  var w : boolean ;
+  var x : Object ;
+  var y : Object ;
+  var z : Object ;
+}
 declare module 'goog:nullable' {
-  export var w : boolean ;
-  export var x : Object ;
-  export var y : Object ;
-  export var z : Object ;
+  import alias = ಠ_ಠ.cl2dts_internal.nullable;
+  export = alias;
 }

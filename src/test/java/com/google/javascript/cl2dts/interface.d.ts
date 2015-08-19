@@ -1,6 +1,9 @@
-declare module 'goog:interface_exp' {
+declare namespace ಠ_ಠ.cl2dts_internal {
   interface interface_exp {
     method ( ) : number ;
   }
-  export default interface_exp ;
+}
+declare module 'goog:interface_exp' {
+  import alias = ಠ_ಠ.cl2dts_internal.interface_exp;
+  export default alias;
 }
