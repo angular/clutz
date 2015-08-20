@@ -165,7 +165,8 @@ public class DeclarationGenerator {
         for (TypedVar other : topScope.getAllSymbols()) {
           String otherName = other.getName();
           if (otherName.startsWith(prefix) && other.getType() != null
-              && !other.getType().isFunctionPrototypeType()) {
+              && !other.getType().isFunctionPrototypeType()
+              && !isPrototypeMethod(other)) {
             walkScope(other, namespace, false);
           }
         }
@@ -177,6 +178,16 @@ public class DeclarationGenerator {
     }
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
+  }
+
+  private boolean isPrototypeMethod(TypedVar other) {
+    if (other.getType() != null && other.getType().isOrdinaryFunction()) {
+      JSType typeOfThis = ((FunctionType) other.getType()).getTypeOfThis();
+      if (typeOfThis != null && !typeOfThis.isUnknownType()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void declareModule(String name, Boolean isDefault) {

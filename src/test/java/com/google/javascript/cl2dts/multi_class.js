@@ -17,6 +17,8 @@ multi_class.B = function() {
   this.b;
 };
 
+multi_class.B.prototype.noop = function() {};
+
 /** @interface */
 multi_class.I = function() {};
 
