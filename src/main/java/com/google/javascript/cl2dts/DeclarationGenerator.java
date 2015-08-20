@@ -3,11 +3,8 @@ package com.google.javascript.cl2dts;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.javascript.jscomp.BasicErrorManager;
 import com.google.javascript.jscomp.CheckLevel;
@@ -56,7 +53,6 @@ public class DeclarationGenerator {
 
   private static final Logger logger = Logger.getLogger(DeclarationGenerator.class.getName());
   private static final String INTERNAL_NAMESPACE = "ಠ_ಠ.cl2dts_internal";
-  public static final Joiner ON_COMMA = Joiner.on(", ");
 
   private StringWriter out = new StringWriter();
   private final boolean parseExterns;
@@ -134,6 +130,7 @@ public class DeclarationGenerator {
 
     out = new StringWriter();
     TypedScope topScope = compiler.getTopScope();
+    Iterable<TypedVar> allSymbols = topScope.getAllSymbols();
     for (String provide : provides) {
       TypedVar symbol = topScope.getOwnSlot(provide);
       checkArgument(symbol != null, "goog.provide not defined: %s", provide);
@@ -147,37 +144,42 @@ public class DeclarationGenerator {
         int lastDot = symbol.getName().lastIndexOf('.');
         namespace = lastDot >= 0 ? symbol.getName().substring(0, lastDot) : "";
       }
-      emitNoSpace("declare namespace ");
-      emitNoSpace(INTERNAL_NAMESPACE);
-      if (!namespace.isEmpty()) {
-        emitNoSpace("." + namespace);
-      }
-      emitNoSpace(" {");
-      indent();
-      emitBreak();
-      if (symbol.getType().isEnumType() || symbol.getType().isFunctionType() ||
-          !symbol.getType().isObject()) {
-        walkScope(symbol, namespace, isDefault);
-      } else {
-        // JSCompiler treats "foo.x" as one variable name, so collect all provides that start with
-        // $provide + ".".
-        String prefix = provide + ".";
-        for (TypedVar other : topScope.getAllSymbols()) {
-          String otherName = other.getName();
-          if (otherName.startsWith(prefix) && other.getType() != null
-              && !other.getType().isFunctionPrototypeType()
-              && !isPrototypeMethod(other)) {
-            walkScope(other, namespace, false);
-          }
-        }
-      }
-      unindent();
-      emit("}");
-      emitBreak();
+      declareNamespace(namespace, provide, symbol, isDefault, allSymbols);
       declareModule(provide, isDefault);
     }
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
+  }
+
+  private void declareNamespace(String namespace, String provide, TypedVar symbol,
+      boolean isDefault, Iterable<TypedVar> allSymbols) {
+    emitNoSpace("declare namespace ");
+    emitNoSpace(INTERNAL_NAMESPACE);
+    if (!namespace.isEmpty()) {
+      emitNoSpace("." + namespace);
+    }
+    emitNoSpace(" {");
+    indent();
+    emitBreak();
+    if (symbol.getType().isEnumType() || symbol.getType().isFunctionType() ||
+        !symbol.getType().isObject()) {
+      new TreeWalker(symbol, namespace).walk(isDefault);
+    } else {
+      // JSCompiler treats "foo.x" as one variable name, so collect all provides that start with
+      // $provide + ".".
+      String prefix = provide + ".";
+      for (TypedVar other : allSymbols) {
+        String otherName = other.getName();
+        if (otherName.startsWith(prefix) && other.getType() != null
+            && !other.getType().isFunctionPrototypeType()
+            && !isPrototypeMethod(other)) {
+          new TreeWalker(other, namespace).walk(false);
+        }
+      }
+    }
+    unindent();
+    emit("}");
+    emitBreak();
   }
 
   private boolean isPrototypeMethod(TypedVar other) {
@@ -264,76 +266,6 @@ public class DeclarationGenerator {
     startOfLine = true;
   }
 
-  private void walkScope(TypedVar symbol, final String namespace, boolean isDefault) {
-    JSType type = symbol.getType();
-    if (type.isFunctionType()) {
-      FunctionType ftype = (FunctionType) type;
-      if (isDefault && ftype.isInterface()) {
-        // Have to produce a named interface and export that.
-        // https://github.com/Microsoft/TypeScript/issues/3194
-        emit("interface");
-        emit(getUnqualifiedName(symbol));
-        visitObjectType(ftype, ftype.getPrototype());
-        return;
-      }
-      if (type.isOrdinaryFunction()) {
-        emit("function");
-        emit(getUnqualifiedName(symbol));
-        visitFunctionDeclaration(ftype);
-        emit(";");
-        emitBreak();
-        return;
-      }
-      if (type.isConstructor()) {
-        emit("class");
-      } else if (type.isInterface()) {
-        emit("interface");
-      } else {
-        checkState(false, "Unexpected function type " + type);
-      }
-      emit(getUnqualifiedName(symbol));
-
-      Function<ObjectType, String> relativeName = new Function<ObjectType, String>() {
-        @Override public String apply(ObjectType input) {
-          return !input.getDisplayName().startsWith(namespace) ? input.getDisplayName()
-              : input.getDisplayName().substring(namespace.length() + 1);
-        }
-      };
-
-      // Interface extends another interface
-      if (ftype.getExtendedInterfacesCount() > 0) {
-        emit("extends");
-        emit(FluentIterable.from(ftype.getExtendedInterfaces())
-            .transform(relativeName)
-            .join(ON_COMMA));
-      }
-      // Class extends another class
-      if (getSuperType(ftype) != null) {
-        emit("extends");
-        emit(relativeName.apply(getSuperType(ftype)));
-      }
-
-      if (ftype.hasImplementedInterfaces()) {
-        emit("implements");
-        emit(FluentIterable.from(ftype.getOwnImplementedInterfaces())
-            .transform(relativeName)
-            .join(ON_COMMA));
-      }
-
-      visitObjectType(ftype, ftype.getPrototype());
-    } else {
-      if (type.isEnumType()) {
-        declareEnumType((EnumType) type);
-        return;
-      }
-      emit("var");
-      emit(getUnqualifiedName(symbol));
-      visitTypeDeclaration(type);
-      emit(";");
-      emitBreak();
-    }
-  }
-
   private ObjectType getSuperType(FunctionType type) {
     FunctionType superClassConstructor = type.getSuperClassConstructor();
     return superClassConstructor == null ? null
@@ -341,241 +273,354 @@ public class DeclarationGenerator {
             : superClassConstructor;
   }
 
-  private void declareEnumType(EnumType type) {
-    // Enums are top level vars, but also declare a corresponding type:
-    // /** @enum {ValueType} */ var MyEnum = {A: ..., B: ...};
-    // type MyEnum = EnumValueType;
-    // var MyEnum: {A: MyEnum, B: MyEnum, ...};
-    // TODO(martinprobst): Special case number enums to map to plain TS enums?
-    emit("type");
-    emit(type.getDisplayName());
-    emit("=");
-    visitType(type.getElementsType().getPrimitiveType());
-    emit(";");
-    emitBreak();
-    emit("var");
-    emit(type.getDisplayName());
-    emit(": {");
-    emitBreak();
-    indent();
-    for (String elem : type.getElements()) {
-      emit(elem);
-      emit(":");
-      visitType(type.getElementsType());
-      emit(",");
-      emitBreak();
+  private class TreeWalker {
+    private final TypedVar symbol;
+    private final String namespace;
+
+    private TreeWalker(TypedVar symbol, String namespace) {
+      this.symbol = symbol;
+      this.namespace = namespace;
     }
-    unindent();
-    emit("};");
-    emitBreak();
-  }
 
-  private String getUnqualifiedName(TypedVar symbol) {
-    String qualifiedName = symbol.getName();
-    int dotIdx = qualifiedName.lastIndexOf('.');
-    if (dotIdx == -1) {
-      return qualifiedName;
+    private String getRelativeName(ObjectType objectType) {
+      String name = objectType.getDisplayName();
+      return !name.startsWith(namespace) ? name : name.substring(namespace.length() + 1);
     }
-    return qualifiedName.substring(dotIdx + 1, qualifiedName.length());
-  }
 
-  private void visitTypeDeclaration(JSType type) {
-    if (type != null) {
-      emit(":");
-      visitType(type);
+    private String getUnqualifiedName() {
+      String qualifiedName = symbol.getName();
+      int dotIdx = qualifiedName.lastIndexOf('.');
+      if (dotIdx == -1) {
+        return qualifiedName;
+      }
+      return qualifiedName.substring(dotIdx + 1, qualifiedName.length());
     }
-  }
 
-  private void visitType(JSType type) {
-    // See also JsdocToEs6TypedConverter in the Closure code base. This code is implementing the
-    // same algorithm starting from JSType nodes (as opposed to JSDocInfo), and directly generating
-    // textual output. Otherwise both algorithms should produce the same output.
-    type.visit(new Visitor<Void>() {
-      @Override
-      public Void caseBooleanType() {
-        emit("boolean");
-        return null;
-      }
+    private void walk(boolean isDefault) {
+      JSType type = symbol.getType();
+      if (type.isFunctionType()) {
+        FunctionType ftype = (FunctionType) type;
+        if (isDefault && ftype.isInterface()) {
+          // Have to produce a named interface and export that.
+          // https://github.com/Microsoft/TypeScript/issues/3194
+          emit("interface");
+          emit(getUnqualifiedName());
+          visitObjectType(ftype, ftype.getPrototype());
+          return;
+        }
+        if (type.isOrdinaryFunction()) {
+          emit("function");
+          emit(getUnqualifiedName());
+          visitFunctionDeclaration(ftype);
+          emit(";");
+          emitBreak();
+          return;
+        }
+        if (type.isConstructor()) {
+          emit("class");
+        } else if (type.isInterface()) {
+          emit("interface");
+        } else {
+          checkState(false, "Unexpected function type " + type);
+        }
+        emit(getUnqualifiedName());
 
-      @Override
-      public Void caseNumberType() {
-        emit("number");
-        return null;
-      }
+        if (type.hasAnyTemplateTypes()) {
+          emit("<");
+          Iterator<TemplateType> it = ftype.getTemplateTypeMap().getTemplateKeys().iterator();
+          while (it.hasNext()) {
+            emit(it.next().getDisplayName());
+            if (it.hasNext()) {
+              emit(",");
+            }
+          }
+          emit(">");
+        }
 
-      @Override
-      public Void caseStringType() {
-        emit("string");
-        return null;
-      }
+        // Interface extends another interface
+        if (ftype.getExtendedInterfacesCount() > 0) {
+          emit("extends");
+          Iterator<ObjectType> it = ftype.getExtendedInterfaces().iterator();
+          while (it.hasNext()) {
+            emit(getRelativeName(it.next()));
+            if (it.hasNext()) {
+              emit(",");
+            }
+          }
+        }
+        // Class extends another class
+        if (getSuperType(ftype) != null) {
+          emit("extends");
+          emit(getRelativeName(getSuperType(ftype)));
+        }
 
-      @Override
-      public Void caseObjectType(ObjectType type) {
-        emit("Object");
-        return null;
-      }
+        if (ftype.hasImplementedInterfaces()) {
+          emit("implements");
+          Iterator<ObjectType> it = ftype.getOwnImplementedInterfaces().iterator();
+          while (it.hasNext()) {
+            emit(getRelativeName(it.next()));
+            if (it.hasNext()) {
+              emit(",");
+            }
+          }
+        }
 
-      @Override
-      public Void caseUnionType(UnionType type) {
-        visitUnionType(type);
-        return null;
-      }
-
-      @Override
-      public Void caseNamedType(NamedType type) {
-        emit(type.getReferenceName());
-        return null;
-      }
-
-      @Override
-      public Void caseTemplatizedType(TemplatizedType type) {
-        throw new IllegalArgumentException("unsupported " + type);
-      }
-
-      @Override
-      public Void caseTemplateType(TemplateType templateType) {
-        throw new IllegalArgumentException("unsupported " + templateType);
-      }
-
-      @Override
-      public Void caseNoType(NoType type) {
-        emit("any");
-        return null;
-      }
-
-      @Override
-      public Void caseAllType() {
-        emit("any");
-        return null;
-      }
-
-      @Override
-      public Void caseNoObjectType() {
-        emit("any");
-        return null;
-      }
-
-      @Override
-      public Void caseUnknownType() {
-        emit("any");
-        return null;
-      }
-
-      @Override
-      public Void caseNullType() {
-        emit("any");
-        return null;
-      }
-
-      @Override
-      public Void caseVoidType() {
-        emit("void");
-        return null;
-      }
-
-      @Override
-      public Void caseEnumElementType(EnumElementType type) {
-        emit(type.getReferenceName());
-        return null;
-      }
-
-      @Override
-      public Void caseFunctionType(FunctionType type) {
-        throw new IllegalArgumentException("unsupported " + type);
-      }
-
-      @Override
-      public Void caseProxyObjectType(ProxyObjectType type) {
-        type.visitReferenceType(this);
-        return null;
-      }
-    });
-  }
-
-  private void visitUnionType(UnionType ut) {
-    Collection<JSType> alts = Collections2.filter(ut.getAlternates(), new Predicate<JSType>() {
-      @Override
-      public boolean apply(JSType input) {
-        // Skip - TypeScript does not have explicit null or optional types.
-        // Optional types must be handled at the declaration name (`foo?` syntax).
-        return !input.isNullable() && !input.isVoidType();
-      }
-    });
-    if (alts.size() == 1) {
-      visitType(alts.iterator().next());
-      return;
-    }
-    this.emit("(");
-    Iterator<JSType> it = alts.iterator();
-    while (it.hasNext()) {
-      visitType(it.next());
-      if (it.hasNext()) {
-        this.emit("|");
-      }
-    }
-    this.emit(")");
-  }
-
-  private void visitObjectType(ObjectType type, ObjectType prototype) {
-    emit("{");
-    indent();
-    emitBreak();
-    // Fields.
-    JSType instanceType = type.getTypeOfThis();
-    checkArgument(instanceType.isObject(), "expected an ObjectType for this, but got "
-        + instanceType + " which is a " + instanceType.getClass().getSimpleName());
-    visitProperties((ObjectType) instanceType, false);
-    // Methods.
-    visitProperties(prototype, false);
-    // Statics.
-    visitProperties(type, true);
-    unindent();
-    emit("}");
-    emitBreak();
-  }
-
-  private void visitProperties(ObjectType objType, boolean isStatic) {
-    for (String propName : objType.getOwnPropertyNames()) {
-      if ("prototype".equals(propName)) {
-        continue;
-      }
-      if (isStatic) {
-        emit("static");
-      }
-      emit(propName);
-      JSType propertyType = objType.getPropertyType(propName);
-      if (propertyType.isFunctionType()) {
-        visitFunctionDeclaration((FunctionType) propertyType);
+        visitObjectType(ftype, ftype.getPrototype());
       } else {
-        visitTypeDeclaration(propertyType);
+        if (type.isEnumType()) {
+          visitEnumType((EnumType) type);
+          return;
+        }
+        emit("var");
+        emit(getUnqualifiedName());
+        visitTypeDeclaration(type);
+        emit(";");
+        emitBreak();
       }
+    }
+
+    private void visitEnumType(EnumType type) {
+      // Enums are top level vars, but also declare a corresponding type:
+      // /** @enum {ValueType} */ var MyEnum = {A: ..., B: ...};
+      // type MyEnum = EnumValueType;
+      // var MyEnum: {A: MyEnum, B: MyEnum, ...};
+      // TODO(martinprobst): Special case number enums to map to plain TS enums?
+      emit("type");
+      emit(type.getDisplayName());
+      emit("=");
+      visitType(type.getElementsType().getPrimitiveType());
       emit(";");
       emitBreak();
+      emit("var");
+      emit(type.getDisplayName());
+      emit(": {");
+      emitBreak();
+      indent();
+      for (String elem : type.getElements()) {
+        emit(elem);
+        emit(":");
+        visitType(type.getElementsType());
+        emit(",");
+        emitBreak();
+      }
+      unindent();
+      emit("};");
+      emitBreak();
     }
-  }
 
-  private void visitFunctionDeclaration(FunctionType ftype) {
-    emit("(");
-    Iterator<Node> parameters = ftype.getParameters().iterator();
-    char pName = 'a'; // let's hope for no more than 26 parameters...
-    while (parameters.hasNext()) {
-      Node param = parameters.next();
-      if (param.isVarArgs()) {
-        emit("...");
-      }
-      emitNoSpace("" + pName++);
-      if (param.isOptionalArg()) {
-        emit("?");
-      }
-      visitTypeDeclaration(param.getJSType());
-      if (param.isVarArgs()) {
-        emit("[]");
-      }
-      if (parameters.hasNext()) {
-        emit(", ");
+    private void visitTypeDeclaration(JSType type) {
+      if (type != null) {
+        emit(":");
+        visitType(type);
       }
     }
-    emit(")");
-    visitTypeDeclaration(ftype.getReturnType());
+
+    private void visitType(JSType type) {
+      // See also JsdocToEs6TypedConverter in the Closure code base. This code is implementing the
+      // same algorithm starting from JSType nodes (as opposed to JSDocInfo), and directly
+      // generating textual output. Otherwise both algorithms should produce the same output.
+      type.visit(new Visitor<Void>() {
+        @Override
+        public Void caseBooleanType() {
+          emit("boolean");
+          return null;
+        }
+
+        @Override
+        public Void caseNumberType() {
+          emit("number");
+          return null;
+        }
+
+        @Override
+        public Void caseStringType() {
+          emit("string");
+          return null;
+        }
+
+        @Override
+        public Void caseObjectType(ObjectType type) {
+          emit("Object");
+          return null;
+        }
+
+        @Override
+        public Void caseUnionType(UnionType type) {
+          visitUnionType(type);
+          return null;
+        }
+
+        @Override
+        public Void caseNamedType(NamedType type) {
+          emit(type.getReferenceName());
+          return null;
+        }
+
+        @Override
+        public Void caseTemplatizedType(TemplatizedType type) {
+          ObjectType referencedType = type.getReferencedType();
+          String templateTypeName = getRelativeName(referencedType);
+          if ("Array".equals(referencedType.getReferenceName())
+              && type.getTemplateTypes().size() == 1) {
+            visitType(type.getTemplateTypes().get(0));
+            emit("[]");
+            return null;
+          }
+          emit(templateTypeName);
+          emit("<");
+          for (JSType tmplType : type.getTemplateTypes()) {
+            visitType(tmplType);
+          }
+          emit(">");
+          return null;
+        }
+
+        @Override
+        public Void caseTemplateType(TemplateType templateType) {
+          emit(templateType.getReferenceName());
+          return null;
+        }
+
+        @Override
+        public Void caseNoType(NoType type) {
+          emit("any");
+          return null;
+        }
+
+        @Override
+        public Void caseAllType() {
+          emit("any");
+          return null;
+        }
+
+        @Override
+        public Void caseNoObjectType() {
+          emit("any");
+          return null;
+        }
+
+        @Override
+        public Void caseUnknownType() {
+          emit("any");
+          return null;
+        }
+
+        @Override
+        public Void caseNullType() {
+          emit("any");
+          return null;
+        }
+
+        @Override
+        public Void caseVoidType() {
+          emit("void");
+          return null;
+        }
+
+        @Override
+        public Void caseEnumElementType(EnumElementType type) {
+          emit(type.getReferenceName());
+          return null;
+        }
+
+        @Override
+        public Void caseFunctionType(FunctionType type) {
+          throw new IllegalArgumentException("unsupported " + type);
+        }
+
+        @Override
+        public Void caseProxyObjectType(ProxyObjectType type) {
+          type.visitReferenceType(this);
+          return null;
+        }
+      });
+    }
+
+    private void visitUnionType(UnionType ut) {
+      Collection<JSType> alts = Collections2.filter(ut.getAlternates(), new Predicate<JSType>() {
+        @Override
+        public boolean apply(JSType input) {
+          // Skip - TypeScript does not have explicit null or optional types.
+          // Optional types must be handled at the declaration name (`foo?` syntax).
+          return !input.isNullable() && !input.isVoidType();
+        }
+      });
+      if (alts.size() == 1) {
+        visitType(alts.iterator().next());
+        return;
+      }
+      emit("(");
+      Iterator<JSType> it = alts.iterator();
+      while (it.hasNext()) {
+        visitType(it.next());
+        if (it.hasNext()) {
+          emit("|");
+        }
+      }
+      emit(")");
+    }
+
+    private void visitObjectType(ObjectType type, ObjectType prototype) {
+      emit("{");
+      indent();
+      emitBreak();
+      // Fields.
+      JSType instanceType = type.getTypeOfThis();
+      checkArgument(instanceType.isObject(), "expected an ObjectType for this, but got "
+          + instanceType + " which is a " + instanceType.getClass().getSimpleName());
+      visitProperties((ObjectType) instanceType, false);
+      // Methods.
+      visitProperties(prototype, false);
+      // Statics.
+      visitProperties(type, true);
+      unindent();
+      emit("}");
+      emitBreak();
+    }
+
+    private void visitProperties(ObjectType objType, boolean isStatic) {
+      for (String propName : objType.getOwnPropertyNames()) {
+        if ("prototype".equals(propName)) {
+          continue;
+        }
+        if (isStatic) {
+          emit("static");
+        }
+        emit(propName);
+        JSType propertyType = objType.getPropertyType(propName);
+        if (propertyType.isFunctionType()) {
+          visitFunctionDeclaration((FunctionType) propertyType);
+        } else {
+          visitTypeDeclaration(propertyType);
+        }
+        emit(";");
+        emitBreak();
+      }
+    }
+
+    private void visitFunctionDeclaration(FunctionType ftype) {
+      emit("(");
+      Iterator<Node> parameters = ftype.getParameters().iterator();
+      char pName = 'a'; // let's hope for no more than 26 parameters...
+      while (parameters.hasNext()) {
+        Node param = parameters.next();
+        if (param.isVarArgs()) {
+          emit("...");
+        }
+        emitNoSpace("" + pName++);
+        if (param.isOptionalArg()) {
+          emit("?");
+        }
+        visitTypeDeclaration(param.getJSType());
+        if (param.isVarArgs()) {
+          emit("[]");
+        }
+        if (parameters.hasNext()) {
+          emit(", ");
+        }
+      }
+      emit(")");
+      visitTypeDeclaration(ftype.getReturnType());
+    }
   }
 }

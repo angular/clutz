@@ -2,7 +2,7 @@ declare namespace ಠ_ಠ.cl2dts_internal.multi_class {
   class A {
     a : number ;
   }
-  class B extends A implements I, I2 {
+  class B extends A implements I , I2 {
     b : number ;
     noop ( ) : void ;
   }
