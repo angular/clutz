@@ -139,6 +139,7 @@ public class DeclarationGenerator {
         // These goog.provide's have only one symbol, so users expect to use default import
       boolean isDefault = !symbol.getType().isObject() ||
           symbol.getType().isInterface() ||
+          symbol.getType().isEnumType() ||
           symbol.getType().isFunctionType();
       if (isDefault) {
         int lastDot = symbol.getName().lastIndexOf('.');
@@ -161,9 +162,8 @@ public class DeclarationGenerator {
     emitNoSpace(" {");
     indent();
     emitBreak();
-    if (symbol.getType().isEnumType() || symbol.getType().isFunctionType() ||
-        !symbol.getType().isObject()) {
-      new TreeWalker(symbol, namespace).walk(isDefault);
+    if (isDefault) {
+      new TreeWalker(symbol, namespace).walk(true);
     } else {
       // JSCompiler treats "foo.x" as one variable name, so collect all provides that start with
       // $provide + ".".
