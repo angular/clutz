@@ -29,3 +29,6 @@ types.Foo.prototype.set = function(t) { };
 
 /** @type {types.Foo<string>} */
 types.f = new Foo();
+
+/** @type {null|function(number, ?):?} handler */
+types.g = null;
