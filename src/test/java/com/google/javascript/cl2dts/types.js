@@ -32,3 +32,6 @@ types.f = new Foo();
 
 /** @type {null|function(number, ?):?} handler */
 types.g = null;
+
+/** @type {{a: string, b}} */
+types.h = {a: 'a', b: 34};

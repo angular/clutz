@@ -29,6 +29,7 @@ import com.google.javascript.rhino.jstype.NamedType;
 import com.google.javascript.rhino.jstype.NoType;
 import com.google.javascript.rhino.jstype.ObjectType;
 import com.google.javascript.rhino.jstype.ProxyObjectType;
+import com.google.javascript.rhino.jstype.RecordType;
 import com.google.javascript.rhino.jstype.TemplateType;
 import com.google.javascript.rhino.jstype.TemplatizedType;
 import com.google.javascript.rhino.jstype.UnionType;
@@ -131,7 +132,6 @@ public class DeclarationGenerator {
 
     out = new StringWriter();
     TypedScope topScope = compiler.getTopScope();
-    Iterable<TypedVar> allSymbols = topScope.getAllSymbols();
     for (String provide : provides) {
       TypedVar symbol = topScope.getOwnSlot(provide);
       checkArgument(symbol != null, "goog.provide not defined: %s", provide);
@@ -146,15 +146,15 @@ public class DeclarationGenerator {
         int lastDot = symbol.getName().lastIndexOf('.');
         namespace = lastDot >= 0 ? symbol.getName().substring(0, lastDot) : "";
       }
-      declareNamespace(namespace, provide, symbol, isDefault, allSymbols, compiler.getTypeRegistry());
+      declareNamespace(namespace, symbol, isDefault, compiler);
       declareModule(provide, isDefault);
     }
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
   }
 
-  private void declareNamespace(String namespace, String provide, TypedVar symbol,
-                                boolean isDefault, Iterable<TypedVar> allSymbols, JSTypeRegistry typeRegistry) {
+  private void declareNamespace(
+      String namespace, TypedVar symbol, boolean isDefault, Compiler compiler) {
     emitNoSpace("declare namespace ");
     emitNoSpace(INTERNAL_NAMESPACE);
     if (!namespace.isEmpty()) {
@@ -163,18 +163,26 @@ public class DeclarationGenerator {
     emitNoSpace(" {");
     indent();
     emitBreak();
+    TreeWalker treeWalker = new TreeWalker(namespace, compiler.getTypeRegistry());
     if (isDefault) {
-      new TreeWalker(symbol, namespace, typeRegistry).walk(true);
+      treeWalker.walk(symbol, true);
     } else {
       // JSCompiler treats "foo.x" as one variable name, so collect all provides that start with
-      // $provide + ".".
-      String prefix = provide + ".";
+      // $provide + "." but are not sub-properties.
+      Set<String> desiredSymbols = new HashSet<>();
+      Iterable<TypedVar> allSymbols = compiler.getTopScope().getAllSymbols();
+
+      ObjectType objType = (ObjectType) symbol.getType();
+      for (String property : objType.getPropertyNames()) {
+        desiredSymbols.add(symbol.getName() + "." + property);
+      }
+
       for (TypedVar other : allSymbols) {
         String otherName = other.getName();
-        if (otherName.startsWith(prefix) && other.getType() != null
+        if (desiredSymbols.contains(otherName) && other.getType() != null
             && !other.getType().isFunctionPrototypeType()
             && !isPrototypeMethod(other)) {
-          new TreeWalker(other, namespace, typeRegistry).walk(false);
+          treeWalker.walk(other, false);
         }
       }
     }
@@ -275,12 +283,10 @@ public class DeclarationGenerator {
   }
 
   private class TreeWalker {
-    private final TypedVar symbol;
     private final String namespace;
     private final JSTypeRegistry typeRegistry;
 
-    private TreeWalker(TypedVar symbol, String namespace, JSTypeRegistry typeRegistry) {
-      this.symbol = symbol;
+    private TreeWalker(String namespace, JSTypeRegistry typeRegistry) {
       this.namespace = namespace;
       this.typeRegistry = typeRegistry;
     }
@@ -290,7 +296,7 @@ public class DeclarationGenerator {
       return !name.startsWith(namespace) ? name : name.substring(namespace.length() + 1);
     }
 
-    private String getUnqualifiedName() {
+    private String getUnqualifiedName(TypedVar symbol) {
       String qualifiedName = symbol.getName();
       int dotIdx = qualifiedName.lastIndexOf('.');
       if (dotIdx == -1) {
@@ -299,7 +305,7 @@ public class DeclarationGenerator {
       return qualifiedName.substring(dotIdx + 1, qualifiedName.length());
     }
 
-    private void walk(boolean isDefault) {
+    private void walk(TypedVar symbol, boolean isDefault) {
       JSType type = symbol.getType();
       if (type.isFunctionType()) {
         FunctionType ftype = (FunctionType) type;
@@ -307,13 +313,13 @@ public class DeclarationGenerator {
           // Have to produce a named interface and export that.
           // https://github.com/Microsoft/TypeScript/issues/3194
           emit("interface");
-          emit(getUnqualifiedName());
+          emit(getUnqualifiedName(symbol));
           visitObjectType(ftype, ftype.getPrototype());
           return;
         }
         if (type.isOrdinaryFunction()) {
           emit("function");
-          emit(getUnqualifiedName());
+          emit(getUnqualifiedName(symbol));
           visitFunctionDeclaration(ftype);
           emit(";");
           emitBreak();
@@ -326,7 +332,7 @@ public class DeclarationGenerator {
         } else {
           checkState(false, "Unexpected function type " + type);
         }
-        emit(getUnqualifiedName());
+        emit(getUnqualifiedName(symbol));
 
         if (type.hasAnyTemplateTypes()) {
           emit("<");
@@ -380,12 +386,12 @@ public class DeclarationGenerator {
         if (type.isNoType()) {
           JSType registryType = typeRegistry.getType(symbol.getName());
           if (registryType != null) {
-            visitTypeAlias(registryType, getUnqualifiedName());
+            visitTypeAlias(registryType, getUnqualifiedName(symbol));
             return;
           }
         }
         emit("var");
-        emit(getUnqualifiedName());
+        emit(getUnqualifiedName(symbol));
         visitTypeDeclaration(type);
         emit(";");
         emitBreak();
@@ -457,7 +463,11 @@ public class DeclarationGenerator {
 
         @Override
         public Void caseObjectType(ObjectType type) {
-          emit("Object");
+          if (type.isRecordType()) {
+            visitRecordType((RecordType) type);
+          } else {
+            emit(type.getReferenceName());
+          }
           return null;
         }
 
@@ -552,6 +562,20 @@ public class DeclarationGenerator {
           return null;
         }
       });
+    }
+
+    private void visitRecordType(RecordType type) {
+      emit("{");
+      Iterator<String> it = type.getPropertyNames().iterator();
+      while (it.hasNext()) {
+        String propName = it.next();
+        emit(propName);
+        visitTypeDeclaration(type.getPropertyType(propName));
+        if (it.hasNext()) {
+          emit(",");
+        }
+      }
+      emit("}");
     }
 
     private void visitUnionType(UnionType ut) {
