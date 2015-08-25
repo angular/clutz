@@ -10,6 +10,7 @@ declare namespace ಠ_ಠ.cl2dts_internal.types {
   }
   var f : Foo < string > ;
   var g : (a : number , b : any ) => any ;
+  var h : { a : string , b : any } ;
 }
 declare module 'goog:types' {
   import alias = ಠ_ಠ.cl2dts_internal.types;
