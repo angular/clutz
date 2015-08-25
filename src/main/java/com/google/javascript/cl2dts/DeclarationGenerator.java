@@ -525,7 +525,8 @@ public class DeclarationGenerator {
 
         @Override
         public Void caseFunctionType(FunctionType type) {
-          throw new IllegalArgumentException("unsupported " + type);
+          visitFunctionType(type, "=>");
+          return null;
         }
 
         @Override
@@ -599,6 +600,10 @@ public class DeclarationGenerator {
     }
 
     private void visitFunctionDeclaration(FunctionType ftype) {
+      visitFunctionType(ftype, ":");
+    }
+
+    private void visitFunctionType(FunctionType ftype, String separator) {
       emit("(");
       Iterator<Node> parameters = ftype.getParameters().iterator();
       char pName = 'a'; // let's hope for no more than 26 parameters...
@@ -620,7 +625,11 @@ public class DeclarationGenerator {
         }
       }
       emit(")");
-      visitTypeDeclaration(ftype.getReturnType());
+      JSType type = ftype.getReturnType();
+      if (type != null) {
+        emit(separator);
+        visitType(type);
+      }
     }
   }
 }

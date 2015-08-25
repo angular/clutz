@@ -1,26 +1,26 @@
 goog.provide("fn_params");
 
 /**
- * @param {string} a
- * @param {number=} opt_b
+ * @param {string} x
+ * @param {number=} opt_y
  * @return {number}
  */
-fn_params.optional = function(a, opt_b) {
+fn_params.optional = function(x, opt_y) {
   return 1;
 };
 
 /**
- * @param {string} a
- * @param {?number=} opt_b
+ * @param {string} x
+ * @param {?number=} opt_y
  * @return {number}
  */
-fn_params.optionalNullable = function(a, opt_b) {
+fn_params.optionalNullable = function(x, opt_y) {
   return 1;
 };
 
 /**
- * @param {string} a
- * @param {...number} b
+ * @param {string} x
+ * @param {...number} y
  */
-fn_params.varargs = function(a, b) {
+fn_params.varargs = function(x, y) {
 };
