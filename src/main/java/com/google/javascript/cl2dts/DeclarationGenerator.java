@@ -93,6 +93,7 @@ public class DeclarationGenerator {
     Compiler compiler = new Compiler();
     compiler.disableThreads();
     final CompilerOptions options = new CompilerOptions();
+    options.setClosurePass(true);
     options.setCheckGlobalNamesLevel(CheckLevel.ERROR);
     options.setCheckGlobalThisLevel(CheckLevel.ERROR);
     options.setCheckTypes(true);
@@ -136,17 +137,15 @@ public class DeclarationGenerator {
     for (String provide : provides) {
       TypedVar symbol = topScope.getOwnSlot(provide);
       checkArgument(symbol != null, "goog.provide not defined: %s", provide);
+      checkArgument(symbol.getType() != null, "all symbols should have a type");
       String namespace = provide;
-      boolean isDefault = false;
-      if (symbol.getType() != null) {
         // These goog.provide's have only one symbol, so users expect to use default import
-        if (!symbol.getType().isObject() ||
-            symbol.getType().isInterface() ||
-            symbol.getType().isFunctionType()) {
-          int lastDot = symbol.getName().lastIndexOf('.');
-          namespace = lastDot >= 0 ? symbol.getName().substring(0, lastDot) : "";
-          isDefault = true;
-        }
+      boolean isDefault = !symbol.getType().isObject() ||
+          symbol.getType().isInterface() ||
+          symbol.getType().isFunctionType();
+      if (isDefault) {
+        int lastDot = symbol.getName().lastIndexOf('.');
+        namespace = lastDot >= 0 ? symbol.getName().substring(0, lastDot) : "";
       }
       emitNoSpace("declare namespace ");
       emitNoSpace(INTERNAL_NAMESPACE);
@@ -156,7 +155,8 @@ public class DeclarationGenerator {
       emitNoSpace(" {");
       indent();
       emitBreak();
-      if (symbol.getType() != null) {
+      if (symbol.getType().isEnumType() || symbol.getType().isFunctionType() ||
+          !symbol.getType().isObject()) {
         walkScope(symbol, namespace, isDefault);
       } else {
         // JSCompiler treats "foo.x" as one variable name, so collect all provides that start with
