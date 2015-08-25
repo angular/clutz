@@ -24,6 +24,7 @@ import com.google.javascript.rhino.jstype.EnumElementType;
 import com.google.javascript.rhino.jstype.EnumType;
 import com.google.javascript.rhino.jstype.FunctionType;
 import com.google.javascript.rhino.jstype.JSType;
+import com.google.javascript.rhino.jstype.JSTypeRegistry;
 import com.google.javascript.rhino.jstype.NamedType;
 import com.google.javascript.rhino.jstype.NoType;
 import com.google.javascript.rhino.jstype.ObjectType;
@@ -145,7 +146,7 @@ public class DeclarationGenerator {
         int lastDot = symbol.getName().lastIndexOf('.');
         namespace = lastDot >= 0 ? symbol.getName().substring(0, lastDot) : "";
       }
-      declareNamespace(namespace, provide, symbol, isDefault, allSymbols);
+      declareNamespace(namespace, provide, symbol, isDefault, allSymbols, compiler.getTypeRegistry());
       declareModule(provide, isDefault);
     }
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
@@ -153,7 +154,7 @@ public class DeclarationGenerator {
   }
 
   private void declareNamespace(String namespace, String provide, TypedVar symbol,
-      boolean isDefault, Iterable<TypedVar> allSymbols) {
+                                boolean isDefault, Iterable<TypedVar> allSymbols, JSTypeRegistry typeRegistry) {
     emitNoSpace("declare namespace ");
     emitNoSpace(INTERNAL_NAMESPACE);
     if (!namespace.isEmpty()) {
@@ -163,7 +164,7 @@ public class DeclarationGenerator {
     indent();
     emitBreak();
     if (isDefault) {
-      new TreeWalker(symbol, namespace).walk(true);
+      new TreeWalker(symbol, namespace, typeRegistry).walk(true);
     } else {
       // JSCompiler treats "foo.x" as one variable name, so collect all provides that start with
       // $provide + ".".
@@ -173,7 +174,7 @@ public class DeclarationGenerator {
         if (otherName.startsWith(prefix) && other.getType() != null
             && !other.getType().isFunctionPrototypeType()
             && !isPrototypeMethod(other)) {
-          new TreeWalker(other, namespace).walk(false);
+          new TreeWalker(other, namespace, typeRegistry).walk(false);
         }
       }
     }
@@ -276,10 +277,12 @@ public class DeclarationGenerator {
   private class TreeWalker {
     private final TypedVar symbol;
     private final String namespace;
+    private final JSTypeRegistry typeRegistry;
 
-    private TreeWalker(TypedVar symbol, String namespace) {
+    private TreeWalker(TypedVar symbol, String namespace, JSTypeRegistry typeRegistry) {
       this.symbol = symbol;
       this.namespace = namespace;
+      this.typeRegistry = typeRegistry;
     }
 
     private String getRelativeName(ObjectType objectType) {
@@ -371,6 +374,16 @@ public class DeclarationGenerator {
           visitEnumType((EnumType) type);
           return;
         }
+        // Closure keeps type None for the symbol which became the type alias.
+        // However, the aliased type is present in the registry under the same name.
+        // TODO(rado): figure out whether NoType guarantees a typedef.
+        if (type.isNoType()) {
+          JSType registryType = typeRegistry.getType(symbol.getName());
+          if (registryType != null) {
+            visitTypeAlias(registryType, getUnqualifiedName());
+            return;
+          }
+        }
         emit("var");
         emit(getUnqualifiedName());
         visitTypeDeclaration(type);
@@ -379,18 +392,22 @@ public class DeclarationGenerator {
       }
     }
 
+    private void visitTypeAlias(JSType registryType, String unqualifiedName) {
+      emit("type");
+      emit(unqualifiedName);
+      emit("=");
+      visitType(registryType);
+      emit(";");
+      emitBreak();
+    }
+
     private void visitEnumType(EnumType type) {
       // Enums are top level vars, but also declare a corresponding type:
       // /** @enum {ValueType} */ var MyEnum = {A: ..., B: ...};
       // type MyEnum = EnumValueType;
       // var MyEnum: {A: MyEnum, B: MyEnum, ...};
       // TODO(martinprobst): Special case number enums to map to plain TS enums?
-      emit("type");
-      emit(type.getDisplayName());
-      emit("=");
-      visitType(type.getElementsType().getPrimitiveType());
-      emit(";");
-      emitBreak();
+      visitTypeAlias(type.getElementsType().getPrimitiveType(), type.getDisplayName());
       emit("var");
       emit(type.getDisplayName());
       emit(": {");
