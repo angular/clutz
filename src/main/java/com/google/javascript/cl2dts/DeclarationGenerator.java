@@ -2,10 +2,15 @@ package com.google.javascript.cl2dts;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.Iterables.getOnlyElement;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.UnmodifiableIterator;
+import com.google.common.io.Files;
 import com.google.javascript.jscomp.BasicErrorManager;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CommandLineRunner;
@@ -42,9 +47,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -63,7 +71,7 @@ public class DeclarationGenerator {
     this.parseExterns = parseExterns;
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException {
     if (args.length == 0) {
       System.err.println("Usage: c2dts [FILES...]");
       System.exit(1);
@@ -78,16 +86,24 @@ public class DeclarationGenerator {
       sources.add(SourceFile.fromFile(f));
     }
     DeclarationGenerator generator = new DeclarationGenerator(true);
-    System.out.println(generator.generateDeclarations(sources));
+    for (Entry<CompilerInput, String> eachEntry : generator
+        .generateDeclarations(sources).entrySet()) {
+      File outputFile = new File(eachEntry.getKey().getSourceFile().getOriginalPath()
+          .replaceAll("\\.js$", ".d.ts"));
+      // TODO(alexeagle): don't write generated files in the source directory
+      // instead we should take an argument saying where to lay out the result files
+      Files.write(eachEntry.getValue(), outputFile, UTF_8);
+    }
   }
 
   String generateDeclarations(String sourceContents) {
     SourceFile sourceFile = SourceFile.fromCode("test.js", sourceContents);
     List<SourceFile> sourceFiles = Collections.singletonList(sourceFile);
-    return generateDeclarations(sourceFiles);
+    return getOnlyElement(generateDeclarations(sourceFiles).values());
   }
 
-  private String generateDeclarations(List<SourceFile> sourceFiles) throws AssertionError {
+  private Map<CompilerInput, String> generateDeclarations(List<SourceFile> sourceFiles)
+      throws AssertionError {
     Compiler compiler = new Compiler();
     compiler.disableThreads();
     final CompilerOptions options = new CompilerOptions();
@@ -123,34 +139,37 @@ public class DeclarationGenerator {
     return produceDts(compiler);
   }
 
-  public String produceDts(Compiler compiler) {
-    Set<String> provides = new HashSet<>();
+  public Map<CompilerInput, String> produceDts(Compiler compiler) {
+    Map<CompilerInput, String> result = new HashMap<>();
+    TypedScope topScope = compiler.getTopScope();
+
     // TODO: only inspect inputs which were explicitly provided by the user
     for (CompilerInput compilerInput : compiler.getInputsById().values()) {
-      provides.addAll(compilerInput.getProvides());
-    }
-
-    out = new StringWriter();
-    TypedScope topScope = compiler.getTopScope();
-    for (String provide : provides) {
-      TypedVar symbol = topScope.getOwnSlot(provide);
-      checkArgument(symbol != null, "goog.provide not defined: %s", provide);
-      checkArgument(symbol.getType() != null, "all symbols should have a type");
-      String namespace = provide;
-        // These goog.provide's have only one symbol, so users expect to use default import
-      boolean isDefault = !symbol.getType().isObject() ||
-          symbol.getType().isInterface() ||
-          symbol.getType().isEnumType() ||
-          symbol.getType().isFunctionType();
-      if (isDefault) {
-        int lastDot = symbol.getName().lastIndexOf('.');
-        namespace = lastDot >= 0 ? symbol.getName().substring(0, lastDot) : "";
+      if (compilerInput.getProvides().isEmpty()) {
+        continue;
       }
-      declareNamespace(namespace, symbol, isDefault, compiler);
-      declareModule(provide, isDefault);
+      out = new StringWriter();
+      for (String provide : compilerInput.getProvides()) {
+        TypedVar symbol = topScope.getOwnSlot(provide);
+        checkArgument(symbol != null, "goog.provide not defined: %s", provide);
+        checkArgument(symbol.getType() != null, "all symbols should have a type");
+        String namespace = provide;
+        // These goog.provide's have only one symbol, so users expect to use default import
+        boolean isDefault = !symbol.getType().isObject() ||
+            symbol.getType().isInterface() ||
+            symbol.getType().isEnumType() ||
+            symbol.getType().isFunctionType();
+        if (isDefault) {
+          int lastDot = symbol.getName().lastIndexOf('.');
+          namespace = lastDot >= 0 ? symbol.getName().substring(0, lastDot) : "";
+        }
+        checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
+        declareNamespace(namespace, symbol, isDefault, compiler);
+        declareModule(provide, isDefault);
+      }
+      result.put(compilerInput, out.toString());
     }
-    checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
-    return out.toString();
+    return result;
   }
 
   private void declareNamespace(
@@ -292,8 +311,21 @@ public class DeclarationGenerator {
     }
 
     private String getRelativeName(ObjectType objectType) {
+      if (objectType.isNativeObjectType()) {
+        return objectType.getDisplayName();
+      }
       String name = objectType.getDisplayName();
-      return !name.startsWith(namespace) ? name : name.substring(namespace.length() + 1);
+      //FIXME(alexeagle): add test coverage, why do we need this?
+      if (name == null) {
+        return "";
+      }
+      //FIXME(alexeagle): add test coverage, why do we need this?
+      if (name.equals(namespace)) {
+        return name;
+      }
+      return !name.startsWith(namespace)
+          ? INTERNAL_NAMESPACE + '.' + name
+          : name.substring(namespace.length() + 1);
     }
 
     private String getUnqualifiedName(TypedVar symbol) {
@@ -442,7 +474,7 @@ public class DeclarationGenerator {
       // See also JsdocToEs6TypedConverter in the Closure code base. This code is implementing the
       // same algorithm starting from JSType nodes (as opposed to JSDocInfo), and directly
       // generating textual output. Otherwise both algorithms should produce the same output.
-      type.visit(new Visitor<Void>() {
+      class V implements Visitor<Void> {
         @Override
         public Void caseBooleanType() {
           emit("boolean");
@@ -463,10 +495,12 @@ public class DeclarationGenerator {
 
         @Override
         public Void caseObjectType(ObjectType type) {
-          if (type.isRecordType()) {
+          if (type.isNativeObjectType()) {
+            emit(type.getReferenceName());
+          } else if (type.isRecordType()) {
             visitRecordType((RecordType) type);
           } else {
-            emit(type.getReferenceName());
+            emit(getRelativeName(type));
           }
           return null;
         }
@@ -495,8 +529,12 @@ public class DeclarationGenerator {
           }
           emit(templateTypeName);
           emit("<");
-          for (JSType tmplType : type.getTemplateTypes()) {
-            visitType(tmplType);
+          UnmodifiableIterator<JSType> it = type.getTemplateTypes().iterator();
+          while (it.hasNext()) {
+            visitType(it.next());
+            if (it.hasNext()) {
+              emit(",");
+            }
           }
           emit(">");
           return null;
@@ -561,7 +599,12 @@ public class DeclarationGenerator {
           type.visitReferenceType(this);
           return null;
         }
-      });
+      }
+      try {
+        type.visit(new V());
+      } catch (Exception e) {
+        throw new RuntimeException("In " + namespace + ": failed to emit type " + type, e);
+      }
     }
 
     private void visitRecordType(RecordType type) {

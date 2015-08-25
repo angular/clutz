@@ -55,8 +55,12 @@ public class DeclarationGeneratorTests {
   }
 
   static List<File> getTestInputFiles(FilenameFilter filter) {
+    return getTestInputFiles(filter, DeclarationGeneratorTests.class.getPackage());
+  }
+
+  public static List<File> getTestInputFiles(FilenameFilter filter, Package aPackage) {
     Path testDir = FileSystems.getDefault().getPath("src", "test", "java");
-    String packageName = DeclarationGeneratorTests.class.getPackage().getName();
+    String packageName = aPackage.getName();
     Path testPackage = testDir.resolve(packageName.replace('.', File.separatorChar));
 
     File[] testFiles = testPackage.toFile().listFiles(filter);
