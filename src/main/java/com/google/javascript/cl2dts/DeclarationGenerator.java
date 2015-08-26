@@ -413,9 +413,9 @@ public class DeclarationGenerator {
       // type MyEnum = EnumValueType;
       // var MyEnum: {A: MyEnum, B: MyEnum, ...};
       // TODO(martinprobst): Special case number enums to map to plain TS enums?
-      visitTypeAlias(type.getElementsType().getPrimitiveType(), type.getDisplayName());
+      visitTypeAlias(type.getElementsType().getPrimitiveType(), getRelativeName(type));
       emit("var");
-      emit(type.getDisplayName());
+      emit(getRelativeName(type));
       emit(": {");
       emitBreak();
       indent();
@@ -546,7 +546,7 @@ public class DeclarationGenerator {
 
         @Override
         public Void caseEnumElementType(EnumElementType type) {
-          emit(type.getReferenceName());
+          emit(getRelativeName(type));
           return null;
         }
 

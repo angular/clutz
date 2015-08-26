@@ -1,7 +1,7 @@
-goog.provide('SomeEnum');
+goog.provide('some.SomeEnum');
 
 /** @enum {number} */
-SomeEnum = {
+some.SomeEnum = {
   A: 1,
   B: 2
 };
