@@ -1,5 +1,6 @@
 declare namespace ಠ_ಠ.cl2dts_internal.multi_class {
   class A {
+    constructor (a : number ) ;
     a : number ;
   }
   class B extends A implements I , I2 {

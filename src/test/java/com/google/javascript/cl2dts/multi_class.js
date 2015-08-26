@@ -1,9 +1,12 @@
 goog.provide('multi_class');
 
-/** @constructor */
-multi_class.A = function() {
+/**
+ * @constructor
+ * @param {number} n
+ */
+multi_class.A = function(n) {
   /** @type {number} */
-  this.a;
+  this.a = n;
 };
 
 /**
@@ -33,6 +36,7 @@ multi_class.I2 = function() {};
  * @extends {multi_class.B}
  */
 multi_class.C = function() {};
+goog.inherits(multi_class.C, multi_class.B);
 
 /**
  * @constructor

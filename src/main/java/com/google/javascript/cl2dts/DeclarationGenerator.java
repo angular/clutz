@@ -556,7 +556,12 @@ public class DeclarationGenerator {
 
         @Override
         public Void caseFunctionType(FunctionType type) {
-          visitFunctionType(type, "=>");
+          visitFunctionParameters(type);
+          JSType returnType = type.getReturnType();
+          if (returnType != null) {
+            emit("=>");
+            visitType(returnType);
+          }
           return null;
         }
 
@@ -610,6 +615,13 @@ public class DeclarationGenerator {
       emit("{");
       indent();
       emitBreak();
+      // Constructors.
+      if (type.isConstructor() && ((FunctionType)type).getParameters().iterator().hasNext()) {
+        emit("constructor");
+        visitFunctionParameters((FunctionType) type);
+        emit(";");
+        emitBreak();
+      }
       // Fields.
       JSType instanceType = type.getTypeOfThis();
       checkArgument(instanceType.isObject(), "expected an ObjectType for this, but got "
@@ -626,7 +638,9 @@ public class DeclarationGenerator {
 
     private void visitProperties(ObjectType objType, boolean isStatic) {
       for (String propName : objType.getOwnPropertyNames()) {
-        if ("prototype".equals(propName)) {
+        if ("prototype".equals(propName) || "superClass_".equals(propName)
+            // constructors are handled in #visitObjectType
+            || "constructor".equals(propName)) {
           continue;
         }
         if (isStatic) {
@@ -645,10 +659,15 @@ public class DeclarationGenerator {
     }
 
     private void visitFunctionDeclaration(FunctionType ftype) {
-      visitFunctionType(ftype, ":");
+      visitFunctionParameters(ftype);
+      JSType type = ftype.getReturnType();
+      if (type != null) {
+        emit(":");
+        visitType(type);
+      }
     }
 
-    private void visitFunctionType(FunctionType ftype, String separator) {
+    private void visitFunctionParameters(FunctionType ftype) {
       visitTemplateTypes(ftype);
       emit("(");
       Iterator<Node> parameters = ftype.getParameters().iterator();
@@ -671,11 +690,6 @@ public class DeclarationGenerator {
         }
       }
       emit(")");
-      JSType type = ftype.getReturnType();
-      if (type != null) {
-        emit(separator);
-        visitType(type);
-      }
     }
   }
 }
