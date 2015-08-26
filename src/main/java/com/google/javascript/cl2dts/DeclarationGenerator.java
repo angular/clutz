@@ -354,9 +354,9 @@ public class DeclarationGenerator {
           emit(getRelativeName(getSuperType(ftype)));
         }
 
-        if (ftype.hasImplementedInterfaces()) {
+        Iterator<ObjectType> it = ftype.getOwnImplementedInterfaces().iterator();
+        if (it.hasNext()) {
           emit("implements");
-          Iterator<ObjectType> it = ftype.getOwnImplementedInterfaces().iterator();
           while (it.hasNext()) {
             emit(getRelativeName(it.next()));
             if (it.hasNext()) {

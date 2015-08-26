@@ -27,3 +27,9 @@ multi_class.I = function() {};
  * @extends {multi_class.I}
  */
 multi_class.I2 = function() {};
+
+/**
+ * @constructor
+ * @extends {multi_class.B}
+ */
+multi_class.C = function() {};
