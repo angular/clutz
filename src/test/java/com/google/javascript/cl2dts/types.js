@@ -27,6 +27,14 @@ types.Foo.prototype.get = function() { return null; };
 /** @param {T} t */
 types.Foo.prototype.set = function(t) { };
 
+/**
+ * @param {T} t
+ * @param {V} v
+ * @template V
+ * @template W
+ */
+types.Foo.prototype.loop = function(t, v) { return v(t); };
+
 /** @type {types.Foo<string>} */
 types.f = new Foo();
 
@@ -35,3 +43,10 @@ types.g = null;
 
 /** @type {{a: string, b}} */
 types.h = {a: 'a', b: 34};
+
+/**
+ * @param {T} a
+ * @return {T}
+ * @template T
+ */
+types.identity = function(a) { return a; };
