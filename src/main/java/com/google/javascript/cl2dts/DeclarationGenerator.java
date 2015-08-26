@@ -334,17 +334,7 @@ public class DeclarationGenerator {
         }
         emit(getUnqualifiedName(symbol));
 
-        if (type.hasAnyTemplateTypes()) {
-          emit("<");
-          Iterator<TemplateType> it = ftype.getTemplateTypeMap().getTemplateKeys().iterator();
-          while (it.hasNext()) {
-            emit(it.next().getDisplayName());
-            if (it.hasNext()) {
-              emit(",");
-            }
-          }
-          emit(">");
-        }
+        visitTemplateTypes(ftype);
 
         // Interface extends another interface
         if (ftype.getExtendedInterfacesCount() > 0) {
@@ -395,6 +385,20 @@ public class DeclarationGenerator {
         visitTypeDeclaration(type);
         emit(";");
         emitBreak();
+      }
+    }
+
+    private void visitTemplateTypes(FunctionType ftype) {
+      if (ftype.hasAnyTemplateTypes() && !ftype.getTemplateTypeMap().isEmpty()) {
+        emit("<");
+        Iterator<TemplateType> it = ftype.getTemplateTypeMap().getTemplateKeys().iterator();
+        while (it.hasNext()) {
+          emit(it.next().getDisplayName());
+          if (it.hasNext()) {
+            emit(",");
+          }
+        }
+        emit(">");
       }
     }
 
@@ -645,6 +649,7 @@ public class DeclarationGenerator {
     }
 
     private void visitFunctionType(FunctionType ftype, String separator) {
+      visitTemplateTypes(ftype);
       emit("(");
       Iterator<Node> parameters = ftype.getParameters().iterator();
       char pName = 'a'; // let's hope for no more than 26 parameters...
