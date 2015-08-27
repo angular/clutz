@@ -3,9 +3,11 @@ package com.google.javascript.cl2dts;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.javascript.jscomp.BasicErrorManager;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CommandLineRunner;
@@ -55,6 +57,10 @@ public class DeclarationGenerator {
 
   private static final Logger logger = Logger.getLogger(DeclarationGenerator.class.getName());
   private static final String INTERNAL_NAMESPACE = "ಠ_ಠ.cl2dts_internal";
+  private static final Function<Node, String> NODE_GET_STRING = new Function<Node, String>() {
+    @Override public String apply(Node input) {
+      return input.getString();
+    }};
 
   private StringWriter out = new StringWriter();
   private final boolean parseExterns;
@@ -671,13 +677,24 @@ public class DeclarationGenerator {
       visitTemplateTypes(ftype);
       emit("(");
       Iterator<Node> parameters = ftype.getParameters().iterator();
+      Iterator<String> names = null;
+      Node functionSource = ftype.getSource();
+      if (functionSource != null) {
+        // functionSource AST:  FUNCTION -> (NAME, PARAM_LIST, BLOCK ...)
+        Iterable<Node> parameterNodes = functionSource.getFirstChild().getNext().children();
+        names = Iterables.transform(parameterNodes, NODE_GET_STRING).iterator();
+      }
       char pName = 'a'; // let's hope for no more than 26 parameters...
       while (parameters.hasNext()) {
         Node param = parameters.next();
         if (param.isVarArgs()) {
           emit("...");
         }
-        emitNoSpace("" + pName++);
+        if (names != null && names.hasNext()) {
+          emitNoSpace(names.next());
+        } else {
+          emitNoSpace("" + pName++);
+        }
         if (param.isOptionalArg()) {
           emit("?");
         }
