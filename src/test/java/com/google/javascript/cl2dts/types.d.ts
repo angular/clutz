@@ -6,8 +6,8 @@ declare namespace ಠ_ಠ.cl2dts_internal.types {
   var e : any [] ;
   class Foo < T > {
     get ( ) : T ;
-    loop < V , W > (a : T , b : V ) : any ;
-    set (a : T ) : void ;
+    loop < V , W > (t : T , v : V ) : any ;
+    set (t : T ) : void ;
   }
   var f : Foo < string > ;
   var g : (a : number , b : any ) => any ;
