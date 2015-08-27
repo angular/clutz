@@ -5,9 +5,12 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import static com.google.common.base.Predicates.not;
+import static com.google.common.base.Predicates.equalTo;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.any;
 import com.google.javascript.jscomp.BasicErrorManager;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CommandLineRunner;
@@ -315,14 +318,7 @@ public class DeclarationGenerator {
       JSType type = symbol.getType();
       if (type.isFunctionType()) {
         FunctionType ftype = (FunctionType) type;
-        if (isDefault && ftype.isInterface()) {
-          // Have to produce a named interface and export that.
-          // https://github.com/Microsoft/TypeScript/issues/3194
-          emit("interface");
-          emit(getUnqualifiedName(symbol));
-          visitObjectType(ftype, ftype.getPrototype());
-          return;
-        }
+
         if (type.isOrdinaryFunction()) {
           emit("function");
           emit(getUnqualifiedName(symbol));
@@ -370,7 +366,19 @@ public class DeclarationGenerator {
           }
         }
 
-        visitObjectType(ftype, ftype.getPrototype());
+        if (ftype.isInterface()) {
+          visitObjectType(ftype, ftype.getPrototype(), false);
+
+          if (any(ftype.getOwnPropertyNames(), not(equalTo("prototype")))) {
+            emit("var");
+            emit(getUnqualifiedName(symbol));
+            emit(":");
+            visitRecordLikeType(ftype);
+            emitBreak();
+          }
+        } else {
+          visitObjectType(ftype, ftype.getPrototype());
+        }
       } else {
         if (type.isEnumType()) {
           visitEnumType((EnumType) type);
@@ -579,6 +587,26 @@ public class DeclarationGenerator {
       });
     }
 
+    // This method is used for objects like the static props on an interface, that
+    // behave like an object with bunch of props, but are not technically defined as
+    // record types.
+    private void visitRecordLikeType(ObjectType type) {
+      emit("{");
+      Iterable allProps = type.getOwnPropertyNames();
+      // The prototype key is implicitly defined in the Object signature in TS.
+      Iterator<String> it = Iterables.filter(allProps, not(equalTo("prototype"))).iterator();
+      while (it.hasNext()) {
+        String propName = it.next();
+        emit(propName);
+        visitTypeDeclaration(type.getPropertyType(propName));
+        if (it.hasNext()) {
+          emit(",");
+        }
+      }
+      emit("}");
+    }
+
+
     private void visitRecordType(RecordType type) {
       emit("{");
       Iterator<String> it = type.getOwnPropertyNames().iterator();
@@ -618,6 +646,10 @@ public class DeclarationGenerator {
     }
 
     private void visitObjectType(ObjectType type, ObjectType prototype) {
+      visitObjectType(type, prototype, true);
+    }
+
+    private void visitObjectType(ObjectType type, ObjectType prototype, Boolean processStatics) {
       emit("{");
       indent();
       emitBreak();
@@ -636,7 +668,9 @@ public class DeclarationGenerator {
       // Methods.
       visitProperties(prototype, false);
       // Statics.
-      visitProperties(type, true);
+      if (processStatics) {
+        visitProperties(type, true);
+      }
       unindent();
       emit("}");
       emitBreak();
