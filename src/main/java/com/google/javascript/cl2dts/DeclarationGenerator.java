@@ -575,7 +575,7 @@ public class DeclarationGenerator {
 
     private void visitRecordType(RecordType type) {
       emit("{");
-      Iterator<String> it = type.getPropertyNames().iterator();
+      Iterator<String> it = type.getOwnPropertyNames().iterator();
       while (it.hasNext()) {
         String propName = it.next();
         emit(propName);

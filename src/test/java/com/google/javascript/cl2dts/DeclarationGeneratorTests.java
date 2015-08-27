@@ -45,7 +45,7 @@ public class DeclarationGeneratorTests {
       File golden = getGoldenFile(input);
       final String inputText = getTestFileText(input);
       final String goldenText = getTestFileText(golden);
-      suite.addTest(new DeclarationTest(input.getName(), goldenText, inputText));
+      suite.addTest(new DeclarationTest(input.getName(), goldenText, inputText, input.getName().contains("_externs")));
     }
     return suite;
   }
@@ -73,18 +73,20 @@ public class DeclarationGeneratorTests {
     private final String testName;
     private final String goldenText;
     private final String inputText;
+    private final boolean withExterns;
 
-    private DeclarationTest(String testName, String goldenText, String inputText) {
+    private DeclarationTest(String testName, String goldenText, String inputText, boolean withExterns) {
       this.testName = testName;
       this.goldenText = goldenText;
       this.inputText = inputText;
+      this.withExterns = withExterns;
     }
 
     @Override
     public void run(TestResult result) {
       result.startTest(this);
       try {
-        assertThatProgram(inputText).generatesDeclarations(goldenText);
+        assertThatProgram(inputText).generatesDeclarations(withExterns, goldenText);
       } catch (Throwable t) {
         result.addError(this, t);
       } finally {

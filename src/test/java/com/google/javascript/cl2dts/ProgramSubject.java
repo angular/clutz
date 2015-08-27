@@ -32,8 +32,8 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
     super(failureStrategy, subject);
   }
 
-  public void generatesDeclarations(String... lines) {
-    DeclarationGenerator dct = new DeclarationGenerator(false);
+  public void generatesDeclarations(Boolean withExterns, String... lines) {
+    DeclarationGenerator dct = new DeclarationGenerator(withExterns);
     String actual = dct.generateDeclarations(getSubject().code);
     String expected = LINE_JOINER.join(lines);
     if (!actual.equals(expected)) {
