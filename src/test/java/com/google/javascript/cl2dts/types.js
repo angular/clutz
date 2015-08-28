@@ -33,20 +33,29 @@ types.Foo.prototype.set = function(t) { };
  * @template V
  * @template W
  */
-types.Foo.prototype.loop = function(t, v) { return v(t); };
+types.Foo.prototype.genericMethod = function(t, v) { return v(t); };
 
 /** @type {types.Foo<string>} */
 types.f = new Foo();
 
 /** @type {null|function(number, ?):?} handler */
-types.g = null;
+types.functionAndUnion = null;
 
 /** @type {{a: string, b}} */
-types.h = {a: 'a', b: 34};
+types.recordType = {a: 'a', b: 34};
 
 /**
  * @param {T} a
  * @return {T}
  * @template T
  */
-types.identity = function(a) { return a; };
+types.genericFunction = function(a) { return a; };
+
+/** @type {Object<number, string>} */
+types.j = {a: 'a'};
+
+/**
+ * @param {Object<K,V>} obj
+ * @template K,V
+ */
+types.objectWithGenericKeyType = function(obj) { };

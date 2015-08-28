@@ -5,14 +5,16 @@ declare namespace ಠ_ಠ.cl2dts_internal.types {
   var d : Object ;
   var e : any [] ;
   class Foo < T > {
+    genericMethod < V , W > (t : T , v : V ) : any ;
     get ( ) : T ;
-    loop < V , W > (t : T , v : V ) : any ;
     set (t : T ) : void ;
   }
   var f : Foo < string > ;
-  var g : (a : number , b : any ) => any ;
-  var h : { a : string , b : any } ;
-  function identity < T > (a : T ) : T ;
+  var functionAndUnion : (a : number , b : any ) => any ;
+  var recordType : { a : string , b : any } ;
+  function genericFunction < T > (a : T ) : T ;
+  var j : { [ n: number ]: string } ;
+  function objectWithGenericKeyType < K , V > (obj : { [ /* warning: coerced from K */ s: string ]: V } ) : void ;
 }
 declare module 'goog:types' {
   import alias = ಠ_ಠ.cl2dts_internal.types;

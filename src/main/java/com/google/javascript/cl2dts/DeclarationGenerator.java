@@ -2,15 +2,17 @@ package com.google.javascript.cl2dts;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Predicates.equalTo;
+import static com.google.common.base.Predicates.not;
+import static com.google.common.collect.Iterables.any;
+import static com.google.javascript.rhino.jstype.JSTypeNative.ARRAY_TYPE;
+import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import static com.google.common.base.Predicates.not;
-import static com.google.common.base.Predicates.equalTo;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import static com.google.common.collect.Iterables.any;
 import com.google.javascript.jscomp.BasicErrorManager;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CommandLineRunner;
@@ -29,6 +31,7 @@ import com.google.javascript.rhino.jstype.EnumElementType;
 import com.google.javascript.rhino.jstype.EnumType;
 import com.google.javascript.rhino.jstype.FunctionType;
 import com.google.javascript.rhino.jstype.JSType;
+import com.google.javascript.rhino.jstype.JSTypeNative;
 import com.google.javascript.rhino.jstype.JSTypeRegistry;
 import com.google.javascript.rhino.jstype.NamedType;
 import com.google.javascript.rhino.jstype.NoType;
@@ -507,16 +510,38 @@ public class DeclarationGenerator {
         public Void caseTemplatizedType(TemplatizedType type) {
           ObjectType referencedType = type.getReferencedType();
           String templateTypeName = getRelativeName(referencedType);
-          if ("Array".equals(referencedType.getReferenceName())
+          if (typeRegistry.getNativeType(ARRAY_TYPE).equals(referencedType)
               && type.getTemplateTypes().size() == 1) {
             visitType(type.getTemplateTypes().get(0));
             emit("[]");
             return null;
           }
+          Iterator<JSType> it = type.getTemplateTypes().iterator();
+          if (typeRegistry.getNativeType(OBJECT_TYPE).equals(referencedType)) {
+            emit("{ [");
+            // TS allows only number or string as index type of an object
+            // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.9.4
+            JSType keyType = it.next();
+            if (keyType.isNumberValueType()) {
+              emit("n: number");
+            } else {
+              if (!keyType.isStringValueType()) {
+                emit("/* warning: coerced from " + keyType + " */");
+              }
+              emit("s: string");
+            }
+            emit("]:");
+            visitType(it.next());
+            emit("}");
+            return null;
+          }
           emit(templateTypeName);
           emit("<");
-          for (JSType tmplType : type.getTemplateTypes()) {
-            visitType(tmplType);
+          while (it.hasNext()) {
+            visitType(it.next());
+            if (it.hasNext()) {
+              emit(",");
+            }
           }
           emit(">");
           return null;
