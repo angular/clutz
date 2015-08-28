@@ -175,7 +175,7 @@ public class DeclarationGenerator {
     emitNoSpace(" {");
     indent();
     emitBreak();
-    TreeWalker treeWalker = new TreeWalker(namespace, compiler.getTypeRegistry());
+    TreeWalker treeWalker = new TreeWalker(namespace, compiler.getTypeRegistry(), provides);
     if (isDefault) {
       treeWalker.walk(symbol, true);
     } else {
@@ -299,10 +299,12 @@ public class DeclarationGenerator {
   private class TreeWalker {
     private final String namespace;
     private final JSTypeRegistry typeRegistry;
+    private final Set<String> provides;
 
-    private TreeWalker(String namespace, JSTypeRegistry typeRegistry) {
+    private TreeWalker(String namespace, JSTypeRegistry typeRegistry, Set<String> provides) {
       this.namespace = namespace;
       this.typeRegistry = typeRegistry;
+      this.provides = provides;
     }
 
     private String getRelativeName(ObjectType objectType) {
@@ -708,6 +710,10 @@ public class DeclarationGenerator {
         if ("prototype".equals(propName) || "superClass_".equals(propName)
             // constructors are handled in #visitObjectType
             || "constructor".equals(propName)) {
+          continue;
+        }
+        // Some symbols might be emitted as provides, so don't duplicate them
+        if (provides.contains(objType.getDisplayName() + "." + propName)) {
           continue;
         }
         if (isStatic) {
