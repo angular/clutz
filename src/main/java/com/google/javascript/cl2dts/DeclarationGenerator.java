@@ -152,15 +152,15 @@ public class DeclarationGenerator {
         int lastDot = symbol.getName().lastIndexOf('.');
         namespace = lastDot >= 0 ? symbol.getName().substring(0, lastDot) : "";
       }
-      declareNamespace(namespace, symbol, isDefault, compiler);
+      declareNamespace(namespace, symbol, isDefault, compiler, provides);
       declareModule(provide, isDefault);
     }
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
   }
 
-  private void declareNamespace(
-      String namespace, TypedVar symbol, boolean isDefault, Compiler compiler) {
+  private void declareNamespace(String namespace, TypedVar symbol, boolean isDefault,
+      Compiler compiler, Set<String> provides) {
     emitNoSpace("declare namespace ");
     emitNoSpace(INTERNAL_NAMESPACE);
     if (!namespace.isEmpty()) {
@@ -182,6 +182,8 @@ public class DeclarationGenerator {
       for (String property : objType.getPropertyNames()) {
         desiredSymbols.add(symbol.getName() + "." + property);
       }
+      // These will be emitted in their own default-exported namespace
+      desiredSymbols.removeAll(provides);
 
       for (TypedVar other : allSymbols) {
         String otherName = other.getName();
