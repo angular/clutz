@@ -5,7 +5,7 @@ declare namespace ಠ_ಠ.cl2dts_internal.types {
   var d : Object ;
   var e : any [] ;
   class Foo < T > {
-    genericMethod < V , W > (t : T , v : V ) : any ;
+    genericMethod < V , W > (t : T , v ? : V ) : any ;
     get ( ) : T ;
     set (t : T ) : void ;
   }

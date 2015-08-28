@@ -654,7 +654,7 @@ public class DeclarationGenerator {
         public boolean apply(JSType input) {
           // Skip - TypeScript does not have explicit null or optional types.
           // Optional types must be handled at the declaration name (`foo?` syntax).
-          return !input.isNullable() && !input.isVoidType();
+          return !input.isNullType() && !input.isVoidType();
         }
       });
       if (alts.size() == 1) {

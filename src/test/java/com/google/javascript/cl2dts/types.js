@@ -29,7 +29,7 @@ types.Foo.prototype.set = function(t) { };
 
 /**
  * @param {T} t
- * @param {V} v
+ * @param {V=} v
  * @template V
  * @template W
  */
