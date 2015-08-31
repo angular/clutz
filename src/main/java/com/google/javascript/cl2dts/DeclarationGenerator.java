@@ -513,8 +513,10 @@ public class DeclarationGenerator {
             visitRecordType((RecordType) type);
           } else if (type.isDict()) {
             emit("{[key: string]: any}");
-          } else {
+          } else if (type.getReferenceName() != null) {
             emit(getRelativeName(type));
+          } else {
+            emit("Object");
           }
           return null;
         }

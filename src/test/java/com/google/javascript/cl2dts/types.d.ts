@@ -10,6 +10,8 @@ declare namespace ಠ_ಠ.cl2dts_internal.types {
   function genericFunction < T > (a : T ) : T ;
   var j : { [ n: number ]: string } ;
   function objectWithGenericKeyType < K , V > (obj : { [ /* warning: coerced from K */ s: string ]: V } ) : void ;
+  var inferredobj : Object ;
+  var inferrednum : number ;
 }
 declare module 'goog:types' {
   import alias = ಠ_ಠ.cl2dts_internal.types;

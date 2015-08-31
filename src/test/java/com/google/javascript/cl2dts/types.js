@@ -39,3 +39,15 @@ types.j = {a: 'a'};
  * @template K,V
  */
 types.objectWithGenericKeyType = function(obj) { };
+
+//!! marked @const to appear in `compiler.getTopScope().getAllSymbols()`
+/**
+ * @const
+ */
+types.inferredobj = {};
+
+//!! marked @const to appear in `compiler.getTopScope().getAllSymbols()`
+/**
+ * @const
+ */
+types.inferrednum = 1;
