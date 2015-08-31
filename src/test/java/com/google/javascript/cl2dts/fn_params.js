@@ -25,3 +25,8 @@ fn_params.optionalNullable = function(x, opt_y) {
  */
 fn_params.varargs = function(x, y) {
 };
+
+/**
+ * @param {...Function} var_args A list of functions.
+ */
+fn_params.varargs_fns = function(var_args) {};

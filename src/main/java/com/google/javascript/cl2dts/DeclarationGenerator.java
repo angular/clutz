@@ -402,7 +402,7 @@ public class DeclarationGenerator {
         }
         emit("var");
         emit(getUnqualifiedName(symbol));
-        visitTypeDeclaration(type);
+        visitTypeDeclaration(type, false);
         emit(";");
         emitBreak();
       }
@@ -455,10 +455,17 @@ public class DeclarationGenerator {
       emitBreak();
     }
 
-    private void visitTypeDeclaration(JSType type) {
+    private void visitTypeDeclaration(JSType type, boolean isVarArgs) {
       if (type != null) {
         emit(":");
-        visitType(type);
+        if (isVarArgs && !type.isAllType() && !type.isUnknownType()) {
+          emit("(");
+          visitType(type);
+          emit(")");
+        } else {
+          visitType(type);
+        }
+        if (isVarArgs) emit("[]");
       }
     }
 
@@ -626,7 +633,7 @@ public class DeclarationGenerator {
       while (it.hasNext()) {
         String propName = it.next();
         emit(propName);
-        visitTypeDeclaration(type.getPropertyType(propName));
+        visitTypeDeclaration(type.getPropertyType(propName), false);
         if (it.hasNext()) {
           emit(",");
         }
@@ -641,7 +648,7 @@ public class DeclarationGenerator {
       while (it.hasNext()) {
         String propName = it.next();
         emit(propName);
-        visitTypeDeclaration(type.getPropertyType(propName));
+        visitTypeDeclaration(type.getPropertyType(propName), false);
         if (it.hasNext()) {
           emit(",");
         }
@@ -729,7 +736,7 @@ public class DeclarationGenerator {
         if (propertyType.isFunctionType()) {
           visitFunctionDeclaration((FunctionType) propertyType);
         } else {
-          visitTypeDeclaration(propertyType);
+          visitTypeDeclaration(propertyType, false);
         }
         emit(";");
         emitBreak();
@@ -770,10 +777,7 @@ public class DeclarationGenerator {
         if (param.isOptionalArg()) {
           emit("?");
         }
-        visitTypeDeclaration(param.getJSType());
-        if (param.isVarArgs()) {
-          emit("[]");
-        }
+        visitTypeDeclaration(param.getJSType(), param.isVarArgs());
         if (parameters.hasNext()) {
           emit(", ");
         }
