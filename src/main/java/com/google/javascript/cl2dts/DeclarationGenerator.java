@@ -9,6 +9,7 @@ import static com.google.javascript.rhino.jstype.JSTypeNative.ARRAY_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
@@ -196,7 +197,11 @@ public class DeclarationGenerator {
         if (desiredSymbols.contains(otherName) && other.getType() != null
             && !other.getType().isFunctionPrototypeType()
             && !isPrototypeMethod(other)) {
-          treeWalker.walk(other, false);
+          try {
+            treeWalker.walk(other, false);
+          } catch (RuntimeException e) {
+            throw new RuntimeException("Failed to emit for " + other, e);
+          }
         }
       }
     }
@@ -267,6 +272,7 @@ public class DeclarationGenerator {
   }
 
   private void emit(String str) {
+    Preconditions.checkNotNull(str);
     if (!maybeEmitIndent()) {
       out.write(" ");
     }
@@ -467,7 +473,7 @@ public class DeclarationGenerator {
       // See also JsdocToEs6TypedConverter in the Closure code base. This code is implementing the
       // same algorithm starting from JSType nodes (as opposed to JSDocInfo), and directly
       // generating textual output. Otherwise both algorithms should produce the same output.
-      type.visit(new Visitor<Void>() {
+      Visitor<Void> visitor = new Visitor<Void>() {
         @Override
         public Void caseBooleanType() {
           emit("boolean");
@@ -490,6 +496,8 @@ public class DeclarationGenerator {
         public Void caseObjectType(ObjectType type) {
           if (type.isRecordType()) {
             visitRecordType((RecordType) type);
+          } else if (type.isDict()) {
+            emit("{[key: string]: any}");
           } else {
             emit(type.getReferenceName());
           }
@@ -613,7 +621,12 @@ public class DeclarationGenerator {
           type.visitReferenceType(this);
           return null;
         }
-      });
+      };
+      try {
+        type.visit(visitor);
+      } catch (Exception e) {
+        throw new RuntimeException("Failed to emit type " + type, e);
+      }
     }
 
     // This method is used for objects like the static props on an interface, that
