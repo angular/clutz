@@ -4,12 +4,7 @@ declare namespace ಠ_ಠ.cl2dts_internal.types {
   var c : string ;
   var d : Object ;
   var e : any [] ;
-  class Foo < T > {
-    genericMethod < V , W > (t : T , v ? : V ) : any ;
-    get ( ) : T ;
-    set (t : T ) : void ;
-  }
-  var f : Foo < string > ;
+  var arrayMissingTypeParam : any [] ;
   var functionAndUnion : (a : number , b : any ) => any ;
   var recordType : { a : string , b : any } ;
   function genericFunction < T > (a : T ) : T ;
