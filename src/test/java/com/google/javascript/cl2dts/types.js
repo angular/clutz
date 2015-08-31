@@ -15,28 +15,8 @@ types.d = {};
 /** @type {Array<?>} */
 types.e = [];
 
-/**
- * @constructor
- * @template T
- */
-types.Foo = function() { };
-
-/** @return {T} */
-types.Foo.prototype.get = function() { return null; };
-
-/** @param {T} t */
-types.Foo.prototype.set = function(t) { };
-
-/**
- * @param {T} t
- * @param {V=} v
- * @template V
- * @template W
- */
-types.Foo.prototype.genericMethod = function(t, v) { return v(t); };
-
-/** @type {types.Foo<string>} */
-types.f = new Foo();
+/** @type {Array} */
+types.arrayMissingTypeParam = [];
 
 /** @type {null|function(number, ?):?} handler */
 types.functionAndUnion = null;

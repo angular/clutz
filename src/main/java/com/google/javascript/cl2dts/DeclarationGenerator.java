@@ -13,6 +13,10 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.any;
+import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
+
+import com.google.common.collect.UnmodifiableIterator;
 import com.google.javascript.jscomp.BasicErrorManager;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CommandLineRunner;
@@ -349,7 +353,7 @@ public class DeclarationGenerator {
           emit("extends");
           Iterator<ObjectType> it = ftype.getExtendedInterfaces().iterator();
           while (it.hasNext()) {
-            emit(getRelativeName(it.next()));
+            visitType(it.next());
             if (it.hasNext()) {
               emit(",");
             }
@@ -408,10 +412,10 @@ public class DeclarationGenerator {
       }
     }
 
-    private void visitTemplateTypes(FunctionType ftype) {
-      if (ftype.hasAnyTemplateTypes() && !ftype.getTemplateTypeMap().isEmpty()) {
+    private void visitTemplateTypes(ObjectType type) {
+      if (type.hasAnyTemplateTypes() && !type.getTemplateTypeMap().isEmpty()) {
         emit("<");
-        Iterator<TemplateType> it = ftype.getTemplateTypeMap().getTemplateKeys().iterator();
+        Iterator<TemplateType> it = type.getTemplateTypeMap().getTemplateKeys().iterator();
         while (it.hasNext()) {
           emit(it.next().getDisplayName());
           if (it.hasNext()) {
@@ -494,6 +498,11 @@ public class DeclarationGenerator {
 
         @Override
         public Void caseObjectType(ObjectType type) {
+          // Closure doesn't require that all the type params be declared, but TS does
+          if (!type.getTemplateTypeMap().isEmpty()
+              && !typeRegistry.getNativeType(OBJECT_TYPE).equals(type)) {
+            return caseTemplatizedType(typeRegistry.createTemplatizedType(type));
+          }
           if (type.isRecordType()) {
             visitRecordType((RecordType) type);
           } else {
