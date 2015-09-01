@@ -31,7 +31,6 @@ import com.google.javascript.rhino.jstype.EnumElementType;
 import com.google.javascript.rhino.jstype.EnumType;
 import com.google.javascript.rhino.jstype.FunctionType;
 import com.google.javascript.rhino.jstype.JSType;
-import com.google.javascript.rhino.jstype.JSTypeNative;
 import com.google.javascript.rhino.jstype.JSTypeRegistry;
 import com.google.javascript.rhino.jstype.NamedType;
 import com.google.javascript.rhino.jstype.NoType;
@@ -491,7 +490,7 @@ public class DeclarationGenerator {
           if (type.isRecordType()) {
             visitRecordType((RecordType) type);
           } else {
-            emit(type.getReferenceName());
+            emit(getRelativeName(type));
           }
           return null;
         }
@@ -504,7 +503,7 @@ public class DeclarationGenerator {
 
         @Override
         public Void caseNamedType(NamedType type) {
-          emit(type.getReferenceName());
+          emit(getRelativeName(type));
           return null;
         }
 
@@ -712,15 +711,21 @@ public class DeclarationGenerator {
             || "constructor".equals(propName)) {
           continue;
         }
+        JSType propertyType = objType.getPropertyType(propName);
         // Some symbols might be emitted as provides, so don't duplicate them
         if (provides.contains(objType.getDisplayName() + "." + propName)) {
           continue;
+        } else if (propertyType.isEnumType()) {
+          // For now, we don't emit static enum properties. We theorize it should not be needed.
+          emit("/* not emitting " + propName + " because it is an enum and it is not provided */");
+          emitBreak();
+          continue;
         }
+
         if (isStatic) {
           emit("static");
         }
         emit(propName);
-        JSType propertyType = objType.getPropertyType(propName);
         if (propertyType.isFunctionType()) {
           visitFunctionDeclaration((FunctionType) propertyType);
         } else {
