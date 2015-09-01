@@ -192,8 +192,15 @@ public class DeclarationGenerator {
       for (String property : objType.getPropertyNames()) {
         desiredSymbols.add(symbol.getName() + "." + property);
       }
-      // These will be emitted in their own default-exported namespace
-      desiredSymbols.removeAll(provides);
+      // Any provides have their own namespace and should not be emitted in this namespace.
+      for (String provide : provides) {
+        String toRemove = provide;
+        while (!toRemove.isEmpty()) {
+          desiredSymbols.remove(toRemove);
+          // Strip any parent namespaces as well
+          toRemove = toRemove.substring(0, Math.max(0, toRemove.lastIndexOf('.')));
+        }
+      }
 
       for (TypedVar other : allSymbols) {
         String otherName = other.getName();

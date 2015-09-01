@@ -1,8 +1,13 @@
-goog.provide('goog.multi_provides');
-goog.provide('goog.multi_provides.Two');
+goog.provide('multi_provides.a');
+
+/** @const */
+multi_provides.a.val = 10;
+
+goog.provide('multi_provides.a.b.c');
+goog.provide('multi_provides.a.b.c.Two');
 
 /** @constructor */
-goog.multi_provides.Two = function() {};
+multi_provides.a.b.c.Two = function() {};
 
 /** @type {string} */
-goog.multi_provides.three = "three";
+multi_provides.a.b.c.three = "three";
