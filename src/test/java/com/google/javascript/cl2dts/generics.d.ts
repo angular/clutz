@@ -7,6 +7,8 @@ declare namespace ಠ_ಠ.cl2dts_internal.generics {
   var fooMissingOneTypeParam : Foo < string , any > ;
   var fooMissingAllTypeParams : Foo < any , any > ;
   var arrayMissingTypeParam : any [] ;
+  function objectWithGenericKeyType < K , V > (obj : { [ /* warning: coerced from K */ s: string ]: V } ) : void ;
+  function genericFunction < T > (a : T ) : T ;
   function identity < T > (a : T ) : T ;
   interface GenericInterface < TYPE > {
   }

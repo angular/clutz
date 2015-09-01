@@ -31,6 +31,19 @@ generics.fooMissingAllTypeParams = new generics.Foo();
 generics.arrayMissingTypeParam = [];
 
 /**
+ * @param {Object<K,V>} obj
+ * @template K,V
+ */
+generics.objectWithGenericKeyType = function(obj) { };
+
+/**
+ * @param {T} a
+ * @return {T}
+ * @template T
+ */
+generics.genericFunction = function(a) { return a; };
+
+/**
  * @param {T} a
  * @return {T}
  * @template T
