@@ -32,6 +32,11 @@ foo.bar.Baz.prototype.equals = function(b) {
   return false;
 };
 
+/**
+ * @private
+ */
+foo.bar.Baz.prototype.thisIsPrivate_ = function() {};
+
 /** @constructor */
 foo.bar.Baz.NestedClass = function() {};
 

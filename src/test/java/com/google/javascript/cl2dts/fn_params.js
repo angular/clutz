@@ -30,3 +30,9 @@ fn_params.varargs = function(x, y) {
  * @param {...Function} var_args A list of functions.
  */
 fn_params.varargs_fns = function(var_args) {};
+
+/**
+ * @const
+ * @private
+ */
+fn_params.private_property = 123;

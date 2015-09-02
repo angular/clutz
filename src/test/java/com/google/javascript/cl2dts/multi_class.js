@@ -43,3 +43,6 @@ goog.inherits(multi_class.C, multi_class.B);
  * @implements {multi_class.I}
  */
 multi_class.D = function() {};
+
+/** @private @constructor */
+multi_class.PrivateClass = function() {};

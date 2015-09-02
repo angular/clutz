@@ -14,10 +14,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import static com.google.common.collect.Iterables.any;
-import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
-
-import com.google.common.collect.UnmodifiableIterator;
 import com.google.javascript.jscomp.BasicErrorManager;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CommandLineRunner;
@@ -31,6 +27,8 @@ import com.google.javascript.jscomp.Result;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.TypedScope;
 import com.google.javascript.jscomp.TypedVar;
+import com.google.javascript.rhino.JSDocInfo;
+import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.jstype.EnumElementType;
 import com.google.javascript.rhino.jstype.EnumType;
@@ -59,6 +57,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import javax.annotation.Nullable;
 
 /**
  * A tool that generates {@code .d.ts} declarations from a Google Closure JavaScript program.
@@ -190,7 +190,9 @@ public class DeclarationGenerator {
 
       ObjectType objType = (ObjectType) symbol.getType();
       for (String property : objType.getPropertyNames()) {
-        desiredSymbols.add(symbol.getName() + "." + property);
+        if (!isPrivate(objType.getOwnPropertyJSDocInfo(property))) {
+          desiredSymbols.add(symbol.getName() + "." + property);
+        }
       }
       // Any provides have their own namespace and should not be emitted in this namespace.
       for (String provide : provides) {
@@ -228,6 +230,10 @@ public class DeclarationGenerator {
       }
     }
     return false;
+  }
+
+  private boolean isPrivate(@Nullable JSDocInfo docInfo) {
+    return docInfo != null && docInfo.getVisibility() == Visibility.PRIVATE;
   }
 
   private void declareModule(String name, Boolean isDefault) {
@@ -751,7 +757,10 @@ public class DeclarationGenerator {
         }
         JSType propertyType = objType.getPropertyType(propName);
         // Some symbols might be emitted as provides, so don't duplicate them
-        if (provides.contains(objType.getDisplayName() + "." + propName)) {
+        String qualifiedName = objType.getDisplayName() + "." + propName;
+        if (provides.contains(qualifiedName)) {
+          continue;
+        } else if (isPrivate(propertyType.getJSDocInfo())) {
           continue;
         } else if (propertyType.isEnumType()) {
           // For now, we don't emit static enum properties. We theorize it should not be needed.
