@@ -1,7 +1,7 @@
 ///<reference path="./dict"/>
 import {DictClass, ClassWithDottedProperties} from 'goog:dict';
 
-var d = new DictClass();
+var d = new DictClass('123');
 var s: string = d['thing'];
 
 var c = new ClassWithDottedProperties();
