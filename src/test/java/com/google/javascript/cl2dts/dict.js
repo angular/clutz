@@ -13,8 +13,10 @@ dict.untyped = {};
 dict.typed = {'a': function() {}};
 
 /** @dict @constructor */
-dict.DictClass = function() {};
-var obj1 = new dict.DictClass();
+dict.DictClass = function(n) {};
+dict.DictClass.prototype.foo = function() {};
+
+var obj1 = new dict.DictClass(123);
 
 /** @dict @constructor */
 dict.ClassWithDottedProperties = function() {};

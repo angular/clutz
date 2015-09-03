@@ -804,6 +804,11 @@ public class DeclarationGenerator {
       checkArgument(instanceType.isObject(), "expected an ObjectType for this, but got "
           + instanceType + " which is a " + instanceType.getClass().getSimpleName());
       visitProperties((ObjectType) instanceType, false);
+      // Bracket-style property access
+      if (type.isDict()) {
+        emit("[key: string]: any;");
+        emitBreak();
+      }
       // Methods.
       visitProperties(prototype, false);
       // Statics.
