@@ -549,14 +549,37 @@ public class DeclarationGenerator {
     private void visitTypeDeclaration(JSType type, boolean isVarArgs) {
       if (type != null) {
         emit(":");
-        if (isVarArgs && !type.isAllType() && !type.isUnknownType()) {
-          emit("(");
-          visitType(type);
-          emit(")");
+        // From https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#a-grammar
+        // ArrayType:
+        //   PrimaryType [no LineTerminator here] [ ]
+        if (isVarArgs) {
+          visitTypeAsPrimary(type);
         } else {
           visitType(type);
         }
         if (isVarArgs) emit("[]");
+      }
+    }
+
+    /**
+     * Adds parentheses to turn a Type grammar production into a PrimaryType.
+     * See https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#a-grammar
+     *
+     * Avoid adding extra parens where the type is already known to be Primary.
+     *
+     * PrimaryType:
+     *   ParenthesizedType
+     * ParenthesizedType:
+     *   ( Type )
+     */
+    private void visitTypeAsPrimary(JSType type) {
+      // These types will produce a non-primary grammar production
+      if (type.isConstructor() || type.isFunctionType() || type.isUnionType()) {
+        emit("(");
+        visitType(type);
+        emit(")");
+      } else {
+        visitType(type);
       }
     }
 
@@ -774,15 +797,16 @@ public class DeclarationGenerator {
         visitType(alts.iterator().next());
         return;
       }
-      emit("(");
       Iterator<JSType> it = alts.iterator();
       while (it.hasNext()) {
-        visitType(it.next());
+        // See https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#a-grammar
+        // UnionType:
+        //   UnionOrIntersectionOrPrimaryType | IntersectionOrPrimaryType
+        visitTypeAsPrimary(it.next());
         if (it.hasNext()) {
           emit("|");
         }
       }
-      emit(")");
     }
 
     private void visitObjectType(ObjectType type, ObjectType prototype) {
