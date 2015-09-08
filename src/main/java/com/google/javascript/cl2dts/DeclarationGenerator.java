@@ -398,6 +398,7 @@ public class DeclarationGenerator {
 
     private String getRelativeName(ObjectType objectType) {
       String name = objectType.getDisplayName();
+      if (name.equals(namespace)) return name;
       return !name.startsWith(namespace) ? name : name.substring(namespace.length() + 1);
     }
 

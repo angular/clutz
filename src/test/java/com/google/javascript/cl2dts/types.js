@@ -15,9 +15,6 @@ types.d = {};
 /** @type {Array<?>} */
 types.e = [];
 
-/** @type {Array} */
-types.arrayMissingTypeParam = [];
-
 /** @type {null|function(number, ?):?} handler */
 types.functionAndUnion = null;
 

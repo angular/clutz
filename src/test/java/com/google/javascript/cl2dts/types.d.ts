@@ -4,7 +4,6 @@ declare namespace ಠ_ಠ.cl2dts_internal.types {
   var c : string ;
   var d : Object ;
   var e : any [] ;
-  var arrayMissingTypeParam : any [] ;
   var functionAndUnion : (a : number , b : any ) => any ;
   var recordType : { a : string , b : any } ;
   var j : { [ n: number ]: string } ;
