@@ -7,6 +7,7 @@ import com.google.common.truth.FailureStrategy;
 import com.google.common.truth.Subject;
 import com.google.common.truth.SubjectFactory;
 import com.google.javascript.cl2dts.DeclarationGenerator;
+import com.google.javascript.cl2dts.DeclarationGenerator.Options;
 
 /**
  * A subject that supports assertions on {@link DeclarationGenerator}'s results.
@@ -33,7 +34,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
   }
 
   public void generatesDeclarations(Boolean withExterns, String... lines) {
-    DeclarationGenerator dct = new DeclarationGenerator(withExterns);
+    DeclarationGenerator dct = new DeclarationGenerator(new Options(!withExterns));
     String actual = dct.generateDeclarations(getSubject().code);
     String expected = LINE_JOINER.join(lines);
     if (!actual.equals(expected)) {

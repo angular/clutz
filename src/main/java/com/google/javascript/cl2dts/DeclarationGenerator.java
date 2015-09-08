@@ -7,13 +7,14 @@ import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.Iterables.any;
 import static com.google.javascript.rhino.jstype.JSTypeNative.ARRAY_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.io.Files;
 import com.google.javascript.jscomp.BasicErrorManager;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CommandLineRunner;
@@ -45,6 +46,12 @@ import com.google.javascript.rhino.jstype.TemplatizedType;
 import com.google.javascript.rhino.jstype.UnionType;
 import com.google.javascript.rhino.jstype.Visitor;
 
+import org.kohsuke.args4j.Argument;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
+import org.kohsuke.args4j.spi.StringArrayOptionHandler;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -72,55 +79,113 @@ public class DeclarationGenerator {
       return input.getString();
     }};
 
-  private StringWriter out = new StringWriter();
-  private final boolean parseExterns;
+  static class Options {
+    @Option(name = "-o", usage = "output to this file", metaVar = "OUTPUT")
+    String output = "-";
 
-  DeclarationGenerator(boolean parseExterns) {
-    this.parseExterns = parseExterns;
+    @Option(name = "--externs",
+        usage = "list of files to read externs definitions (as separate args)",
+        metaVar = "EXTERN...",
+        handler=StringArrayOptionHandler.class)
+    List<String> externs = new ArrayList<>();
+
+    @Option(name = "--skipParseExterns",
+        usage = "run faster by skipping the externs parsing (useful for tests)")
+    boolean skipParseExterns;
+
+    @Argument
+    List<String> arguments = new ArrayList<>();
+
+    private CompilerOptions getCompilerOptions() {
+      final CompilerOptions options = new CompilerOptions();
+      options.setClosurePass(true);
+      options.setCheckGlobalNamesLevel(CheckLevel.ERROR);
+      options.setCheckGlobalThisLevel(CheckLevel.ERROR);
+      options.setCheckTypes(true);
+      options.setInferTypes(true);
+      options.setIdeMode(true); // So that we can query types after compilation.
+      options.setErrorHandler(new ErrorHandler() {
+        @Override
+        public void report(CheckLevel level, JSError error) {
+          throw new AssertionError(error.toString());
+        }
+      });
+      return options;
+    }
+
+    Options(String[] args) throws CmdLineException {
+      CmdLineParser parser = new CmdLineParser(this);
+      parser.parseArgument(args);
+      if(arguments.isEmpty()) {
+        throw new CmdLineException(parser, "No files were given");
+      }
+    }
+
+    Options(boolean skipParseExterns) {
+      this.skipParseExterns = skipParseExterns;
+    }
+  }
+
+  private StringWriter out = new StringWriter();
+  private final Options opts;
+
+  DeclarationGenerator(Options opts) {
+    this.opts = opts;
   }
 
   public static void main(String[] args) {
-    if (args.length == 0) {
-      System.err.println("Usage: c2dts [FILES...]");
+    try {
+      new DeclarationGenerator(new Options(args)).generateDeclarations();
+    } catch (CmdLineException e) {
+      System.err.println(e.getMessage());
+      System.err.println("Usage: cl2dts [options...] arguments...");
+      e.getParser().printUsage(System.err);
+      System.err.println();
+      System.exit(1);
+    } catch (Exception e) {
+      e.printStackTrace(System.err);
+      System.err.println("Uncaught exception in cl2dts, exiting.");
       System.exit(1);
     }
-    List<SourceFile> sources = new ArrayList<>();
-    for (String arg : args) {
-      File f = new File(arg);
-      if (!f.exists()) {
-        System.err.println("Input file not found: " + f.getPath());
-        System.exit(1);
-      }
-      sources.add(SourceFile.fromFile(f));
-    }
-    DeclarationGenerator generator = new DeclarationGenerator(true);
-    System.out.println(generator.generateDeclarations(sources));
+    System.exit(0);
   }
 
+  void generateDeclarations() {
+    List<SourceFile> sourceFiles = new ArrayList<>();
+    for (String source : opts.arguments) {
+      sourceFiles.add(SourceFile.fromFile(source, UTF_8));
+    }
+    List<SourceFile> externFiles = new ArrayList<>();
+    for (String extern : opts.externs) {
+      externFiles.add(SourceFile.fromFile(extern, UTF_8));
+    }
+    String result = generateDeclarations(sourceFiles, externFiles);
+
+    if ("-".equals(opts.output)) {
+      System.out.println(result);
+    } else {
+      File output = new File(opts.output);
+      try {
+        Files.write(result, output, UTF_8);
+      } catch (IOException e) {
+        throw new IllegalArgumentException("Unable to write to file " + opts.output, e);
+      }
+    }
+  }
+
+  // For testing
   String generateDeclarations(String sourceContents) {
     SourceFile sourceFile = SourceFile.fromCode("test.js", sourceContents);
     List<SourceFile> sourceFiles = Collections.singletonList(sourceFile);
-    return generateDeclarations(sourceFiles);
+    return generateDeclarations(sourceFiles, Collections.<SourceFile>emptyList());
   }
 
-  private String generateDeclarations(List<SourceFile> sourceFiles) throws AssertionError {
+  private String generateDeclarations(List<SourceFile> sourceFiles, List<SourceFile> externs)
+      throws AssertionError {
     Compiler compiler = new Compiler();
     compiler.disableThreads();
-    final CompilerOptions options = new CompilerOptions();
-    options.setClosurePass(true);
-    options.setCheckGlobalNamesLevel(CheckLevel.ERROR);
-    options.setCheckGlobalThisLevel(CheckLevel.ERROR);
-    options.setCheckTypes(true);
-    options.setInferTypes(true);
-    options.setIdeMode(true); // So that we can query types after compilation.
-    options.setErrorHandler(new ErrorHandler() {
-      @Override
-      public void report(CheckLevel level, JSError error) {
-        throw new AssertionError(error.toString());
-      }
-    });
-
-    compiler.setPassConfig(new DefaultPassConfig(options));
+    CompilerOptions compilerOptions = opts.getCompilerOptions();
+    compiler.setPassConfig(new DefaultPassConfig(compilerOptions));
     // Don't print anything, throw later below.
     compiler.setErrorManager(new BasicErrorManager() {
       @Override
@@ -130,8 +195,13 @@ public class DeclarationGenerator {
       protected void printSummary() {}
     });
 
+    if (externs.isEmpty()) {
+      externs = opts.skipParseExterns ? Collections.<SourceFile>emptyList() : getDefaultExterns();
+    } else {
+      Preconditions.checkArgument(!opts.skipParseExterns);
+    }
     Result compilationResult =
-        compiler.compile(getExterns(), sourceFiles, options);
+        compiler.compile(externs, sourceFiles, compilerOptions);
     if (compiler.hasErrors()) {
       throw new AssertionError("Compile failed: " + Arrays.toString(compilationResult.errors));
     }
@@ -259,10 +329,7 @@ public class DeclarationGenerator {
     emitBreak();
   }
 
-  private List<SourceFile> getExterns() {
-    if (!parseExterns) {
-      return ImmutableList.of();
-    }
+  private List<SourceFile> getDefaultExterns() {
     try {
       return CommandLineRunner.getDefaultExterns();
     } catch (IOException e) {
@@ -768,7 +835,6 @@ public class DeclarationGenerator {
           emitBreak();
           continue;
         }
-
         if (isStatic) {
           emit("static");
         }
