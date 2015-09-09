@@ -1,5 +1,5 @@
 /// <reference path="./generics"/>
-import {Foo, fooMissingAllTypeParams, identity, ExtendGenericInterface} from 'goog:generics';
+import {Foo, fooMissingAllTypeParams, identity, ExtendGenericInterface, ImplementsGenericInterface, GenericInterface, ExtendsGenericClass} from 'goog:generics';
 
 var f = new Foo<string, string>();
 f.set("thing");
@@ -8,3 +8,7 @@ f.loop<number, number>("thing", 123);
 f = fooMissingAllTypeParams;
 
 class Test implements ExtendGenericInterface<string> {}
+
+var i: GenericInterface<string> = new ImplementsGenericInterface<string>();
+
+var i2: GenericInterface<string> = new ExtendsGenericClass<string>();

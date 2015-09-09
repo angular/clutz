@@ -14,6 +14,10 @@ declare namespace ಠ_ಠ.cl2dts_internal.generics {
   }
   interface ExtendGenericInterface < TYPE > extends GenericInterface < TYPE > {
   }
+  class ImplementsGenericInterface < TYPE > implements GenericInterface < TYPE > {
+  }
+  class ExtendsGenericClass < TYPE > extends Foo < TYPE , number > {
+  }
 }
 declare module 'goog:generics' {
   import alias = ಠ_ಠ.cl2dts_internal.generics;

@@ -62,3 +62,18 @@ generics.GenericInterface = function() {};
  * @template TYPE
  */
 generics.ExtendGenericInterface = function() {};
+
+
+/**
+ * @constructor
+ * @template TYPE
+ * @implements {generics.GenericInterface<TYPE>}
+ */
+generics.ImplementsGenericInterface = function() {};
+
+/**
+ * @constructor
+ * @template TYPE
+ * @extends {generics.Foo<TYPE, number>}
+ */
+generics.ExtendsGenericClass = function() {};

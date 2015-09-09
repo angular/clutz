@@ -379,10 +379,10 @@ public class DeclarationGenerator {
   }
 
   private ObjectType getSuperType(FunctionType type) {
-    FunctionType superClassConstructor = type.getSuperClassConstructor();
-    return superClassConstructor == null ? null
-        : superClassConstructor.getDisplayName().equals("Object") ? null
-            : superClassConstructor;
+    ObjectType proto = type.getPrototype();
+    return proto == null ? null :
+        proto.getImplicitPrototype().getDisplayName().equals("Object") ? null :
+        proto.getImplicitPrototype();
   }
 
   private class TreeWalker {
@@ -449,14 +449,14 @@ public class DeclarationGenerator {
         // Class extends another class
         if (getSuperType(ftype) != null) {
           emit("extends");
-          emit(getRelativeName(getSuperType(ftype)));
+          visitType(getSuperType(ftype));
         }
 
         Iterator<ObjectType> it = ftype.getOwnImplementedInterfaces().iterator();
         if (it.hasNext()) {
           emit("implements");
           while (it.hasNext()) {
-            emit(getRelativeName(it.next()));
+            visitType(it.next());
             if (it.hasNext()) {
               emit(",");
             }
