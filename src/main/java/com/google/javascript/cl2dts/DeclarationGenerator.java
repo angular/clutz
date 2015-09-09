@@ -17,7 +17,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.io.Files;
 import com.google.javascript.jscomp.BasicErrorManager;
 import com.google.javascript.jscomp.CheckLevel;
-import com.google.javascript.jscomp.CommandLineRunner;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerInput;
 import com.google.javascript.jscomp.CompilerOptions;
@@ -55,6 +54,7 @@ import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -331,8 +331,9 @@ public class DeclarationGenerator {
 
   private List<SourceFile> getDefaultExterns() {
     try {
-      return CommandLineRunner.getDefaultExterns();
-    } catch (IOException e) {
+      Class<?> clazz = getClass().getClassLoader().loadClass("com.google.javascript.jscomp.CommandLineRunner");
+      return (List<SourceFile>) clazz.getMethod("getDefaultExterns").invoke(null);
+    } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
       throw new RuntimeException(e);
     }
   }
