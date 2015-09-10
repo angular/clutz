@@ -438,7 +438,12 @@ public class DeclarationGenerator {
       if (type.isFunctionType()) {
         FunctionType ftype = (FunctionType) type;
 
-        if (type.isOrdinaryFunction()) {
+        // Closure represents top-level functions as classes because they might be new-able.
+        // See https://github.com/angular/closure-to-dts/issues/90
+        boolean ordinaryFunctionAppearingAsClass = type.isConstructor()
+            && type.getJSDocInfo() != null && !type.getJSDocInfo().isConstructor();
+
+        if (type.isOrdinaryFunction() || ordinaryFunctionAppearingAsClass) {
           emit("function");
           emit(getUnqualifiedName(symbol));
           visitFunctionDeclaration(ftype);

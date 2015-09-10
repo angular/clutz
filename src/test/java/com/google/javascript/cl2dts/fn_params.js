@@ -36,3 +36,8 @@ fn_params.varargs_fns = function(var_args) {};
  * @private
  */
 fn_params.private_property = 123;
+
+/**
+ * @type {!Function}
+ */
+fn_params.declaredWithType = function() {};
