@@ -241,14 +241,7 @@ public class DeclarationGenerator {
 
   private void declareNamespace(String namespace, TypedVar symbol, boolean isDefault,
       Compiler compiler, Set<String> provides) {
-    emitNoSpace("declare namespace ");
-    emitNoSpace(INTERNAL_NAMESPACE);
-    if (!namespace.isEmpty()) {
-      emitNoSpace("." + namespace);
-    }
-    emitNoSpace(" {");
-    indent();
-    emitBreak();
+    emitNamespaceBegin(namespace);
     TreeWalker treeWalker = new TreeWalker(namespace, compiler.getTypeRegistry(), provides);
     if (isDefault) {
       treeWalker.walk(symbol, true);
@@ -287,6 +280,29 @@ public class DeclarationGenerator {
         }
       }
     }
+    emitNamespaceEnd();
+    // An extra pass is required for default exported interfaces, because in Closure they might have
+    // static methods. TS does not support static methods on interfaces, thus we create a new namespace for them.
+    if (isDefault && isInterfaceWithStatic(symbol.getType())) {
+      emitNamespaceBegin(symbol.getName());
+      treeWalker.walkDefaultInterface((FunctionType) symbol.getType());
+      emitNamespaceEnd();
+    }
+  }
+
+
+  private void emitNamespaceBegin(String namespace) {
+    emitNoSpace("declare namespace ");
+    emitNoSpace(INTERNAL_NAMESPACE);
+    if (!namespace.isEmpty()) {
+      emitNoSpace("." + namespace);
+    }
+    emitNoSpace(" {");
+    indent();
+    emitBreak();
+  }
+
+  private void emitNamespaceEnd() {
     unindent();
     emit("}");
     emitBreak();
@@ -304,6 +320,12 @@ public class DeclarationGenerator {
 
   private boolean isPrivate(@Nullable JSDocInfo docInfo) {
     return docInfo != null && docInfo.getVisibility() == Visibility.PRIVATE;
+  }
+
+  private boolean isInterfaceWithStatic(JSType type) {
+    if (!type.isInterface() || !type.isFunctionType()) return false;
+    FunctionType ftype = (FunctionType) type;
+    return any(ftype.getOwnPropertyNames(), not(equalTo("prototype")));
   }
 
   private void declareModule(String name, Boolean isDefault) {
@@ -462,20 +484,7 @@ public class DeclarationGenerator {
             }
           }
         }
-
-        if (ftype.isInterface()) {
-          visitObjectType(ftype, ftype.getPrototype(), false);
-
-          if (any(ftype.getOwnPropertyNames(), not(equalTo("prototype")))) {
-            emit("var");
-            emit(getUnqualifiedName(symbol));
-            emit(":");
-            visitRecordLikeType(ftype);
-            emitBreak();
-          }
-        } else {
-          visitObjectType(ftype, ftype.getPrototype());
-        }
+        visitObjectType(ftype, ftype.getPrototype(), !ftype.isInterface());
       } else {
         if (type.isEnumType()) {
           visitEnumType((EnumType) type);
@@ -494,6 +503,21 @@ public class DeclarationGenerator {
         emit("var");
         emit(getUnqualifiedName(symbol));
         visitTypeDeclaration(type, false);
+        emit(";");
+        emitBreak();
+      }
+    }
+
+    private void walkDefaultInterface(FunctionType ftype) {
+      for (String propName : ftype.getOwnPropertyNames()) {
+        if (propName.equals("prototype")) continue;
+        JSType pType = ftype.getPropertyType(propName);
+        // Here we assume the enum is exported and handled separately.
+        if (pType.isEnumType()) continue;
+        emit("var");
+        emit(propName);
+        emit(":");
+        visitType(pType);
         emit(";");
         emitBreak();
       }
@@ -753,22 +777,9 @@ public class DeclarationGenerator {
     // This method is used for objects like the static props on an interface, that
     // behave like an object with bunch of props, but are not technically defined as
     // record types.
-    private void visitRecordLikeType(ObjectType type) {
-      emit("{");
-      Iterable allProps = type.getOwnPropertyNames();
-      // The prototype key is implicitly defined in the Object signature in TS.
-      Iterator<String> it = Iterables.filter(allProps, not(equalTo("prototype"))).iterator();
-      while (it.hasNext()) {
-        String propName = it.next();
-        emit(propName);
-        visitTypeDeclaration(type.getPropertyType(propName), false);
-        if (it.hasNext()) {
-          emit(",");
-        }
-      }
-      emit("}");
-    }
+    private void visitNamespaceLikeType(ObjectType type) {
 
+    }
 
     private void visitRecordType(RecordType type) {
       emit("{");
