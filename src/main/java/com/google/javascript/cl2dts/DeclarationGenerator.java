@@ -425,12 +425,19 @@ public class DeclarationGenerator {
     }
 
     private String getUnqualifiedName(TypedVar symbol) {
-      String qualifiedName = symbol.getName();
-      int dotIdx = qualifiedName.lastIndexOf('.');
+      return lastPart(symbol.getName());
+    }
+
+    private String getUnqualifiedName(JSType type) {
+      return lastPart(type.getDisplayName());
+    }
+
+    private String lastPart(String input) {
+      int dotIdx = input.lastIndexOf('.');
       if (dotIdx == -1) {
-        return qualifiedName;
+        return input;
       }
-      return qualifiedName.substring(dotIdx + 1, qualifiedName.length());
+      return input.substring(dotIdx + 1, input.length());
     }
 
     private void walk(TypedVar symbol, boolean isDefault) {
@@ -557,9 +564,10 @@ public class DeclarationGenerator {
       // type MyEnum = EnumValueType;
       // var MyEnum: {A: MyEnum, B: MyEnum, ...};
       // TODO(martinprobst): Special case number enums to map to plain TS enums?
-      visitTypeAlias(type.getElementsType().getPrimitiveType(), getRelativeName(type));
+      visitTypeAlias(type.getElementsType().getPrimitiveType(), getUnqualifiedName(type));
       emit("var");
-      emit(getRelativeName(type));
+      // TS `type` declarations accept only unqualified names.
+      emit(getUnqualifiedName(type));
       emit(": {");
       emitBreak();
       indent();
