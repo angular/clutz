@@ -890,6 +890,8 @@ public class DeclarationGenerator {
           continue;
         }
         if (isStatic) {
+          // The static methods apply and call are provided by lib.d.ts.
+          if (propName.equals("apply") || propName.equals("call")) continue;
           emit("static");
         }
         emit(propName);
