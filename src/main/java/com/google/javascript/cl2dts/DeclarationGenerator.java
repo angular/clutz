@@ -844,7 +844,7 @@ public class DeclarationGenerator {
       // Constructors.
       if (type.isConstructor() && ((FunctionType)type).getParameters().iterator().hasNext()) {
         emit("constructor");
-        visitFunctionParameters((FunctionType) type);
+        visitFunctionParameters((FunctionType) type, false);
         emit(";");
         emitBreak();
       }
@@ -915,7 +915,13 @@ public class DeclarationGenerator {
     }
 
     private void visitFunctionParameters(FunctionType ftype) {
-      visitTemplateTypes(ftype);
+      visitFunctionParameters(ftype, true);
+    }
+
+    private void visitFunctionParameters(FunctionType ftype, boolean emitTemplatizedTypes) {
+      if (emitTemplatizedTypes) {
+        visitTemplateTypes(ftype);
+      }
       emit("(");
       Iterator<Node> parameters = ftype.getParameters().iterator();
       Iterator<String> names = null;

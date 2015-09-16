@@ -1,5 +1,6 @@
 declare namespace ಠ_ಠ.cl2dts_internal.generics {
   class Foo < T , U > {
+    constructor (a : number ) ;
     get ( ) : T ;
     loop < V , W > (t : T , v : V ) : any ;
     set (t : T ) : void ;
