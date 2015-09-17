@@ -28,7 +28,7 @@ public class DepgraphTest {
       args.add(testInputFile.getAbsolutePath());
     }
     Options opts = new Options(args.toArray(new String[testInputFiles.size() + 2]));
-    List<String> depgraphRoots = new DeclarationGenerator(opts).getDepgraphRoots();
+    List<String> depgraphRoots = new DeclarationGenerator(opts).parseDepgraphRoots();
     assertThat(depgraphRoots)
         .containsExactly("my/thing/static/js/annotations/annotations-canvas-controller.js");
   }

@@ -5,7 +5,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.Iterables.any;
-import static com.google.common.collect.Iterables.getFirst;
 import static com.google.javascript.rhino.jstype.JSTypeNative.ARRAY_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -17,7 +16,6 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.javascript.jscomp.BasicErrorManager;
 import com.google.javascript.jscomp.CheckLevel;
@@ -165,7 +163,7 @@ public class DeclarationGenerator {
     System.exit(0);
   }
 
-  List<String> getDepgraphRoots() {
+  List<String> parseDepgraphRoots() {
     List<String> result = new ArrayList<>();
     for (String file : opts.depgraphFiles) {
       try (FileReader reader = new FileReader(new File(file))) {
@@ -175,8 +173,8 @@ public class DeclarationGenerator {
           if ("roots".equals(i.next())) {
             List<List> roots = (List<List>) i.next();
             for (List rootDescriptor : roots) {
-              String filename = (String) getFirst(rootDescriptor, "");
-              // *-bootstrap.js are automatically added to every rule in Bazel
+              String filename = (String) rootDescriptor.iterator().next();
+              // *-bootstrap.js are automatically added to every rule by Bazel
               if (!filename.endsWith("-bootstrap.js")) {
                 result.add(filename);
               }
@@ -255,14 +253,28 @@ public class DeclarationGenerator {
 
   public String produceDts(Compiler compiler) {
     Set<String> provides = new HashSet<>();
-    List<String> depgraphRoots = getDepgraphRoots();
+    Set<String> transitiveProvides = new HashSet<>();
+    List<String> depgraphRoots = parseDepgraphRoots();
+    out = new StringWriter();
+
+    if (depgraphRoots.isEmpty() && opts.debugOutput) {
+      emit("// WARNING: depgraph contains no roots; all provides from all inputs will be walked");
+      emitBreak();
+    }
     for (CompilerInput compilerInput : compiler.getInputsById().values()) {
+      transitiveProvides.addAll(compilerInput.getProvides());
       if (depgraphRoots.isEmpty() ||
-          depgraphRoots.contains(compilerInput.getSourceFile().getOriginalPath()))
-      provides.addAll(compilerInput.getProvides());
+          depgraphRoots.contains(compilerInput.getSourceFile().getOriginalPath())) {
+        provides.addAll(compilerInput.getProvides());
+        if (opts.debugOutput) {
+          emit(String.format("// Processing provides %s from input %s",
+              compilerInput.getProvides(),
+              compilerInput.getSourceFile().getOriginalPath()));
+          emitBreak();
+        }
+      }
     }
 
-    out = new StringWriter();
     TypedScope topScope = compiler.getTopScope();
     for (String provide : provides) {
       TypedVar symbol = topScope.getOwnSlot(provide);
@@ -278,7 +290,7 @@ public class DeclarationGenerator {
         int lastDot = symbol.getName().lastIndexOf('.');
         namespace = lastDot >= 0 ? symbol.getName().substring(0, lastDot) : "";
       }
-      declareNamespace(namespace, symbol, isDefault, compiler, provides);
+      declareNamespace(namespace, symbol, isDefault, compiler, transitiveProvides);
       declareModule(provide, isDefault);
     }
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
