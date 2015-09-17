@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.Iterables.any;
+import static com.google.common.collect.Iterables.getFirst;
 import static com.google.javascript.rhino.jstype.JSTypeNative.ARRAY_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -15,6 +16,9 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.io.Files;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.google.javascript.jscomp.BasicErrorManager;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CommandLineRunner;
@@ -53,6 +57,8 @@ import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -89,9 +95,18 @@ public class DeclarationGenerator {
         handler=StringArrayOptionHandler.class)
     List<String> externs = new ArrayList<>();
 
+    @Option(name = "--depgraphs",
+        usage = "file(s) which contains the JSON representation of the dependency graph",
+        metaVar = "file.depgraph...",
+        handler=StringArrayOptionHandler.class)
+    List<String> depgraphFiles = new ArrayList<>();
+
     @Option(name = "--skipParseExterns",
         usage = "run faster by skipping the externs parsing (useful for tests)")
     boolean skipParseExterns;
+
+    @Option(name = "--debug", usage = "emit extra debugging info into the .d.ts files")
+    boolean debugOutput;
 
     @Argument
     List<String> arguments = new ArrayList<>();
@@ -148,6 +163,35 @@ public class DeclarationGenerator {
       System.exit(1);
     }
     System.exit(0);
+  }
+
+  List<String> getDepgraphRoots() {
+    List<String> result = new ArrayList<>();
+    for (String file : opts.depgraphFiles) {
+      try (FileReader reader = new FileReader(new File(file))) {
+        List<List> list = new Gson().fromJson(reader, new TypeToken<List<List>>(){}.getType());
+        for (List outer : list) {
+          Iterator i = outer.iterator();
+          if ("roots".equals(i.next())) {
+            List<List> roots = (List<List>) i.next();
+            for (List rootDescriptor : roots) {
+              String filename = (String) getFirst(rootDescriptor, "");
+              // *-bootstrap.js are automatically added to every rule in Bazel
+              if (!filename.endsWith("-bootstrap.js")) {
+                result.add(filename);
+              }
+            }
+          }
+        }
+      } catch (FileNotFoundException e) {
+        throw new IllegalArgumentException("depgraph file not found: " + file);
+      } catch (IOException e) {
+        throw new RuntimeException("error reading depgraph file", e);
+      } catch (Exception e) {
+        throw new RuntimeException("malformed depgraphs file " + file, e);
+      }
+    }
+    return result;
   }
 
   void generateDeclarations() {
@@ -211,8 +255,10 @@ public class DeclarationGenerator {
 
   public String produceDts(Compiler compiler) {
     Set<String> provides = new HashSet<>();
-    // TODO: only inspect inputs which were explicitly provided by the user
+    List<String> depgraphRoots = getDepgraphRoots();
     for (CompilerInput compilerInput : compiler.getInputsById().values()) {
+      if (depgraphRoots.isEmpty() ||
+          depgraphRoots.contains(compilerInput.getSourceFile().getOriginalPath()))
       provides.addAll(compilerInput.getProvides());
     }
 
@@ -353,6 +399,8 @@ public class DeclarationGenerator {
 
   private List<SourceFile> getDefaultExterns() {
     try {
+      // TODO(alexeagle): change to this after next closure release (dated after 9/9/15)
+      // return AbstractCommandLineRunner.getBuiltinExterns(opts.getCompilerOptions());
       return CommandLineRunner.getDefaultExterns();
     } catch (IOException e) {
       throw new RuntimeException(e);
