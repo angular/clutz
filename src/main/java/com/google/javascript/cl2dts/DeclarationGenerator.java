@@ -56,7 +56,6 @@ import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -99,6 +98,9 @@ public class DeclarationGenerator {
         handler=StringArrayOptionHandler.class)
     List<String> depgraphFiles = new ArrayList<>();
 
+    // Visible for tests, to configure with depgraph contents rather than files
+    List<String> depgraphs;
+
     @Option(name = "--skipParseExterns",
         usage = "run faster by skipping the externs parsing (useful for tests)")
     boolean skipParseExterns;
@@ -137,6 +139,23 @@ public class DeclarationGenerator {
     Options(boolean skipParseExterns) {
       this.skipParseExterns = skipParseExterns;
     }
+
+    public List<String> readDepgraphs() {
+      if (depgraphs != null) {
+        return depgraphs;
+      }
+      List<String> result = new ArrayList<>();
+      for (String file : depgraphFiles) {
+        try {
+          result.add(Files.toString(new File(file), UTF_8));
+        } catch (FileNotFoundException e) {
+          throw new IllegalArgumentException("depgraph file not found: " + file, e);
+        } catch (IOException e) {
+          throw new RuntimeException("error reading depgraph file " + file, e);
+        }
+      }
+      return result;
+    }
   }
 
   private StringWriter out = new StringWriter();
@@ -165,9 +184,9 @@ public class DeclarationGenerator {
 
   List<String> parseDepgraphRoots() {
     List<String> result = new ArrayList<>();
-    for (String file : opts.depgraphFiles) {
-      try (FileReader reader = new FileReader(new File(file))) {
-        List<List> list = new Gson().fromJson(reader, new TypeToken<List<List>>(){}.getType());
+    for (String depgraph : opts.readDepgraphs()) {
+      try {
+        List<List> list = new Gson().fromJson(depgraph, new TypeToken<List<List>>(){}.getType());
         for (List outer : list) {
           Iterator i = outer.iterator();
           if ("roots".equals(i.next())) {
@@ -181,12 +200,8 @@ public class DeclarationGenerator {
             }
           }
         }
-      } catch (FileNotFoundException e) {
-        throw new IllegalArgumentException("depgraph file not found: " + file);
-      } catch (IOException e) {
-        throw new RuntimeException("error reading depgraph file", e);
       } catch (Exception e) {
-        throw new RuntimeException("malformed depgraphs file " + file, e);
+        throw new RuntimeException("malformed depgraphs content:\n" + depgraph, e);
       }
     }
     return result;
@@ -215,14 +230,7 @@ public class DeclarationGenerator {
     }
   }
 
-  // For testing
-  String generateDeclarations(String sourceContents) {
-    SourceFile sourceFile = SourceFile.fromCode("test.js", sourceContents);
-    List<SourceFile> sourceFiles = Collections.singletonList(sourceFile);
-    return generateDeclarations(sourceFiles, Collections.<SourceFile>emptyList());
-  }
-
-  private String generateDeclarations(List<SourceFile> sourceFiles, List<SourceFile> externs)
+  String generateDeclarations(List<SourceFile> sourceFiles, List<SourceFile> externs)
       throws AssertionError {
     Compiler compiler = new Compiler();
     compiler.disableThreads();

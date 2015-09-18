@@ -1,4 +1,4 @@
-goog.provide('a.b.Stuff');
+goog.provide('a.b.ShouldNotAppear');
 
 /** @constructor @extends {a.b.Thing} */
-a.b.Stuff = function() {};
+a.b.ShouldNotAppear = function() {};

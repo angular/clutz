@@ -8,6 +8,7 @@ import com.google.common.io.Files;
 import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
+
 import org.junit.runner.Describable;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
@@ -43,9 +44,9 @@ public class DeclarationGeneratorTests {
     List<File> testFiles = getTestInputFiles(JS);
     for (final File input : testFiles) {
       File golden = getGoldenFile(input);
-      final String inputText = getTestFileText(input);
       final String goldenText = getTestFileText(golden);
-      suite.addTest(new DeclarationTest(input.getName(), goldenText, inputText, input.getName().contains("_externs")));
+      boolean withExterns = input.getName().contains("_externs");
+      suite.addTest(new DeclarationTest(input.getName(), goldenText, input, withExterns));
     }
     return suite;
   }
@@ -63,22 +64,22 @@ public class DeclarationGeneratorTests {
     return Arrays.asList(testFiles);
   }
 
-  private static String getTestFileText(final File input) throws IOException {
+  static String getTestFileText(final File input) throws IOException {
     String text = Files.asCharSource(input, Charsets.UTF_8).read();
-    // Strip test comments starting with '//!!'.
+    // Strip test comments in .d.ts golden files starting with '//!!'.
     return text.replaceAll("^\\s*//!!.*\\n", "");
   }
 
   private static final class DeclarationTest implements Test, Describable {
     private final String testName;
     private final String goldenText;
-    private final String inputText;
+    private final File input;
     private final boolean withExterns;
 
-    private DeclarationTest(String testName, String goldenText, String inputText, boolean withExterns) {
+    private DeclarationTest(String testName, String goldenText, File input, boolean withExterns) {
       this.testName = testName;
       this.goldenText = goldenText;
-      this.inputText = inputText;
+      this.input = input;
       this.withExterns = withExterns;
     }
 
@@ -86,7 +87,7 @@ public class DeclarationGeneratorTests {
     public void run(TestResult result) {
       result.startTest(this);
       try {
-        assertThatProgram(inputText).generatesDeclarations(withExterns, goldenText);
+        assertThatProgram(input).generatesDeclarations(withExterns, goldenText);
       } catch (Throwable t) {
         result.addError(this, t);
       } finally {
