@@ -1,8 +1,9 @@
 package com.google.javascript.cl2dts;
 
 import static com.google.common.truth.Truth.assertThat;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
-import com.google.javascript.cl2dts.DeclarationGenerator.Options;
+import com.google.common.io.Files;
 
 import org.junit.Test;
 
@@ -21,15 +22,12 @@ public class DepgraphTest {
         return name.endsWith(".depgraph");
       }
     });
-    List<String> args = new ArrayList<>();
-    args.add("foo.js");
-    args.add("--depgraphs");
+    List<String> contents = new ArrayList<>();
     for (File testInputFile : testInputFiles) {
-      args.add(testInputFile.getAbsolutePath());
+      contents.add(Files.toString(testInputFile, UTF_8));
     }
-    Options opts = new Options(args.toArray(new String[testInputFiles.size() + 2]));
-    List<String> depgraphRoots = new DeclarationGenerator(opts).parseDepgraphRoots();
-    assertThat(depgraphRoots)
+    Depgraph depgraph = Depgraph.parseFrom(contents);
+    assertThat(depgraph.getRoots())
         .containsExactly("my/thing/static/js/annotations/annotations-canvas-controller.js");
   }
 }

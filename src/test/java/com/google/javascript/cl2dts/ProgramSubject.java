@@ -7,7 +7,6 @@ import static java.util.Collections.singletonList;
 import com.google.common.truth.FailureStrategy;
 import com.google.common.truth.Subject;
 import com.google.common.truth.SubjectFactory;
-import com.google.javascript.cl2dts.DeclarationGenerator.Options;
 import com.google.javascript.jscomp.SourceFile;
 
 import java.io.File;
@@ -63,7 +62,9 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
     depgraph.append("]]]]");
     opts.depgraphs = singletonList(depgraph.toString());
 
-    String actual = new DeclarationGenerator(opts).generateDeclarations(sourceFiles, NO_EXTERNS);
+    String actual = new DeclarationGenerator(opts)
+        .generateDeclarations(sourceFiles, NO_EXTERNS)
+        .replaceAll("^\\s*//!!.*\\n", "");
     if (!actual.equals(expected)) {
       failureStrategy.failComparing("compilation result doesn't match", expected, actual);
     }

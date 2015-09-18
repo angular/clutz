@@ -13,7 +13,7 @@ public class MultiFileTest {
 
   // Repro for https://github.com/angular/closure-to-dts/issues/101
   @Test
-  public void testRequireFromOtherFile() throws Exception {
+  public void testPruneSymbolsProvidedInOtherFile() throws Exception {
     String expected = DeclarationGeneratorTests.getTestFileText(input("prune_other/require.d.ts"));
     assertThatProgram(
         singletonList(input("prune_other/require.js")),

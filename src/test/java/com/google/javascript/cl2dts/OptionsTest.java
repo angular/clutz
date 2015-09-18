@@ -3,15 +3,13 @@ package com.google.javascript.cl2dts;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
 
-import com.google.javascript.cl2dts.DeclarationGenerator.Options;
-
 import org.junit.Test;
 import org.kohsuke.args4j.CmdLineException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-public class CommandLineInterfaceTest {
+public class OptionsTest {
 
   @Test
   public void testFullUsage() throws Exception {

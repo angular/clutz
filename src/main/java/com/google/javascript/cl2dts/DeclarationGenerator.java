@@ -15,8 +15,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.io.Files;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.google.javascript.jscomp.BasicErrorManager;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CommandLineRunner;
@@ -24,7 +22,6 @@ import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerInput;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DefaultPassConfig;
-import com.google.javascript.jscomp.ErrorHandler;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.Result;
 import com.google.javascript.jscomp.SourceFile;
@@ -48,14 +45,9 @@ import com.google.javascript.rhino.jstype.TemplatizedType;
 import com.google.javascript.rhino.jstype.UnionType;
 import com.google.javascript.rhino.jstype.Visitor;
 
-import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.Option;
-import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -82,82 +74,6 @@ public class DeclarationGenerator {
       return input.getString();
     }};
 
-  static class Options {
-    @Option(name = "-o", usage = "output to this file", metaVar = "OUTPUT")
-    String output = "-";
-
-    @Option(name = "--externs",
-        usage = "list of files to read externs definitions (as separate args)",
-        metaVar = "EXTERN...",
-        handler=StringArrayOptionHandler.class)
-    List<String> externs = new ArrayList<>();
-
-    @Option(name = "--depgraphs",
-        usage = "file(s) which contains the JSON representation of the dependency graph",
-        metaVar = "file.depgraph...",
-        handler=StringArrayOptionHandler.class)
-    List<String> depgraphFiles = new ArrayList<>();
-
-    // Visible for tests, to configure with depgraph contents rather than files
-    List<String> depgraphs;
-
-    @Option(name = "--skipParseExterns",
-        usage = "run faster by skipping the externs parsing (useful for tests)")
-    boolean skipParseExterns;
-
-    @Option(name = "--debug", usage = "emit extra debugging info into the .d.ts files")
-    boolean debugOutput;
-
-    @Argument
-    List<String> arguments = new ArrayList<>();
-
-    private CompilerOptions getCompilerOptions() {
-      final CompilerOptions options = new CompilerOptions();
-      options.setClosurePass(true);
-      options.setCheckGlobalNamesLevel(CheckLevel.ERROR);
-      options.setCheckGlobalThisLevel(CheckLevel.ERROR);
-      options.setCheckTypes(true);
-      options.setInferTypes(true);
-      options.setIdeMode(true); // So that we can query types after compilation.
-      options.setErrorHandler(new ErrorHandler() {
-        @Override
-        public void report(CheckLevel level, JSError error) {
-          throw new AssertionError(error.toString());
-        }
-      });
-      return options;
-    }
-
-    Options(String[] args) throws CmdLineException {
-      CmdLineParser parser = new CmdLineParser(this);
-      parser.parseArgument(args);
-      if(arguments.isEmpty()) {
-        throw new CmdLineException(parser, "No files were given");
-      }
-    }
-
-    Options(boolean skipParseExterns) {
-      this.skipParseExterns = skipParseExterns;
-    }
-
-    public List<String> readDepgraphs() {
-      if (depgraphs != null) {
-        return depgraphs;
-      }
-      List<String> result = new ArrayList<>();
-      for (String file : depgraphFiles) {
-        try {
-          result.add(Files.toString(new File(file), UTF_8));
-        } catch (FileNotFoundException e) {
-          throw new IllegalArgumentException("depgraph file not found: " + file, e);
-        } catch (IOException e) {
-          throw new RuntimeException("error reading depgraph file " + file, e);
-        }
-      }
-      return result;
-    }
-  }
-
   private StringWriter out = new StringWriter();
   private final Options opts;
 
@@ -180,31 +96,6 @@ public class DeclarationGenerator {
       System.exit(1);
     }
     System.exit(0);
-  }
-
-  List<String> parseDepgraphRoots() {
-    List<String> result = new ArrayList<>();
-    for (String depgraph : opts.readDepgraphs()) {
-      try {
-        List<List> list = new Gson().fromJson(depgraph, new TypeToken<List<List>>(){}.getType());
-        for (List outer : list) {
-          Iterator i = outer.iterator();
-          if ("roots".equals(i.next())) {
-            List<List> roots = (List<List>) i.next();
-            for (List rootDescriptor : roots) {
-              String filename = (String) rootDescriptor.iterator().next();
-              // *-bootstrap.js are automatically added to every rule by Bazel
-              if (!filename.endsWith("-bootstrap.js")) {
-                result.add(filename);
-              }
-            }
-          }
-        }
-      } catch (Exception e) {
-        throw new RuntimeException("malformed depgraphs content:\n" + depgraph, e);
-      }
-    }
-    return result;
   }
 
   void generateDeclarations() {
@@ -262,24 +153,17 @@ public class DeclarationGenerator {
   public String produceDts(Compiler compiler) {
     Set<String> provides = new HashSet<>();
     Set<String> transitiveProvides = new HashSet<>();
-    List<String> depgraphRoots = parseDepgraphRoots();
+    Depgraph depgraph = Depgraph.parseFrom(opts.readDepgraphs());
     out = new StringWriter();
 
-    if (depgraphRoots.isEmpty() && opts.debugOutput) {
-      emit("// WARNING: depgraph contains no roots; all provides from all inputs will be walked");
-      emitBreak();
-    }
     for (CompilerInput compilerInput : compiler.getInputsById().values()) {
       transitiveProvides.addAll(compilerInput.getProvides());
-      if (depgraphRoots.isEmpty() ||
-          depgraphRoots.contains(compilerInput.getSourceFile().getOriginalPath())) {
+      if (depgraph.getRoots().isEmpty() ||
+          depgraph.getRoots().contains(compilerInput.getSourceFile().getOriginalPath())) {
         provides.addAll(compilerInput.getProvides());
-        if (opts.debugOutput) {
-          emit(String.format("// Processing provides %s from input %s",
-              compilerInput.getProvides(),
-              compilerInput.getSourceFile().getOriginalPath()));
-          emitBreak();
-        }
+        emitComment(String.format("Processing provides %s from input %s",
+            compilerInput.getProvides(),
+            compilerInput.getSourceFile().getOriginalPath()));
       }
     }
 
@@ -466,6 +350,13 @@ public class DeclarationGenerator {
   private void emitBreak() {
     out.write("\n");
     startOfLine = true;
+  }
+
+  // We use a syntax for comments that we can strip in unit tests
+  private void emitComment(String s) {
+    emit("//!!");
+    emit(s);
+    emitBreak();
   }
 
   private ObjectType getSuperType(FunctionType type) {
