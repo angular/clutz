@@ -1,4 +1,3 @@
-///<reference path="./types"/>
 import * as t from 'goog:types';
 t.functionAndUnion(1, "something");
 

@@ -1,4 +1,3 @@
-/// <reference path="./aliased_enums"/>
 import Enum from 'goog:nested.bar.Enum';
 import EnumAlias from 'goog:nested.baz.Enum';
 

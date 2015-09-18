@@ -1,4 +1,3 @@
-/// <reference path="./interface" />
 import I from 'goog:interface_exp';
 import E from 'goog:interface_exp.SomeEnum';
 

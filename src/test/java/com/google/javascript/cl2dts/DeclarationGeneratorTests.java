@@ -34,7 +34,7 @@ public class DeclarationGeneratorTests {
   public static final FilenameFilter TS_SOURCES = new FilenameFilter() {
     @Override
     public boolean accept(File dir, String name) {
-      return name.endsWith(".ts") && !name.endsWith(".d.ts");
+      return name.endsWith(".ts");
     }
   };
 

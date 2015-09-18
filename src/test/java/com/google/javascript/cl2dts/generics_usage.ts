@@ -1,4 +1,3 @@
-/// <reference path="./generics"/>
 import {Foo, fooMissingAllTypeParams, identity, ExtendGenericInterface, ImplementsGenericInterface, GenericInterface, ExtendsGenericClass} from 'goog:generics';
 
 var f = new Foo<string, string>(1);

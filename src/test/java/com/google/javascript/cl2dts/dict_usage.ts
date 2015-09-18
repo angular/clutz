@@ -1,4 +1,3 @@
-///<reference path="./dict"/>
 import {DictClass, ClassWithDottedProperties} from 'goog:dict';
 
 var d = new DictClass('123');
