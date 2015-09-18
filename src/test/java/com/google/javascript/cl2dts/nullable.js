@@ -3,15 +3,15 @@ goog.provide('nullable');
 /** @type {?boolean} */
 nullable.w = true;
 
-//!! Explicitly non-nullable.
+// Explicitly non-nullable.
 /** @type {!Object} */
 nullable.x = {};
 
-//!! Implicitly nullable.
+// Implicitly nullable.
 /** @type {Object} */
 nullable.y = {};
 
-//!! Explicitly nullable.
+// Explicitly nullable.
 /** @type {?Object} */
 nullable.z = {};
 

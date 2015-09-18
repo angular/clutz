@@ -46,7 +46,10 @@ foo.bar.Baz.NestedEnum = {
   B: 2
 };
 
-//!! This is not goog.provided, and it would be strange to reference an enum type as a static class
-//!! property. This is just here to assert that we gracefully ignore it.
-/** @enum */
+/**
+ * This is not goog.provided, and it would be strange to reference an enum type
+ * as a static class property.
+ * This is just here to assert that we gracefully ignore it.
+ * @enum
+ */
 foo.bar.Baz.AnotherNestedEnum = {};

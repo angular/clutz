@@ -24,14 +24,14 @@ types.recordType = {a: 'a', b: 34};
 /** @type {Object<number, string>} */
 types.j = {a: 'a'};
 
-//!! marked @const to appear in `compiler.getTopScope().getAllSymbols()`
 /**
+ * marked const to appear in `compiler.getTopScope().getAllSymbols()`
  * @const
  */
 types.inferredobj = {};
 
-//!! marked @const to appear in `compiler.getTopScope().getAllSymbols()`
 /**
+ * marked const to appear in `compiler.getTopScope().getAllSymbols()`
  * @const
  */
 types.inferrednum = 1;

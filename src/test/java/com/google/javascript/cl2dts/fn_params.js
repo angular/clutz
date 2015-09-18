@@ -18,8 +18,8 @@ fn_params.optionalNullable = function(x, opt_y) {
   return 1;
 };
 
-//!! Parameters intentionally documented in the wrong order
 /**
+ * Parameters intentionally documented in the wrong order
  * @param {...number} y
  * @param {string} x
  */

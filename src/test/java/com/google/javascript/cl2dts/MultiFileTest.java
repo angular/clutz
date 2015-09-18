@@ -15,7 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
-public class RequireFromOtherFileTest {
+public class MultiFileTest {
 
   // Repro for https://github.com/angular/closure-to-dts/issues/101
   @Test
@@ -31,7 +31,7 @@ public class RequireFromOtherFileTest {
         "/** @constructor @extends {a.b.Thing} */",
         "a.b.Stuff = function() {};");
 
-    File depgraphFile = write("lib.depgraph",
+    File depgraphFile = write("lib.depgraph.js",
         format("[['roots',[['%s']]]]", requireFile.getAbsolutePath()));
 
     ByteArrayOutputStream out = new ByteArrayOutputStream();
