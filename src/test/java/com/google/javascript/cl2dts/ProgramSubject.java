@@ -50,20 +50,14 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       sourceFiles.add(SourceFile.fromFile(nonroot, UTF_8));
     }
 
-    StringBuilder depgraph = new StringBuilder("[['roots',[[");
-    Iterator<File> it = getSubject().roots.iterator();
-    while (it.hasNext()) {
-      File root = it.next();
+    List<String> roots = new ArrayList<>();
+    for (File root : getSubject().roots) {
       sourceFiles.add(SourceFile.fromFile(root, UTF_8));
-      depgraph.append("'").append(root.getPath()).append("'");
-      if (it.hasNext())
-        depgraph.append(",");
+      roots.add(root.getPath());
     }
-    depgraph.append("]]]]");
-    opts.depgraphs = singletonList(depgraph.toString());
 
     String actual = new DeclarationGenerator(opts)
-        .generateDeclarations(sourceFiles, NO_EXTERNS)
+        .generateDeclarations(sourceFiles, NO_EXTERNS, new Depgraph(roots))
         .replaceAll("^\\s*//!!.*\\n", "");
     if (!actual.equals(expected)) {
       failureStrategy.failComparing("compilation result doesn't match", expected, actual);

@@ -107,7 +107,8 @@ public class DeclarationGenerator {
     for (String extern : opts.externs) {
       externFiles.add(SourceFile.fromFile(extern, UTF_8));
     }
-    String result = generateDeclarations(sourceFiles, externFiles);
+    String result = generateDeclarations(sourceFiles, externFiles,
+        Depgraph.parseFrom(opts.readDepgraphs()));
 
     if ("-".equals(opts.output)) {
       System.out.println(result);
@@ -121,8 +122,8 @@ public class DeclarationGenerator {
     }
   }
 
-  String generateDeclarations(List<SourceFile> sourceFiles, List<SourceFile> externs)
-      throws AssertionError {
+  String generateDeclarations(List<SourceFile> sourceFiles, List<SourceFile> externs,
+      Depgraph depgraph) throws AssertionError {
     Compiler compiler = new Compiler();
     compiler.disableThreads();
     CompilerOptions compilerOptions = opts.getCompilerOptions();
@@ -147,13 +148,12 @@ public class DeclarationGenerator {
       throw new AssertionError("Compile failed: " + Arrays.toString(compilationResult.errors));
     }
 
-    return produceDts(compiler);
+    return produceDts(compiler, depgraph);
   }
 
-  public String produceDts(Compiler compiler) {
+  public String produceDts(Compiler compiler, Depgraph depgraph) {
     Set<String> provides = new HashSet<>();
     Set<String> transitiveProvides = new HashSet<>();
-    Depgraph depgraph = Depgraph.parseFrom(opts.readDepgraphs());
     out = new StringWriter();
 
     for (CompilerInput compilerInput : compiler.getInputsById().values()) {

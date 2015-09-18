@@ -22,6 +22,7 @@ public class Depgraph {
   }
 
   // TODO(alexeagle): consider parsing into an object graph rather than these nested loops
+  @SuppressWarnings("unchecked")
   public static Depgraph parseFrom(List<String> fileContents) {
     if (fileContents.isEmpty()) {
       return new Depgraph(Collections.<String>emptyList());
@@ -30,12 +31,12 @@ public class Depgraph {
     List<String> roots = new ArrayList<>();
     for (String depgraph : fileContents) {
       try {
-        List<List> list = new Gson().fromJson(depgraph, new TypeToken<List<List>>(){}.getType());
-        for (List outer : list) {
+        List<List<?>> list = new Gson().fromJson(depgraph, new TypeToken<List<List>>(){}.getType());
+        for (List<?> outer : list) {
           Iterator i = outer.iterator();
           if ("roots".equals(i.next())) {
-            List<List> rootsList = (List<List>) i.next();
-            for (List rootDescriptor : rootsList) {
+            List<List<?>> rootsList = (List<List<?>>) i.next();
+            for (List<?> rootDescriptor : rootsList) {
               String filename = (String) rootDescriptor.iterator().next();
               // *-bootstrap.js are automatically added to every rule by Bazel
               if (!filename.endsWith("-bootstrap.js")) {

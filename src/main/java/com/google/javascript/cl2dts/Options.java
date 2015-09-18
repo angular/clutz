@@ -37,9 +37,6 @@ public class Options {
       handler = StringArrayOptionHandler.class)
   List<String> depgraphFiles = new ArrayList<>();
 
-  // Visible for tests, to configure with depgraph contents rather than files
-  List<String> depgraphs;
-
   @Option(name = "--skipParseExterns",
       usage = "run faster by skipping the externs parsing (useful for tests)")
   boolean skipParseExterns;
@@ -77,9 +74,6 @@ public class Options {
   }
 
   public List<String> readDepgraphs() {
-    if (depgraphs != null) {
-      return depgraphs;
-    }
     List<String> result = new ArrayList<>();
     for (String file : depgraphFiles) {
       try {
