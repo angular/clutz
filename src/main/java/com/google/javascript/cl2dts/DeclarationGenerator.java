@@ -480,18 +480,7 @@ public class DeclarationGenerator {
     }
 
     private void walkDefaultInterface(FunctionType ftype) {
-      for (String propName : ftype.getOwnPropertyNames()) {
-        if (propName.equals("prototype")) continue;
-        JSType pType = ftype.getPropertyType(propName);
-        // Here we assume the enum is exported and handled separately.
-        if (pType.isEnumType()) continue;
-        emit("var");
-        emit(propName);
-        emit(":");
-        visitType(pType);
-        emit(";");
-        emitBreak();
-      }
+      visitNamespaceLikeType(ftype);
     }
 
     private void visitTemplateTypes(ObjectType type) {
@@ -643,6 +632,20 @@ public class DeclarationGenerator {
             emit("[]");
             return null;
           }
+          // Arguments<?> and NodeList<?> in es3 externs are correspondinly
+          // IArguments and NodeList interfaces (not-parametrized) in lib.d.ts.
+          // New* are temporary work-arounds for upstream externs.
+          // TODO(rado): upgrade closure compiler and remove them.
+          if (type.getDisplayName().equals("Arguments") ||
+              type.getDisplayName().equals("NewArguments")) {
+            emit("IArguments");
+            return null;
+          }
+          if (type.getDisplayName().equals("NodeList") ||
+              type.getDisplayName().equals("NewNodeList")) {
+            emit("NodeList");
+            return null;
+          }
           Iterator<JSType> it = type.getTemplateTypes().iterator();
           if (typeRegistry.getNativeType(OBJECT_TYPE).equals(referencedType)) {
             emit("{ [");
@@ -750,7 +753,18 @@ public class DeclarationGenerator {
     // behave like an object with bunch of props, but are not technically defined as
     // record types.
     private void visitNamespaceLikeType(ObjectType type) {
-
+      for (String propName : type.getOwnPropertyNames()) {
+        if (propName.equals("prototype")) continue;
+        JSType pType = type.getPropertyType(propName);
+        // Here we assume the enum is exported and handled separately.
+        if (pType.isEnumType()) continue;
+        emit("var");
+        emit(propName);
+        emit(":");
+        visitType(pType);
+        emit(";");
+        emitBreak();
+      }
     }
 
     private void visitRecordType(RecordType type) {

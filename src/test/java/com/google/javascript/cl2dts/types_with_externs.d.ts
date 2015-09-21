@@ -11,6 +11,10 @@ declare module 'goog:typesWithExterns.A' {
 declare namespace ಠ_ಠ.cl2dts_internal.typesWithExterns {
   function elementMaybe ( ) : Element ;
   var a : { a : number } ;
+  var b : IArguments ;
+  type ArrayLike = NodeList | IArguments | { length : number } ;
+  var c : NodeList | IArguments | { length : number } ;
+  function id (x : NodeList | IArguments | { length : number } ) : NodeList | IArguments | { length : number } ;
 }
 declare module 'goog:typesWithExterns' {
   import alias = ಠ_ಠ.cl2dts_internal.typesWithExterns;

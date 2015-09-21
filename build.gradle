@@ -22,7 +22,7 @@ dependencies {
   runtime 'args4j:args4j:2.0.26'
   runtime 'com.google.code.gson:gson:2.3.1'
 
-  compile 'com.google.javascript:closure-compiler:v20150609'
+  compile 'com.google.javascript:closure-compiler:v20150901'
   compile 'com.google.guava:guava:18.0'
 
   testCompile 'junit:junit:4.11'

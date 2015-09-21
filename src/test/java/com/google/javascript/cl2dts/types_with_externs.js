@@ -3,6 +3,7 @@ goog.provide('typesWithExterns.A');
 goog.provide('typesWithExterns.B');
 goog.provide('typesWithExterns.C');
 
+
 /**
  * @return {Element}
  */
@@ -43,3 +44,47 @@ typesWithExterns.C = function() {
   typesWithExterns.A.apply(this, arguments);
 };
 goog.inherits(typesWithExterns.C, typesWithExterns.A);
+
+
+// NewArguments and NewNodeList are copied from an upstream es3.js extern
+// TODO(rado): upgrade closure compiler and remove them when released.
+
+/**
+ * @constructor
+ * @implements {IArrayLike<?>}
+ */
+function NewArguments() {}
+
+/**
+ * @type {number}
+ */
+NewArguments.prototype.length;
+
+/**
+ * @constructor
+ * @implements {IArrayLike<?>}
+ */
+function NewNodeList() {}
+
+/**
+ * @type {number}
+ */
+NewNodeList.prototype.length;
+
+
+/** @type {NewArguments} */
+typesWithExterns.b = null;
+
+/**
+ * @typedef {NewNodeList|NewArguments|{length: number}}
+ */
+typesWithExterns.ArrayLike;
+
+/** @type {typesWithExterns.ArrayLike} */
+typesWithExterns.c = null;
+
+/**
+ * @param {typesWithExterns.ArrayLike} x
+ * @returns {typesWithExterns.ArrayLike}
+ */
+typesWithExterns.id = function(x) { return x; }
