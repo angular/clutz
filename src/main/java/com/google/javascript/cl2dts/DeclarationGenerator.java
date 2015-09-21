@@ -831,8 +831,8 @@ public class DeclarationGenerator {
         emit("[key: string]: any;");
         emitBreak();
       }
-      // Methods.
-      visitProperties(prototype, false);
+      // Prototype fields (mostly methods).
+      visitProperties(prototype, false, ((ObjectType) instanceType).getOwnPropertyNames());
       // Statics.
       if (processStatics) {
         visitProperties(type, true);
@@ -843,7 +843,13 @@ public class DeclarationGenerator {
     }
 
     private void visitProperties(ObjectType objType, boolean isStatic) {
+      visitProperties(objType, isStatic,  Collections.<String>emptySet());
+    }
+
+    private void visitProperties(ObjectType objType, boolean isStatic, Set<String> skipNames) {
       for (String propName : objType.getOwnPropertyNames()) {
+        if (skipNames.contains(propName)) continue;
+
         if ("prototype".equals(propName) || "superClass_".equals(propName)
             // constructors are handled in #visitObjectType
             || "constructor".equals(propName)) {

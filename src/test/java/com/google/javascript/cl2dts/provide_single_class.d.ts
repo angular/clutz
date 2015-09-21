@@ -12,6 +12,7 @@ declare module 'goog:foo.bar.Baz.NestedEnum' {
 declare namespace ಠ_ಠ.cl2dts_internal.foo.bar {
   class Baz {
     field : string ;
+    avalue : number ;
     equals (b : Baz.NestedClass ) : boolean ;
     method (a : string ) : number ;
     static staticMethod (a : string ) : number ;

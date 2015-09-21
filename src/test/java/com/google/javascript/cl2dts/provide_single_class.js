@@ -6,6 +6,12 @@ goog.provide('foo.bar.Baz.NestedEnum');
 foo.bar.Baz = function() {
   /** @type {string} */
   this.field = 'a';
+  // Surprisingly, defining the same field on the prototype and in
+  // the constructor with different signatures doesn't throw a type error.
+  // The type of the prototype is preferred and as far as types are
+  // concerned `avalue` lives on the prototype object.
+  /** @type {string} */
+  this.avalue = 0;
 };
 
 /**
@@ -15,6 +21,11 @@ foo.bar.Baz = function() {
 foo.bar.Baz.staticMethod = function(a) {
   return Number(a)
 };
+
+/**
+ * @type {number}
+ */
+foo.bar.Baz.prototype.avalue = 0;
 
 /**
  * @param {string} a
