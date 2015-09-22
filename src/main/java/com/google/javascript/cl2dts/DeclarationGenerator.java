@@ -860,7 +860,7 @@ public class DeclarationGenerator {
         String qualifiedName = objType.getDisplayName() + "." + propName;
         if (provides.contains(qualifiedName)) {
           continue;
-        } else if (isPrivate(propertyType.getJSDocInfo())) {
+        } else if (isPrivate(objType.getOwnPropertyJSDocInfo(propName))) {
           continue;
         } else if (propertyType.isEnumType()) {
           // For now, we don't emit static enum properties. We theorize it should not be needed.

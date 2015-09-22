@@ -12,6 +12,8 @@ foo.bar.Baz = function() {
   // concerned `avalue` lives on the prototype object.
   /** @type {string} */
   this.avalue = 0;
+  /** @private {number} */
+  this.hideMe_ = 0;
 };
 
 /**
