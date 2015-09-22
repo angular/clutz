@@ -88,3 +88,8 @@ typesWithExterns.c = null;
  * @returns {typesWithExterns.ArrayLike}
  */
 typesWithExterns.id = function(x) { return x; }
+
+/**
+ * @type {!Function}
+ */
+typesWithExterns.topLevelFunction = function() {};
