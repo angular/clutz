@@ -48,6 +48,7 @@ public class DeclarationSyntaxTest {
 
     final List<String> tscCommand =
         Lists.newArrayList(TSC.toString(), "--noEmit", "--skipDefaultLibCheck");
+    tscCommand.add("src/resources/closure.lib.d.ts");
     tscCommand.addAll(goldenFilePaths);
     runChecked(tscCommand);
   }
@@ -57,6 +58,7 @@ public class DeclarationSyntaxTest {
     List<File> inputs = DeclarationGeneratorTests.getTestInputFiles(TS_SOURCES);
     final List<String> tscCommand =
         Lists.newArrayList(TSC.toString(), "--noEmit", "--skipDefaultLibCheck", "-m", "commonjs");
+    tscCommand.add("src/resources/closure.lib.d.ts");
     for (File input : inputs) {
       tscCommand.add(input.getPath());
     }

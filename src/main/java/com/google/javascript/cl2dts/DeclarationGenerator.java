@@ -594,6 +594,11 @@ public class DeclarationGenerator {
 
         @Override
         public Void caseObjectType(ObjectType type) {
+          if (type.getDisplayName() != null && type.getDisplayName().equals("Error")) {
+            // global Error is aliased as GlobalError in closure.lib.d.ts.
+            emit("GlobalError");
+            return null;
+          }
           // Closure doesn't require that all the type params be declared, but TS does
           if (!type.getTemplateTypeMap().isEmpty()
               && !typeRegistry.getNativeType(OBJECT_TYPE).equals(type)) {

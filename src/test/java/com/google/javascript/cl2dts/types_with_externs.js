@@ -99,3 +99,9 @@ typesWithExterns.topLevelFunction = function() {};
  * @extends {IThenable}
  */
 typesWithExterns.ExtendsIThenable = function() {};
+
+/**
+ * @constructor
+ * @extends {Error}
+ */
+typesWithExterns.Error = function() {};

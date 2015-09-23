@@ -18,6 +18,8 @@ declare namespace ಠ_ಠ.cl2dts_internal.typesWithExterns {
   function topLevelFunction ( ...a : any [] ) : any ;
   interface ExtendsIThenable extends PromiseLike < any > {
   }
+  class Error extends GlobalError {
+  }
 }
 declare module 'goog:typesWithExterns' {
   import alias = ಠ_ಠ.cl2dts_internal.typesWithExterns;
