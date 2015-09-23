@@ -59,6 +59,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
@@ -69,6 +70,10 @@ public class DeclarationGenerator {
 
   private static final Logger logger = Logger.getLogger(DeclarationGenerator.class.getName());
   private static final String INTERNAL_NAMESPACE = "ಠ_ಠ.cl2dts_internal";
+
+  // Comments in .d.ts and .js golden files starting with '//!!' are stripped.
+  public static final Pattern GOLDEN_FILE_COMMENTS_REGEXP = Pattern.compile("(?m)^\\s*//!!.*\\n");
+
   private static final Function<Node, String> NODE_GET_STRING = new Function<Node, String>() {
     @Override public String apply(Node input) {
       return input.getString();
@@ -624,7 +629,7 @@ public class DeclarationGenerator {
 
         @Override
         public Void caseNamedType(NamedType type) {
-          emit(getRelativeName(type));
+          visitType(type.getReferencedType());
           return null;
         }
 

@@ -57,8 +57,8 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
     }
 
     String actual = new DeclarationGenerator(opts)
-        .generateDeclarations(sourceFiles, NO_EXTERNS, new Depgraph(roots))
-        .replaceAll("^\\s*//!!.*\\n", "");
+        .generateDeclarations(sourceFiles, NO_EXTERNS, new Depgraph(roots));
+    actual = DeclarationGenerator.GOLDEN_FILE_COMMENTS_REGEXP.matcher(actual).replaceAll("");
     if (!actual.equals(expected)) {
       failureStrategy.failComparing("compilation result doesn't match", expected, actual);
     }

@@ -21,6 +21,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @RunWith(AllTests.class)
 public class DeclarationGeneratorTests {
@@ -66,8 +67,7 @@ public class DeclarationGeneratorTests {
 
   static String getTestFileText(final File input) throws IOException {
     String text = Files.asCharSource(input, Charsets.UTF_8).read();
-    // Strip test comments in .d.ts golden files starting with '//!!'.
-    return text.replaceAll("^\\s*//!!.*\\n", "");
+    return DeclarationGenerator.GOLDEN_FILE_COMMENTS_REGEXP.matcher(text).replaceAll("");
   }
 
   private static final class DeclarationTest implements Test, Describable {
