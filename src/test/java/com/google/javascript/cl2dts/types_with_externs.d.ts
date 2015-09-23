@@ -16,6 +16,8 @@ declare namespace ಠ_ಠ.cl2dts_internal.typesWithExterns {
   var c : NodeList | IArguments | { length : number } ;
   function id (x : NodeList | IArguments | { length : number } ) : NodeList | IArguments | { length : number } ;
   function topLevelFunction ( ...a : any [] ) : any ;
+  interface ExtendsIThenable extends PromiseLike < any > {
+  }
 }
 declare module 'goog:typesWithExterns' {
   import alias = ಠ_ಠ.cl2dts_internal.typesWithExterns;

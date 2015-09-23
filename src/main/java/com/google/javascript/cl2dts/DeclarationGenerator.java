@@ -633,19 +633,24 @@ public class DeclarationGenerator {
             emit("[]");
             return null;
           }
-          // Arguments<?> and NodeList<?> in es3 externs are correspondinly
-          // IArguments and NodeList interfaces (not-parametrized) in lib.d.ts.
-          // New* are temporary work-arounds for upstream externs.
-          // TODO(rado): upgrade closure compiler and remove them.
-          if (type.getDisplayName().equals("Arguments") ||
-              type.getDisplayName().equals("NewArguments")) {
-            emit("IArguments");
-            return null;
-          }
-          if (type.getDisplayName().equals("NodeList") ||
-              type.getDisplayName().equals("NewNodeList")) {
-            emit("NodeList");
-            return null;
+          switch(type.getDisplayName()) {
+            // Arguments<?> and NodeList<?> in es3 externs are correspondinly
+            // IArguments and NodeList interfaces (not-parametrized) in lib.d.ts.
+            // New* are temporary work-arounds for upstream externs.
+            // TODO(rado): upgrade closure compiler and remove them.
+            case "Arguments":
+            case "NewArguments":{
+              emit("IArguments");
+              return null;
+            }
+            case "NodeList":
+            case "NewNodeList": {
+              emit("NodeList");
+              return null;
+            }
+            case "IThenable": {
+              templateTypeName = "PromiseLike";
+            }
           }
           Iterator<JSType> it = type.getTemplateTypes().iterator();
           if (typeRegistry.getNativeType(OBJECT_TYPE).equals(referencedType)) {

@@ -93,3 +93,9 @@ typesWithExterns.id = function(x) { return x; }
  * @type {!Function}
  */
 typesWithExterns.topLevelFunction = function() {};
+
+/**
+ * @interface
+ * @extends {IThenable}
+ */
+typesWithExterns.ExtendsIThenable = function() {};
