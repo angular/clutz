@@ -647,6 +647,9 @@ public class DeclarationGenerator {
             emit("NodeList");
             return null;
           }
+          if (type.getDisplayName().equals("IThenable")) {
+            templateTypeName = "PromiseLike";
+          }
           Iterator<JSType> it = type.getTemplateTypes().iterator();
           if (typeRegistry.getNativeType(OBJECT_TYPE).equals(referencedType)) {
             emit("{ [");
