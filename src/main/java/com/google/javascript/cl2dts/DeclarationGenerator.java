@@ -15,9 +15,9 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.io.Files;
+import com.google.javascript.jscomp.AbstractCommandLineRunner;
 import com.google.javascript.jscomp.BasicErrorManager;
 import com.google.javascript.jscomp.CheckLevel;
-import com.google.javascript.jscomp.CommandLineRunner;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerInput;
 import com.google.javascript.jscomp.CompilerOptions;
@@ -308,9 +308,7 @@ public class DeclarationGenerator {
 
   private List<SourceFile> getDefaultExterns() {
     try {
-      // TODO(alexeagle): change to this after next closure release (dated after 9/9/15)
-      // return AbstractCommandLineRunner.getBuiltinExterns(opts.getCompilerOptions());
-      return CommandLineRunner.getDefaultExterns();
+      return AbstractCommandLineRunner.getBuiltinExterns(opts.getCompilerOptions());
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
