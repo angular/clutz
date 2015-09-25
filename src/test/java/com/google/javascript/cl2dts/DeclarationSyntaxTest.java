@@ -31,7 +31,7 @@ public class DeclarationSyntaxTest {
   public static void setUpTsc() throws Exception {
     if (!TSC.toFile().exists()) {
       System.err.println("Installing typescript...");
-      runChecked("npm", "install", "typescript@next");
+      runChecked("npm", "install", "typescript@1.6.2");
     }
   }
 
