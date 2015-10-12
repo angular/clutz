@@ -14,6 +14,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.google.javascript.jscomp.AbstractCommandLineRunner;
 import com.google.javascript.jscomp.BasicErrorManager;
@@ -54,10 +55,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -155,8 +157,9 @@ public class DeclarationGenerator {
   }
 
   public String produceDts(Compiler compiler, Depgraph depgraph) {
-    Set<String> provides = new HashSet<>();
-    Set<String> transitiveProvides = new HashSet<>();
+    // Tree sets for consistent order.
+    Set<String> provides = new TreeSet<>();
+    Set<String> transitiveProvides = new TreeSet<>();
     out = new StringWriter();
 
     for (CompilerInput compilerInput : compiler.getInputsById().values()) {
@@ -201,8 +204,14 @@ public class DeclarationGenerator {
     } else {
       // JSCompiler treats "foo.x" as one variable name, so collect all provides that start with
       // $provide + "." but are not sub-properties.
-      Set<String> desiredSymbols = new HashSet<>();
-      Iterable<TypedVar> allSymbols = compiler.getTopScope().getAllSymbols();
+      Set<String> desiredSymbols = new TreeSet<>();
+      List<TypedVar> allSymbols = Lists.newArrayList(compiler.getTopScope().getAllSymbols());
+      Collections.sort(allSymbols, new Comparator<TypedVar>() {
+        @Override
+        public int compare(TypedVar o1, TypedVar o2) {
+          return o1.getName().compareTo(o2.getName());
+        }
+      });
 
       ObjectType objType = (ObjectType) symbol.getType();
       for (String property : objType.getPropertyNames()) {
@@ -521,7 +530,7 @@ public class DeclarationGenerator {
       emit(": {");
       emitBreak();
       indent();
-      for (String elem : type.getElements()) {
+      for (String elem : sorted(type.getElements())) {
         emit(elem);
         emit(":");
         visitType(type.getElementsType());
@@ -765,7 +774,7 @@ public class DeclarationGenerator {
     // behave like an object with bunch of props, but are not technically defined as
     // record types.
     private void visitNamespaceLikeType(ObjectType type) {
-      for (String propName : type.getOwnPropertyNames()) {
+      for (String propName : getSortedPropertyNames(type)) {
         if (propName.equals("prototype")) continue;
         JSType pType = type.getPropertyType(propName);
         // Here we assume the enum is exported and handled separately.
@@ -781,7 +790,7 @@ public class DeclarationGenerator {
 
     private void visitRecordType(RecordType type) {
       emit("{");
-      Iterator<String> it = type.getOwnPropertyNames().iterator();
+      Iterator<String> it = getSortedPropertyNames(type).iterator();
       while (it.hasNext()) {
         String propName = it.next();
         emit(propName);
@@ -791,6 +800,14 @@ public class DeclarationGenerator {
         }
       }
       emit("}");
+    }
+
+    private Set<String> getSortedPropertyNames(ObjectType type) {
+      return sorted(type.getOwnPropertyNames());
+    }
+
+    private Set<String> sorted(Set<String> elements) {
+      return new TreeSet<>(elements);
     }
 
     private void visitUnionType(UnionType ut) {
@@ -855,7 +872,7 @@ public class DeclarationGenerator {
     }
 
     private void visitProperties(ObjectType objType, boolean isStatic, Set<String> skipNames) {
-      for (String propName : objType.getOwnPropertyNames()) {
+      for (String propName : getSortedPropertyNames(objType)) {
         if (skipNames.contains(propName)) continue;
 
         if ("prototype".equals(propName) || "superClass_".equals(propName)

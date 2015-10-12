@@ -1,24 +1,24 @@
 declare namespace ಠ_ಠ.cl2dts_internal.generics {
+  interface ExtendGenericInterface < TYPE > extends GenericInterface < TYPE > {
+  }
+  class ExtendsGenericClass < TYPE > extends Foo < TYPE , number > {
+  }
   class Foo < T , U > {
     constructor (a : number ) ;
     get ( ) : T ;
     loop < V , W > (t : T , v : V ) : any ;
     set (t : T ) : void ;
   }
-  var fooMissingOneTypeParam : Foo < string , any > ;
-  var fooMissingAllTypeParams : Foo < any , any > ;
-  var arrayMissingTypeParam : any [] ;
-  function objectWithGenericKeyType < K , V > (obj : { [ /* warning: coerced from K */ s: string ]: V } ) : void ;
-  function genericFunction < T > (a : T ) : T ;
-  function identity < T > (a : T ) : T ;
   interface GenericInterface < TYPE > {
-  }
-  interface ExtendGenericInterface < TYPE > extends GenericInterface < TYPE > {
   }
   class ImplementsGenericInterface < TYPE > implements GenericInterface < TYPE > {
   }
-  class ExtendsGenericClass < TYPE > extends Foo < TYPE , number > {
-  }
+  var arrayMissingTypeParam : any [] ;
+  var fooMissingAllTypeParams : Foo < any , any > ;
+  var fooMissingOneTypeParam : Foo < string , any > ;
+  function genericFunction < T > (a : T ) : T ;
+  function identity < T > (a : T ) : T ;
+  function objectWithGenericKeyType < K , V > (obj : { [ /* warning: coerced from K */ s: string ]: V } ) : void ;
 }
 declare module 'goog:generics' {
   import alias = ಠ_ಠ.cl2dts_internal.generics;

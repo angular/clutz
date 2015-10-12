@@ -7,13 +7,13 @@ declare namespace ಠ_ಠ.cl2dts_internal.multi_class {
     b : number ;
     noop ( ) : void ;
   }
-  interface I {
-  }
-  interface I2 extends I {
-  }
   class C extends B {
   }
   class D implements I {
+  }
+  interface I {
+  }
+  interface I2 extends I {
   }
 }
 declare module 'goog:multi_class' {

@@ -1,15 +1,15 @@
 declare namespace ಠ_ಠ.cl2dts_internal.dict {
-  var untyped : {[key: string]: any} ;
-  var typed : { a : ( ...a : any [] ) => any } ;
+  class ClassWithDottedProperties {
+    [key: string]: any;
+    foo : number ;
+  }
   class DictClass {
     constructor (n : any ) ;
     [key: string]: any;
     foo ( ) : void ;
   }
-  class ClassWithDottedProperties {
-    [key: string]: any;
-    foo : number ;
-  }
+  var typed : { a : ( ...a : any [] ) => any } ;
+  var untyped : {[key: string]: any} ;
 }
 declare module 'goog:dict' {
   import alias = ಠ_ಠ.cl2dts_internal.dict;

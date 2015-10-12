@@ -5,10 +5,10 @@ declare namespace ಠ_ಠ.cl2dts_internal.types {
   var d : Object ;
   var e : any [] ;
   var functionAndUnion : (a : number , b : any ) => any ;
-  var recordType : { a : string , b : any } ;
-  var j : { [ n: number ]: string } ;
-  var inferredobj : Object ;
   var inferrednum : number ;
+  var inferredobj : Object ;
+  var j : { [ n: number ]: string } ;
+  var recordType : { a : string , b : any } ;
 }
 declare module 'goog:types' {
   import alias = ಠ_ಠ.cl2dts_internal.types;

@@ -1,4 +1,21 @@
 declare namespace ಠ_ಠ.cl2dts_internal.typesWithExterns {
+  type ArrayLike = NodeList | IArguments | { length : number } ;
+  class Error extends GlobalError {
+  }
+  interface ExtendsIThenable extends PromiseLike < any > {
+  }
+  var a : { a : number } ;
+  var b : IArguments ;
+  var c : NodeList | IArguments | { length : number } ;
+  function elementMaybe ( ) : Element ;
+  function id (x : NodeList | IArguments | { length : number } ) : NodeList | IArguments | { length : number } ;
+  function topLevelFunction ( ...a : any [] ) : any ;
+}
+declare module 'goog:typesWithExterns' {
+  import alias = ಠ_ಠ.cl2dts_internal.typesWithExterns;
+  export = alias;
+}
+declare namespace ಠ_ಠ.cl2dts_internal.typesWithExterns {
   class A {
     constructor (n : number ) ;
     apply : number ;
@@ -7,23 +24,6 @@ declare namespace ಠ_ಠ.cl2dts_internal.typesWithExterns {
 declare module 'goog:typesWithExterns.A' {
   import alias = ಠ_ಠ.cl2dts_internal.typesWithExterns.A;
   export default alias;
-}
-declare namespace ಠ_ಠ.cl2dts_internal.typesWithExterns {
-  function elementMaybe ( ) : Element ;
-  var a : { a : number } ;
-  var b : IArguments ;
-  type ArrayLike = NodeList | IArguments | { length : number } ;
-  var c : NodeList | IArguments | { length : number } ;
-  function id (x : NodeList | IArguments | { length : number } ) : NodeList | IArguments | { length : number } ;
-  function topLevelFunction ( ...a : any [] ) : any ;
-  interface ExtendsIThenable extends PromiseLike < any > {
-  }
-  class Error extends GlobalError {
-  }
-}
-declare module 'goog:typesWithExterns' {
-  import alias = ಠ_ಠ.cl2dts_internal.typesWithExterns;
-  export = alias;
 }
 declare namespace ಠ_ಠ.cl2dts_internal.typesWithExterns {
   class B extends A {

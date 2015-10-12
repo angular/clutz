@@ -3,3 +3,6 @@ sudo: false
 cache:
   directories:
   - $HOME/.gradle
+jdk:
+  - oraclejdk8
+  - oraclejdk7
