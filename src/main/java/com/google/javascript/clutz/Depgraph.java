@@ -1,4 +1,4 @@
-package com.google.javascript.cl2dts;
+package com.google.javascript.clutz;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

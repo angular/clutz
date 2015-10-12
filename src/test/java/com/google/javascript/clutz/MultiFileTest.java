@@ -1,6 +1,6 @@
-package com.google.javascript.cl2dts;
+package com.google.javascript.clutz;
 
-import static com.google.javascript.cl2dts.ProgramSubject.assertThatProgram;
+import static com.google.javascript.clutz.ProgramSubject.assertThatProgram;
 import static java.util.Collections.singletonList;
 
 import com.google.common.collect.ImmutableList;

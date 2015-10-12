@@ -1,7 +1,9 @@
-package com.google.javascript.cl2dts;
+package com.google.javascript.clutz;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
+
+import com.google.javascript.clutz.Options;
 
 import org.junit.Test;
 import org.kohsuke.args4j.CmdLineException;

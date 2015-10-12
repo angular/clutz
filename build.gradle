@@ -12,7 +12,7 @@ plugins {
 
 sourceCompatibility = 1.7
 version = '1.0'
-mainClassName = 'com.google.javascript.cl2dts.DeclarationGenerator'
+mainClassName = 'com.google.javascript.clutz.DeclarationGenerator'
 
 repositories {
   mavenCentral()

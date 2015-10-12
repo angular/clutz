@@ -1,9 +1,10 @@
-package com.google.javascript.cl2dts;
+package com.google.javascript.clutz;
 
-import static com.google.javascript.cl2dts.ProgramSubject.assertThatProgram;
+import static com.google.javascript.clutz.ProgramSubject.assertThatProgram;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
+import com.google.javascript.clutz.DeclarationGenerator;
 
 import junit.framework.Test;
 import junit.framework.TestResult;

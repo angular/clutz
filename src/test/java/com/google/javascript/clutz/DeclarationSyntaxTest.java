@@ -1,7 +1,7 @@
-package com.google.javascript.cl2dts;
+package com.google.javascript.clutz;
 
-import static com.google.javascript.cl2dts.DeclarationGeneratorTests.JS;
-import static com.google.javascript.cl2dts.DeclarationGeneratorTests.TS_SOURCES;
+import static com.google.javascript.clutz.DeclarationGeneratorTests.JS;
+import static com.google.javascript.clutz.DeclarationGeneratorTests.TS_SOURCES;
 import static org.junit.Assert.fail;
 
 import com.google.common.base.Charsets;

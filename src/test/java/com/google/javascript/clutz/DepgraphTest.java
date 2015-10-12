@@ -1,9 +1,10 @@
-package com.google.javascript.cl2dts;
+package com.google.javascript.clutz;
 
 import static com.google.common.truth.Truth.assertThat;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.io.Files;
+import com.google.javascript.clutz.Depgraph;
 
 import org.junit.Test;
 

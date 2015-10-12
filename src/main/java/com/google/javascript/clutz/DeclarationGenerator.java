@@ -1,4 +1,4 @@
-package com.google.javascript.cl2dts;
+package com.google.javascript.clutz;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;

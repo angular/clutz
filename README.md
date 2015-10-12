@@ -1,5 +1,5 @@
-# Closure to `.d.ts` generator.
-[![Build Status](https://travis-ci.org/angular/closure-to-dts.svg?branch=master)](https://travis-ci.org/angular/closure-to-dts)
+# clutz - Closure to `.d.ts` generator.
+[![Build Status](https://travis-ci.org/angular/clutz.svg?branch=master)](https://travis-ci.org/angular/clutz)
 
 **Experimental: do not use yet**
 

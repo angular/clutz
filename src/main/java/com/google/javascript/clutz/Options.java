@@ -1,4 +1,4 @@
-package com.google.javascript.cl2dts;
+package com.google.javascript.clutz;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 

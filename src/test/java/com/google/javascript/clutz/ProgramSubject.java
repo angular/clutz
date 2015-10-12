@@ -1,4 +1,4 @@
-package com.google.javascript.cl2dts;
+package com.google.javascript.clutz;
 
 import static com.google.common.truth.Truth.assert_;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -7,6 +7,9 @@ import static java.util.Collections.singletonList;
 import com.google.common.truth.FailureStrategy;
 import com.google.common.truth.Subject;
 import com.google.common.truth.SubjectFactory;
+import com.google.javascript.clutz.DeclarationGenerator;
+import com.google.javascript.clutz.Depgraph;
+import com.google.javascript.clutz.Options;
 import com.google.javascript.jscomp.SourceFile;
 
 import java.io.File;
