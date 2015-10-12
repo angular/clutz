@@ -26,7 +26,7 @@ public class OptionsTest {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     System.setErr(new PrintStream(out));
     try {
-      Options opts = new Options(new String[0]);
+      new Options(new String[0]);
       fail("Should throw");
     } catch (CmdLineException expected) {}
   }

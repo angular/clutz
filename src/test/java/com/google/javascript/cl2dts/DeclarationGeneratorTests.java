@@ -21,7 +21,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 @RunWith(AllTests.class)
 public class DeclarationGeneratorTests {

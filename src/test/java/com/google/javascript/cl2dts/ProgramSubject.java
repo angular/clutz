@@ -12,7 +12,6 @@ import com.google.javascript.jscomp.SourceFile;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**

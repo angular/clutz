@@ -58,7 +58,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -68,7 +67,6 @@ import javax.annotation.Nullable;
  */
 public class DeclarationGenerator {
 
-  private static final Logger logger = Logger.getLogger(DeclarationGenerator.class.getName());
   private static final String INTERNAL_NAMESPACE = "ಠ_ಠ.cl2dts_internal";
 
   // Comments in .d.ts and .js golden files starting with '//!!' are stripped.
@@ -818,10 +816,6 @@ public class DeclarationGenerator {
           emit("|");
         }
       }
-    }
-
-    private void visitObjectType(ObjectType type, ObjectType prototype) {
-      visitObjectType(type, prototype, true);
     }
 
     private void visitObjectType(ObjectType type, ObjectType prototype, Boolean processStatics) {

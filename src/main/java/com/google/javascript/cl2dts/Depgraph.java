@@ -31,9 +31,9 @@ public class Depgraph {
     List<String> roots = new ArrayList<>();
     for (String depgraph : fileContents) {
       try {
-        List<List<?>> list = new Gson().fromJson(depgraph, new TypeToken<List<List>>(){}.getType());
+        List<List<?>> list = new Gson().fromJson(depgraph, new TypeToken<List<List<?>>>(){}.getType());
         for (List<?> outer : list) {
-          Iterator i = outer.iterator();
+          Iterator<?> i = outer.iterator();
           if ("roots".equals(i.next())) {
             List<List<?>> rootsList = (List<List<?>>) i.next();
             for (List<?> rootDescriptor : rootsList) {
