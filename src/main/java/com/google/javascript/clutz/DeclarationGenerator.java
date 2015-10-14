@@ -519,9 +519,11 @@ public class DeclarationGenerator {
 
     private void visitEnumType(EnumType type) {
       // Enums are top level vars, but also declare a corresponding type:
+      // <pre>
       // /** @enum {ValueType} */ var MyEnum = {A: ..., B: ...};
       // type MyEnum = EnumValueType;
       // var MyEnum: {A: MyEnum, B: MyEnum, ...};
+      // </pre>
       // TODO(martinprobst): Special case number enums to map to plain TS enums?
       visitTypeAlias(type.getElementsType().getPrimitiveType(), getUnqualifiedName(type));
       emit("var");
