@@ -1,4 +1,4 @@
-declare namespace ಠ_ಠ.cl2dts_internal.multi_class {
+declare namespace ಠ_ಠ.clutz_internal.multi_class {
   class A {
     constructor (n : number ) ;
     a : number ;
@@ -17,6 +17,6 @@ declare namespace ಠ_ಠ.cl2dts_internal.multi_class {
   }
 }
 declare module 'goog:multi_class' {
-  import alias = ಠ_ಠ.cl2dts_internal.multi_class;
+  import alias = ಠ_ಠ.clutz_internal.multi_class;
   export = alias;
 }

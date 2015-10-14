@@ -69,7 +69,7 @@ import javax.annotation.Nullable;
  */
 public class DeclarationGenerator {
 
-  private static final String INTERNAL_NAMESPACE = "ಠ_ಠ.cl2dts_internal";
+  private static final String INTERNAL_NAMESPACE = "ಠ_ಠ.clutz_internal";
 
   // Comments in .d.ts and .js golden files starting with '//!!' are stripped.
   public static final Pattern GOLDEN_FILE_COMMENTS_REGEXP = Pattern.compile("(?m)^\\s*//!!.*\\n");
@@ -91,13 +91,13 @@ public class DeclarationGenerator {
       new DeclarationGenerator(new Options(args)).generateDeclarations();
     } catch (CmdLineException e) {
       System.err.println(e.getMessage());
-      System.err.println("Usage: cl2dts [options...] arguments...");
+      System.err.println("Usage: clutz [options...] arguments...");
       e.getParser().printUsage(System.err);
       System.err.println();
       System.exit(1);
     } catch (Exception e) {
       e.printStackTrace(System.err);
-      System.err.println("Uncaught exception in cl2dts, exiting.");
+      System.err.println("Uncaught exception in clutz, exiting.");
       System.exit(1);
     }
     System.exit(0);

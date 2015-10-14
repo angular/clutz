@@ -1,4 +1,4 @@
-declare namespace ಠ_ಠ.cl2dts_internal.foo.bar {
+declare namespace ಠ_ಠ.clutz_internal.foo.bar {
   class Baz {
     field : string ;
     avalue : number ;
@@ -9,18 +9,18 @@ declare namespace ಠ_ಠ.cl2dts_internal.foo.bar {
   }
 }
 declare module 'goog:foo.bar.Baz' {
-  import alias = ಠ_ಠ.cl2dts_internal.foo.bar.Baz;
+  import alias = ಠ_ಠ.clutz_internal.foo.bar.Baz;
   export default alias;
 }
-declare namespace ಠ_ಠ.cl2dts_internal.foo.bar.Baz {
+declare namespace ಠ_ಠ.clutz_internal.foo.bar.Baz {
   class NestedClass {
   }
 }
 declare module 'goog:foo.bar.Baz.NestedClass' {
-  import alias = ಠ_ಠ.cl2dts_internal.foo.bar.Baz.NestedClass;
+  import alias = ಠ_ಠ.clutz_internal.foo.bar.Baz.NestedClass;
   export default alias;
 }
-declare namespace ಠ_ಠ.cl2dts_internal.foo.bar.Baz {
+declare namespace ಠ_ಠ.clutz_internal.foo.bar.Baz {
   type NestedEnum = number ;
   var NestedEnum : {
     A : NestedEnum ,
@@ -28,6 +28,6 @@ declare namespace ಠ_ಠ.cl2dts_internal.foo.bar.Baz {
   };
 }
 declare module 'goog:foo.bar.Baz.NestedEnum' {
-  import alias = ಠ_ಠ.cl2dts_internal.foo.bar.Baz.NestedEnum;
+  import alias = ಠ_ಠ.clutz_internal.foo.bar.Baz.NestedEnum;
   export default alias;
 }

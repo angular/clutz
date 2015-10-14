@@ -1,17 +1,17 @@
-declare namespace ಠ_ಠ.cl2dts_internal {
+declare namespace ಠ_ಠ.clutz_internal {
   interface interface_exp {
     method ( ) : number ;
   }
 }
-declare namespace ಠ_ಠ.cl2dts_internal.interface_exp {
+declare namespace ಠ_ಠ.clutz_internal.interface_exp {
   var staticMethod : ( ) => number ;
   var staticProp : number ;
 }
 declare module 'goog:interface_exp' {
-  import alias = ಠ_ಠ.cl2dts_internal.interface_exp;
+  import alias = ಠ_ಠ.clutz_internal.interface_exp;
   export default alias;
 }
-declare namespace ಠ_ಠ.cl2dts_internal.interface_exp {
+declare namespace ಠ_ಠ.clutz_internal.interface_exp {
   type SomeEnum = number ;
   var SomeEnum : {
     A : SomeEnum ,
@@ -19,6 +19,6 @@ declare namespace ಠ_ಠ.cl2dts_internal.interface_exp {
   };
 }
 declare module 'goog:interface_exp.SomeEnum' {
-  import alias = ಠ_ಠ.cl2dts_internal.interface_exp.SomeEnum;
+  import alias = ಠ_ಠ.clutz_internal.interface_exp.SomeEnum;
   export default alias;
 }

@@ -1,4 +1,4 @@
-declare namespace ಠ_ಠ.cl2dts_internal.forward {
+declare namespace ಠ_ಠ.clutz_internal.forward {
   class A {
     //!! forward.D may or may not be part of the compilation unit.
     //!! If it is part of it might be a generic at which point TS will error
@@ -7,6 +7,6 @@ declare namespace ಠ_ಠ.cl2dts_internal.forward {
   }
 }
 declare module 'goog:forward.A' {
-  import alias = ಠ_ಠ.cl2dts_internal.forward.A;
+  import alias = ಠ_ಠ.clutz_internal.forward.A;
   export default alias;
 }

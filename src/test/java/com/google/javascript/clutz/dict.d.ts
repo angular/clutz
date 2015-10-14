@@ -1,4 +1,4 @@
-declare namespace ಠ_ಠ.cl2dts_internal.dict {
+declare namespace ಠ_ಠ.clutz_internal.dict {
   class ClassWithDottedProperties {
     [key: string]: any;
     foo : number ;
@@ -12,6 +12,6 @@ declare namespace ಠ_ಠ.cl2dts_internal.dict {
   var untyped : {[key: string]: any} ;
 }
 declare module 'goog:dict' {
-  import alias = ಠ_ಠ.cl2dts_internal.dict;
+  import alias = ಠ_ಠ.clutz_internal.dict;
   export = alias;
 }

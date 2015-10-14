@@ -1,4 +1,4 @@
-declare namespace ಠ_ಠ.cl2dts_internal.types {
+declare namespace ಠ_ಠ.clutz_internal.types {
   var a : number ;
   var b : boolean ;
   var c : string ;
@@ -11,6 +11,6 @@ declare namespace ಠ_ಠ.cl2dts_internal.types {
   var recordType : { a : string , b : any } ;
 }
 declare module 'goog:types' {
-  import alias = ಠ_ಠ.cl2dts_internal.types;
+  import alias = ಠ_ಠ.clutz_internal.types;
   export = alias;
 }

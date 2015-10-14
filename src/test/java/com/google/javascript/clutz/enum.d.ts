@@ -1,4 +1,4 @@
-declare namespace ಠ_ಠ.cl2dts_internal.some {
+declare namespace ಠ_ಠ.clutz_internal.some {
   type SomeEnum = number ;
   var SomeEnum : {
     A : SomeEnum ,
@@ -6,6 +6,6 @@ declare namespace ಠ_ಠ.cl2dts_internal.some {
   };
 }
 declare module 'goog:some.SomeEnum' {
-  import alias = ಠ_ಠ.cl2dts_internal.some.SomeEnum;
+  import alias = ಠ_ಠ.clutz_internal.some.SomeEnum;
   export default alias;
 }

@@ -1,4 +1,4 @@
-declare namespace ಠ_ಠ.cl2dts_internal.generics {
+declare namespace ಠ_ಠ.clutz_internal.generics {
   interface ExtendGenericInterface < TYPE > extends GenericInterface < TYPE > {
   }
   class ExtendsGenericClass < TYPE > extends Foo < TYPE , number > {
@@ -21,6 +21,6 @@ declare namespace ಠ_ಠ.cl2dts_internal.generics {
   function objectWithGenericKeyType < K , V > (obj : { [ /* warning: coerced from K */ s: string ]: V } ) : void ;
 }
 declare module 'goog:generics' {
-  import alias = ಠ_ಠ.cl2dts_internal.generics;
+  import alias = ಠ_ಠ.clutz_internal.generics;
   export = alias;
 }
