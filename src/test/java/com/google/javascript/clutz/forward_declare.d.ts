@@ -6,6 +6,9 @@ declare namespace ಠ_ಠ.clutz_internal.forward {
     fn (a : any ) : any ;
   }
 }
+declare namespace ಠ_ಠ.clutz_internal.goog {
+  function require(name: 'forward.A'): typeof ಠ_ಠ.clutz_internal.forward.A;
+}
 declare module 'goog:forward.A' {
   import alias = ಠ_ಠ.clutz_internal.forward.A;
   export default alias;

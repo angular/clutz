@@ -250,6 +250,18 @@ public class DeclarationGenerator {
       treeWalker.walkDefaultInterface((FunctionType) symbol.getType());
       emitNamespaceEnd();
     }
+    emitGoogRequireSupport(namespace, isDefault ? symbol.getName() : namespace);
+  }
+
+  private void emitGoogRequireSupport(String namespace, String closureNamespace) {
+    // goog namespace doesn't need to be goog.required.
+    if (namespace.equals("goog")) return;
+    emitNamespaceBegin("goog");
+    String qualifiedClosureNamespace = INTERNAL_NAMESPACE + "." + closureNamespace;
+    // TS supports overloading the require declaration with a fixed string argument.
+    emit("function require(name: '" + closureNamespace + "'): typeof " + qualifiedClosureNamespace + ";");
+    emitBreak();
+    emitNamespaceEnd();
   }
 
 

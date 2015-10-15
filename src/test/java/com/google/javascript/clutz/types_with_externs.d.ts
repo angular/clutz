@@ -11,6 +11,9 @@ declare namespace ಠ_ಠ.clutz_internal.typesWithExterns {
   function id (x : NodeList | IArguments | { length : number } ) : NodeList | IArguments | { length : number } ;
   function topLevelFunction ( ...a : any [] ) : any ;
 }
+declare namespace ಠ_ಠ.clutz_internal.goog {
+  function require(name: 'typesWithExterns'): typeof ಠ_ಠ.clutz_internal.typesWithExterns;
+}
 declare module 'goog:typesWithExterns' {
   import alias = ಠ_ಠ.clutz_internal.typesWithExterns;
   export = alias;
@@ -21,6 +24,9 @@ declare namespace ಠ_ಠ.clutz_internal.typesWithExterns {
     apply : number ;
   }
 }
+declare namespace ಠ_ಠ.clutz_internal.goog {
+  function require(name: 'typesWithExterns.A'): typeof ಠ_ಠ.clutz_internal.typesWithExterns.A;
+}
 declare module 'goog:typesWithExterns.A' {
   import alias = ಠ_ಠ.clutz_internal.typesWithExterns.A;
   export default alias;
@@ -29,6 +35,9 @@ declare namespace ಠ_ಠ.clutz_internal.typesWithExterns {
   class B extends A {
   }
 }
+declare namespace ಠ_ಠ.clutz_internal.goog {
+  function require(name: 'typesWithExterns.B'): typeof ಠ_ಠ.clutz_internal.typesWithExterns.B;
+}
 declare module 'goog:typesWithExterns.B' {
   import alias = ಠ_ಠ.clutz_internal.typesWithExterns.B;
   export default alias;
@@ -36,6 +45,9 @@ declare module 'goog:typesWithExterns.B' {
 declare namespace ಠ_ಠ.clutz_internal.typesWithExterns {
   class C extends A {
   }
+}
+declare namespace ಠ_ಠ.clutz_internal.goog {
+  function require(name: 'typesWithExterns.C'): typeof ಠ_ಠ.clutz_internal.typesWithExterns.C;
 }
 declare module 'goog:typesWithExterns.C' {
   import alias = ಠ_ಠ.clutz_internal.typesWithExterns.C;

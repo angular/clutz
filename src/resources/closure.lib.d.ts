@@ -5,3 +5,7 @@ declare namespace ಠ_ಠ.clutz_internal {
   type GlobalError = Error;
   var GlobalError: ErrorConstructor;
 }
+
+// Closure's goog namespace is accessible as a global symbol without the need for
+// an explicit goog.require, during the closure compiler pass.
+declare var goog: typeof ಠ_ಠ.clutz_internal.goog;

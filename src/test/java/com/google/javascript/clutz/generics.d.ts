@@ -20,6 +20,9 @@ declare namespace ಠ_ಠ.clutz_internal.generics {
   function identity < T > (a : T ) : T ;
   function objectWithGenericKeyType < K , V > (obj : { [ /* warning: coerced from K */ s: string ]: V } ) : void ;
 }
+declare namespace ಠ_ಠ.clutz_internal.goog {
+  function require(name: 'generics'): typeof ಠ_ಠ.clutz_internal.generics;
+}
 declare module 'goog:generics' {
   import alias = ಠ_ಠ.clutz_internal.generics;
   export = alias;

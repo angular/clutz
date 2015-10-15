@@ -48,15 +48,24 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
     Options opts = new Options(!withExterns);
 
     List<SourceFile> sourceFiles = new ArrayList<>();
+
+    // base.js is needed for the type declaration of goog.require for
+    // all tests, except the base.js one itself.
+    if (!getSubject().roots.get(0).getName().equals("base.js")) {
+      sourceFiles.add(SourceFile.fromFile("src/test/java/com/google/javascript/clutz/base.js", UTF_8));
+    }
+
     for (File nonroot : getSubject().nonroots) {
       sourceFiles.add(SourceFile.fromFile(nonroot, UTF_8));
     }
 
     List<String> roots = new ArrayList<>();
+
     for (File root : getSubject().roots) {
       sourceFiles.add(SourceFile.fromFile(root, UTF_8));
       roots.add(root.getPath());
     }
+
 
     String actual = new DeclarationGenerator(opts)
         .generateDeclarations(sourceFiles, NO_EXTERNS, new Depgraph(roots));
