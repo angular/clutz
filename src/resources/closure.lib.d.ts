@@ -6,6 +6,11 @@ declare namespace ಠ_ಠ.clutz_internal {
   var GlobalError: ErrorConstructor;
 }
 
+// Will be extended if base.js is a dependency.
+declare namespace ಠ_ಠ.clutz_internal.goog {
+  var __namespace_needs_to_be_non_value_empty__: void;
+}
+
 // Closure's goog namespace is accessible as a global symbol without the need for
 // an explicit goog.require, during the closure compiler pass.
 declare var goog: typeof ಠ_ಠ.clutz_internal.goog;
