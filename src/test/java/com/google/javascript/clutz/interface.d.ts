@@ -7,9 +7,6 @@ declare namespace ಠ_ಠ.clutz_internal.interface_exp {
   var staticMethod : ( ) => number ;
   var staticProp : number ;
 }
-declare namespace ಠ_ಠ.clutz_internal.goog {
-  function require(name: 'interface_exp'): typeof ಠ_ಠ.clutz_internal.interface_exp;
-}
 declare module 'goog:interface_exp' {
   import alias = ಠ_ಠ.clutz_internal.interface_exp;
   export default alias;

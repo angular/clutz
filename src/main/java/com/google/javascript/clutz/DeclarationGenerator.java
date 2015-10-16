@@ -250,7 +250,11 @@ public class DeclarationGenerator {
       treeWalker.walkDefaultInterface((FunctionType) symbol.getType());
       emitNamespaceEnd();
     }
-    emitGoogRequireSupport(namespace, isDefault ? symbol.getName() : namespace);
+    // skip emitting goog.require declarations for value empty namespaces, as calling typeof
+    // does not work them.
+    if (treeWalker.valueSymbolsWalked > 0) {
+      emitGoogRequireSupport(namespace, isDefault ? symbol.getName() : namespace);
+    }
   }
 
   private void emitGoogRequireSupport(String namespace, String closureNamespace) {
@@ -392,6 +396,7 @@ public class DeclarationGenerator {
     private final String namespace;
     private final JSTypeRegistry typeRegistry;
     private final Set<String> provides;
+    private int valueSymbolsWalked = 0;
 
     private TreeWalker(String namespace, JSTypeRegistry typeRegistry, Set<String> provides) {
       this.namespace = namespace;
@@ -423,6 +428,7 @@ public class DeclarationGenerator {
 
     private void walk(TypedVar symbol, boolean isDefault) {
       JSType type = symbol.getType();
+      if (!type.isInterface() && !type.isNoType()) valueSymbolsWalked++;
       if (type.isFunctionType()) {
         FunctionType ftype = (FunctionType) type;
 
