@@ -436,10 +436,10 @@ public class DeclarationGenerator {
         // Closure represents top-level functions as classes because they might be new-able.
         // This happens through externs es3.js which has Function marked as constructor.
         // See https://github.com/angular/closure-to-dts/issues/90
-        boolean ordinaryFunctionAppearingAsClass = type.isConstructor() &&
-            type.getDisplayName().equals("Function");
+        boolean ordinaryFunctionAppearingAsClass =
+            ftype.isConstructor() && "Function".equals(ftype.getDisplayName());
 
-        if (type.isOrdinaryFunction() || ordinaryFunctionAppearingAsClass) {
+        if (ftype.isOrdinaryFunction() || ordinaryFunctionAppearingAsClass) {
           emit("function");
           emit(getUnqualifiedName(symbol));
           visitFunctionDeclaration(ftype);
@@ -447,12 +447,21 @@ public class DeclarationGenerator {
           emitBreak();
           return;
         }
-        if (type.isConstructor()) {
+
+        if (!ftype.isNominalConstructor()) {
+          // A top-level field that has a specific constructor function type.
+          // <code>/** @type {function(new:X)} */ foo.x;</code>
+          visitVarDeclaration(symbol, ftype);
+          return;
+        }
+
+        if (ftype.isConstructor()) {
+          // "proper" class constructor
           emit("class");
-        } else if (type.isInterface()) {
+        } else if (ftype.isInterface()) {
           emit("interface");
         } else {
-          checkState(false, "Unexpected function type " + type);
+          checkState(false, "Unexpected function type " + ftype);
         }
         emit(getUnqualifiedName(symbol));
 
@@ -501,12 +510,16 @@ public class DeclarationGenerator {
             return;
           }
         }
-        emit("var");
-        emit(getUnqualifiedName(symbol));
-        visitTypeDeclaration(type, false);
-        emit(";");
-        emitBreak();
+        visitVarDeclaration(symbol, type);
       }
+    }
+
+    private void visitVarDeclaration(TypedVar symbol, JSType type) {
+      emit("var");
+      emit(getUnqualifiedName(symbol));
+      visitTypeDeclaration(type, false);
+      emit(";");
+      emitBreak();
     }
 
     private void walkDefaultInterface(FunctionType ftype) {
@@ -775,6 +788,10 @@ public class DeclarationGenerator {
 
         @Override
         public Void caseFunctionType(FunctionType type) {
+          if (type.isConstructor() && !"Function".equals(type.getDisplayName())) {
+            visitConstructorFunctionDeclaration(type);
+            return null;
+          }
           visitFunctionParameters(type);
           JSType returnType = type.getReturnType();
           if (returnType != null) {
@@ -943,6 +960,17 @@ public class DeclarationGenerator {
         emit(":");
         visitType(type);
       }
+    }
+
+    private void visitConstructorFunctionDeclaration(FunctionType ftype) {
+      // Translate constructor functions to object type literals with a construct signature.
+      // "function(new:X, string)" --> "{new(a: string): X}".
+      emit("{");
+      emit("new");
+      visitFunctionParameters(ftype);
+      emit(":");
+      emit(getUnqualifiedName(ftype.getInstanceType()));
+      emit("}");
     }
 
     private void visitFunctionParameters(FunctionType ftype) {
