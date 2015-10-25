@@ -1,4 +1,4 @@
-// Changing this defintion to false or removing or renaming it will cause closure to remove
+// Changing this definition to false or removing or renaming it will cause closure to remove
 // goog from the list of provided symbols, thus breaking the output.
 /**
  * @define {boolean}
