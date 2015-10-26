@@ -687,6 +687,12 @@ public class DeclarationGenerator {
               templateTypeName = "PromiseLike";
             }
           }
+          if (type.getTemplateTypes().isEmpty()) {
+            // In Closure, subtypes of `TemplatizedType`s that do not take type arguments are still
+            // represented by templatized types.
+            emit(templateTypeName);
+            return null;
+          }
           Iterator<JSType> it = type.getTemplateTypes().iterator();
           if (typeRegistry.getNativeType(OBJECT_TYPE).equals(referencedType)) {
             emit("{ [");
