@@ -924,32 +924,86 @@ public class DeclarationGenerator {
             || "constructor".equals(propName)) {
           continue;
         }
-        JSType propertyType = objType.getPropertyType(propName);
-        // Some symbols might be emitted as provides, so don't duplicate them
-        String qualifiedName = objType.getDisplayName() + "." + propName;
-        if (provides.contains(qualifiedName)) {
-          continue;
-        } else if (isPrivate(objType.getOwnPropertyJSDocInfo(propName))) {
-          continue;
-        } else if (propertyType.isEnumType()) {
-          // For now, we don't emit static enum properties. We theorize it should not be needed.
-          emit("/* not emitting " + propName + " because it is an enum and it is not provided */");
-          emitBreak();
-          continue;
-        }
-        if (isStatic) {
-          // The static methods apply and call are provided by lib.d.ts.
-          if (propName.equals("apply") || propName.equals("call")) continue;
-          emit("static");
-        }
-        emit(propName);
-        if (propertyType.isFunctionType()) {
-          visitFunctionDeclaration((FunctionType) propertyType);
-        } else {
-          visitTypeDeclaration(propertyType, false);
-        }
-        emit(";");
+        visitProperty(propName, objType, isStatic);
+      }
+    }
+
+    private void visitProperty(String propName, ObjectType objType, boolean isStatic) {
+      JSType propertyType = objType.getPropertyType(propName);
+      // Some symbols might be emitted as provides, so don't duplicate them
+      String qualifiedName = objType.getDisplayName() + "." + propName;
+      if (provides.contains(qualifiedName)) {
+        return;
+      } else if (isPrivate(objType.getOwnPropertyJSDocInfo(propName))) {
+        return;
+      } else if (propertyType.isEnumType()) {
+        // For now, we don't emit static enum properties. We theorize it should not be needed.
+        emit("/* not emitting " + propName + " because it is an enum and it is not provided */");
         emitBreak();
+        return;
+      }
+      if (isStatic) {
+        // The static methods apply and call are provided by lib.d.ts.
+        if (propName.equals("apply") || propName.equals("call")) return;
+        emit("static");
+      }
+      emit(propName);
+      if (propertyType.isFunctionType()) {
+        visitFunctionDeclaration((FunctionType) propertyType);
+      } else {
+        visitTypeDeclaration(propertyType, false);
+      }
+      emit(";");
+      emitBreak();
+      if (isStatic) {
+        emitStaticOverloads(propName, objType, propertyType);
+      }
+    }
+
+    /**
+     * Emit overloads for static methods from super classes that do not match the signature of the
+     * current method.
+     *
+     * In Closure, static methods are completely independent of each other, like regular functions
+     * with different names. In TypeScript, the static side of a class has to extend its parent's
+     * static side, i.e. static methods are inherited and have to subtype the parent's methods.
+     *
+     * E.g. the following code fails as Child incorrectly extends Parent.
+     *
+     * <pre>
+     *   class Parent               { static foo(a: string); }
+     *   class Child extends Parent { static foo(a: number); }
+     * </pre>
+     *
+     * To fix, the code below re-emits (by recursion) any properties that have a colliding type.
+     *
+     * This is necessarily incomplete, and will fail for differences that cannot be dispatched on,
+     * e.g. different return types. It also pretends that functions exist that do not.
+     */
+    private void emitStaticOverloads(String propName, ObjectType objType, JSType propertyType) {
+      if (!objType.isFunctionType()) {
+        return;
+      }
+      ObjectType superType = getSuperType((FunctionType) objType);
+      if (superType == null || superType.getConstructor() == null) {
+        return;
+      }
+      FunctionType superTypeCtor = superType.getConstructor();
+      if (!superTypeCtor.hasProperty(propName)) {
+        return;
+      }
+      // "I, for one, welcome our new static overloads." - H.G. Wells.
+      JSType superPropType = superTypeCtor.getPropertyType(propName);
+      if (!superPropType.equals(propertyType)) {
+        if (!propertyType.isFunctionType() || !superPropType.isFunctionType()) {
+          throw new IllegalArgumentException("Found a statically declared field that does not match"
+              + "the type of a parent field with the same name, which is illegal in TypeScript.\n"
+              + "at " + objType.getDisplayName() + "." + propName);
+        }
+        emit("/** WARNING: emitted for non-matching super type's static method. "
+            + "Only the first overload is actually callable. */");
+        emitBreak();
+        visitProperty(propName, superTypeCtor, true);
       }
     }
 
