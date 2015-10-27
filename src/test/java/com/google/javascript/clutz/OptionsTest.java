@@ -30,6 +30,8 @@ public class OptionsTest {
     try {
       new Options(new String[0]);
       fail("Should throw");
-    } catch (CmdLineException expected) {}
+    } catch (CmdLineException expected) {
+      assertThat(expected.getMessage()).isEqualTo("No files were given");
+    }
   }
 }

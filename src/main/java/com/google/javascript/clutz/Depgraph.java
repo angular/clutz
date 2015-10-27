@@ -10,9 +10,10 @@ import java.util.List;
 
 /**
  * Representation of the data contained in a depgraph file.
- * This JSON file is produced by Bazel javascript rules, and describes the shape
- * of the dependency graph for a given rule.
- * We use it to determine which inputs to the compiler are srcs and which come from deps.
+ *
+ * This JSON file is produced by Bazel javascript rules, and describes the shape of the dependency
+ * graph for a given rule. We use it to determine which inputs to the compiler are srcs and which
+ * come from deps.
  */
 public class Depgraph {
 
@@ -31,7 +32,8 @@ public class Depgraph {
     List<String> roots = new ArrayList<>();
     for (String depgraph : fileContents) {
       try {
-        List<List<?>> list = new Gson().fromJson(depgraph, new TypeToken<List<List<?>>>(){}.getType());
+        List<List<?>> list =
+            new Gson().fromJson(depgraph, new TypeToken<List<List<?>>>() {}.getType());
         for (List<?> outer : list) {
           Iterator<?> i = outer.iterator();
           if ("roots".equals(i.next())) {

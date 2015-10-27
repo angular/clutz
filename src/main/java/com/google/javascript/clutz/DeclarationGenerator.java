@@ -136,10 +136,10 @@ public class DeclarationGenerator {
     // Don't print anything, throw later below.
     compiler.setErrorManager(new BasicErrorManager() {
       @Override
-      public void println(CheckLevel level, JSError error) {}
+      public void println(CheckLevel level, JSError error) { /* check errors below */ }
 
       @Override
-      protected void printSummary() {}
+      protected void printSummary() { /* check errors below */ }
     });
 
     if (externs.isEmpty()) {
@@ -200,7 +200,7 @@ public class DeclarationGenerator {
     emitNamespaceBegin(namespace);
     TreeWalker treeWalker = new TreeWalker(namespace, compiler.getTypeRegistry(), provides);
     if (isDefault) {
-      treeWalker.walk(symbol, true);
+      treeWalker.walk(symbol);
     } else {
       // JSCompiler treats "foo.x" as one variable name, so collect all provides that start with
       // $provide + "." but are not sub-properties.
@@ -235,7 +235,7 @@ public class DeclarationGenerator {
             && !other.getType().isFunctionPrototypeType()
             && !isPrototypeMethod(other)) {
           try {
-            treeWalker.walk(other, false);
+            treeWalker.walk(other);
           } catch (RuntimeException e) {
             throw new RuntimeException("Failed to emit for " + other, e);
           }
@@ -427,7 +427,7 @@ public class DeclarationGenerator {
       return input.substring(dotIdx + 1, input.length());
     }
 
-    private void walk(TypedVar symbol, boolean isDefault) {
+    private void walk(TypedVar symbol) {
       JSType type = symbol.getType();
       if (!type.isInterface() && !type.isNoType()) valueSymbolsWalked++;
       if (type.isFunctionType()) {
@@ -613,7 +613,7 @@ public class DeclarationGenerator {
       }
     }
 
-    private void visitType(JSType type) {
+    private void visitType(JSType typeToVisit) {
       // See also JsdocToEs6TypedConverter in the Closure code base. This code is implementing the
       // same algorithm starting from JSType nodes (as opposed to JSDocInfo), and directly
       // generating textual output. Otherwise both algorithms should produce the same output.
@@ -682,24 +682,24 @@ public class DeclarationGenerator {
             emit("[]");
             return null;
           }
-          switch(type.getDisplayName()) {
+          switch (type.getDisplayName()) {
             // Arguments<?> and NodeList<?> in es3 externs are correspondinly
             // IArguments and NodeList interfaces (not-parametrized) in lib.d.ts.
             // New* are temporary work-arounds for upstream externs.
             // TODO(rado): upgrade closure compiler and remove them.
             case "Arguments":
-            case "NewArguments":{
+            case "NewArguments":
               emit("IArguments");
               return null;
-            }
             case "NodeList":
-            case "NewNodeList": {
+            case "NewNodeList":
               emit("NodeList");
               return null;
-            }
-            case "IThenable": {
+            case "IThenable":
               templateTypeName = "PromiseLike";
-            }
+              break;
+            default:
+              break;
           }
           if (type.getTemplateTypes().isEmpty()) {
             // In Closure, subtypes of `TemplatizedType`s that do not take type arguments are still
@@ -808,9 +808,9 @@ public class DeclarationGenerator {
         }
       };
       try {
-        type.visit(visitor);
+        typeToVisit.visit(visitor);
       } catch (Exception e) {
-        throw new RuntimeException("Failed to emit type " + type, e);
+        throw new RuntimeException("Failed to emit type " + typeToVisit, e);
       }
     }
 
