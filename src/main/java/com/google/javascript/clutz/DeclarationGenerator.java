@@ -10,8 +10,10 @@ import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.base.Function;
+import com.google.common.base.Functions;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -23,8 +25,9 @@ import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerInput;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DefaultPassConfig;
+import com.google.javascript.jscomp.DiagnosticType;
+import com.google.javascript.jscomp.ErrorHandler;
 import com.google.javascript.jscomp.JSError;
-import com.google.javascript.jscomp.Result;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.TypedScope;
 import com.google.javascript.jscomp.TypedVar;
@@ -52,7 +55,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -68,17 +70,20 @@ import javax.annotation.Nullable;
  * A tool that generates {@code .d.ts} declarations from a Google Closure JavaScript program.
  */
 public class DeclarationGenerator {
-
-  private static final String INTERNAL_NAMESPACE = "ಠ_ಠ.clutz_internal";
-
-  // Comments in .d.ts and .js golden files starting with '//!!' are stripped.
-  public static final Pattern GOLDEN_FILE_COMMENTS_REGEXP = Pattern.compile("(?m)^\\s*//!!.*\\n");
+  static final DiagnosticType CLUTZ_OVERRIDDEN_STATIC_FIELD =
+      DiagnosticType.error("CLUTZ_OVERRIDDEN_STATIC_FIELD",
+          "Found a statically declared field that does not match the type of a parent field "
+              + "with the same name, which is illegal in TypeScript.\nAt {0}.{1}");
+  static final DiagnosticType CLUTZ_MISSING_TYPES = DiagnosticType.error("CLUTZ_MISSING_TYPES",
+      "The code does not compile because it is missing some types. This is often caused by "
+          + "the referenced code missing dependencies or by missing externs in your build rule.");
 
   private static final Function<Node, String> NODE_GET_STRING = new Function<Node, String>() {
     @Override public String apply(Node input) {
       return input.getString();
     }};
 
+  private List<JSError> errors = new ArrayList<>();
   private StringWriter out = new StringWriter();
   private final Options opts;
 
@@ -87,13 +92,24 @@ public class DeclarationGenerator {
   }
 
   public static void main(String[] args) {
+    boolean printStackTrace = false;
     try {
-      new DeclarationGenerator(new Options(args)).generateDeclarations();
+      Options options = new Options(args);
+      printStackTrace = options.debug;
+      new DeclarationGenerator(options).generateDeclarations();
     } catch (CmdLineException e) {
       System.err.println(e.getMessage());
       System.err.println("Usage: clutz [options...] arguments...");
       e.getParser().printUsage(System.err);
       System.err.println();
+      System.exit(1);
+    } catch (DeclarationGeneratorException e) {
+      if (printStackTrace) {
+        // Includes the message.
+        e.printStackTrace(System.err);
+      } else {
+        System.err.println(e.getMessage());
+      }
       System.exit(1);
     } catch (Exception e) {
       e.printStackTrace(System.err);
@@ -132,8 +148,15 @@ public class DeclarationGenerator {
     Compiler compiler = new Compiler();
     compiler.disableThreads();
     CompilerOptions compilerOptions = opts.getCompilerOptions();
+    // Capture all errors directly instead of relying on JSCompiler's error reporting mechanisms.
+    compilerOptions.setErrorHandler(new ErrorHandler() {
+      @Override
+      public void report(CheckLevel level, JSError error) {
+        errors.add(error);
+      }
+    });
     compiler.setPassConfig(new DefaultPassConfig(compilerOptions));
-    // Don't print anything, throw later below.
+    // In spite of setting an ErrorHandler above, this is still needed to silence the console.
     compiler.setErrorManager(new BasicErrorManager() {
       @Override
       public void println(CheckLevel level, JSError error) { /* check errors below */ }
@@ -145,15 +168,27 @@ public class DeclarationGenerator {
     if (externs.isEmpty()) {
       externs = opts.skipParseExterns ? Collections.<SourceFile>emptyList() : getDefaultExterns();
     } else {
-      Preconditions.checkArgument(!opts.skipParseExterns);
-    }
-    Result compilationResult =
-        compiler.compile(externs, sourceFiles, compilerOptions);
-    if (compiler.hasErrors()) {
-      throw new AssertionError("Compile failed: " + Arrays.toString(compilationResult.errors));
+      Preconditions.checkArgument(!opts.skipParseExterns,
+          "Cannot pass --skipParseExterns and --externs.");
     }
 
-    return produceDts(compiler, depgraph);
+    compiler.compile(externs, sourceFiles, compilerOptions);
+    if (!errors.isEmpty()) {
+      boolean missingTypes =
+          Iterables.any(Iterables.transform(errors, Functions.toStringFunction()),
+              Predicates.contains(Pattern.compile("Bad type annotation. Unknown type")));
+      if (missingTypes) {
+        errors.add(0, JSError.make(CLUTZ_MISSING_TYPES));
+      }
+      throw new DeclarationGeneratorException("Source code does not compile with JSCompiler",
+          errors);
+    }
+
+    String dts = produceDts(compiler, depgraph);
+    if (!errors.isEmpty()) {
+      throw new DeclarationGeneratorException("Errors while generating definitions", errors);
+    }
+    return dts;
   }
 
   public String produceDts(Compiler compiler, Depgraph depgraph) {
@@ -237,6 +272,7 @@ public class DeclarationGenerator {
           try {
             treeWalker.walk(other);
           } catch (RuntimeException e) {
+            // Do not throw DeclarationGeneratorException - this is an unexpected runtime error.
             throw new RuntimeException("Failed to emit for " + other, e);
           }
         }
@@ -244,7 +280,8 @@ public class DeclarationGenerator {
     }
     emitNamespaceEnd();
     // An extra pass is required for default exported interfaces, because in Closure they might have
-    // static methods. TS does not support static methods on interfaces, thus we create a new namespace for them.
+    // static methods. TS does not support static methods on interfaces, thus we create a new
+    // namespace for them.
     if (isDefault && isInterfaceWithStatic(symbol.getType())) {
       emitNamespaceBegin(symbol.getName());
       treeWalker.walkDefaultInterface((FunctionType) symbol.getType());
@@ -261,9 +298,10 @@ public class DeclarationGenerator {
     // goog namespace doesn't need to be goog.required.
     if (namespace.equals("goog")) return;
     emitNamespaceBegin("goog");
-    String qualifiedClosureNamespace = INTERNAL_NAMESPACE + "." + closureNamespace;
+    String qualifiedClosureNamespace = Constants.INTERNAL_NAMESPACE + "." + closureNamespace;
     // TS supports overloading the require declaration with a fixed string argument.
-    emit("function require(name: '" + closureNamespace + "'): typeof " + qualifiedClosureNamespace + ";");
+    emit("function require(name: '" + closureNamespace + "'): typeof " + qualifiedClosureNamespace
+        + ";");
     emitBreak();
     emitNamespaceEnd();
   }
@@ -271,7 +309,7 @@ public class DeclarationGenerator {
 
   private void emitNamespaceBegin(String namespace) {
     emitNoSpace("declare namespace ");
-    emitNoSpace(INTERNAL_NAMESPACE);
+    emitNoSpace(Constants.INTERNAL_NAMESPACE);
     if (!namespace.isEmpty()) {
       emitNoSpace("." + namespace);
     }
@@ -314,7 +352,7 @@ public class DeclarationGenerator {
     emitBreak();
     // workaround for https://github.com/Microsoft/TypeScript/issues/4325
     emit("import alias = ");
-    emitNoSpace(INTERNAL_NAMESPACE);
+    emitNoSpace(Constants.INTERNAL_NAMESPACE);
     emitNoSpace("." + name);
     emitNoSpace(";");
     emitBreak();
@@ -333,7 +371,7 @@ public class DeclarationGenerator {
     try {
       return AbstractCommandLineRunner.getBuiltinExterns(opts.getCompilerOptions());
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("Could not locate builtin externs", e);
     }
   }
 
@@ -397,6 +435,7 @@ public class DeclarationGenerator {
     private final JSTypeRegistry typeRegistry;
     private final Set<String> provides;
     private int valueSymbolsWalked = 0;
+    private TypedVar currentSymbol;
 
     private TreeWalker(String namespace, JSTypeRegistry typeRegistry, Set<String> provides) {
       this.namespace = namespace;
@@ -428,6 +467,7 @@ public class DeclarationGenerator {
     }
 
     private void walk(TypedVar symbol) {
+      this.currentSymbol = symbol;
       JSType type = symbol.getType();
       if (!type.isInterface() && !type.isNoType()) valueSymbolsWalked++;
       if (type.isFunctionType()) {
@@ -996,13 +1036,13 @@ public class DeclarationGenerator {
       JSType superPropType = superTypeCtor.getPropertyType(propName);
       if (!superPropType.equals(propertyType)) {
         if (!propertyType.isFunctionType() || !superPropType.isFunctionType()) {
-          throw new IllegalArgumentException("Found a statically declared field that does not match"
-              + "the type of a parent field with the same name, which is illegal in TypeScript.\n"
-              + "at " + objType.getDisplayName() + "." + propName);
+          errors.add(JSError.make(currentSymbol.getNode(), CLUTZ_OVERRIDDEN_STATIC_FIELD,
+              objType.getDisplayName(), propName));
+        } else {
+          emit("/** WARNING: emitted for non-matching super type's static method. "
+              + "Only the first overload is actually callable. */");
+          emitBreak();
         }
-        emit("/** WARNING: emitted for non-matching super type's static method. "
-            + "Only the first overload is actually callable. */");
-        emitBreak();
         visitProperty(propName, superTypeCtor, true);
       }
     }

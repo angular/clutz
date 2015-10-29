@@ -3,7 +3,7 @@ goog.provide('fn.String');
 
 /** @return {fn.String} */
 fn = function() {
-  return new fn.String();  
+  return new fn.String();
 };
 
 /** @constructor */

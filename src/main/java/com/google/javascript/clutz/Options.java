@@ -5,8 +5,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.google.common.io.Files;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.ErrorHandler;
-import com.google.javascript.jscomp.JSError;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -24,6 +22,9 @@ public class Options {
 
   @Option(name = "-o", usage = "output to this file", metaVar = "OUTPUT")
   String output = "-";
+
+  @Option(name = "--debug", usage = "run in debug mode (prints stack traces)")
+  boolean debug = false;
 
   @Option(name = "--externs",
       usage = "list of files to read externs definitions (as separate args)",
@@ -52,12 +53,6 @@ public class Options {
     options.setCheckTypes(true);
     options.setInferTypes(true);
     options.setIdeMode(true); // So that we can query types after compilation.
-    options.setErrorHandler(new ErrorHandler() {
-      @Override
-      public void report(CheckLevel level, JSError error) {
-        throw new AssertionError(error.toString());
-      }
-    });
     return options;
   }
 

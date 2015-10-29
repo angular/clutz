@@ -26,7 +26,7 @@ public class MultiFileTest {
     assertThatProgram(
         singletonList(input("require.js")),
         singletonList(input("provide.js")))
-        .generatesDeclarations(false, expected);
+        .generatesDeclarations(expected);
   }
 
   @Test
@@ -35,7 +35,7 @@ public class MultiFileTest {
     assertThatProgram(
         ImmutableList.of(input("index.js"), input("dep.js")),
         Collections.<File>emptyList())
-        .generatesDeclarations(false, expected);
+        .generatesDeclarations(expected);
   }
 
   private File input(String filename) {

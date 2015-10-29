@@ -4,7 +4,6 @@ import static com.google.javascript.clutz.ProgramSubject.assertThatProgram;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
-import com.google.javascript.clutz.DeclarationGenerator;
 
 import junit.framework.Test;
 import junit.framework.TestResult;
@@ -22,9 +21,12 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @RunWith(AllTests.class)
 public class DeclarationGeneratorTests {
+  /** Comments in .d.ts and .js golden files starting with '//!!' are stripped. */
+  static final Pattern GOLDEN_FILE_COMMENTS_REGEXP = Pattern.compile("(?m)^\\s*//!!.*\\n");
 
   public static final FilenameFilter JS = new FilenameFilter() {
     @Override
@@ -67,7 +69,7 @@ public class DeclarationGeneratorTests {
 
   static String getTestFileText(final File input) throws IOException {
     String text = Files.asCharSource(input, Charsets.UTF_8).read();
-    return DeclarationGenerator.GOLDEN_FILE_COMMENTS_REGEXP.matcher(text).replaceAll("");
+    return GOLDEN_FILE_COMMENTS_REGEXP.matcher(text).replaceAll("");
   }
 
   private static final class DeclarationTest implements Test, Describable {
@@ -87,7 +89,11 @@ public class DeclarationGeneratorTests {
     public void run(TestResult result) {
       result.startTest(this);
       try {
-        assertThatProgram(input).generatesDeclarations(withExterns, goldenText);
+        ProgramSubject subject = assertThatProgram(input);
+        if (withExterns) {
+          subject = subject.withExterns();
+        }
+        subject.generatesDeclarations(goldenText);
       } catch (Throwable t) {
         result.addError(this, t);
       } finally {
