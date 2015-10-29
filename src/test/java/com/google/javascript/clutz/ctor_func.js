@@ -3,6 +3,7 @@ goog.provide('ctor_func');
 /**
  * @param {string} a
  * @param {number} b
+ * @template T
  * @constructor
  */
 ctor_func.Ctor = function(a, b) {};

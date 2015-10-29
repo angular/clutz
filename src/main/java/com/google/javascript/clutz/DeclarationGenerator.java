@@ -1063,7 +1063,7 @@ public class DeclarationGenerator {
       emit("new");
       visitFunctionParameters(ftype);
       emit(":");
-      emit(getUnqualifiedName(ftype.getInstanceType()));
+      visitType(ftype.getInstanceType());
       emit("}");
     }
 
