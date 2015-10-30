@@ -287,11 +287,28 @@ public class DeclarationGenerator {
       treeWalker.walkDefaultInterface((FunctionType) symbol.getType());
       emitNamespaceEnd();
     }
+    // extra walk required for inner classes and inner enums. They are allowed in closure,
+    // but not in TS, so we have to generate a namespace-class pair in TS.
+    if (isDefault && hasNestedTypes(symbol.getType())) {
+      emitNamespaceBegin(symbol.getName());
+      treeWalker.walkInnerClassesAndEnums((ObjectType) symbol.getType(), symbol.getName(), provides);
+      emitNamespaceEnd();
+    }
     // skip emitting goog.require declarations for value empty namespaces, as calling typeof
     // does not work them.
     if (treeWalker.valueSymbolsWalked > 0) {
       emitGoogRequireSupport(namespace, isDefault ? symbol.getName() : namespace);
     }
+  }
+
+  private boolean hasNestedTypes(JSType type) {
+    if (!type.isConstructor()) return false;
+    FunctionType ftype = (FunctionType) type;
+    for (String name : ((FunctionType) type).getOwnPropertyNames()) {
+      JSType propType = ftype.getPropertyType(name);
+      if (propType.isConstructor() || propType.isEnumType() || propType.isInterface()) return true;
+    }
+    return false;
   }
 
   private void emitGoogRequireSupport(String namespace, String closureNamespace) {
@@ -425,9 +442,10 @@ public class DeclarationGenerator {
 
   private ObjectType getSuperType(FunctionType type) {
     ObjectType proto = type.getPrototype();
-    return proto == null ? null :
-        proto.getImplicitPrototype().getDisplayName().equals("Object") ? null :
-        proto.getImplicitPrototype();
+    if (proto == null) return null;
+    ObjectType implicitProto = proto.getImplicitPrototype();
+    if (implicitProto == null) return null;
+    return "Object".equals(implicitProto.getDisplayName()) ? null : implicitProto;
   }
 
   private class TreeWalker {
@@ -494,47 +512,7 @@ public class DeclarationGenerator {
           visitVarDeclaration(symbol, ftype);
           return;
         }
-
-        if (ftype.isConstructor()) {
-          // "proper" class constructor
-          emit("class");
-        } else if (ftype.isInterface()) {
-          emit("interface");
-        } else {
-          checkState(false, "Unexpected function type " + ftype);
-        }
-        emit(getUnqualifiedName(symbol));
-
-        visitTemplateTypes(ftype);
-
-        // Interface extends another interface
-        if (ftype.getExtendedInterfacesCount() > 0) {
-          emit("extends");
-          Iterator<ObjectType> it = ftype.getExtendedInterfaces().iterator();
-          while (it.hasNext()) {
-            visitType(it.next());
-            if (it.hasNext()) {
-              emit(",");
-            }
-          }
-        }
-        // Class extends another class
-        if (getSuperType(ftype) != null) {
-          emit("extends");
-          visitType(getSuperType(ftype));
-        }
-
-        Iterator<ObjectType> it = ftype.getOwnImplementedInterfaces().iterator();
-        if (it.hasNext()) {
-          emit("implements");
-          while (it.hasNext()) {
-            visitType(it.next());
-            if (it.hasNext()) {
-              emit(",");
-            }
-          }
-        }
-        visitObjectType(ftype, ftype.getPrototype(), !ftype.isInterface());
+        visitClassOrInterface(getUnqualifiedName(symbol), ftype);
       } else {
         if (type.isEnumType()) {
           visitEnumType((EnumType) type);
@@ -552,6 +530,49 @@ public class DeclarationGenerator {
         }
         visitVarDeclaration(symbol, type);
       }
+    }
+
+    private void visitClassOrInterface(String name, FunctionType ftype) {
+      if (ftype.isConstructor()) {
+        // "proper" class constructor
+        emit("class");
+      } else if (ftype.isInterface()) {
+        emit("interface");
+      } else {
+        checkState(false, "Unexpected function type " + ftype);
+      }
+      emit(name);
+
+      visitTemplateTypes(ftype);
+
+      // Interface extends another interface
+      if (ftype.getExtendedInterfacesCount() > 0) {
+        emit("extends");
+        Iterator<ObjectType> it = ftype.getExtendedInterfaces().iterator();
+        while (it.hasNext()) {
+          visitType(it.next());
+          if (it.hasNext()) {
+            emit(",");
+          }
+        }
+      }
+      // Class extends another class
+      if (getSuperType(ftype) != null) {
+        emit("extends");
+        visitType(getSuperType(ftype));
+      }
+
+      Iterator<ObjectType> it = ftype.getOwnImplementedInterfaces().iterator();
+      if (it.hasNext()) {
+        emit("implements");
+        while (it.hasNext()) {
+          visitType(it.next());
+          if (it.hasNext()) {
+            emit(",");
+          }
+        }
+      }
+      visitObjectType(ftype, ftype.getPrototype(), !ftype.isInterface());
     }
 
     private void visitVarDeclaration(TypedVar symbol, JSType type) {
@@ -976,10 +997,8 @@ public class DeclarationGenerator {
         return;
       } else if (isPrivate(objType.getOwnPropertyJSDocInfo(propName))) {
         return;
-      } else if (propertyType.isEnumType()) {
-        // For now, we don't emit static enum properties. We theorize it should not be needed.
-        emit("/* not emitting " + propName + " because it is an enum and it is not provided */");
-        emitBreak();
+      } else if (propertyType.isEnumType() || propertyType.isConstructor()) {
+        // enums and classes are emitted in a namespace later.
         return;
       }
       if (isStatic) {
@@ -1104,6 +1123,18 @@ public class DeclarationGenerator {
         }
       }
       emit(")");
+    }
+
+    public void walkInnerClassesAndEnums(ObjectType type, String namespace, Set<String> provides) {
+      for (String propName : getSortedPropertyNames(type)) {
+        if (provides.contains(namespace + '.' + propName)) continue;
+        JSType pType = type.getPropertyType(propName);
+        if (pType.isEnumType()) {
+          visitEnumType((EnumType) pType);
+        } else if (pType.isConstructor()) {
+          visitClassOrInterface(propName, (FunctionType) pType);
+        }
+      }
     }
   }
 }

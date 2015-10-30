@@ -1,6 +1,3 @@
-import aFunction from 'goog:a.b.StaticHolder.aFunction';
 import StaticHolder from 'goog:a.b.StaticHolder';
-
-// these are both calling same symbol
-var b: boolean = aFunction();
-b = StaticHolder.aFunction();
+// goog:a.b.StaticHolder.aFunction cannot be required, because it is not provided
+var b: boolean = StaticHolder.aFunction();

@@ -1,6 +1,8 @@
 goog.provide('foo.bar.Baz');
-goog.provide('foo.bar.Baz.NestedClass');
-goog.provide('foo.bar.Baz.NestedEnum');
+
+// NestedClass and NestedEnum are not provided because this is against JS closure's
+// style guide.
+// https://google.github.io/styleguide/javascriptguide.xml?showone=Providing_Dependencies_With_goog.provide#Providing_Dependencies_With_goog.provide
 
 /** @constructor */
 foo.bar.Baz = function() {
@@ -58,11 +60,3 @@ foo.bar.Baz.NestedEnum = {
   A: 1,
   B: 2
 };
-
-/**
- * This is not goog.provided, and it would be strange to reference an enum type
- * as a static class property.
- * This is just here to assert that we gracefully ignore it.
- * @enum
- */
-foo.bar.Baz.AnotherNestedEnum = {};

@@ -2,6 +2,8 @@ declare namespace ಠ_ಠ.clutz_internal.a.b {
   class StaticHolder {
   }
 }
+declare namespace ಠ_ಠ.clutz_internal.a.b.StaticHolder {
+}
 declare namespace ಠ_ಠ.clutz_internal.goog {
   function require(name: 'a.b.StaticHolder'): typeof ಠ_ಠ.clutz_internal.a.b.StaticHolder;
 }
