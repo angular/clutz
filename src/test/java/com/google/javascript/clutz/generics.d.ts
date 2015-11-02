@@ -4,6 +4,7 @@ declare namespace ಠ_ಠ.clutz_internal.generics {
   class ExtendsGenericClass < TYPE > extends Foo < TYPE , number > {
   }
   class Foo < T , U > {
+    private noStructuralTyping_: any;
     constructor (a : number ) ;
     get ( ) : T ;
     loop < V , W > (t : T , v : V ) : any ;
@@ -12,6 +13,7 @@ declare namespace ಠ_ಠ.clutz_internal.generics {
   interface GenericInterface < TYPE > {
   }
   class ImplementsGenericInterface < TYPE > implements GenericInterface < TYPE > {
+    private noStructuralTyping_: any;
   }
   var arrayMissingTypeParam : any [] ;
   var fooMissingAllTypeParams : Foo < any , any > ;

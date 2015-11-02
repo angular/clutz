@@ -1,5 +1,6 @@
 declare namespace ಠ_ಠ.clutz_internal.foo.bar {
   class Baz {
+    private noStructuralTyping_: any;
     field : string ;
     avalue : number ;
     equals (b : Baz.NestedClass ) : boolean ;
@@ -9,6 +10,7 @@ declare namespace ಠ_ಠ.clutz_internal.foo.bar {
 }
 declare namespace ಠ_ಠ.clutz_internal.foo.bar.Baz {
   class NestedClass {
+    private noStructuralTyping_: any;
   }
   type NestedEnum = number ;
   var NestedEnum : {

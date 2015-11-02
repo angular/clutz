@@ -14,8 +14,6 @@ foo.bar.Baz = function() {
   // concerned `avalue` lives on the prototype object.
   /** @type {string} */
   this.avalue = 0;
-  /** @private {number} */
-  this.hideMe_ = 0;
 };
 
 /**
@@ -46,11 +44,6 @@ foo.bar.Baz.prototype.method = function(a) {
 foo.bar.Baz.prototype.equals = function(b) {
   return false;
 };
-
-/**
- * @private
- */
-foo.bar.Baz.prototype.thisIsPrivate_ = function() {};
 
 /** @constructor */
 foo.bar.Baz.NestedClass = function() {};

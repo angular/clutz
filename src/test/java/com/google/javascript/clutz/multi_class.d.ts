@@ -1,5 +1,6 @@
 declare namespace ಠ_ಠ.clutz_internal.multi_class {
   class A {
+    private noStructuralTyping_: any;
     constructor (n : number ) ;
     a : number ;
   }
@@ -10,6 +11,7 @@ declare namespace ಠ_ಠ.clutz_internal.multi_class {
   class C extends B {
   }
   class D implements I {
+    private noStructuralTyping_: any;
   }
   interface I {
   }

@@ -1,5 +1,6 @@
 declare namespace ಠ_ಠ.clutz_internal.foo {
   class SimpleClass {
+    private noStructuralTyping_: any;
   }
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {

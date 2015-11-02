@@ -1,5 +1,6 @@
 declare namespace ಠ_ಠ.clutz_internal.a.b {
   class StaticHolder {
+    private noStructuralTyping_: any;
   }
 }
 declare namespace ಠ_ಠ.clutz_internal.a.b.StaticHolder {

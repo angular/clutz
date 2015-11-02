@@ -971,6 +971,13 @@ public class DeclarationGenerator {
       emit("{");
       indent();
       emitBreak();
+      // Prevent accidental structural typing - emit every class with a private field.
+      if (type.isNominalConstructor() && !type.isInterface()
+          // But only for non-extending classes (TypeScript doesn't like overriding private fields)
+          && getSuperType((FunctionType) type) == null) {
+        emit("private noStructuralTyping_: any;");
+        emitBreak();
+      }
       // Constructors.
       if (type.isConstructor() && ((FunctionType)type).getParameters().iterator().hasNext()) {
         emit("constructor");

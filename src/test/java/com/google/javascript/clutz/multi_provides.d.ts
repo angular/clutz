@@ -20,6 +20,7 @@ declare module 'goog:multi_provides.a.b.c' {
 }
 declare namespace ಠ_ಠ.clutz_internal.multi_provides.a.b.c {
   class Two {
+    private noStructuralTyping_: any;
   }
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {

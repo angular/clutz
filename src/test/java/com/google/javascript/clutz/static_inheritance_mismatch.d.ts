@@ -30,6 +30,7 @@ declare module 'goog:static_inherit.GrandChild' {
 }
 declare namespace ಠ_ಠ.clutz_internal.static_inherit {
   class Parent {
+    private noStructuralTyping_: any;
     static static_fn (a : string ) : void ;
   }
 }

@@ -10,6 +10,7 @@ declare module 'goog:fn' {
 }
 declare namespace ಠ_ಠ.clutz_internal.fn {
   class String {
+    private noStructuralTyping_: any;
   }
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {

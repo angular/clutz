@@ -21,6 +21,7 @@ declare module 'goog:typesWithExterns' {
 }
 declare namespace ಠ_ಠ.clutz_internal.typesWithExterns {
   class A {
+    private noStructuralTyping_: any;
     constructor (n : number ) ;
     apply : number ;
   }
@@ -56,8 +57,10 @@ declare module 'goog:typesWithExterns.C' {
 }
 declare namespace ಠ_ಠ.clutz_internal.angular {
   class $injector {
+    private noStructuralTyping_: any;
   }
   class Scope {
+    private noStructuralTyping_: any;
     $$phase : string ;
     $apply (opt_exp ? : string | ( (a : Scope ) => any ) ) : any ;
     $applyAsync (opt_exp ? : string | ( (a : Scope ) => any ) ) : any ;
