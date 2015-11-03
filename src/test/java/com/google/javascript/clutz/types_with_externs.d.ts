@@ -9,6 +9,7 @@ declare namespace ಠ_ಠ.clutz_internal.typesWithExterns {
   var c : NodeList | IArguments | { length : number } ;
   function elementMaybe ( ) : Element ;
   function id (x : NodeList | IArguments | { length : number } ) : NodeList | IArguments | { length : number } ;
+  var myScope : angular.Scope ;
   function topLevelFunction ( ...a : any [] ) : any ;
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {
@@ -52,4 +53,14 @@ declare namespace ಠ_ಠ.clutz_internal.goog {
 declare module 'goog:typesWithExterns.C' {
   import alias = ಠ_ಠ.clutz_internal.typesWithExterns.C;
   export default alias;
+}
+declare namespace ಠ_ಠ.clutz_internal.angular {
+  class $injector {
+  }
+  class Scope {
+    $$phase : string ;
+    $apply (opt_exp ? : string | ( (a : Scope ) => any ) ) : any ;
+    $applyAsync (opt_exp ? : string | ( (a : Scope ) => any ) ) : any ;
+  }
+  function bootstrap (element : Element | HTMLDocument , opt_modules ? : string | ( ( ...a : any [] ) => any ) [] ) : $injector ;
 }

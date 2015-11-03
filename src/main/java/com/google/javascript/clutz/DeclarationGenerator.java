@@ -31,6 +31,7 @@ import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.TypedScope;
 import com.google.javascript.jscomp.TypedVar;
+import com.google.javascript.rhino.InputId;
 import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
@@ -129,7 +130,7 @@ public class DeclarationGenerator {
       externFiles.add(SourceFile.fromFile(extern, UTF_8));
     }
     String result = generateDeclarations(sourceFiles, externFiles,
-        Depgraph.parseFrom(opts.readDepgraphs()));
+            Depgraph.parseFrom(opts.readDepgraphs()));
 
     if ("-".equals(opts.output)) {
       System.out.println(result);
@@ -166,7 +167,7 @@ public class DeclarationGenerator {
     });
 
     if (externs.isEmpty()) {
-      externs = opts.skipParseExterns ? Collections.<SourceFile>emptyList() : getDefaultExterns();
+      externs = opts.skipParseExterns ? Collections.<SourceFile>emptyList() : getDefaultExterns(opts);
     } else {
       Preconditions.checkArgument(!opts.skipParseExterns,
           "Cannot pass --skipParseExterns and --externs.");
@@ -223,15 +224,44 @@ public class DeclarationGenerator {
         int lastDot = symbol.getName().lastIndexOf('.');
         namespace = lastDot >= 0 ? symbol.getName().substring(0, lastDot) : "";
       }
-      declareNamespace(namespace, symbol, isDefault, compiler, transitiveProvides);
+      int valueSymbolsWalked = declareNamespace(namespace, symbol, isDefault, compiler, transitiveProvides);
+
+      // skip emitting goog.require declarations for value empty namespaces, as calling typeof
+      // does not work for them.
+      if (valueSymbolsWalked > 0) {
+        emitGoogRequireSupport(namespace, isDefault ? symbol.getName() : namespace);
+      }
       declareModule(provide, isDefault);
     }
+
+    // In order to typecheck in the presence of third-party externs, also emit all top-level extern
+    // symbols, even though they have no explicit provides.
+    for (TypedVar symbol : topScope.getAllSymbols()) {
+      CompilerInput symbolInput = compiler.getInput(new InputId(symbol.getInputName()));
+      if (symbolInput == null || !symbolInput.isExtern()) continue;
+      if (isPlatformExtern(symbolInput)) continue;
+      // Only emitting top-level symbols, since they transitively contain all children.
+      if (symbol.getName().contains(".")) continue;
+      declareNamespace(symbol.getName(), symbol, false, compiler, transitiveProvides);
+      // we do not declare modules or goog.require support, because externs types should not be
+      // visible from TS code.
+    }
+
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
   }
 
-  private void declareNamespace(String namespace, TypedVar symbol, boolean isDefault,
-      Compiler compiler, Set<String> provides) {
+  // For platform externs we skip emitting .d.ts, to avoid collisions with lib.d.ts.
+  private boolean isPlatformExtern(CompilerInput symbolInput) {
+    String name = symbolInput.getName();
+    name = name.replace("externs.zip//", "");
+    // mostly matching what is in https://github.com/google/closure-compiler/tree/master/externs.
+    return name.startsWith("es") || name.startsWith("w3c") || name.startsWith("ie_")
+        || name.startsWith("browser");
+  }
+
+  private int declareNamespace(String namespace, TypedVar symbol, boolean isDefault,
+                               Compiler compiler, Set<String> provides) {
     emitNamespaceBegin(namespace);
     TreeWalker treeWalker = new TreeWalker(namespace, compiler.getTypeRegistry(), provides);
     if (isDefault) {
@@ -294,11 +324,8 @@ public class DeclarationGenerator {
       treeWalker.walkInnerClassesAndEnums((ObjectType) symbol.getType(), symbol.getName(), provides);
       emitNamespaceEnd();
     }
-    // skip emitting goog.require declarations for value empty namespaces, as calling typeof
-    // does not work them.
-    if (treeWalker.valueSymbolsWalked > 0) {
-      emitGoogRequireSupport(namespace, isDefault ? symbol.getName() : namespace);
-    }
+    return treeWalker.valueSymbolsWalked;
+
   }
 
   private boolean hasNestedTypes(JSType type) {
@@ -384,7 +411,7 @@ public class DeclarationGenerator {
     emitBreak();
   }
 
-  private List<SourceFile> getDefaultExterns() {
+  static public List<SourceFile> getDefaultExterns(Options opts) {
     try {
       return AbstractCommandLineRunner.getBuiltinExterns(opts.getCompilerOptions());
     } catch (IOException e) {

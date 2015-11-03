@@ -48,6 +48,8 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
         }
       };
   static final List<SourceFile> NO_EXTERNS = Collections.emptyList();
+  static final List<SourceFile> THIRD_PARTY_EXTERNS =
+          singletonList(SourceFile.fromFile("src/resources/third_party_externs.js"));
 
   private boolean withExterns = false;
 
@@ -108,8 +110,14 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       roots.add("main.js");
     }
 
+    List<SourceFile> externs = NO_EXTERNS;
+    if (withExterns) {
+      externs = DeclarationGenerator.getDefaultExterns(opts);
+      externs.addAll(THIRD_PARTY_EXTERNS);
+    }
+
     String actual = new DeclarationGenerator(opts)
-        .generateDeclarations(sourceFiles, NO_EXTERNS, new Depgraph(roots));
+        .generateDeclarations(sourceFiles, externs, new Depgraph(roots));
     return actual;
   }
 

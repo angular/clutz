@@ -105,3 +105,9 @@ typesWithExterns.ExtendsIThenable = function() {};
  * @extends {Error}
  */
 typesWithExterns.Error = function() {};
+
+
+/**
+ * @type {angular.Scope}
+ */
+typesWithExterns.myScope = null;
