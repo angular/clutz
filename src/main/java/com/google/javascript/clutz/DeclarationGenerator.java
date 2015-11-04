@@ -256,8 +256,8 @@ public class DeclarationGenerator {
     String name = symbolInput.getName();
     name = name.replace("externs.zip//", "");
     // mostly matching what is in https://github.com/google/closure-compiler/tree/master/externs.
-    return name.startsWith("es") || name.startsWith("w3c") || name.startsWith("ie_")
-        || name.startsWith("browser");
+    return name.startsWith("javascript/externs/") || name.startsWith("es") || name.startsWith("w3c")
+        || name.startsWith("ie_") || name.startsWith("browser");
   }
 
   private int declareNamespace(String namespace, TypedVar symbol, boolean isDefault,
