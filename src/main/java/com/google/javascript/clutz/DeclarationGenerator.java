@@ -321,7 +321,7 @@ public class DeclarationGenerator {
     // but not in TS, so we have to generate a namespace-class pair in TS.
     if (isDefault && hasNestedTypes(symbol.getType())) {
       emitNamespaceBegin(symbol.getName());
-      treeWalker.walkInnerClassesAndEnums((ObjectType) symbol.getType(), symbol.getName(), provides);
+      treeWalker.walkInnerClassesAndEnums((ObjectType) symbol.getType(), symbol.getName());
       emitNamespaceEnd();
     }
     return treeWalker.valueSymbolsWalked;
@@ -1159,9 +1159,9 @@ public class DeclarationGenerator {
       emit(")");
     }
 
-    public void walkInnerClassesAndEnums(ObjectType type, String namespace, Set<String> provides) {
+    public void walkInnerClassesAndEnums(ObjectType type, String innerNamespace) {
       for (String propName : getSortedPropertyNames(type)) {
-        if (provides.contains(namespace + '.' + propName)) continue;
+        if (provides.contains(innerNamespace + '.' + propName)) continue;
         JSType pType = type.getPropertyType(propName);
         if (pType.isEnumType()) {
           visitEnumType((EnumType) pType);
