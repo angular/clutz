@@ -1048,7 +1048,7 @@ public class DeclarationGenerator {
       }
       emit(";");
       emitBreak();
-      if (isStatic) {
+      if (isStatic && !isPrivate(objType.getOwnPropertyJSDocInfo(propName))) {
         emitStaticOverloads(propName, objType, propertyType);
       }
     }
@@ -1087,7 +1087,9 @@ public class DeclarationGenerator {
       }
       // "I, for one, welcome our new static overloads." - H.G. Wells.
       JSType superPropType = superTypeCtor.getPropertyType(propName);
-      if (!superPropType.equals(propertyType)) {
+      if (!propertyType.isSubtype(superPropType)) {
+        // If the super field is private there is no issue, because private fields are not emitted.
+        if (isPrivate(superTypeCtor.getOwnPropertyJSDocInfo(propName))) return;
         if (!propertyType.isFunctionType() || !superPropType.isFunctionType()) {
           errors.add(JSError.make(currentSymbol.getNode(), CLUTZ_OVERRIDDEN_STATIC_FIELD,
               objType.getDisplayName(), propName));

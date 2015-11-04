@@ -1,8 +1,10 @@
 declare namespace ಠ_ಠ.clutz_internal.static_inherit {
   class Child extends Parent {
+    static privateParentOverrideField : number ;
     static static_fn (a : number ) : void ;
     /** WARNING: emitted for non-matching super type's static method. Only the first overload is actually callable. */
     static static_fn (a : string ) : void ;
+    static subTypeField : any [] ;
   }
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {
@@ -31,7 +33,9 @@ declare module 'goog:static_inherit.GrandChild' {
 declare namespace ಠ_ಠ.clutz_internal.static_inherit {
   class Parent {
     private noStructuralTyping_: any;
+    static privateChildOverrideField : number ;
     static static_fn (a : string ) : void ;
+    static subTypeField : Object ;
   }
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {
