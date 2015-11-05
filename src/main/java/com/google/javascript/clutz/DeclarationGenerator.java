@@ -192,6 +192,14 @@ public class DeclarationGenerator {
     return dts;
   }
 
+  private String getNamespace(String input) {
+    int dotIdx = input.lastIndexOf('.');
+    if (dotIdx == -1) {
+      return "";
+    }
+    return input.substring(0, dotIdx);
+  }
+
   public String produceDts(Compiler compiler, Depgraph depgraph) {
     // Tree sets for consistent order.
     Set<String> provides = new TreeSet<>();
@@ -221,10 +229,10 @@ public class DeclarationGenerator {
           symbol.getType().isEnumType() ||
           symbol.getType().isFunctionType();
       if (isDefault) {
-        int lastDot = symbol.getName().lastIndexOf('.');
-        namespace = lastDot >= 0 ? symbol.getName().substring(0, lastDot) : "";
+        namespace = getNamespace(symbol.getName());
       }
-      int valueSymbolsWalked = declareNamespace(namespace, symbol, isDefault, compiler, transitiveProvides);
+      int valueSymbolsWalked = declareNamespace(namespace, symbol, isDefault, compiler,
+          transitiveProvides, false);
 
       // skip emitting goog.require declarations for value empty namespaces, as calling typeof
       // does not work for them.
@@ -234,15 +242,29 @@ public class DeclarationGenerator {
       declareModule(provide, isDefault);
     }
 
-    // In order to typecheck in the presence of third-party externs, also emit all top-level extern
-    // symbols, even though they have no explicit provides.
+    // In order to typecheck in the presence of third-party externs, also emit all top-level and
+    // class symbols, even though they have no explicit provides.
     for (TypedVar symbol : topScope.getAllSymbols()) {
       CompilerInput symbolInput = compiler.getInput(new InputId(symbol.getInputName()));
-      if (symbolInput == null || !symbolInput.isExtern()) continue;
-      if (isPlatformExtern(symbolInput)) continue;
-      // Only emitting top-level symbols, since they transitively contain all children.
-      if (symbol.getName().contains(".")) continue;
-      declareNamespace(symbol.getName(), symbol, false, compiler, transitiveProvides);
+      if (symbolInput == null || !symbolInput.isExtern()) {
+        continue;
+      }
+      if (isPlatformExtern(symbolInput)) {
+        continue;
+      }
+
+      JSType type = symbol.getType();
+      String namespace = getNamespace(symbol.getName());
+      if (namespace.contains(".") &&
+          (type.isConstructor() || type.isEnumType() || type.isInterface())) {
+        declareNamespace(namespace, symbol, true, compiler,
+            transitiveProvides, true);
+      } else {
+        if (symbol.getName().contains(".")) {
+          continue;
+        }
+        declareNamespace(symbol.getName(), symbol, false, compiler, transitiveProvides, true);
+      }
       // we do not declare modules or goog.require support, because externs types should not be
       // visible from TS code.
     }
@@ -261,7 +283,7 @@ public class DeclarationGenerator {
   }
 
   private int declareNamespace(String namespace, TypedVar symbol, boolean isDefault,
-                               Compiler compiler, Set<String> provides) {
+                               Compiler compiler, Set<String> provides, boolean isExtern) {
     emitNamespaceBegin(namespace);
     TreeWalker treeWalker = new TreeWalker(namespace, compiler.getTypeRegistry(), provides);
     if (isDefault) {
@@ -319,7 +341,9 @@ public class DeclarationGenerator {
     }
     // extra walk required for inner classes and inner enums. They are allowed in closure,
     // but not in TS, so we have to generate a namespace-class pair in TS.
-    if (isDefault && hasNestedTypes(symbol.getType())) {
+    // In the case of the externs, however we *do* go through all symbols so this pass is not
+    // needed.
+    if (isDefault && hasNestedTypes(symbol.getType()) && !isExtern) {
       emitNamespaceBegin(symbol.getName());
       treeWalker.walkInnerClassesAndEnums((ObjectType) symbol.getType(), symbol.getName());
       emitNamespaceEnd();

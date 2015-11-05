@@ -56,6 +56,7 @@ declare module 'goog:typesWithExterns.C' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz_internal.angular {
+  type $cacheFactory = (a : string , b ? : { capacity : number } ) => $cacheFactory.Cache < any > ;
   class $injector {
     private noStructuralTyping_: any;
   }
@@ -66,4 +67,24 @@ declare namespace ಠ_ಠ.clutz_internal.angular {
     $applyAsync (opt_exp ? : string | ( (a : Scope ) => any ) ) : any ;
   }
   function bootstrap (element : Element | HTMLDocument , opt_modules ? : ( string | ( ( ...a : any [] ) => any ) ) [] ) : $injector ;
+}
+declare namespace ಠ_ಠ.clutz_internal.angular.$cacheFactory {
+  type get = (a : string ) => Cache < any > ;
+}
+declare namespace ಠ_ಠ.clutz_internal.angular.$cacheFactory {
+  type Options = { capacity : number } ;
+}
+declare namespace ಠ_ಠ.clutz_internal.angular.$cacheFactory {
+  class Cache < T > {
+    private noStructuralTyping_: any;
+    destroy ( ) : any ;
+    get (key : string ) : T ;
+    info ( ) : { id : string , options : { capacity : number } , size : number } ;
+    put (key : string , value : T ) : any ;
+    remove (key : string ) : any ;
+    removeAll ( ) : any ;
+  }
+}
+declare namespace ಠ_ಠ.clutz_internal.angular.$cacheFactory.Cache {
+  type Info = { id : string , options : { capacity : number } , size : number } ;
 }
