@@ -15,6 +15,9 @@ types.d = {};
 /** @type {Array<?>} */
 types.e = [];
 
+/** @type {Array<function():string>} */
+types.f = [];
+
 /** @type {null|function(number, ?):?} handler */
 types.functionAndUnion = null;
 

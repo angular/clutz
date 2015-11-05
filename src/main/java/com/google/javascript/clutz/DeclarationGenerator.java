@@ -130,7 +130,7 @@ public class DeclarationGenerator {
       externFiles.add(SourceFile.fromFile(extern, UTF_8));
     }
     String result = generateDeclarations(sourceFiles, externFiles,
-            Depgraph.parseFrom(opts.readDepgraphs()));
+        Depgraph.parseFrom(opts.readDepgraphs()));
 
     if ("-".equals(opts.output)) {
       System.out.println(result);
@@ -766,7 +766,9 @@ public class DeclarationGenerator {
           String templateTypeName = getRelativeName(referencedType);
           if (typeRegistry.getNativeType(ARRAY_TYPE).equals(referencedType)
               && type.getTemplateTypes().size() == 1) {
-            visitType(type.getTemplateTypes().get(0));
+            // As per TS type grammar, array types require primary types.
+            // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#a-grammar
+            visitTypeAsPrimary(type.getTemplateTypes().get(0));
             emit("[]");
             return null;
           }

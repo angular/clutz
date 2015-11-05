@@ -1,4 +1,5 @@
 declare namespace ಠ_ಠ.clutz_internal.union {
+  var fn : ( ( ) => string ) | ( ( ) => number ) [] ;
   var nullableUnion : Object | number ;
   var x : boolean | string ;
 }

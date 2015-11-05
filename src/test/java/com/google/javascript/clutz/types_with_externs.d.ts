@@ -65,5 +65,5 @@ declare namespace ಠ_ಠ.clutz_internal.angular {
     $apply (opt_exp ? : string | ( (a : Scope ) => any ) ) : any ;
     $applyAsync (opt_exp ? : string | ( (a : Scope ) => any ) ) : any ;
   }
-  function bootstrap (element : Element | HTMLDocument , opt_modules ? : string | ( ( ...a : any [] ) => any ) [] ) : $injector ;
+  function bootstrap (element : Element | HTMLDocument , opt_modules ? : ( string | ( ( ...a : any [] ) => any ) ) [] ) : $injector ;
 }

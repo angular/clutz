@@ -4,6 +4,7 @@ declare namespace ಠ_ಠ.clutz_internal.types {
   var c : string ;
   var d : Object ;
   var e : any [] ;
+  var f : ( ( ) => string ) [] ;
   var functionAndUnion : (a : number , b : any ) => any ;
   var inferrednum : number ;
   var inferredobj : Object ;
