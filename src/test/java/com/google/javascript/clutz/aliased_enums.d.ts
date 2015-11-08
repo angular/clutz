@@ -1,7 +1,7 @@
 declare namespace ಠ_ಠ.clutz_internal.nested.bar {
   type Enum = number ;
   var Enum : {
-    A : nested.baz.Enum ,
+    A : ಠ_ಠ.clutz_internal.nested.baz.Enum ,
   };
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {
@@ -14,7 +14,7 @@ declare module 'goog:nested.bar.Enum' {
 declare namespace ಠ_ಠ.clutz_internal.nested.baz {
   type Enum = number ;
   var Enum : {
-    A : Enum ,
+    A : ಠ_ಠ.clutz_internal.nested.baz.Enum ,
   };
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {

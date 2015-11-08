@@ -1,7 +1,7 @@
 declare namespace ಠ_ಠ.clutz_internal.namedType {
   class A < U > {
     private noStructuralTyping_: any;
-    fn (a : D < any > ) : any ;
+    fn (a : ಠ_ಠ.clutz_internal.namedType.D < any > ) : any ;
   }
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {

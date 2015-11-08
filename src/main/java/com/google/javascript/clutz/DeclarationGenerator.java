@@ -285,7 +285,7 @@ public class DeclarationGenerator {
   private int declareNamespace(String namespace, TypedVar symbol, boolean isDefault,
                                Compiler compiler, Set<String> provides, boolean isExtern) {
     emitNamespaceBegin(namespace);
-    TreeWalker treeWalker = new TreeWalker(namespace, compiler.getTypeRegistry(), provides);
+    TreeWalker treeWalker = new TreeWalker(compiler.getTypeRegistry(), provides);
     if (isDefault) {
       treeWalker.walk(symbol);
     } else {
@@ -500,23 +500,26 @@ public class DeclarationGenerator {
   }
 
   private class TreeWalker {
-    private final String namespace;
     private final JSTypeRegistry typeRegistry;
     private final Set<String> provides;
     private int valueSymbolsWalked = 0;
     private TypedVar currentSymbol;
 
-    private TreeWalker(String namespace, JSTypeRegistry typeRegistry, Set<String> provides) {
-      this.namespace = namespace;
+    private TreeWalker(JSTypeRegistry typeRegistry, Set<String> provides) {
       this.typeRegistry = typeRegistry;
       this.provides = provides;
     }
 
-    private String getRelativeName(ObjectType objectType) {
+    private String getAbsoluteName(ObjectType objectType) {
       String name = objectType.getDisplayName();
-      if (name.equals(namespace)) return name;
-      boolean keepNamespace = "".equals(namespace) || !name.startsWith(namespace);
-      return keepNamespace ? name : name.substring(namespace.length() + 1);
+      // Names that do not have a namespace '.' are either platform names in the top level
+      // namespace like `Object` or `Element`, or they are unqualified `goog.provide`s, e.g.
+      // `goog.provide('Toplevel')`. In both cases they will be found with the naked name.
+      // However a goog.provide'd name can collide with a re-declared top-level symbol, e.g. if some
+      // code goog.provide's `Element`.
+      // TODO(martinprobst): Consider aliasing all global symbols into the clutz namespace.
+      if (name.indexOf('.') == -1) return name;
+      return Constants.INTERNAL_NAMESPACE + "." + name;
     }
 
     private String getUnqualifiedName(TypedVar symbol) {
@@ -765,7 +768,7 @@ public class DeclarationGenerator {
           } else if (type.isDict()) {
             emit("{[key: string]: any}");
           } else if (type.getReferenceName() != null) {
-            emit(getRelativeName(type));
+            emit(getAbsoluteName(type));
           } else {
             emit("Object");
           }
@@ -787,7 +790,7 @@ public class DeclarationGenerator {
         @Override
         public Void caseTemplatizedType(TemplatizedType type) {
           ObjectType referencedType = type.getReferencedType();
-          String templateTypeName = getRelativeName(referencedType);
+          String templateTypeName = getAbsoluteName(referencedType);
           if (typeRegistry.getNativeType(ARRAY_TYPE).equals(referencedType)
               && type.getTemplateTypes().size() == 1) {
             // As per TS type grammar, array types require primary types.
@@ -896,7 +899,7 @@ public class DeclarationGenerator {
 
         @Override
         public Void caseEnumElementType(EnumElementType type) {
-          emit(getRelativeName(type));
+          emit(getAbsoluteName(type));
           return null;
         }
 

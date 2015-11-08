@@ -4,18 +4,18 @@ declare namespace ಠ_ಠ.clutz_internal.multi_class {
     constructor (n : number ) ;
     a : number ;
   }
-  class B extends A implements I , I2 {
+  class B extends ಠ_ಠ.clutz_internal.multi_class.A implements ಠ_ಠ.clutz_internal.multi_class.I , ಠ_ಠ.clutz_internal.multi_class.I2 {
     b : number ;
     noop ( ) : void ;
   }
-  class C extends B {
+  class C extends ಠ_ಠ.clutz_internal.multi_class.B {
   }
-  class D implements I {
+  class D implements ಠ_ಠ.clutz_internal.multi_class.I {
     private noStructuralTyping_: any;
   }
   interface I {
   }
-  interface I2 extends I {
+  interface I2 extends ಠ_ಠ.clutz_internal.multi_class.I {
   }
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {

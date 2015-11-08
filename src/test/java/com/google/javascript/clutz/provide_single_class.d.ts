@@ -3,7 +3,7 @@ declare namespace ಠ_ಠ.clutz_internal.foo.bar {
     private noStructuralTyping_: any;
     field : string ;
     avalue : number ;
-    equals (b : Baz.NestedClass ) : boolean ;
+    equals (b : ಠ_ಠ.clutz_internal.foo.bar.Baz.NestedClass ) : boolean ;
     method (a : string ) : number ;
     static staticMethod (a : string ) : number ;
   }
@@ -14,8 +14,8 @@ declare namespace ಠ_ಠ.clutz_internal.foo.bar.Baz {
   }
   type NestedEnum = number ;
   var NestedEnum : {
-    A : Baz.NestedEnum ,
-    B : Baz.NestedEnum ,
+    A : ಠ_ಠ.clutz_internal.foo.bar.Baz.NestedEnum ,
+    B : ಠ_ಠ.clutz_internal.foo.bar.Baz.NestedEnum ,
   };
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {

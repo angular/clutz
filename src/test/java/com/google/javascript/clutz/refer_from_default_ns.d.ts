@@ -1,5 +1,5 @@
 declare namespace ಠ_ಠ.clutz_internal {
-  function fn ( ) : fn.String ;
+  function fn ( ) : ಠ_ಠ.clutz_internal.fn.String ;
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {
   function require(name: 'fn'): typeof ಠ_ಠ.clutz_internal.fn;

@@ -1,8 +1,8 @@
 declare namespace ಠ_ಠ.clutz_internal.some {
   type SomeEnum = number ;
   var SomeEnum : {
-    A : SomeEnum ,
-    B : SomeEnum ,
+    A : ಠ_ಠ.clutz_internal.some.SomeEnum ,
+    B : ಠ_ಠ.clutz_internal.some.SomeEnum ,
   };
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {

@@ -9,7 +9,7 @@ declare namespace ಠ_ಠ.clutz_internal.typesWithExterns {
   var c : NodeList | IArguments | { length : number } ;
   function elementMaybe ( ) : Element ;
   function id (x : NodeList | IArguments | { length : number } ) : NodeList | IArguments | { length : number } ;
-  var myScope : angular.Scope ;
+  var myScope : ಠ_ಠ.clutz_internal.angular.Scope ;
   function topLevelFunction ( ...a : any [] ) : any ;
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {
@@ -34,7 +34,7 @@ declare module 'goog:typesWithExterns.A' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz_internal.typesWithExterns {
-  class B extends A {
+  class B extends ಠ_ಠ.clutz_internal.typesWithExterns.A {
   }
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {
@@ -45,7 +45,7 @@ declare module 'goog:typesWithExterns.B' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz_internal.typesWithExterns {
-  class C extends A {
+  class C extends ಠ_ಠ.clutz_internal.typesWithExterns.A {
   }
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {
@@ -56,20 +56,20 @@ declare module 'goog:typesWithExterns.C' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz_internal.angular {
-  type $cacheFactory = (a : string , b ? : { capacity : number } ) => $cacheFactory.Cache < any > ;
+  type $cacheFactory = (a : string , b ? : { capacity : number } ) => ಠ_ಠ.clutz_internal.angular.$cacheFactory.Cache < any > ;
   class $injector {
     private noStructuralTyping_: any;
   }
   class Scope {
     private noStructuralTyping_: any;
     $$phase : string ;
-    $apply (opt_exp ? : string | ( (a : Scope ) => any ) ) : any ;
-    $applyAsync (opt_exp ? : string | ( (a : Scope ) => any ) ) : any ;
+    $apply (opt_exp ? : string | ( (a : ಠ_ಠ.clutz_internal.angular.Scope ) => any ) ) : any ;
+    $applyAsync (opt_exp ? : string | ( (a : ಠ_ಠ.clutz_internal.angular.Scope ) => any ) ) : any ;
   }
-  function bootstrap (element : Element | HTMLDocument , opt_modules ? : ( string | ( ( ...a : any [] ) => any ) ) [] ) : $injector ;
+  function bootstrap (element : Element | HTMLDocument , opt_modules ? : ( string | ( ( ...a : any [] ) => any ) ) [] ) : ಠ_ಠ.clutz_internal.angular.$injector ;
 }
 declare namespace ಠ_ಠ.clutz_internal.angular.$cacheFactory {
-  type get = (a : string ) => Cache < any > ;
+  type get = (a : string ) => ಠ_ಠ.clutz_internal.angular.$cacheFactory.Cache < any > ;
 }
 declare namespace ಠ_ಠ.clutz_internal.angular.$cacheFactory {
   type Options = { capacity : number } ;

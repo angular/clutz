@@ -3,8 +3,8 @@ declare namespace ಠ_ಠ.clutz_internal.ctor_func {
     private noStructuralTyping_: any;
     constructor (a : string , b : number ) ;
   }
-  var ctorFuncField : { new (a : string , b : number ) : Ctor < any > } ;
-  function ctorFuncParam (ctor : { new (a : number ) : Ctor < any > } ) : void ;
+  var ctorFuncField : { new (a : string , b : number ) : ಠ_ಠ.clutz_internal.ctor_func.Ctor < any > } ;
+  function ctorFuncParam (ctor : { new (a : number ) : ಠ_ಠ.clutz_internal.ctor_func.Ctor < any > } ) : void ;
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {
   function require(name: 'ctor_func'): typeof ಠ_ಠ.clutz_internal.ctor_func;
