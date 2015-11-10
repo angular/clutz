@@ -1011,6 +1011,10 @@ public class DeclarationGenerator {
           return !input.isNullType() && !input.isVoidType();
         }
       });
+      if (alts.size() == 0) {
+        emit("any");
+        return;
+      }
       if (alts.size() == 1) {
         visitType(alts.iterator().next());
         return;
