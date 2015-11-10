@@ -1,7 +1,16 @@
 declare namespace ಠ_ಠ.clutz_internal.nullable {
   var w : boolean ;
+  /**
+   * Explicitly non-nullable.
+   */
   var x : Object ;
+  /**
+   * Implicitly nullable.
+   */
   var y : Object ;
+  /**
+   * Explicitly nullable.
+   */
   var z : Object ;
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {

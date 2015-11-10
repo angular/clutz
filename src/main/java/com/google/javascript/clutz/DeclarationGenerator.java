@@ -14,6 +14,7 @@ import com.google.common.base.Functions;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -552,6 +553,7 @@ public class DeclarationGenerator {
             ftype.isConstructor() && "Function".equals(ftype.getDisplayName());
 
         if (ftype.isOrdinaryFunction() || ordinaryFunctionAppearingAsClass) {
+          maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
           emit("function");
           emit(getUnqualifiedName(symbol));
           visitFunctionDeclaration(ftype);
@@ -560,6 +562,7 @@ public class DeclarationGenerator {
           return;
         }
 
+        maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ true);
         if (!ftype.isNominalConstructor()) {
           // A top-level field that has a specific constructor function type.
           // <code>/** @type {function(new:X)} */ foo.x;</code>
@@ -568,6 +571,7 @@ public class DeclarationGenerator {
         }
         visitClassOrInterface(getUnqualifiedName(symbol), ftype);
       } else {
+        maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
         if (type.isEnumType()) {
           visitEnumType((EnumType) type);
           return;
@@ -584,6 +588,32 @@ public class DeclarationGenerator {
         }
         visitVarDeclaration(symbol, type);
       }
+    }
+
+    private void maybeEmitJsDoc(JSDocInfo docs, boolean ignoreParams) {
+      if (docs == null) return;
+      String desc = docs.getBlockDescription();
+      if (desc == null) return;
+      emit("/**");
+      emitBreak();
+      if (desc != null) {
+        for (String line : Splitter.on('\n').split(desc)) {
+          emit(" *");
+          if (!line.isEmpty()) emit(line);
+          emitBreak();
+        }
+      }
+      if (!ignoreParams) {
+        for (String name : docs.getParameterNames()) {
+          if (docs.getDescriptionForParameter(name) == null) continue;
+          emit(" * @param");
+          emit(name);
+          emit(docs.getDescriptionForParameter(name));
+          emitBreak();
+        }
+      }
+      emit(" */");
+      emitBreak();
     }
 
     private void visitClassOrInterface(String name, FunctionType ftype) {
@@ -940,6 +970,7 @@ public class DeclarationGenerator {
         JSType pType = type.getPropertyType(propName);
         // Here we assume the enum is exported and handled separately.
         if (pType.isEnumType()) continue;
+        maybeEmitJsDoc(pType.getJSDocInfo(), /* ignoreParams */ false);
         emit("var");
         emit(propName);
         emit(":");
@@ -1009,6 +1040,7 @@ public class DeclarationGenerator {
       }
       // Constructors.
       if (type.isConstructor() && ((FunctionType)type).getParameters().iterator().hasNext()) {
+        maybeEmitJsDoc(type.getJSDocInfo(), /* ignoreParams */ false);
         emit("constructor");
         visitFunctionParameters((FunctionType) type, false);
         emit(";");
@@ -1064,6 +1096,7 @@ public class DeclarationGenerator {
         // enums and classes are emitted in a namespace later.
         return;
       }
+      maybeEmitJsDoc(objType.getOwnPropertyJSDocInfo(propName), /* ignoreParams */ false);
       if (isStatic) {
         // The static methods apply and call are provided by lib.d.ts.
         if (propName.equals("apply") || propName.equals("call")) return;
