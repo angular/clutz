@@ -221,8 +221,12 @@ public class DeclarationGenerator {
     TypedScope topScope = compiler.getTopScope();
     for (String provide : provides) {
       TypedVar symbol = topScope.getOwnSlot(provide);
-      checkArgument(symbol != null, "goog.provide not defined: %s", provide);
-      checkArgument(symbol.getType() != null, "all symbols should have a type");
+      if (symbol == null) {
+        // Sometimes goog.provide statements are used as pure markers for dependency management.
+        declareModule(provide, true);
+        continue;
+      }
+      checkArgument(symbol.getType() != null, "all symbols should have a type: %s", provide);
       String namespace = provide;
         // These goog.provide's have only one symbol, so users expect to use default import
       boolean isDefault = !symbol.getType().isObject() ||
