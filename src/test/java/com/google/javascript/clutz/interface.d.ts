@@ -14,8 +14,8 @@ declare module 'goog:interface_exp' {
 declare namespace ಠ_ಠ.clutz_internal.interface_exp {
   type SomeEnum = number ;
   var SomeEnum : {
-    A : ಠ_ಠ.clutz_internal.interface_exp.SomeEnum ,
-    B : ಠ_ಠ.clutz_internal.interface_exp.SomeEnum ,
+    A : SomeEnum ,
+    B : SomeEnum ,
   };
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {

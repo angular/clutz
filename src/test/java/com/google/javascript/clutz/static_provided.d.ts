@@ -15,8 +15,8 @@ declare module 'goog:a.b.StaticHolder' {
 declare namespace ಠ_ಠ.clutz_internal.a.b.StaticHolder {
   type AnEnum = number ;
   var AnEnum : {
-    X : ಠ_ಠ.clutz_internal.a.b.StaticHolder.AnEnum ,
-    Y : ಠ_ಠ.clutz_internal.a.b.StaticHolder.AnEnum ,
+    X : AnEnum ,
+    Y : AnEnum ,
   };
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {

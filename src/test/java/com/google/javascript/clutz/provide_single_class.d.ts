@@ -14,8 +14,8 @@ declare namespace ಠ_ಠ.clutz_internal.foo.bar.Baz {
   }
   type NestedEnum = number ;
   var NestedEnum : {
-    A : ಠ_ಠ.clutz_internal.foo.bar.Baz.NestedEnum ,
-    B : ಠ_ಠ.clutz_internal.foo.bar.Baz.NestedEnum ,
+    A : NestedEnum ,
+    B : NestedEnum ,
   };
 }
 declare namespace ಠ_ಠ.clutz_internal.goog {

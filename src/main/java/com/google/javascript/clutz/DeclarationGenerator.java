@@ -527,11 +527,11 @@ public class DeclarationGenerator {
     }
 
     private String getUnqualifiedName(TypedVar symbol) {
-      return lastPart(symbol.getName());
+      return getUnqualifiedName(symbol.getName());
     }
 
-    private String getUnqualifiedName(JSType type) {
-      return lastPart(type.getDisplayName());
+    private String getUnqualifiedName(String name) {
+      return lastPart(name);
     }
 
     private String lastPart(String input) {
@@ -576,7 +576,7 @@ public class DeclarationGenerator {
       } else {
         maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
         if (type.isEnumType()) {
-          visitEnumType((EnumType) type);
+          visitEnumType(symbol.getName(), (EnumType) type);
           return;
         }
         // Closure keeps type None for the symbol which became the type alias.
@@ -697,7 +697,7 @@ public class DeclarationGenerator {
       emitBreak();
     }
 
-    private void visitEnumType(EnumType type) {
+    private void visitEnumType(String symbolName, EnumType type) {
       // Enums are top level vars, but also declare a corresponding type:
       // <pre>
       // /** @enum {ValueType} */ var MyEnum = {A: ..., B: ...};
@@ -705,17 +705,19 @@ public class DeclarationGenerator {
       // var MyEnum: {A: MyEnum, B: MyEnum, ...};
       // </pre>
       // TODO(martinprobst): Special case number enums to map to plain TS enums?
-      visitTypeAlias(type.getElementsType().getPrimitiveType(), getUnqualifiedName(type));
-      emit("var");
+      String unqualifiedName = getUnqualifiedName(symbolName);
       // TS `type` declarations accept only unqualified names.
-      emit(getUnqualifiedName(type));
+      visitTypeAlias(type.getElementsType().getPrimitiveType(), unqualifiedName);
+      emit("var");
+      emit(unqualifiedName);
       emit(": {");
       emitBreak();
       indent();
       for (String elem : sorted(type.getElements())) {
         emit(elem);
         emit(":");
-        visitType(type.getElementsType());
+        // No need to use type.getMembersType(), this must match the type alias we just declared.
+        emit(unqualifiedName);
         emit(",");
         emitBreak();
       }
@@ -1242,7 +1244,7 @@ public class DeclarationGenerator {
         if (provides.contains(innerNamespace + '.' + propName)) continue;
         JSType pType = type.getPropertyType(propName);
         if (pType.isEnumType()) {
-          visitEnumType((EnumType) pType);
+          visitEnumType(propName, (EnumType) pType);
         } else if (pType.isConstructor()) {
           visitClassOrInterface(propName, (FunctionType) pType);
         }
