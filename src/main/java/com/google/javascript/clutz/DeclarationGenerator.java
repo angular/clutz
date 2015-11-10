@@ -302,7 +302,10 @@ public class DeclarationGenerator {
       });
 
       ObjectType objType = (ObjectType) symbol.getType();
-      for (String property : objType.getPropertyNames()) {
+      // Can be null if the symbol is provided, but not defined.  
+      Set<String> propertyNames =
+          objType != null ? objType.getPropertyNames() : Collections.<String>emptySet();
+      for (String property : propertyNames) {
         if (!isPrivate(objType.getOwnPropertyJSDocInfo(property))) {
           desiredSymbols.add(symbol.getName() + "." + property);
         }
@@ -762,6 +765,13 @@ public class DeclarationGenerator {
       // See also JsdocToEs6TypedConverter in the Closure code base. This code is implementing the
       // same algorithm starting from JSType nodes (as opposed to JSDocInfo), and directly
       // generating textual output. Otherwise both algorithms should produce the same output.
+      if (isPrivate(typeToVisit.getJSDocInfo())) {
+        // TypeScript does not allow public APIs that expose non-exported/private types. Just emit
+        // an empty object literal type for those, i.e. something that cannot be used for anything,
+        // except being passed around.
+        emit(Constants.INTERNAL_NAMESPACE + ".PrivateType");
+        return;
+      }
       Visitor<Void> visitor = new Visitor<Void>() {
         @Override
         public Void caseBooleanType() {

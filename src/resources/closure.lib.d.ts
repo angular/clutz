@@ -4,6 +4,8 @@
 declare namespace ಠ_ಠ.clutz_internal {
   type GlobalError = Error;
   var GlobalError: ErrorConstructor;
+  /** Represents a Closure type that is private, represented by an empty interface. */
+  interface PrivateType {}
 }
 
 // Will be extended if base.js is a dependency.
