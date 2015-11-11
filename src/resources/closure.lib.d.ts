@@ -6,6 +6,8 @@ declare namespace ಠ_ಠ.clutz {
   var GlobalError: ErrorConstructor;
   /** Represents a Closure type that is private, represented by an empty interface. */
   interface PrivateType {}
+  /** Represents the type returned when goog.require-ing an unknown symbol */
+  interface ClosureSymbolNotGoogProvided {}
 }
 
 // Will be extended if base.js is a dependency.

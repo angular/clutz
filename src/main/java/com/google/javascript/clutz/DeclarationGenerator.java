@@ -262,8 +262,7 @@ public class DeclarationGenerator {
       String namespace = getNamespace(symbol.getName());
       if (namespace.contains(".") &&
           (type.isConstructor() || type.isEnumType() || type.isInterface())) {
-        declareNamespace(namespace, symbol, true, compiler,
-            transitiveProvides, true);
+        declareNamespace(namespace, symbol, true, compiler, transitiveProvides, true);
       } else {
         if (symbol.getName().contains(".")) {
           continue;
@@ -329,6 +328,15 @@ public class DeclarationGenerator {
         if (desiredSymbols.contains(otherName) && other.getType() != null
             && !other.getType().isFunctionPrototypeType()
             && !isPrototypeMethod(other)) {
+          // For safety we need to special case goog.require to return the empty interface by default
+          // For existing namespaces we emit a goog.require string override that has the proper type.
+          // See emitGoogRequireSupport method.
+          if (otherName.equals("goog.require")) {
+            emit("function require (name : string ) : " + Constants.INTERNAL_NAMESPACE
+                + ".ClosureSymbolNotGoogProvided;");
+            emitBreak();
+            continue;
+          }
           try {
             treeWalker.walk(other);
           } catch (RuntimeException e) {

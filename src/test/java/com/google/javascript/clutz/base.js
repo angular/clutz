@@ -12,6 +12,7 @@ var goog = goog || {};
 
 /**
  * @param {string} name
+ * @return {?}
  */
 goog.require = function(name) {};
 
