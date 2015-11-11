@@ -1,4 +1,4 @@
-declare namespace ಠ_ಠ.clutz_internal.types {
+declare namespace ಠ_ಠ.clutz.types {
   var a : number ;
   var b : boolean ;
   var c : string ;
@@ -17,10 +17,10 @@ declare namespace ಠ_ಠ.clutz_internal.types {
   var j : { [ n: number ]: string } ;
   var recordType : { a : string , b : any } ;
 }
-declare namespace ಠ_ಠ.clutz_internal.goog {
-  function require(name: 'types'): typeof ಠ_ಠ.clutz_internal.types;
+declare namespace ಠ_ಠ.clutz.goog {
+  function require(name: 'types'): typeof ಠ_ಠ.clutz.types;
 }
 declare module 'goog:types' {
-  import alias = ಠ_ಠ.clutz_internal.types;
+  import alias = ಠ_ಠ.clutz.types;
   export = alias;
 }

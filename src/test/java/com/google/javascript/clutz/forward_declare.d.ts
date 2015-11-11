@@ -1,4 +1,4 @@
-declare namespace ಠ_ಠ.clutz_internal.forward {
+declare namespace ಠ_ಠ.clutz.forward {
   class A {
     private noStructuralTyping_: any;
     //!! forward.D may or may not be part of the compilation unit.
@@ -7,10 +7,10 @@ declare namespace ಠ_ಠ.clutz_internal.forward {
     fn (a : any ) : any ;
   }
 }
-declare namespace ಠ_ಠ.clutz_internal.goog {
-  function require(name: 'forward.A'): typeof ಠ_ಠ.clutz_internal.forward.A;
+declare namespace ಠ_ಠ.clutz.goog {
+  function require(name: 'forward.A'): typeof ಠ_ಠ.clutz.forward.A;
 }
 declare module 'goog:forward.A' {
-  import alias = ಠ_ಠ.clutz_internal.forward.A;
+  import alias = ಠ_ಠ.clutz.forward.A;
   export default alias;
 }

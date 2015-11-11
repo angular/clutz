@@ -1,4 +1,4 @@
-declare namespace ಠ_ಠ.clutz_internal.x {
+declare namespace ಠ_ಠ.clutz.x {
   /**
    * Docs on a ctor.
    *
@@ -24,10 +24,10 @@ declare namespace ಠ_ಠ.clutz_internal.x {
     method (foo : string ) : void ;
   }
 }
-declare namespace ಠ_ಠ.clutz_internal.goog {
-  function require(name: 'x.Y'): typeof ಠ_ಠ.clutz_internal.x.Y;
+declare namespace ಠ_ಠ.clutz.goog {
+  function require(name: 'x.Y'): typeof ಠ_ಠ.clutz.x.Y;
 }
 declare module 'goog:x.Y' {
-  import alias = ಠ_ಠ.clutz_internal.x.Y;
+  import alias = ಠ_ಠ.clutz.x.Y;
   export default alias;
 }
