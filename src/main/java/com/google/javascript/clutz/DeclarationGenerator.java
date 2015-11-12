@@ -231,6 +231,7 @@ public class DeclarationGenerator {
         // These goog.provide's have only one symbol, so users expect to use default import
       boolean isDefault = !symbol.getType().isObject() ||
           symbol.getType().isInterface() ||
+          symbol.getType().isInstanceType() ||
           symbol.getType().isEnumType() ||
           symbol.getType().isFunctionType();
       if (isDefault) {
