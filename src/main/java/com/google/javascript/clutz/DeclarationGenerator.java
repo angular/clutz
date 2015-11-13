@@ -60,6 +60,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -88,6 +89,7 @@ public class DeclarationGenerator {
   private List<JSError> errors = new ArrayList<>();
   private StringWriter out = new StringWriter();
   private final Options opts;
+  private Set<String> privateEnums = new HashSet<>();
 
   DeclarationGenerator(Options opts) {
     this.opts = opts;
@@ -306,12 +308,22 @@ public class DeclarationGenerator {
       });
 
       ObjectType objType = (ObjectType) symbol.getType();
-      // Can be null if the symbol is provided, but not defined.  
+      // Can be null if the symbol is provided, but not defined.
       Set<String> propertyNames =
           objType != null ? objType.getPropertyNames() : Collections.<String>emptySet();
       for (String property : propertyNames) {
-        if (!isPrivate(objType.getOwnPropertyJSDocInfo(property))) {
+        if (!isPrivateProperty(objType, property)) {
           desiredSymbols.add(symbol.getName() + "." + property);
+        } else if (objType.getPropertyType(property).isEnumType()) {
+          // For enum types (unlike classes or interfaces), Closure does not track the visibility on
+          // the created type. Clutz still needs to skip emitting the values, as the original enum
+          // is not emitted here. JSTypeRegistry etc do not provide access to this, so the list of
+          // private enums has to be tracked in this side channel.
+          //
+          // NB: This has multiple issues. It requires the enum to be declared before used, and it
+          // requires the enum to be on an exported namespace. In pracice, the rare instances of
+          // this pattern appear to follow those rules.
+          privateEnums.add(namespace + "." + property);
         }
       }
       // Any provides have their own namespace and should not be emitted in this namespace.
@@ -417,6 +429,11 @@ public class DeclarationGenerator {
       }
     }
     return false;
+  }
+
+  private boolean isPrivateProperty(ObjectType obj, String propName) {
+    JSDocInfo info = obj.getOwnPropertyJSDocInfo(propName);
+    return isPrivate(info);
   }
 
   private boolean isPrivate(@Nullable JSDocInfo docInfo) {
@@ -780,7 +797,8 @@ public class DeclarationGenerator {
       // See also JsdocToEs6TypedConverter in the Closure code base. This code is implementing the
       // same algorithm starting from JSType nodes (as opposed to JSDocInfo), and directly
       // generating textual output. Otherwise both algorithms should produce the same output.
-      if (isPrivate(typeToVisit.getJSDocInfo())) {
+      if (isPrivate(typeToVisit.getJSDocInfo())
+          || privateEnums.contains(typeToVisit.getDisplayName())) {
         // TypeScript does not allow public APIs that expose non-exported/private types. Just emit
         // an empty object literal type for those, i.e. something that cannot be used for anything,
         // except being passed around.
@@ -1119,7 +1137,7 @@ public class DeclarationGenerator {
       String qualifiedName = objType.getDisplayName() + "." + propName;
       if (provides.contains(qualifiedName)) {
         return;
-      } else if (isPrivate(objType.getOwnPropertyJSDocInfo(propName))) {
+      } else if (isPrivateProperty(objType, propName)) {
         return;
       } else if (propertyType.isEnumType() || propertyType.isConstructor()) {
         // enums and classes are emitted in a namespace later.
@@ -1139,7 +1157,7 @@ public class DeclarationGenerator {
       }
       emit(";");
       emitBreak();
-      if (isStatic && !isPrivate(objType.getOwnPropertyJSDocInfo(propName))) {
+      if (isStatic && !isPrivateProperty(objType, propName)) {
         emitStaticOverloads(propName, objType, propertyType);
       }
     }
@@ -1180,7 +1198,7 @@ public class DeclarationGenerator {
       JSType superPropType = superTypeCtor.getPropertyType(propName);
       if (!propertyType.isSubtype(superPropType)) {
         // If the super field is private there is no issue, because private fields are not emitted.
-        if (isPrivate(superTypeCtor.getOwnPropertyJSDocInfo(propName))) return;
+        if (isPrivateProperty(superTypeCtor, propName)) return;
         if (!propertyType.isFunctionType() || !superPropType.isFunctionType()) {
           errors.add(JSError.make(currentSymbol.getNode(), CLUTZ_OVERRIDDEN_STATIC_FIELD,
               objType.getDisplayName(), propName));
