@@ -1,4 +1,5 @@
 goog.provide('priv');
+goog.provide('priv2.PublicClass');
 
 /** @private */
 priv.field = 12;
@@ -23,3 +24,9 @@ priv.PublicClass.prototype.publicField;
 
 /** @private @return {number} */
 priv.PublicClass.prototype.method_ = function() { return this.field; };
+
+/** @constructor */
+priv2.PublicClass = function() {};
+
+/** @constructor @private */
+priv2.PublicClass.PrivateNestedClass_ = function() {};

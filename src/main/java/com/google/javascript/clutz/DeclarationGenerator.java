@@ -18,6 +18,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.javascript.jscomp.AbstractCommandLineRunner;
 import com.google.javascript.jscomp.BasicErrorManager;
@@ -1008,7 +1009,7 @@ public class DeclarationGenerator {
     // behave like an object with bunch of props, but are not technically defined as
     // record types.
     private void visitNamespaceLikeType(ObjectType type) {
-      for (String propName : getSortedPropertyNames(type)) {
+      for (String propName : getSortedPublicPropertyNames(type)) {
         if (propName.equals("prototype")) continue;
         JSType pType = type.getPropertyType(propName);
         // Here we assume the enum is exported and handled separately.
@@ -1025,7 +1026,7 @@ public class DeclarationGenerator {
 
     private void visitRecordType(RecordType type) {
       emit("{");
-      Iterator<String> it = getSortedPropertyNames(type).iterator();
+      Iterator<String> it = getSortedPublicPropertyNames(type).iterator();
       while (it.hasNext()) {
         String propName = it.next();
         emit(propName);
@@ -1037,8 +1038,13 @@ public class DeclarationGenerator {
       emit("}");
     }
 
-    private Set<String> getSortedPropertyNames(ObjectType type) {
-      return sorted(type.getOwnPropertyNames());
+    private Set<String> getSortedPublicPropertyNames(final ObjectType type) {
+      return sorted(Sets.filter(type.getOwnPropertyNames(), new Predicate<String> () {
+        @Override
+        public boolean apply(String propName) {
+          return !isPrivateProperty(type, propName);
+        }
+      }));
     }
 
     private Set<String> sorted(Set<String> elements) {
@@ -1119,7 +1125,7 @@ public class DeclarationGenerator {
     }
 
     private void visitProperties(ObjectType objType, boolean isStatic, Set<String> skipNames) {
-      for (String propName : getSortedPropertyNames(objType)) {
+      for (String propName : getSortedPublicPropertyNames(objType)) {
         if (skipNames.contains(propName)) continue;
 
         if ("prototype".equals(propName) || "superClass_".equals(propName)
@@ -1136,8 +1142,6 @@ public class DeclarationGenerator {
       // Some symbols might be emitted as provides, so don't duplicate them
       String qualifiedName = objType.getDisplayName() + "." + propName;
       if (provides.contains(qualifiedName)) {
-        return;
-      } else if (isPrivateProperty(objType, propName)) {
         return;
       } else if (propertyType.isEnumType() || propertyType.isConstructor()) {
         // enums and classes are emitted in a namespace later.
@@ -1157,7 +1161,7 @@ public class DeclarationGenerator {
       }
       emit(";");
       emitBreak();
-      if (isStatic && !isPrivateProperty(objType, propName)) {
+      if (isStatic) {
         emitStaticOverloads(propName, objType, propertyType);
       }
     }
@@ -1197,7 +1201,7 @@ public class DeclarationGenerator {
       // "I, for one, welcome our new static overloads." - H.G. Wells.
       JSType superPropType = superTypeCtor.getPropertyType(propName);
       if (!propertyType.isSubtype(superPropType)) {
-        // If the super field is private there is no issue, because private fields are not emitted.
+        // If this field is public, but the super field is private, and thus not emitted, it's ok.
         if (isPrivateProperty(superTypeCtor, propName)) return;
         if (!propertyType.isFunctionType() || !superPropType.isFunctionType()) {
           errors.add(JSError.make(currentSymbol.getNode(), CLUTZ_OVERRIDDEN_STATIC_FIELD,
@@ -1270,8 +1274,8 @@ public class DeclarationGenerator {
       emit(")");
     }
 
-    public void walkInnerClassesAndEnums(ObjectType type, String innerNamespace) {
-      for (String propName : getSortedPropertyNames(type)) {
+    void walkInnerClassesAndEnums(ObjectType type, String innerNamespace) {
+      for (String propName : getSortedPublicPropertyNames(type)) {
         if (provides.contains(innerNamespace + '.' + propName)) continue;
         JSType pType = type.getPropertyType(propName);
         if (pType.isEnumType()) {
