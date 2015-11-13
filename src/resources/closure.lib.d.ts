@@ -4,10 +4,10 @@
 declare namespace ಠ_ಠ.clutz {
   type GlobalError = Error;
   var GlobalError: ErrorConstructor;
-  /** Represents a Closure type that is private, represented by an empty interface. */
-  interface PrivateType {}
   /** Represents the type returned when goog.require-ing an unknown symbol */
-  interface ClosureSymbolNotGoogProvided {}
+  type ClosureSymbolNotGoogProvided = void;
+  /** Represents a Closure type that is private, represented by an empty interface. */
+  type PrivateType = void;
 }
 
 // Will be extended if base.js is a dependency.
