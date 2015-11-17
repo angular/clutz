@@ -50,6 +50,8 @@ public class Options {
     options.setClosurePass(true);
     options.setCheckGlobalNamesLevel(CheckLevel.ERROR);
     options.setCheckGlobalThisLevel(CheckLevel.ERROR);
+    options.setLanguage(CompilerOptions.LanguageMode.ECMASCRIPT6);
+    options.setLanguageOut(CompilerOptions.LanguageMode.ECMASCRIPT5);
     options.setCheckTypes(true);
     options.setInferTypes(true);
     options.setIdeMode(true); // So that we can query types after compilation.
