@@ -87,3 +87,24 @@ angular.$cacheFactory.Cache.prototype.destroy = function() {};
  *   }}
  */
 angular.$cacheFactory.Cache.Info;
+
+/**
+ * @param {!{is: string}} descriptor
+ */
+var Polymer = function(descriptor) {};
+
+/**
+ * @constructor
+ */
+var PolymerDomApi = function() {};
+
+/**
+ * @constructor
+ */
+var PolymerEventApi = function() {};
+
+/**
+ * @param {?Node|?Event} nodeOrEvent
+ * @return {!PolymerDomApi|!PolymerEventApi}
+ */
+Polymer.dom = function(nodeOrEvent) {};

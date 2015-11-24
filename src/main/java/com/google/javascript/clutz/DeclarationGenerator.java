@@ -57,15 +57,7 @@ import org.kohsuke.args4j.CmdLineException;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -231,12 +223,8 @@ public class DeclarationGenerator {
       }
       checkArgument(symbol.getType() != null, "all symbols should have a type: %s", provide);
       String namespace = provide;
-        // These goog.provide's have only one symbol, so users expect to use default import
-      boolean isDefault = !symbol.getType().isObject() ||
-          symbol.getType().isInterface() ||
-          symbol.getType().isInstanceType() ||
-          symbol.getType().isEnumType() ||
-          symbol.getType().isFunctionType();
+      // These goog.provide's have only one symbol, so users expect to use default import
+      boolean isDefault = isDefaultExport(symbol);
       if (isDefault) {
         namespace = getNamespace(symbol.getName());
       }
@@ -251,8 +239,8 @@ public class DeclarationGenerator {
       declareModule(provide, isDefault);
     }
 
-    // In order to typecheck in the presence of third-party externs, also emit all top-level and
-    // class symbols, even though they have no explicit provides.
+    // In order to typecheck in the presence of third-party externs, emit all extern symbols.
+    LinkedHashSet<String> visitedNamespaces = new LinkedHashSet<>();
     for (TypedVar symbol : topScope.getAllSymbols()) {
       CompilerInput symbolInput = compiler.getInput(new InputId(symbol.getInputName()));
       if (symbolInput == null || !symbolInput.isExtern()) {
@@ -261,24 +249,35 @@ public class DeclarationGenerator {
       if (isPlatformExtern(symbolInput)) {
         continue;
       }
+      // Closure treats all prototypes as separate symbols, but we handle them in conjunction with
+      // parent symbol.
+      if (symbol.getName().contains(".prototype")) continue;
 
-      JSType type = symbol.getType();
       String namespace = getNamespace(symbol.getName());
-      if (namespace.contains(".") &&
-          (type.isConstructor() || type.isEnumType() || type.isInterface())) {
-        declareNamespace(namespace, symbol, true, compiler, transitiveProvides, true);
-      } else {
-        if (symbol.getName().contains(".")) {
-          continue;
-        }
-        declareNamespace(symbol.getName(), symbol, false, compiler, transitiveProvides, true);
-      }
+      boolean isDefault = isDefaultExport(symbol);
+      // NoType is used as a proxy for typedef symbol, due to lack of appropriate API call.
+      boolean isTypedef = symbol.getType() != null && symbol.getType().isNoType();
+      // Typedef symbols do not enumerate their namespace properties.
+      if (!isDefault && !isTypedef) visitedNamespaces.add(symbol.getName());
+      if (isDefault && visitedNamespaces.contains(namespace)) continue;
+      declareNamespace(isDefault ? namespace : symbol.getName(), symbol, isDefault, compiler, transitiveProvides, true);
       // we do not declare modules or goog.require support, because externs types should not be
       // visible from TS code.
     }
 
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
+  }
+
+  private boolean isDefaultExport(TypedVar symbol) {
+    if (symbol.getType() == null) return false;
+    return !symbol.getType().isObject() ||
+        symbol.getType().isInterface() ||
+        symbol.getType().isInstanceType() ||
+        symbol.getType().isEnumType() ||
+        symbol.getType().isFunctionType() ||
+        // NoType is used as a proxy for symbol that is typedef.
+        symbol.getType().isNoType();
   }
 
   // For platform externs we skip emitting .d.ts, to avoid collisions with lib.d.ts.
@@ -373,7 +372,7 @@ public class DeclarationGenerator {
     // but not in TS, so we have to generate a namespace-class pair in TS.
     // In the case of the externs, however we *do* go through all symbols so this pass is not
     // needed.
-    if (isDefault && hasNestedTypes(symbol.getType()) && !isExtern) {
+    if (isDefault && !isExtern && hasNestedTypes(symbol.getType())) {
       emitNamespaceBegin(symbol.getName());
       treeWalker.walkInnerClassesAndEnums((ObjectType) symbol.getType(), symbol.getName());
       emitNamespaceEnd();
@@ -1039,7 +1038,7 @@ public class DeclarationGenerator {
     }
 
     private Set<String> getSortedPublicPropertyNames(final ObjectType type) {
-      return sorted(Sets.filter(type.getOwnPropertyNames(), new Predicate<String> () {
+      return sorted(Sets.filter(type.getOwnPropertyNames(), new Predicate<String>() {
         @Override
         public boolean apply(String propName) {
           return !isPrivateProperty(type, propName);

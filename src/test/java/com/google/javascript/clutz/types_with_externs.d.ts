@@ -88,3 +88,19 @@ declare namespace ಠ_ಠ.clutz.angular.$cacheFactory {
 declare namespace ಠ_ಠ.clutz.angular.$cacheFactory.Cache {
   type Info = { id : string , options : { capacity : number } , size : number } ;
 }
+declare namespace ಠ_ಠ.clutz {
+  function Polymer (descriptor : { is : string } ) : any ;
+}
+declare namespace ಠ_ಠ.clutz {
+  class PolymerDomApi {
+    private noStructuralTyping_: any;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class PolymerEventApi {
+    private noStructuralTyping_: any;
+  }
+}
+declare namespace ಠ_ಠ.clutz.Polymer {
+  function dom (nodeOrEvent : Node | Event ) : PolymerDomApi | PolymerEventApi ;
+}
