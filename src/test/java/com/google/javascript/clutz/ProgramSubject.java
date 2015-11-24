@@ -27,7 +27,8 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
   private static final SourceFile CLUTZ_GOOG_BASE =
       SourceFile.fromFile("src/test/java/com/google/javascript/clutz/base.js", UTF_8);
 
-  public static ProgramSubject assertThatProgram(String sourceText) {
+  public static ProgramSubject assertThatProgram(String... sourceLines) {
+    String sourceText = Joiner.on('\n').join(sourceLines);
     return assert_().about(ProgramSubject.FACTORY).that(new Program(sourceText));
   }
 
@@ -72,14 +73,14 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
     }
   }
 
-  public void reportsDiagnosticsContaining(String message) {
+  public void reportsDiagnosticsContaining(String expectedDiagnostics) {
     String unexpectedRes = null;
     try {
       unexpectedRes = parse();
-      failureStrategy.failComparing("expected errors, but got a successful result",
-          message, unexpectedRes);
+      failureStrategy.failComparing("expected diagnostics, but got a successful result",
+          expectedDiagnostics, unexpectedRes);
     } catch (DeclarationGeneratorException e) {
-      assertThat(Joiner.on('\n').join(e.errors)).contains(message);
+      assertThat(e.getMessage()).contains(expectedDiagnostics);
     }
   }
 

@@ -7,23 +7,34 @@ import org.junit.Test;
 public class ErrorHandlingTest {
   @Test
   public void testOverriddenIncompatibleStaticField() {
-    assertThatProgram("goog.provide('X');\n" +
-        "goog.provide('Y');\n"
-        + "/** @constructor */"
-        + "X = function() {};\n"
-        + "/** @type {string} */ X.f;\n"
-        + "/** @constructor @extends {X} */"
-        + "Y = function() {};\n"
-        + "/** @type {number} */ Y.f;\n")
-        .reportsDiagnosticsContaining(DeclarationGenerator.CLUTZ_OVERRIDDEN_STATIC_FIELD.key);
+    assertThatProgram(
+            "goog.provide('X');",
+            "goog.provide('Y');",
+            "/** @constructor */",
+            "X = function() {};",
+            "/** @type {string} */ X.f;",
+            "/** @constructor @extends {X} */",
+            "Y = function() {};",
+            "/** @type {number} */ Y.f;")
+        .reportsDiagnosticsContaining(
+            "statically declared field that does not match the type of a parent field");
   }
 
   @Test
   public void testMissingSymbolOrExtern() {
     assertThatProgram(
-            "goog.provide('foo.x');\n"
-            + "/** @param {some.Unknown} y */\n"
-            + "foo.x = function(y) {};\n")
-        .reportsDiagnosticsContaining(DeclarationGenerator.CLUTZ_MISSING_TYPES.key);
+            "goog.provide('foo.x');",
+            "/** @param {some.Unknown} y */",
+            "foo.x = function(y) {};")
+        .reportsDiagnosticsContaining("missing some types");
+  }
+
+  @Test
+  public void testReportsSourceSnippets() {
+    assertThatProgram(
+            "goog.provide('foo.x');",
+            "/** @param {some.Unknown} y */",
+            "foo.x = function(y) {};")
+        .reportsDiagnosticsContaining("foo.x = function");
   }
 }

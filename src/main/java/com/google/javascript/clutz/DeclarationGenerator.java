@@ -105,6 +105,7 @@ public class DeclarationGenerator {
         // Includes the message.
         e.printStackTrace(System.err);
       } else {
+        // Includes source snippets and colorized errors.
         System.err.println(e.getMessage());
       }
       System.exit(1);
@@ -163,7 +164,8 @@ public class DeclarationGenerator {
     });
 
     if (externs.isEmpty()) {
-      externs = opts.skipParseExterns ? Collections.<SourceFile>emptyList() : getDefaultExterns(opts);
+      externs =
+          opts.skipParseExterns ? Collections.<SourceFile>emptyList() : getDefaultExterns(opts);
     } else {
       Preconditions.checkArgument(!opts.skipParseExterns,
           "Cannot pass --skipParseExterns and --externs.");
@@ -177,13 +179,14 @@ public class DeclarationGenerator {
       if (missingTypes) {
         errors.add(0, JSError.make(CLUTZ_MISSING_TYPES));
       }
-      throw new DeclarationGeneratorException("Source code does not compile with JSCompiler",
-          errors);
+      throw new DeclarationGeneratorException(compiler,
+          "Source code does not compile with JSCompiler", errors);
     }
 
     String dts = produceDts(compiler, depgraph);
     if (!errors.isEmpty()) {
-      throw new DeclarationGeneratorException("Errors while generating definitions", errors);
+      throw new DeclarationGeneratorException(compiler, "Errors while generating definitions",
+          errors);
     }
     return dts;
   }
