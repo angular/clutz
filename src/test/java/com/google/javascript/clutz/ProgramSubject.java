@@ -23,6 +23,18 @@ import javax.annotation.Nullable;
  */
 class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
 
+  enum Externs {
+    NONE,
+    PLATFORM,
+    THIRD_PARTY_AND_PLATFORM,;
+
+    static Externs fromTestName(String name) {
+      if (name.contains("_3p_externs")) return Externs.THIRD_PARTY_AND_PLATFORM;
+      if (name.contains("_externs")) return PLATFORM;
+      return NONE;
+    }
+  }
+
   /** A stripped down version of Closure's base.js for Clutz tests. */
   private static final SourceFile CLUTZ_GOOG_BASE =
       SourceFile.fromFile("src/test/java/com/google/javascript/clutz/base.js", UTF_8);
@@ -52,15 +64,15 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
   static final List<SourceFile> THIRD_PARTY_EXTERNS =
           singletonList(SourceFile.fromFile("src/resources/third_party_externs.js"));
 
-  private boolean withExterns = false;
+  private Externs externs = Externs.NONE;
 
   public ProgramSubject(FailureStrategy failureStrategy, ProgramSubject.Program subject) {
     super(failureStrategy, subject);
   }
 
-  public ProgramSubject withExterns() {
+  public ProgramSubject withExterns(Externs newExterns) {
     ProgramSubject result = assert_().about(ProgramSubject.FACTORY).that(getSubject());
-    result.withExterns = true;
+    result.externs = newExterns;
     return result;
   }
 
@@ -85,7 +97,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
   }
 
   private String parse() throws AssertionError {
-    Options opts = new Options(!withExterns);
+    Options opts = new Options(externs == Externs.NONE);
 
     List<SourceFile> sourceFiles = new ArrayList<>();
 
@@ -111,14 +123,24 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       roots.add("main.js");
     }
 
-    List<SourceFile> externs = NO_EXTERNS;
-    if (withExterns) {
-      externs = DeclarationGenerator.getDefaultExterns(opts);
-      externs.addAll(THIRD_PARTY_EXTERNS);
+    List<SourceFile> externFiles;
+    switch (externs) {
+      case NONE:
+        externFiles = NO_EXTERNS;
+        break;
+      case PLATFORM:
+        externFiles = DeclarationGenerator.getDefaultExterns(opts);
+        break;
+      case THIRD_PARTY_AND_PLATFORM:
+        externFiles = DeclarationGenerator.getDefaultExterns(opts);
+        externFiles.addAll(THIRD_PARTY_EXTERNS);
+        break;
+      default:
+        throw new AssertionError();
     }
 
     String actual = new DeclarationGenerator(opts)
-        .generateDeclarations(sourceFiles, externs, new Depgraph(roots));
+        .generateDeclarations(sourceFiles, externFiles, new Depgraph(roots));
     return actual;
   }
 

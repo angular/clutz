@@ -4,6 +4,7 @@ import static com.google.javascript.clutz.ProgramSubject.assertThatProgram;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
+import com.google.javascript.clutz.ProgramSubject.Externs;
 
 import junit.framework.Test;
 import junit.framework.TestResult;
@@ -48,8 +49,9 @@ public class DeclarationGeneratorTests {
     for (final File input : testFiles) {
       File golden = getGoldenFile(input);
       final String goldenText = getTestFileText(golden);
-      boolean withExterns = input.getName().contains("_externs");
-      suite.addTest(new DeclarationTest(input.getName(), goldenText, input, withExterns));
+      Externs externs = Externs.fromTestName(input.getName());
+      ProgramSubject subject = assertThatProgram(input).withExterns(externs);
+      suite.addTest(new DeclarationTest(input.getName(), goldenText, subject));
     }
     return suite;
   }
@@ -74,25 +76,19 @@ public class DeclarationGeneratorTests {
 
   private static final class DeclarationTest implements Test, Describable {
     private final String testName;
+    private final ProgramSubject subject;
     private final String goldenText;
-    private final File input;
-    private final boolean withExterns;
 
-    private DeclarationTest(String testName, String goldenText, File input, boolean withExterns) {
+    private DeclarationTest(String testName, String goldenText, ProgramSubject subject) {
       this.testName = testName;
       this.goldenText = goldenText;
-      this.input = input;
-      this.withExterns = withExterns;
+      this.subject = subject;
     }
 
     @Override
     public void run(TestResult result) {
       result.startTest(this);
       try {
-        ProgramSubject subject = assertThatProgram(input);
-        if (withExterns) {
-          subject = subject.withExterns();
-        }
         subject.generatesDeclarations(goldenText);
       } catch (Throwable t) {
         result.addError(this, t);
