@@ -258,8 +258,7 @@ public class DeclarationGenerator {
 
       String namespace = getNamespace(symbol.getName());
       boolean isDefault = isDefaultExport(symbol);
-      // NoType is used as a proxy for typedef symbol, due to lack of appropriate API call.
-      boolean isTypedef = symbol.getType() != null && symbol.getType().isNoType();
+      boolean isTypedef = symbol.getType() != null && isTypedef(symbol.getType());
       // Typedef symbols do not enumerate their namespace properties.
       if (!isDefault && !isTypedef) visitedNamespaces.add(symbol.getName());
       if (isDefault && visitedNamespaces.contains(namespace)) continue;
@@ -279,8 +278,7 @@ public class DeclarationGenerator {
         symbol.getType().isInstanceType() ||
         symbol.getType().isEnumType() ||
         symbol.getType().isFunctionType() ||
-        // NoType is used as a proxy for symbol that is typedef.
-        symbol.getType().isNoType();
+        isTypedef(symbol.getType());
   }
 
   // For platform externs we skip emitting .d.ts, to avoid collisions with lib.d.ts.
@@ -377,7 +375,7 @@ public class DeclarationGenerator {
     // needed.
     if (isDefault && !isExtern && hasNestedTypes(symbol.getType())) {
       emitNamespaceBegin(symbol.getName());
-      treeWalker.walkInnerClassesAndEnums((ObjectType) symbol.getType(), symbol.getName());
+      treeWalker.walkInnerSymbols((ObjectType) symbol.getType(), symbol.getName());
       emitNamespaceEnd();
     }
     return treeWalker.valueSymbolsWalked;
@@ -385,13 +383,29 @@ public class DeclarationGenerator {
   }
 
   private boolean hasNestedTypes(JSType type) {
-    if (!type.isConstructor()) return false;
+    if (!isTrueConstructor(type)) return false;
     FunctionType ftype = (FunctionType) type;
     for (String name : ((FunctionType) type).getOwnPropertyNames()) {
       JSType propType = ftype.getPropertyType(name);
-      if (propType.isConstructor() || propType.isEnumType() || propType.isInterface()) return true;
+      if (isTrueConstructor(propType) || propType.isEnumType() || propType.isInterface()
+          || isTypedef(propType)) return true;
     }
     return false;
+  }
+
+  /**
+   * Confusingly, the typedef type returns true on isConstructor checks, so we need to filter
+   * the NoType through this utility method.
+   */
+  private boolean isTrueConstructor(JSType propType) {
+    return !isTypedef(propType) && propType.isConstructor();
+  }
+
+  // This indirection exists because the name in the Closure APIs is confusing.
+  // TODO(rado): figure out if NoType can be created through other means and more filtering is
+  // needed here.
+  private boolean isTypedef(JSType type) {
+    return type.isNoType();
   }
 
   private void emitGoogRequireSupport(String namespace, String closureNamespace) {
@@ -578,7 +592,7 @@ public class DeclarationGenerator {
     private void walk(TypedVar symbol) {
       this.currentSymbol = symbol;
       JSType type = symbol.getType();
-      if (!type.isInterface() && !type.isNoType()) valueSymbolsWalked++;
+      if (!type.isInterface() && !isTypedef(type)) valueSymbolsWalked++;
       if (type.isFunctionType()) {
         FunctionType ftype = (FunctionType) type;
 
@@ -612,10 +626,8 @@ public class DeclarationGenerator {
           visitEnumType(symbol.getName(), (EnumType) type);
           return;
         }
-        // Closure keeps type None for the symbol which became the type alias.
-        // However, the aliased type is present in the registry under the same name.
-        // TODO(rado): figure out whether NoType guarantees a typedef.
-        if (type.isNoType()) {
+        if (isTypedef(type)) {
+          // The aliased type is present in the registry under the symbol name.
           JSType registryType = typeRegistry.getType(symbol.getName());
           if (registryType != null) {
             visitTypeAlias(registryType, getUnqualifiedName(symbol));
@@ -1276,14 +1288,19 @@ public class DeclarationGenerator {
       emit(")");
     }
 
-    void walkInnerClassesAndEnums(ObjectType type, String innerNamespace) {
+    void walkInnerSymbols(ObjectType type, String innerNamespace) {
       for (String propName : getSortedPublicPropertyNames(type)) {
-        if (provides.contains(innerNamespace + '.' + propName)) continue;
+        String qualifiedName = innerNamespace + '.' + propName;
+        if (provides.contains(qualifiedName)) continue;
         JSType pType = type.getPropertyType(propName);
         if (pType.isEnumType()) {
           visitEnumType(propName, (EnumType) pType);
-        } else if (pType.isConstructor()) {
+        } else if (isTrueConstructor(pType)) {
           visitClassOrInterface(propName, (FunctionType) pType);
+        // NoType is the reported type of a typedef declaration symbol.
+        } else if (isTypedef(pType)) {
+          JSType registryType = typeRegistry.getType(qualifiedName);
+          visitTypeAlias(registryType, propName);
         }
       }
     }
