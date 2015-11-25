@@ -313,7 +313,10 @@ public class DeclarationGenerator {
       Set<String> propertyNames =
           objType != null ? objType.getPropertyNames() : Collections.<String>emptySet();
       for (String property : propertyNames) {
-        if (!isPrivateProperty(objType, property)) {
+        // When parsing externs namespaces are explicitly declared with a var of Object type
+        // Do not emit the var declaration, as it will conflict with the namespace.
+        if (!(isPrivateProperty(objType, property) ||
+            (isExtern && isLikelyNamespace(objType.getPropertyType(property), compiler)))) {
           desiredSymbols.add(symbol.getName() + "." + property);
         } else if (objType.getPropertyType(property).isEnumType()) {
           // For enum types (unlike classes or interfaces), Closure does not track the visibility on
@@ -380,6 +383,21 @@ public class DeclarationGenerator {
     }
     return treeWalker.valueSymbolsWalked;
 
+  }
+
+  // Due to lack of precise definition of a namespace, we look for object types that are not of any
+  // other type. This will need more refinement as more cases appear.
+  private boolean isLikelyNamespace(JSType type, Compiler compiler) {
+    UnionType utype = type.toMaybeUnionType();
+    if (utype != null) {
+      return isNativeObjectType(utype.restrictByNotNullOrUndefined(), compiler);
+    }
+    return isNativeObjectType(type, compiler);
+  }
+
+  // TODO(rado): refactor so that the native object type is a final field.
+  private boolean isNativeObjectType(JSType type, Compiler compiler) {
+    return compiler.getTypeRegistry().getNativeType(OBJECT_TYPE).equals(type);
   }
 
   private boolean hasNestedTypes(JSType type) {

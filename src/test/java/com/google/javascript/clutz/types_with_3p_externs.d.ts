@@ -9,7 +9,7 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
   var c : NodeList | IArguments | { length : number } ;
   function elementMaybe ( ) : Element ;
   function id (x : NodeList | IArguments | { length : number } ) : NodeList | IArguments | { length : number } ;
-  var myScope : ಠ_ಠ.clutz.angular.Scope ;
+  var myScope : ಠ_ಠ.clutz.namespace.Foo ;
   function topLevelFunction ( ...a : any [] ) : any ;
 }
 declare namespace ಠ_ಠ.clutz.goog {
@@ -55,26 +55,22 @@ declare module 'goog:typesWithExterns.C' {
   import alias = ಠ_ಠ.clutz.typesWithExterns.C;
   export default alias;
 }
-declare namespace ಠ_ಠ.clutz.angular {
-  type $cacheFactory = (a : string , b ? : { capacity : number } ) => ಠ_ಠ.clutz.angular.$cacheFactory.Cache < any > ;
-  class $injector {
+declare namespace ಠ_ಠ.clutz.namespace {
+  class Foo {
     private noStructuralTyping_: any;
+    member : string ;
+    method (opt_exp ? : (a : ಠ_ಠ.clutz.namespace.Foo ) => any ) : any ;
   }
-  class Scope {
-    private noStructuralTyping_: any;
-    $$phase : string ;
-    $apply (opt_exp ? : string | ( (a : ಠ_ಠ.clutz.angular.Scope ) => any ) ) : any ;
-    $applyAsync (opt_exp ? : string | ( (a : ಠ_ಠ.clutz.angular.Scope ) => any ) ) : any ;
-  }
-  function bootstrap (element : Element | HTMLDocument , opt_modules ? : ( string | ( ( ...a : any [] ) => any ) ) [] ) : ಠ_ಠ.clutz.angular.$injector ;
+  type atypedef = (a : string , b ? : { capacity : number } ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > ;
+  function bootstrap (arg1 : Element | HTMLDocument , opt_arg2 ? : ( string | ( ( ...a : any [] ) => any ) ) [] ) : any ;
 }
-declare namespace ಠ_ಠ.clutz.angular.$cacheFactory {
-  type get = (a : string ) => ಠ_ಠ.clutz.angular.$cacheFactory.Cache < any > ;
+declare namespace ಠ_ಠ.clutz.namespace.atypedef {
+  type get = (a : string ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > ;
 }
-declare namespace ಠ_ಠ.clutz.angular.$cacheFactory {
+declare namespace ಠ_ಠ.clutz.namespace.atypedef {
   type Options = { capacity : number } ;
 }
-declare namespace ಠ_ಠ.clutz.angular.$cacheFactory {
+declare namespace ಠ_ಠ.clutz.namespace.atypedef {
   class Cache < T > {
     private noStructuralTyping_: any;
     destroy ( ) : any ;
@@ -85,22 +81,23 @@ declare namespace ಠ_ಠ.clutz.angular.$cacheFactory {
     removeAll ( ) : any ;
   }
 }
-declare namespace ಠ_ಠ.clutz.angular.$cacheFactory.Cache {
+declare namespace ಠ_ಠ.clutz.namespace.atypedef.Cache {
   type Info = { id : string , options : { capacity : number } , size : number } ;
 }
-declare namespace ಠ_ಠ.clutz {
-  function Polymer (descriptor : { is : string } ) : any ;
+declare namespace ಠ_ಠ.clutz.namespace.subNamespace {
+  var fieldA : string ;
+}
+declare namespace ಠ_ಠ.clutz.namespace.subNamespace {
+  var fieldB : number ;
 }
 declare namespace ಠ_ಠ.clutz {
-  class PolymerDomApi {
+  function FunctionNamespace (descriptor : { is : string } ) : any ;
+}
+declare namespace ಠ_ಠ.clutz {
+  class FunctionNamespaceHelperClass {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz {
-  class PolymerEventApi {
-    private noStructuralTyping_: any;
-  }
-}
-declare namespace ಠ_ಠ.clutz.Polymer {
-  function dom (nodeOrEvent : Node | Event ) : PolymerDomApi | PolymerEventApi ;
+declare namespace ಠ_ಠ.clutz.FunctionNamespace {
+  function dom (nodeOrEvent : Node | Event ) : FunctionNamespaceHelperClass ;
 }

@@ -108,6 +108,6 @@ typesWithExterns.Error = function() {};
 
 
 /**
- * @type {angular.Scope}
+ * @type {namespace.Foo}
  */
 typesWithExterns.myScope = null;

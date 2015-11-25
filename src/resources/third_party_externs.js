@@ -1,110 +1,109 @@
 /**
  * @const
  */
-var angular = {};
+var namespace = {};
 
 /** @constructor */
-angular.Scope = function() {};
+namespace.Foo = function() {};
 
 /** @type {string} */
-angular.Scope.prototype.$$phase;
+namespace.Foo.prototype.member;
 
 /**
- * @param {(string|function(!angular.Scope))=} opt_exp
- * @return {*}
+ * @param {function(!namespace.Foo)=} opt_exp
  */
-angular.Scope.prototype.$apply = function(opt_exp) {};
+namespace.Foo.prototype.method = function(opt_exp) {};
 
 /**
- * @param {(string|function(!angular.Scope))=} opt_exp
+ * @param {Element|HTMLDocument} arg1
+ * @param {Array.<string|Function>=} opt_arg2
  */
-angular.Scope.prototype.$applyAsync = function(opt_exp) {};
+namespace.bootstrap = function(arg1, opt_arg2) {};
 
-/**
- * @param {Element|HTMLDocument} element
- * @param {Array.<string|Function>=} opt_modules
- * @return {!angular.$injector}
- */
-angular.bootstrap = function(element, opt_modules) {};
 
-/**
- * @constructor
- */
-angular.$injector = function() {};
-
-// TODO(rado): bring the whole angular externs instead of chunks.
+// TODO(rado): add integration tests with angular and polymer externs.
 /**
  * @typedef {
- *   function(string, angular.$cacheFactory.Options=):
- *       !angular.$cacheFactory.Cache}
+ *   function(string, namespace.atypedef.Options=):
+ *       !namespace.atypedef.Cache}
  */
-angular.$cacheFactory;
+namespace.atypedef;
 
 /**
- * @typedef {function(string): ?angular.$cacheFactory.Cache}
+ * @typedef {function(string): ?namespace.atypedef.Cache}
  */
-angular.$cacheFactory.get;
+namespace.atypedef.get;
 
 /** @typedef {{capacity: (number|undefined)}} */
-angular.$cacheFactory.Options;
+namespace.atypedef.Options;
 
 /**
  * @template T
  * @constructor
  */
-angular.$cacheFactory.Cache = function() {};
+namespace.atypedef.Cache = function() {};
 
 /**
- * @return {!angular.$cacheFactory.Cache.Info}
+ * @return {!namespace.atypedef.Cache.Info}
  */
-angular.$cacheFactory.Cache.prototype.info = function() {};
+namespace.atypedef.Cache.prototype.info = function() {};
 
 /**
  * @param {string} key
  * @param {T} value
  */
-angular.$cacheFactory.Cache.prototype.put = function(key, value) {};
+namespace.atypedef.Cache.prototype.put = function(key, value) {};
 
 /**
  * @param {string} key
  * @return {T}
  */
-angular.$cacheFactory.Cache.prototype.get = function(key) {};
+namespace.atypedef.Cache.prototype.get = function(key) {};
 
 /**
  * @param {string} key
  */
-angular.$cacheFactory.Cache.prototype.remove = function(key) {};
+namespace.atypedef.Cache.prototype.remove = function(key) {};
 
-angular.$cacheFactory.Cache.prototype.removeAll = function() {};
-angular.$cacheFactory.Cache.prototype.destroy = function() {};
+namespace.atypedef.Cache.prototype.removeAll = function() {};
+namespace.atypedef.Cache.prototype.destroy = function() {};
 
 /**
  * @typedef {{
  *   id: string,
  *   size: number,
- *   options: angular.$cacheFactory.Options
+ *   options: namespace.atypedef.Options
  *   }}
  */
-angular.$cacheFactory.Cache.Info;
+namespace.atypedef.Cache.Info;
+
+/**
+ * @type {Object}
+ */
+namespace.subNamespace = {};
+
+/**
+ * @type {string}
+ */
+namespace.subNamespace.fieldA = '';
+
+/**
+ * @type {number}
+ */
+namespace.subNamespace.fieldB = 0;
 
 /**
  * @param {!{is: string}} descriptor
  */
-var Polymer = function(descriptor) {};
+var FunctionNamespace = function(descriptor) {};
 
 /**
  * @constructor
  */
-var PolymerDomApi = function() {};
-
-/**
- * @constructor
- */
-var PolymerEventApi = function() {};
+var FunctionNamespaceHelperClass = function() {};
 
 /**
  * @param {?Node|?Event} nodeOrEvent
- * @return {!PolymerDomApi|!PolymerEventApi}
+ * @return {!FunctionNamespaceHelperClass}
  */
-Polymer.dom = function(nodeOrEvent) {};
+FunctionNamespace.dom = function(nodeOrEvent) {};
