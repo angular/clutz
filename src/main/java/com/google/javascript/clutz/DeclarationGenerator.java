@@ -903,6 +903,9 @@ public class DeclarationGenerator {
             case "IThenable":
               templateTypeName = "PromiseLike";
               break;
+            case "IArrayLike":
+              templateTypeName = "ArrayLike";
+              break;
             default:
               break;
           }
