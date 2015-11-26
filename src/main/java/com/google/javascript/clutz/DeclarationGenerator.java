@@ -228,7 +228,11 @@ public class DeclarationGenerator {
     for (String provide : provides) {
       TypedVar symbol = topScope.getOwnSlot(provide);
       if (symbol == null) {
-        // Sometimes goog.provide statements are used as pure markers for dependency management.
+        // Sometimes goog.provide statements are used as pure markers for dependency management, or
+        // the defined provides do not get a symbol because they don't have a proper type.
+        // Emit an empty namespace and declare an empty module providing that namespace.
+        emitNamespaceBegin(provide);
+        emitNamespaceEnd();
         declareModule(provide, true);
         continue;
       }
