@@ -79,10 +79,10 @@ public class DeclarationGenerator {
       return input.getString();
     }};
 
-  private List<JSError> errors = new ArrayList<>();
+  private final List<JSError> errors = new ArrayList<>();
   private StringWriter out = new StringWriter();
   private final Options opts;
-  private Set<String> privateEnums = new HashSet<>();
+  private final Set<String> privateEnums = new HashSet<>();
 
   DeclarationGenerator(Options opts) {
     this.opts = opts;
@@ -401,22 +401,36 @@ public class DeclarationGenerator {
   }
 
   private boolean hasNestedTypes(JSType type) {
-    if (!isTrueConstructor(type)) return false;
+    if (!isClassLike(type)) return false;
     FunctionType ftype = (FunctionType) type;
     for (String name : ((FunctionType) type).getOwnPropertyNames()) {
       JSType propType = ftype.getPropertyType(name);
-      if (isTrueConstructor(propType) || propType.isEnumType() || propType.isInterface()
-          || isTypedef(propType)) return true;
+      if (isDefiningType(propType)) {
+        return true;
+      }
     }
     return false;
   }
 
   /**
-   * Confusingly, the typedef type returns true on isConstructor checks, so we need to filter
-   * the NoType through this utility method.
+   * Returns true if {@code propType} is creating a new type in the TypeScript sense - i.e. it's a
+   * constructor function (class or interface), enum, or typedef.
    */
-  private boolean isTrueConstructor(JSType propType) {
-    return !isTypedef(propType) && propType.isConstructor();
+  private boolean isDefiningType(JSType propType) {
+    return isClassLike(propType) || propType.isEnumType() || propType.isInterface()
+        || isTypedef(propType);
+  }
+
+  /**
+   * Returns true for types that are class like, i.e. that define a constructor or interface, but
+   * excludes typedefs and the built-in constructor functions such as {@code Function}.
+   */
+  private boolean isClassLike(JSType propType) {
+    // Confusingly, the typedef type returns true on isConstructor checks, so we need to filter
+    // the NoType through this utility method.
+    return !isTypedef(propType) && propType.isConstructor()
+        // "Function" is a constructor, but does not define a new type for our purposes.
+        && !propType.toMaybeObjectType().isNativeObjectType();
   }
 
   // This indirection exists because the name in the Closure APIs is confusing.
@@ -1178,7 +1192,7 @@ public class DeclarationGenerator {
       String qualifiedName = objType.getDisplayName() + "." + propName;
       if (provides.contains(qualifiedName)) {
         return;
-      } else if (propertyType.isEnumType() || propertyType.isConstructor()) {
+      } else if (isDefiningType(propertyType)) {
         // enums and classes are emitted in a namespace later.
         return;
       }
@@ -1316,7 +1330,7 @@ public class DeclarationGenerator {
         JSType pType = type.getPropertyType(propName);
         if (pType.isEnumType()) {
           visitEnumType(propName, (EnumType) pType);
-        } else if (isTrueConstructor(pType)) {
+        } else if (isClassLike(pType)) {
           visitClassOrInterface(propName, (FunctionType) pType);
         // NoType is the reported type of a typedef declaration symbol.
         } else if (isTypedef(pType)) {
