@@ -9,6 +9,12 @@ namespace.Foo = function() {};
 /** @type {string} */
 namespace.Foo.prototype.member;
 
+/** @type {string} */
+namespace.Foo.staticField;
+
+/** @return {string} */
+namespace.Foo.staticMethod;
+
 /**
  * @param {function(!namespace.Foo)=} opt_exp
  */

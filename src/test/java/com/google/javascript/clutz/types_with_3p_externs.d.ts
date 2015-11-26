@@ -60,6 +60,8 @@ declare namespace ಠ_ಠ.clutz.namespace {
     private noStructuralTyping_: any;
     member : string ;
     method (opt_exp ? : (a : ಠ_ಠ.clutz.namespace.Foo ) => any ) : any ;
+    static staticField : string ;
+    static staticMethod ( ) : string ;
   }
   type atypedef = (a : string , b ? : { capacity : number } ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > ;
   function bootstrap (arg1 : Element | HTMLDocument , opt_arg2 ? : ( string | ( ( ...a : any [] ) => any ) ) [] ) : any ;

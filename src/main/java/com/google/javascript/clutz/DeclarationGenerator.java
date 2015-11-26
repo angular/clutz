@@ -253,12 +253,21 @@ public class DeclarationGenerator {
       }
       declareModule(provide, isDefault);
     }
-
     // In order to typecheck in the presence of third-party externs, emit all extern symbols.
+    processExternSymbols(compiler);
+
+    checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
+    return out.toString();
+  }
+
+  private void processExternSymbols(Compiler compiler) {
+    Set<String> noTransitiveProvides = Collections.emptySet();
     LinkedHashSet<String> visitedNamespaces = new LinkedHashSet<>();
-    for (TypedVar symbol : topScope.getAllSymbols()) {
+    LinkedHashSet<String> visitedClassLikes = new LinkedHashSet<>();
+
+    for (TypedVar symbol : compiler.getTopScope().getAllSymbols()) {
       CompilerInput symbolInput = compiler.getInput(new InputId(symbol.getInputName()));
-      if (symbolInput == null || !symbolInput.isExtern()) {
+      if (symbolInput == null || !symbolInput.isExtern() || symbol.getType() == null) {
         continue;
       }
       if (isPlatformExtern(symbolInput)) {
@@ -268,19 +277,30 @@ public class DeclarationGenerator {
       // parent symbol.
       if (symbol.getName().contains(".prototype")) continue;
 
-      String namespace = getNamespace(symbol.getName());
+      String parentPath = getNamespace(symbol.getName());
       boolean isDefault = isDefaultExport(symbol);
-      boolean isTypedef = symbol.getType() != null && isTypedef(symbol.getType());
-      // Typedef symbols do not enumerate their namespace properties.
-      if (!isDefault && !isTypedef) visitedNamespaces.add(symbol.getName());
-      if (isDefault && visitedNamespaces.contains(namespace)) continue;
-      declareNamespace(isDefault ? namespace : symbol.getName(), symbol, isDefault, compiler, transitiveProvides, true);
+
+      if (visitedNamespaces.contains(parentPath)) {
+        // Note that this class has been visited before continuing.
+        if (isDefault && isClassLike(symbol.getType())) visitedClassLikes.add(symbol.getName());
+        continue;
+      }
+      // will be handled by class-like emitting code.
+      if (isStaticFieldOrMethod(symbol.getType()) && visitedClassLikes.contains(parentPath)) continue;
+
+      declareNamespace(isDefault ? parentPath : symbol.getName(), symbol, isDefault, compiler,
+          noTransitiveProvides, true);
+
+      if (!isDefault && isLikelyNamespace(symbol.getType(), compiler)) visitedNamespaces.add(symbol.getName());
+      if (isDefault && isClassLike(symbol.getType())) visitedClassLikes.add(symbol.getName());
+
       // we do not declare modules or goog.require support, because externs types should not be
       // visible from TS code.
     }
+  }
 
-    checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
-    return out.toString();
+  private boolean isStaticFieldOrMethod(JSType type) {
+    return !isClassLike(type) && !isTypedef(type);
   }
 
   private boolean isDefaultExport(TypedVar symbol) {
@@ -403,7 +423,11 @@ public class DeclarationGenerator {
     if (utype != null) {
       return isNativeObjectType(utype.restrictByNotNullOrUndefined(), compiler);
     }
-    return isNativeObjectType(type, compiler);
+    // The inferred type for an namespace-like object is not the native object,
+    // but rather PrototypeObjectType.
+    return isNativeObjectType(type, compiler) ||
+        // TODO(rado): find a better api to use here (if it exists).
+        (type.isObject() && !type.isConstructor() && !type.isInstanceType() && !type.isFunctionType());
   }
 
   // TODO(rado): refactor so that the native object type is a final field.
