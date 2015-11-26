@@ -57,7 +57,15 @@ import org.kohsuke.args4j.CmdLineException;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -82,7 +90,7 @@ public class DeclarationGenerator {
   private final List<JSError> errors = new ArrayList<>();
   private StringWriter out = new StringWriter();
   private final Options opts;
-  private final Set<String> privateEnums = new HashSet<>();
+  private final Set<String> privateEnums = new LinkedHashSet<>();
 
   DeclarationGenerator(Options opts) {
     this.opts = opts;
@@ -655,7 +663,7 @@ public class DeclarationGenerator {
       } else {
         maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
         if (type.isEnumType()) {
-          visitEnumType(symbol.getName(), (EnumType) type);
+          visitEnumType(symbol.getName(), (EnumType) type, Collections.<JSType>emptySet());
           return;
         }
         if (isTypedef(type)) {
@@ -774,7 +782,7 @@ public class DeclarationGenerator {
       emitBreak();
     }
 
-    private void visitEnumType(String symbolName, EnumType type) {
+    private void visitEnumType(String symbolName, EnumType type, Iterable<JSType> intersectTypes) {
       // Enums are top level vars, but also declare a corresponding type:
       // <pre>
       // /** @enum {ValueType} */ var MyEnum = {A: ..., B: ...};
@@ -799,7 +807,19 @@ public class DeclarationGenerator {
         emitBreak();
       }
       unindent();
-      emit("};");
+      emit("}");
+      // Closure code commonly defines enum types with the same name as nested types. This creates
+      // collisions of "Class static side" properties in TS. This changes an enum that's overriden
+      // into a faux intersection type to mask the error.
+      for (JSType intersect: intersectTypes) {
+        emit("&");
+        emitBreak();
+        emit("(/* Incompatible inherited static property */");
+        emit("typeof");
+        visitType(intersect);
+        emit(")");
+      }
+      emitNoSpace(";");
       emitBreak();
     }
 
@@ -1196,12 +1216,17 @@ public class DeclarationGenerator {
         // enums and classes are emitted in a namespace later.
         return;
       }
+      // The static methods apply and call are provided by lib.d.ts.
+      if (isStatic && propName.equals("apply") || propName.equals("call")) return;
       maybeEmitJsDoc(objType.getOwnPropertyJSDocInfo(propName), /* ignoreParams */ false);
+      emitProperty(propName, propertyType, isStatic);
       if (isStatic) {
-        // The static methods apply and call are provided by lib.d.ts.
-        if (propName.equals("apply") || propName.equals("call")) return;
-        emit("static");
+        emitStaticOverloads(propName, objType, propertyType);
       }
+    }
+
+    private void emitProperty(String propName, JSType propertyType, boolean isStatic) {
+      if (isStatic) emit("static");
       emit(propName);
       if (propertyType.isFunctionType()) {
         visitFunctionDeclaration((FunctionType) propertyType);
@@ -1210,9 +1235,6 @@ public class DeclarationGenerator {
       }
       emit(";");
       emitBreak();
-      if (isStatic) {
-        emitStaticOverloads(propName, objType, propertyType);
-      }
     }
 
     /**
@@ -1236,22 +1258,11 @@ public class DeclarationGenerator {
      * e.g. different return types. It also pretends that functions exist that do not.
      */
     private void emitStaticOverloads(String propName, ObjectType objType, JSType propertyType) {
-      if (!objType.isFunctionType()) {
-        return;
-      }
-      ObjectType superType = getSuperType((FunctionType) objType);
-      if (superType == null || superType.getConstructor() == null) {
-        return;
-      }
-      FunctionType superTypeCtor = superType.getConstructor();
-      if (!superTypeCtor.hasProperty(propName)) {
-        return;
-      }
+      Set<JSType> incompatibleSuperTypes =
+          getIncompatibleSuperTypes(objType, propName, propertyType);
+
       // "I, for one, welcome our new static overloads." - H.G. Wells.
-      JSType superPropType = superTypeCtor.getPropertyType(propName);
-      if (!propertyType.isSubtype(superPropType)) {
-        // If this field is public, but the super field is private, and thus not emitted, it's ok.
-        if (isPrivateProperty(superTypeCtor, propName)) return;
+      for (JSType superPropType : incompatibleSuperTypes) {
         if (!propertyType.isFunctionType() || !superPropType.isFunctionType()) {
           errors.add(JSError.make(currentSymbol.getNode(), CLUTZ_OVERRIDDEN_STATIC_FIELD,
               objType.getDisplayName(), propName));
@@ -1259,8 +1270,8 @@ public class DeclarationGenerator {
           emit("/** WARNING: emitted for non-matching super type's static method. "
               + "Only the first overload is actually callable. */");
           emitBreak();
+          emitProperty(propName, superPropType, true);
         }
-        visitProperty(propName, superTypeCtor, true);
       }
     }
 
@@ -1324,20 +1335,57 @@ public class DeclarationGenerator {
     }
 
     void walkInnerSymbols(ObjectType type, String innerNamespace) {
+      // TODO(martinprobst): This curiously duplicates visitProperty above. Investigate the code
+      // smell and reduce duplication (or figure out & document why it's needed).
       for (String propName : getSortedPublicPropertyNames(type)) {
         String qualifiedName = innerNamespace + '.' + propName;
         if (provides.contains(qualifiedName)) continue;
         JSType pType = type.getPropertyType(propName);
+
+        Set<JSType> incompatibleTypes = getIncompatibleSuperTypes(type, propName, pType);
+
+        if (!pType.isEnumType() && !incompatibleTypes.isEmpty()) {
+          errors.add(JSError.make(currentSymbol.getNode(), CLUTZ_OVERRIDDEN_STATIC_FIELD,
+              innerNamespace, propName));
+          continue;
+        }
+
         if (pType.isEnumType()) {
-          visitEnumType(propName, (EnumType) pType);
+          visitEnumType(propName, (EnumType) pType, incompatibleTypes);
         } else if (isClassLike(pType)) {
           visitClassOrInterface(propName, (FunctionType) pType);
-        // NoType is the reported type of a typedef declaration symbol.
         } else if (isTypedef(pType)) {
           JSType registryType = typeRegistry.getType(qualifiedName);
           visitTypeAlias(registryType, propName);
         }
       }
+    }
+
+    private Set<JSType> getIncompatibleSuperTypes(ObjectType type, String propName, JSType pType) {
+      Set<JSType> incompatibleTypes = new LinkedHashSet<>();
+      collectSuperTypes(type, propName, incompatibleTypes);
+      for (JSType candidate: incompatibleTypes) {
+        if (pType.isSubtype(candidate)) incompatibleTypes.remove(candidate);
+      }
+      return incompatibleTypes;
+    }
+
+    /**
+     * Collects property types from the super type prototype chain that have the same
+     * {@code propName} but an incompatible {@link JSType} into {@code accumulator}.
+     */
+    private void collectSuperTypes(ObjectType type, String propName, Set<JSType> accumulator) {
+      if (!type.isFunctionType()) return;
+      ObjectType superType = getSuperType(type.toMaybeFunctionType());
+      if (superType == null) return;
+      FunctionType superTypeCtor = superType.getConstructor();
+      if (superTypeCtor == null) return;
+      if (superTypeCtor.hasOwnProperty(propName) && !isPrivateProperty(superTypeCtor, propName)) {
+        // If this field is public, but the super field is private, and thus not emitted, it's ok.
+        JSType superPropType = superTypeCtor.getPropertyType(propName);
+        accumulator.add(superPropType);
+      }
+      collectSuperTypes(superTypeCtor, propName, accumulator);
     }
   }
 }
