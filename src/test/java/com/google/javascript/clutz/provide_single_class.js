@@ -24,6 +24,10 @@ foo.bar.Baz.staticMethod = function(a) {
   return Number(a)
 };
 
+/** @const {!Function} */
+// A static property of type Function, not to be confused with a real ctor.
+foo.bar.Baz.FUNCTION_PROP_ = foo.bar.Baz.staticMethod;
+
 /**
  * @type {number}
  */

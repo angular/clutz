@@ -5,6 +5,7 @@ declare namespace ಠ_ಠ.clutz.foo.bar {
     avalue : number ;
     equals (b : ಠ_ಠ.clutz.foo.bar.Baz.NestedClass ) : boolean ;
     method (a : string ) : number ;
+    static FUNCTION_PROP_ ( ...a : any [] ) : any ;
     static staticMethod (a : string ) : number ;
   }
 }
