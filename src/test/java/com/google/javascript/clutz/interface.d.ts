@@ -4,7 +4,10 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz.interface_exp {
-  var staticMethod : ( ) => number ;
+  class SomeClazz {
+    private noStructuralTyping_: any;
+  }
+  function staticMethod ( ) : number ;
   var staticProp : number ;
 }
 declare module 'goog:interface_exp' {

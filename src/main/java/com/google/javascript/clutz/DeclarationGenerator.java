@@ -380,9 +380,8 @@ public class DeclarationGenerator {
     // static methods. TS does not support static methods on interfaces, thus we create a new
     // namespace for them.
     if (isDefault && isInterfaceWithStatic(symbol.getType())) {
-      emitNamespaceBegin(symbol.getName());
-      treeWalker.walkDefaultInterface((FunctionType) symbol.getType());
-      emitNamespaceEnd();
+      declareNamespace(symbol.getName(), symbol, /* isDefault, prevents infinite recursion */ false,
+          compiler, provides, isExtern);
     }
     // extra walk required for inner classes and inner enums. They are allowed in closure,
     // but not in TS, so we have to generate a namespace-class pair in TS.
@@ -759,10 +758,6 @@ public class DeclarationGenerator {
       emitBreak();
     }
 
-    private void walkDefaultInterface(FunctionType ftype) {
-      visitNamespaceLikeType(ftype);
-    }
-
     private void visitTemplateTypes(ObjectType type) {
       if (type.hasAnyTemplateTypes() && !type.getTemplateTypeMap().isEmpty()) {
         emit("<");
@@ -1075,25 +1070,6 @@ public class DeclarationGenerator {
         typeToVisit.visit(visitor);
       } catch (Exception e) {
         throw new RuntimeException("Failed to emit type " + typeToVisit, e);
-      }
-    }
-
-    // This method is used for objects like the static props on an interface, that
-    // behave like an object with bunch of props, but are not technically defined as
-    // record types.
-    private void visitNamespaceLikeType(ObjectType type) {
-      for (String propName : getSortedPublicPropertyNames(type)) {
-        if (propName.equals("prototype")) continue;
-        JSType pType = type.getPropertyType(propName);
-        // Here we assume the enum is exported and handled separately.
-        if (pType.isEnumType()) continue;
-        maybeEmitJsDoc(pType.getJSDocInfo(), /* ignoreParams */ false);
-        emit("var");
-        emit(propName);
-        emit(":");
-        visitType(pType);
-        emit(";");
-        emitBreak();
       }
     }
 
