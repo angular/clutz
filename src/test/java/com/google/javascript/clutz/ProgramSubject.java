@@ -7,11 +7,14 @@ import static java.util.Collections.singletonList;
 
 import com.google.common.base.Joiner;
 import com.google.common.truth.FailureStrategy;
+import com.google.common.truth.StringSubject;
 import com.google.common.truth.Subject;
 import com.google.common.truth.SubjectFactory;
 import com.google.javascript.jscomp.SourceFile;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,16 +42,16 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
   private static final SourceFile CLUTZ_GOOG_BASE =
       SourceFile.fromFile("src/test/java/com/google/javascript/clutz/base.js", UTF_8);
 
-  public static ProgramSubject assertThatProgram(String... sourceLines) {
+  static ProgramSubject assertThatProgram(String... sourceLines) {
     String sourceText = Joiner.on('\n').join(sourceLines);
     return assert_().about(ProgramSubject.FACTORY).that(new Program(sourceText));
   }
 
-  public static ProgramSubject assertThatProgram(File singleInput) {
+  static ProgramSubject assertThatProgram(File singleInput) {
     return assertThatProgram(singletonList(singleInput), Collections.<File>emptyList());
   }
 
-  public static ProgramSubject assertThatProgram(List<File> roots, List<File> nonroots) {
+  static ProgramSubject assertThatProgram(List<File> roots, List<File> nonroots) {
     Program program = new Program(roots, nonroots);
     return assert_().about(ProgramSubject.FACTORY).that(program);
   }
@@ -66,18 +69,19 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
 
   private Externs externs = Externs.NONE;
 
-  public ProgramSubject(FailureStrategy failureStrategy, ProgramSubject.Program subject) {
+  ProgramSubject(FailureStrategy failureStrategy, ProgramSubject.Program subject) {
     super(failureStrategy, subject);
   }
 
-  public ProgramSubject withExterns(Externs newExterns) {
+  ProgramSubject withExterns(Externs newExterns) {
     ProgramSubject result = assert_().about(ProgramSubject.FACTORY).that(getSubject());
     result.externs = newExterns;
     return result;
   }
 
-  public void generatesDeclarations(String expected) {
-    String actual = parse();
+  void generatesDeclarations(String expected) {
+    String[] parseResult = parse();
+    String actual = parseResult[0];
     String stripped =
         DeclarationGeneratorTests.GOLDEN_FILE_COMMENTS_REGEXP.matcher(actual).replaceAll("");
     if (!stripped.equals(expected)) {
@@ -85,20 +89,14 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
     }
   }
 
-  public void reportsDiagnosticsContaining(String expectedDiagnostics) {
-    String unexpectedRes = null;
-    try {
-      unexpectedRes = parse();
-      failureStrategy.failComparing("expected diagnostics, but got a successful result",
-          expectedDiagnostics, unexpectedRes);
-    } catch (DeclarationGeneratorException e) {
-      assertThat(e.getMessage()).contains(expectedDiagnostics);
-    }
+  StringSubject diagnosticStream() {
+    String[] parseResult = parse();
+    return assertThat(parseResult[1]);
   }
 
-  private String parse() throws AssertionError {
+  private String[] parse() throws AssertionError {
     Options opts = new Options(externs == Externs.NONE);
-
+    opts.debug = true;
     List<SourceFile> sourceFiles = new ArrayList<>();
 
     // base.js is needed for the type declaration of goog.require for
@@ -139,9 +137,20 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
         throw new AssertionError();
     }
 
-    String actual = new DeclarationGenerator(opts)
-        .generateDeclarations(sourceFiles, externFiles, new Depgraph(roots));
-    return actual;
+
+    PrintStream err = System.err;
+    try {
+      // Admittedly the PrintStream setting is a bit hacky, but it's closest to how users would
+      // run Clutz.
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      System.setErr(new PrintStream(out));
+      DeclarationGenerator generator = new DeclarationGenerator(opts);
+      String dts = generator.generateDeclarations(sourceFiles, externFiles, new Depgraph(roots));
+      String diagnostics = out.toString();
+      return new String[] {dts, diagnostics};
+    } finally {
+      System.setErr(err);
+    }
   }
 
   static class Program {

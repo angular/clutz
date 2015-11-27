@@ -5,6 +5,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.google.common.io.Files;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.DiagnosticGroups;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -23,7 +24,7 @@ public class Options {
   @Option(name = "-o", usage = "output to this file", metaVar = "OUTPUT")
   String output = "-";
 
-  @Option(name = "--debug", usage = "run in debug mode (prints stack traces)")
+  @Option(name = "--debug", usage = "run in debug mode (prints compiler warnings)")
   boolean debug = false;
 
   @Option(name = "--externs",
@@ -48,8 +49,15 @@ public class Options {
   public CompilerOptions getCompilerOptions() {
     final CompilerOptions options = new CompilerOptions();
     options.setClosurePass(true);
+
+    // All diagnostics are WARNINGs (or off) and thus ignored unless debug == true.
+    // Only report issues (and fail for them) that are specifically causing problems for Clutz.
+    // The idea is to not do a general sanity check of Closure code, just make sure Clutz works.
+    // Report missing types as errors.
     options.setCheckGlobalNamesLevel(CheckLevel.ERROR);
-    options.setCheckGlobalThisLevel(CheckLevel.ERROR);
+    // Report duplicate definitions, e.g. for accidentally duplicated externs.
+    options.setWarningLevel(DiagnosticGroups.DUPLICATE_VARS, CheckLevel.ERROR);
+
     options.setLanguage(CompilerOptions.LanguageMode.ECMASCRIPT6);
     options.setLanguageOut(CompilerOptions.LanguageMode.ECMASCRIPT5);
     options.setCheckTypes(true);

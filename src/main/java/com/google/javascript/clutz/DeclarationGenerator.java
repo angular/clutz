@@ -10,10 +10,8 @@ import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.base.Function;
-import com.google.common.base.Functions;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
@@ -21,14 +19,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.javascript.jscomp.AbstractCommandLineRunner;
-import com.google.javascript.jscomp.BasicErrorManager;
-import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerInput;
-import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.DefaultPassConfig;
 import com.google.javascript.jscomp.DiagnosticType;
-import com.google.javascript.jscomp.ErrorHandler;
+import com.google.javascript.jscomp.ErrorFormat;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.TypedScope;
@@ -66,7 +60,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
@@ -74,12 +67,39 @@ import javax.annotation.Nullable;
  * A tool that generates {@code .d.ts} declarations from a Google Closure JavaScript program.
  */
 public class DeclarationGenerator {
+
+  public static void main(String[] args) {
+    Options options = null;
+    try {
+      options = new Options(args);
+    } catch (CmdLineException e) {
+      System.err.println(e.getMessage());
+      System.err.println("Usage: clutz [options...] arguments...");
+      e.getParser().printUsage(System.err);
+      System.err.println();
+      System.exit(1);
+    }
+    try {
+      DeclarationGenerator generator = new DeclarationGenerator(options);
+      generator.generateDeclarations();
+      if (generator.hasErrors()) {
+        // Already reported through the print stream.
+        System.exit(2);
+      }
+    } catch (Exception e) {
+      e.printStackTrace(System.err);
+      System.err.println("Uncaught exception in clutz, exiting.");
+      System.exit(3);
+    }
+    System.exit(0);
+  }
+
   static final DiagnosticType CLUTZ_OVERRIDDEN_STATIC_FIELD =
       DiagnosticType.error("CLUTZ_OVERRIDDEN_STATIC_FIELD",
           "Found a statically declared field that does not match the type of a parent field "
               + "with the same name, which is illegal in TypeScript.\nAt {0}.{1}");
   static final DiagnosticType CLUTZ_MISSING_TYPES = DiagnosticType.error("CLUTZ_MISSING_TYPES",
-      "The code does not compile because it is missing some types. This is often caused by "
+      "A dependency does not compile because it is missing some types. This is often caused by "
           + "the referenced code missing dependencies or by missing externs in your build rule.");
 
   private static final Function<Node, String> NODE_GET_STRING = new Function<Node, String>() {
@@ -87,42 +107,23 @@ public class DeclarationGenerator {
       return input.getString();
     }};
 
-  private final List<JSError> errors = new ArrayList<>();
-  private StringWriter out = new StringWriter();
   private final Options opts;
+  private final Compiler compiler;
+  private final ClutzErrorManager errorManager;
+  private StringWriter out = new StringWriter();
   private final Set<String> privateEnums = new LinkedHashSet<>();
 
   DeclarationGenerator(Options opts) {
     this.opts = opts;
+    this.compiler = new Compiler();
+    compiler.disableThreads();
+    this.errorManager = new ClutzErrorManager(System.err,
+        ErrorFormat.MULTILINE.toFormatter(compiler, true), opts.debug);
+    compiler.setErrorManager(errorManager);
   }
 
-  public static void main(String[] args) {
-    boolean printStackTrace = false;
-    try {
-      Options options = new Options(args);
-      printStackTrace = options.debug;
-      new DeclarationGenerator(options).generateDeclarations();
-    } catch (CmdLineException e) {
-      System.err.println(e.getMessage());
-      System.err.println("Usage: clutz [options...] arguments...");
-      e.getParser().printUsage(System.err);
-      System.err.println();
-      System.exit(1);
-    } catch (DeclarationGeneratorException e) {
-      if (printStackTrace) {
-        // Includes the message.
-        e.printStackTrace(System.err);
-      } else {
-        // Includes source snippets and colorized errors.
-        System.err.println(e.getMessage());
-      }
-      System.exit(1);
-    } catch (Exception e) {
-      e.printStackTrace(System.err);
-      System.err.println("Uncaught exception in clutz, exiting.");
-      System.exit(1);
-    }
-    System.exit(0);
+  boolean hasErrors() {
+    return errorManager.getErrorCount() > 0;
   }
 
   void generateDeclarations() {
@@ -151,26 +152,6 @@ public class DeclarationGenerator {
 
   String generateDeclarations(List<SourceFile> sourceFiles, List<SourceFile> externs,
       Depgraph depgraph) throws AssertionError {
-    Compiler compiler = new Compiler();
-    compiler.disableThreads();
-    CompilerOptions compilerOptions = opts.getCompilerOptions();
-    // Capture all errors directly instead of relying on JSCompiler's error reporting mechanisms.
-    compilerOptions.setErrorHandler(new ErrorHandler() {
-      @Override
-      public void report(CheckLevel level, JSError error) {
-        errors.add(error);
-      }
-    });
-    compiler.setPassConfig(new DefaultPassConfig(compilerOptions));
-    // In spite of setting an ErrorHandler above, this is still needed to silence the console.
-    compiler.setErrorManager(new BasicErrorManager() {
-      @Override
-      public void println(CheckLevel level, JSError error) { /* check errors below */ }
-
-      @Override
-      protected void printSummary() { /* check errors below */ }
-    });
-
     if (externs.isEmpty()) {
       externs =
           opts.skipParseExterns ? Collections.<SourceFile>emptyList() : getDefaultExterns(opts);
@@ -178,24 +159,9 @@ public class DeclarationGenerator {
       Preconditions.checkArgument(!opts.skipParseExterns,
           "Cannot pass --skipParseExterns and --externs.");
     }
-
-    compiler.compile(externs, sourceFiles, compilerOptions);
-    if (!errors.isEmpty()) {
-      boolean missingTypes =
-          Iterables.any(Iterables.transform(errors, Functions.toStringFunction()),
-              Predicates.contains(Pattern.compile("Bad type annotation. Unknown type")));
-      if (missingTypes) {
-        errors.add(0, JSError.make(CLUTZ_MISSING_TYPES));
-      }
-      throw new DeclarationGeneratorException(compiler,
-          "Source code does not compile with JSCompiler", errors);
-    }
-
-    String dts = produceDts(compiler, depgraph);
-    if (!errors.isEmpty()) {
-      throw new DeclarationGeneratorException(compiler, "Errors while generating definitions",
-          errors);
-    }
+    compiler.compile(externs, sourceFiles, opts.getCompilerOptions());
+    String dts = produceDts(depgraph);
+    errorManager.doGenerateReport();
     return dts;
   }
 
@@ -207,7 +173,7 @@ public class DeclarationGenerator {
     return input.substring(0, dotIdx);
   }
 
-  public String produceDts(Compiler compiler, Depgraph depgraph) {
+  public String produceDts(Depgraph depgraph) {
     // Tree sets for consistent order.
     Set<String> provides = new TreeSet<>();
     Set<String> transitiveProvides = new TreeSet<>();
@@ -243,8 +209,8 @@ public class DeclarationGenerator {
       if (isDefault) {
         namespace = getNamespace(symbol.getName());
       }
-      int valueSymbolsWalked = declareNamespace(namespace, symbol, isDefault, compiler,
-          transitiveProvides, false);
+      int valueSymbolsWalked =
+          declareNamespace(namespace, symbol, isDefault, transitiveProvides, false);
 
       // skip emitting goog.require declarations for value empty namespaces, as calling typeof
       // does not work for them.
@@ -254,13 +220,13 @@ public class DeclarationGenerator {
       declareModule(provide, isDefault);
     }
     // In order to typecheck in the presence of third-party externs, emit all extern symbols.
-    processExternSymbols(compiler);
+    processExternSymbols();
 
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
   }
 
-  private void processExternSymbols(Compiler compiler) {
+  private void processExternSymbols() {
     Set<String> noTransitiveProvides = Collections.emptySet();
     LinkedHashSet<String> visitedNamespaces = new LinkedHashSet<>();
     LinkedHashSet<String> visitedClassLikes = new LinkedHashSet<>();
@@ -288,12 +254,11 @@ public class DeclarationGenerator {
       // will be handled by class-like emitting code.
       if (isStaticFieldOrMethod(symbol.getType()) && visitedClassLikes.contains(parentPath)) continue;
 
-      declareNamespace(isDefault ? parentPath : symbol.getName(), symbol, isDefault, compiler,
+      declareNamespace(isDefault ? parentPath : symbol.getName(), symbol, isDefault,
           noTransitiveProvides, true);
 
-      if (!isDefault && isLikelyNamespace(symbol.getType(), compiler)) visitedNamespaces.add(symbol.getName());
+      if (!isDefault && isLikelyNamespace(symbol.getType())) visitedNamespaces.add(symbol.getName());
       if (isDefault && isClassLike(symbol.getType())) visitedClassLikes.add(symbol.getName());
-
       // we do not declare modules or goog.require support, because externs types should not be
       // visible from TS code.
     }
@@ -323,7 +288,7 @@ public class DeclarationGenerator {
   }
 
   private int declareNamespace(String namespace, TypedVar symbol, boolean isDefault,
-                               Compiler compiler, Set<String> provides, boolean isExtern) {
+      Set<String> provides, boolean isExtern) {
     emitNamespaceBegin(namespace);
     TreeWalker treeWalker = new TreeWalker(compiler.getTypeRegistry(), provides);
     if (isDefault) {
@@ -347,8 +312,8 @@ public class DeclarationGenerator {
       for (String property : propertyNames) {
         // When parsing externs namespaces are explicitly declared with a var of Object type
         // Do not emit the var declaration, as it will conflict with the namespace.
-        if (!(isPrivateProperty(objType, property) ||
-            (isExtern && isLikelyNamespace(objType.getPropertyType(property), compiler)))) {
+        if (!(isPrivateProperty(objType, property)
+            || (isExtern && isLikelyNamespace(objType.getPropertyType(property))))) {
           desiredSymbols.add(symbol.getName() + "." + property);
         } else if (objType.getPropertyType(property).isEnumType()) {
           // For enum types (unlike classes or interfaces), Closure does not track the visibility on
@@ -401,7 +366,7 @@ public class DeclarationGenerator {
     // namespace for them.
     if (isDefault && isInterfaceWithStatic(symbol.getType())) {
       declareNamespace(symbol.getName(), symbol, /* isDefault, prevents infinite recursion */ false,
-          compiler, provides, isExtern);
+          provides, isExtern);
     }
     // extra walk required for inner classes and inner enums. They are allowed in closure,
     // but not in TS, so we have to generate a namespace-class pair in TS.
@@ -418,20 +383,21 @@ public class DeclarationGenerator {
 
   // Due to lack of precise definition of a namespace, we look for object types that are not of any
   // other type. This will need more refinement as more cases appear.
-  private boolean isLikelyNamespace(JSType type, Compiler compiler) {
+  private boolean isLikelyNamespace(JSType type) {
     UnionType utype = type.toMaybeUnionType();
     if (utype != null) {
-      return isNativeObjectType(utype.restrictByNotNullOrUndefined(), compiler);
+      return isNativeObjectType(utype.restrictByNotNullOrUndefined());
     }
     // The inferred type for an namespace-like object is not the native object,
     // but rather PrototypeObjectType.
-    return isNativeObjectType(type, compiler) ||
+    return isNativeObjectType(type) ||
         // TODO(rado): find a better api to use here (if it exists).
-        (type.isObject() && !type.isConstructor() && !type.isInstanceType() && !type.isFunctionType());
+        (type.isObject() && !type.isConstructor() && !type.isInstanceType()
+            && !type.isFunctionType());
   }
 
   // TODO(rado): refactor so that the native object type is a final field.
-  private boolean isNativeObjectType(JSType type, Compiler compiler) {
+  private boolean isNativeObjectType(JSType type) {
     return compiler.getTypeRegistry().getNativeType(OBJECT_TYPE).equals(type);
   }
 
@@ -1268,7 +1234,7 @@ public class DeclarationGenerator {
       // "I, for one, welcome our new static overloads." - H.G. Wells.
       for (JSType superPropType : incompatibleSuperTypes) {
         if (!propertyType.isFunctionType() || !superPropType.isFunctionType()) {
-          errors.add(JSError.make(currentSymbol.getNode(), CLUTZ_OVERRIDDEN_STATIC_FIELD,
+          compiler.report(JSError.make(currentSymbol.getNode(), CLUTZ_OVERRIDDEN_STATIC_FIELD,
               objType.getDisplayName(), propName));
         } else {
           emit("/** WARNING: emitted for non-matching super type's static method. "
@@ -1349,7 +1315,7 @@ public class DeclarationGenerator {
         Set<JSType> incompatibleTypes = getIncompatibleSuperTypes(type, propName, pType);
 
         if (!pType.isEnumType() && !incompatibleTypes.isEmpty()) {
-          errors.add(JSError.make(currentSymbol.getNode(), CLUTZ_OVERRIDDEN_STATIC_FIELD,
+          compiler.report(JSError.make(currentSymbol.getNode(), CLUTZ_OVERRIDDEN_STATIC_FIELD,
               innerNamespace, propName));
           continue;
         }

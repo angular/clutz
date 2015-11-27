@@ -4,7 +4,7 @@ import static com.google.javascript.clutz.ProgramSubject.assertThatProgram;
 
 import org.junit.Test;
 
-public class ErrorHandlingTest {
+public class ClutzErrorManagerTest {
   @Test
   public void testOverriddenIncompatibleStaticField() {
     assertThatProgram(
@@ -16,8 +16,8 @@ public class ErrorHandlingTest {
             "/** @constructor @extends {X} */",
             "Y = function() {};",
             "/** @type {number} */ Y.f;")
-        .reportsDiagnosticsContaining(
-            "statically declared field that does not match the type of a parent field");
+        .diagnosticStream()
+        .containsMatch("ERROR.*statically declared field that does not match the type of a parent");
   }
 
   @Test
@@ -26,7 +26,18 @@ public class ErrorHandlingTest {
             "goog.provide('foo.x');",
             "/** @param {some.Unknown} y */",
             "foo.x = function(y) {};")
-        .reportsDiagnosticsContaining("missing some types");
+        .diagnosticStream()
+        .containsMatch("ERROR.*missing some types");
+  }
+
+  @Test
+  public void testDuplicateSymbol() {
+    // Useful
+    assertThatProgram(
+            "/** @type {number} */ var x = 1;",
+            "/** @type {number} */ var x = 2;")
+        .diagnosticStream()
+        .containsMatch("ERROR.*variable x redefined");
   }
 
   @Test
@@ -35,6 +46,16 @@ public class ErrorHandlingTest {
             "goog.provide('foo.x');",
             "/** @param {some.Unknown} y */",
             "foo.x = function(y) {};")
-        .reportsDiagnosticsContaining("foo.x = function");
+        .diagnosticStream()
+        .contains("foo.x = function");
+  }
+
+  @Test
+  public void testReportsWarningsInTests() {
+    assertThatProgram(
+            "/** @see */",
+            "var noSee;")
+        .diagnosticStream()
+        .containsMatch("WARNING.*@see tag missing description");
   }
 }

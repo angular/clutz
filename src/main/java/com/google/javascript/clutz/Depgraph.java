@@ -33,7 +33,7 @@ public class Depgraph {
     for (String depgraph : fileContents) {
       try {
         List<List<?>> list =
-            new Gson().fromJson(depgraph, new TypeToken<List<List<?>>>() {}.getType());
+            new Gson().fromJson(depgraph, new TypeToken<List<List<?>>>() { /* empty */ }.getType());
         for (List<?> outer : list) {
           Iterator<?> i = outer.iterator();
           if ("roots".equals(i.next())) {
