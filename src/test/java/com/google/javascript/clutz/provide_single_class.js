@@ -21,7 +21,7 @@ foo.bar.Baz = function() {
  * @return {number}
  */
 foo.bar.Baz.staticMethod = function(a) {
-  return Number(a)
+  return +a;
 };
 
 /** @const {!Function} */
@@ -38,7 +38,7 @@ foo.bar.Baz.prototype.avalue = 0;
  * @return {number}
  */
 foo.bar.Baz.prototype.method = function(a) {
-  return Number(a)
+  return +a;
 };
 
 /**

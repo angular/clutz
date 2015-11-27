@@ -5,7 +5,7 @@ goog.provide('a');
  * @return {string}
  */
 a.b = function(opt_precision) {
-    return goog.isDef(opt_precision) ? a.c(opt_precision) : "undef";
+  return goog.isDef(opt_precision) ? a.c(opt_precision) : "undef";
 };
 
 /**
@@ -13,5 +13,5 @@ a.b = function(opt_precision) {
  * @return {string}
  */
 a.c = function(s) {
-    return String(s);
+  return s + '';
 };

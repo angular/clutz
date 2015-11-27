@@ -12,7 +12,7 @@ privatetype.PrivateEnum_ = { VALUE: '' };
 privatetype.enumUser = privatetype.PrivateEnum_.VALUE;
 
 /** @type {privatetype.X_} */
-privatetype.user = new foo.X_();
+privatetype.user = new privatetype.X_();
 
 /** @constructor @private */
 privatetype.X_ = function() {};
