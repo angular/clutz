@@ -1314,7 +1314,7 @@ public class DeclarationGenerator {
 
         Set<JSType> incompatibleTypes = getIncompatibleSuperTypes(type, propName, pType);
 
-        if (!pType.isEnumType() && !incompatibleTypes.isEmpty()) {
+        if ((isClassLike(pType) || isTypedef(pType)) && !incompatibleTypes.isEmpty()) {
           compiler.report(JSError.make(currentSymbol.getNode(), CLUTZ_OVERRIDDEN_STATIC_FIELD,
               innerNamespace, propName));
           continue;
@@ -1334,8 +1334,9 @@ public class DeclarationGenerator {
     private Set<JSType> getIncompatibleSuperTypes(ObjectType type, String propName, JSType pType) {
       Set<JSType> incompatibleTypes = new LinkedHashSet<>();
       collectSuperTypes(type, propName, incompatibleTypes);
-      for (JSType candidate: incompatibleTypes) {
-        if (pType.isSubtype(candidate)) incompatibleTypes.remove(candidate);
+      Iterator<JSType> it = incompatibleTypes.iterator();
+      while (it.hasNext()) {
+        if (pType.isSubtype(it.next())) it.remove();
       }
       return incompatibleTypes;
     }

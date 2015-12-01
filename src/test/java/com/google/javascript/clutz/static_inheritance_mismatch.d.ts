@@ -5,6 +5,7 @@ declare namespace ಠ_ಠ.clutz.static_inherit {
     /** WARNING: emitted for non-matching super type's static method. Only the first overload is actually callable. */
     static static_fn (a : string ) : void ;
     static subTypeField : any [] ;
+    static subTypeFieldMirrorType : ಠ_ಠ.clutz.static_inherit.Child ;
   }
 }
 declare namespace ಠ_ಠ.clutz.goog {
@@ -21,6 +22,7 @@ declare namespace ಠ_ಠ.clutz.static_inherit {
     static static_fn (a : number ) : void ;
     /** WARNING: emitted for non-matching super type's static method. Only the first overload is actually callable. */
     static static_fn (a : string ) : void ;
+    static subTypeFieldMirrorType : ಠ_ಠ.clutz.static_inherit.GrandChild ;
   }
 }
 declare namespace ಠ_ಠ.clutz.goog {
@@ -36,6 +38,7 @@ declare namespace ಠ_ಠ.clutz.static_inherit {
     static privateChildOverrideField : number ;
     static static_fn (a : string ) : void ;
     static subTypeField : Object ;
+    static subTypeFieldMirrorType : ಠ_ಠ.clutz.static_inherit.Parent ;
   }
 }
 declare namespace ಠ_ಠ.clutz.goog {
