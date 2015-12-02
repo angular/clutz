@@ -656,7 +656,20 @@ public class DeclarationGenerator {
       } else {
         maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
         if (type.isEnumType()) {
-          visitEnumType(symbol.getName(), (EnumType) type, Collections.<JSType>emptySet());
+          Set<JSType> incompatibleTypes = Collections.emptySet();
+
+          // Recovering the constructor type (if any) for the parent object, in case the enum is
+          // an nested enum.
+          JSType parentType = typeRegistry.getType(getNamespace(type.getDisplayName()));
+          ObjectType namespaceType = parentType != null ? parentType.toMaybeObjectType() : null;
+          FunctionType constructorType = namespaceType != null ? namespaceType.getConstructor() : null;
+
+          if (constructorType != null) {
+             incompatibleTypes = getIncompatibleSuperTypes(constructorType,
+                 getUnqualifiedName(symbol), type);
+          }
+
+          visitEnumType(symbol.getName(), (EnumType) type, incompatibleTypes);
           return;
         }
         if (isTypedef(type)) {
