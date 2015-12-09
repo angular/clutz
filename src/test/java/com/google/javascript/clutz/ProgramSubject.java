@@ -81,7 +81,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
 
   void generatesDeclarations(String expected) {
     String[] parseResult = parse();
-    assertThat(parseResult[1].isEmpty());
+    assertThat(parseResult[1]).isEmpty();
     String actual = parseResult[0];
     String stripped =
         DeclarationGeneratorTests.GOLDEN_FILE_COMMENTS_REGEXP.matcher(actual).replaceAll("");

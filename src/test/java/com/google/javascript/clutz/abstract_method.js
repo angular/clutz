@@ -11,7 +11,7 @@ goog.provide('abstract_method.Child');
  * @throws {Error} when invoked to indicate the method should be overridden.
  */
 goog.abstractMethod = function() {
-  throw Error('unimplemented abstract method');
+  // throws
 };
 
 /** @interface */
@@ -42,4 +42,4 @@ abstract_method.Child = function() {};
 /**
  * @override
  */
-abstract_method.Child.prototype.bar = function(a) { return String(a) };
+abstract_method.Child.prototype.bar = function(a) { return a.toString() };

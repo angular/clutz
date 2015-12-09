@@ -58,6 +58,9 @@ public class Options {
     // Report duplicate definitions, e.g. for accidentally duplicated externs.
     options.setWarningLevel(DiagnosticGroups.DUPLICATE_VARS, CheckLevel.ERROR);
 
+    // Late Provides are errors by default, but they do not prevent clutz from transpiling.
+    options.setWarningLevel("lateProvide", CheckLevel.OFF);
+
     options.setLanguage(CompilerOptions.LanguageMode.ECMASCRIPT6);
     options.setLanguageOut(CompilerOptions.LanguageMode.ECMASCRIPT5);
     options.setCheckTypes(true);

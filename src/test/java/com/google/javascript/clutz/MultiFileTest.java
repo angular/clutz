@@ -38,6 +38,16 @@ public class MultiFileTest {
         .generatesDeclarations(expected);
   }
 
+  @Test
+  public void shouldWorkWithOutOfOrderProvides() throws Exception {
+    String expected = DeclarationGeneratorTests.getTestFileText(input("index.d.ts"));
+    assertThatProgram(
+        ImmutableList.of(input("index.js"), input("dep.js")),
+        Collections.<File>emptyList())
+        .generatesDeclarations(expected);
+  }
+
+
   private File input(String filename) {
     Path testDir = FileSystems.getDefault().getPath("src", "test", "java");
     String packageName = ProgramSubject.class.getPackage().getName();
