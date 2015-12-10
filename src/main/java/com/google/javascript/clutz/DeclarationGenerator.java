@@ -109,6 +109,11 @@ public class DeclarationGenerator {
   private final ClutzErrorManager errorManager;
   private StringWriter out = new StringWriter();
   private final Set<String> privateEnums = new LinkedHashSet<>();
+  /**
+   * Aggregates all emitted types, used in a final pass to find types emitted in type position
+   * but not declared, possibly due to missing goog.provides.
+   */
+  private final Set<String> typesUsed = new LinkedHashSet<>();
 
   DeclarationGenerator(Options opts) {
     this.opts = opts;
@@ -219,8 +224,32 @@ public class DeclarationGenerator {
     // In order to typecheck in the presence of third-party externs, emit all extern symbols.
     processExternSymbols();
 
+    processUnprovidedTypes(provides, compiler);
+
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
+  }
+
+  /**
+   * Closure does not require all types to be explicitly provided, if they are only used in
+   * type positions. However, our emit phases only emits goog.provided symbols and namespaces,
+   * so this extra pass is required, in order to have valid output.
+   */
+  private void processUnprovidedTypes(Set<String> provides, Compiler compiler) {
+    // AFAIKT, there is no api for going from type to symbol, so iterate all symbols first.
+    for (TypedVar symbol : compiler.getTopScope().getAllSymbols()) {
+      String name = symbol.getName();
+      // skip unused symbols.
+      if (!typesUsed.contains(name)) continue;
+      // skip provided symbols (as default or in an namespace).
+      if (provides.contains(name) || provides.contains(getNamespace(name))) continue;
+
+      // skip extern symbols (they have a separate pass).
+      CompilerInput symbolInput = this.compiler.getInput(new InputId(symbol.getInputName()));
+      if (symbolInput == null || symbolInput.isExtern()) continue;
+      declareNamespace(getNamespace(name), symbol, /* isDefault */ true,
+          Collections.<String>emptySet(), /* isExtern */ false);
+    }
   }
 
   private void processExternSymbols() {
@@ -837,6 +866,7 @@ public class DeclarationGenerator {
         }
         if (isVarArgs) emit("[]");
       }
+      typesUsed.add(type.getDisplayName());
     }
 
     /**
