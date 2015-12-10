@@ -48,6 +48,16 @@ public class MultiFileTest {
   }
 
 
+  @Test
+  public void googModule() throws Exception {
+    String expected = DeclarationGeneratorTests.getTestFileText(input("goog_module.d.ts"));
+    assertThatProgram(
+        ImmutableList.of(input("required_module.js"), input("required.js"),
+            input("goog_module.js")),
+        Collections.<File>emptyList())
+        .generatesDeclarations(expected);
+  }
+
   private File input(String filename) {
     Path testDir = FileSystems.getDefault().getPath("src", "test", "java");
     String packageName = ProgramSubject.class.getPackage().getName();
