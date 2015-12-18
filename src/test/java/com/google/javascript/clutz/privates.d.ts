@@ -1,5 +1,7 @@
 declare namespace ಠ_ಠ.clutz.priv {
-  class PublicClass {
+  class PublicClass extends PublicClass_Instance {
+  }
+  class PublicClass_Instance {
     private noStructuralTyping_: any;
     publicField : number ;
   }
@@ -12,7 +14,9 @@ declare module 'goog:priv' {
   export = alias;
 }
 declare namespace ಠ_ಠ.clutz.priv2 {
-  class PublicClass {
+  class PublicClass extends PublicClass_Instance {
+  }
+  class PublicClass_Instance {
     private noStructuralTyping_: any;
   }
 }

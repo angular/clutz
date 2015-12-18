@@ -1,5 +1,7 @@
 declare namespace ಠ_ಠ.clutz.innerTypeDef {
-  class Foo {
+  class Foo extends Foo_Instance {
+  }
+  class Foo_Instance {
     private noStructuralTyping_: any;
   }
 }

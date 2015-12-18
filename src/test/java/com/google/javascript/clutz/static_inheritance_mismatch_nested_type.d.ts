@@ -1,13 +1,14 @@
 declare namespace ಠ_ಠ.clutz.sim_nested {
-  class Child extends ಠ_ಠ.clutz.sim_nested.Parent {
+  class Child extends Child_Instance {
+  }
+  class Child_Instance extends ಠ_ಠ.clutz.sim_nested.Parent_Instance {
   }
 }
 declare namespace ಠ_ಠ.clutz.sim_nested.Child {
   type Nested = number ;
   var Nested : {
     B : Nested ,
-  } &
-  (/* Incompatible inherited static property */ typeof ಠ_ಠ.clutz.sim_nested.Parent.Nested );
+  };
 }
 declare namespace ಠ_ಠ.clutz.goog {
   function require(name: 'sim_nested.Child'): typeof ಠ_ಠ.clutz.sim_nested.Child;
@@ -20,8 +21,7 @@ declare namespace ಠ_ಠ.clutz.sim_nested.Child {
   type NestedAndProvided = number ;
   var NestedAndProvided : {
     B : NestedAndProvided ,
-  } &
-  (/* Incompatible inherited static property */ typeof ಠ_ಠ.clutz.sim_nested.Parent.NestedAndProvided );
+  };
 }
 declare namespace ಠ_ಠ.clutz.goog {
   function require(name: 'sim_nested.Child.NestedAndProvided'): typeof ಠ_ಠ.clutz.sim_nested.Child.NestedAndProvided;
@@ -31,7 +31,9 @@ declare module 'goog:sim_nested.Child.NestedAndProvided' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.sim_nested {
-  class Parent {
+  class Parent extends Parent_Instance {
+  }
+  class Parent_Instance {
     private noStructuralTyping_: any;
   }
 }

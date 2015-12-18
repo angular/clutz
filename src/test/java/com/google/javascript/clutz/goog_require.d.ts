@@ -1,5 +1,7 @@
 declare namespace ಠ_ಠ.clutz.foo {
-  class SimpleClass {
+  class SimpleClass extends SimpleClass_Instance {
+  }
+  class SimpleClass_Instance {
     private noStructuralTyping_: any;
   }
 }

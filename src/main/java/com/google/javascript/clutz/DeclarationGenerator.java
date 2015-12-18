@@ -68,6 +68,8 @@ import javax.annotation.Nullable;
  */
 public class DeclarationGenerator {
 
+  static final String INSTANCE_CLASS_SUFFIX = "_Instance";
+
   public static void main(String[] args) {
     Options options = null;
     try {
@@ -94,10 +96,6 @@ public class DeclarationGenerator {
     System.exit(0);
   }
 
-  static final DiagnosticType CLUTZ_OVERRIDDEN_STATIC_FIELD =
-      DiagnosticType.error("CLUTZ_OVERRIDDEN_STATIC_FIELD",
-          "Found a statically declared field that does not match the type of a parent field "
-              + "with the same name, which is illegal in TypeScript.\nAt {0}.{1}");
   static final DiagnosticType CLUTZ_MISSING_TYPES = DiagnosticType.error("CLUTZ_MISSING_TYPES",
       "A dependency does not compile because it is missing some types. This is often caused by "
           + "the referenced code missing dependencies or by missing externs in your build rule.");
@@ -656,20 +654,7 @@ public class DeclarationGenerator {
       } else {
         maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
         if (type.isEnumType()) {
-          Set<JSType> incompatibleTypes = Collections.emptySet();
-
-          // Recovering the constructor type (if any) for the parent object, in case the enum is
-          // an nested enum.
-          JSType parentType = typeRegistry.getType(getNamespace(type.getDisplayName()));
-          ObjectType namespaceType = parentType != null ? parentType.toMaybeObjectType() : null;
-          FunctionType constructorType = namespaceType != null ? namespaceType.getConstructor() : null;
-
-          if (constructorType != null) {
-             incompatibleTypes = getIncompatibleSuperTypes(constructorType,
-                 getUnqualifiedName(symbol), type);
-          }
-
-          visitEnumType(symbol.getName(), (EnumType) type, incompatibleTypes);
+          visitEnumType(symbol.getName(), (EnumType) type);
           return;
         }
         if (isTypedef(type)) {
@@ -711,6 +696,33 @@ public class DeclarationGenerator {
     }
 
     private void visitClassOrInterface(String name, FunctionType ftype) {
+      // TypeScript classes (like ES6 classes) have prototypal inheritance on the static side,
+      // which means that if A extends B, A.foo and B.foo cannot be of incompatible types.
+      // Closure (ES5) classes have no such restriction.
+      // To avoid collisions on the static side, emit all statics in the original class name A,
+      // and emit instance fields in another class A_Instance. As such:
+      // class A extends A_Instance { <static fields and methods> }
+      // class B extends B_Instance { <static fields and methods> }
+      // class A_Instance extends B_Instance { <instance fields and methods> }
+      // class B_Instance { <instance fields and methods> }
+      //
+      // Emit original name class before Instance in order to match the already emitted JSDoc.
+      boolean emitInstance = !ftype.isInterface();
+      if (emitInstance) {
+        emit("class");
+        emit(name);
+        visitTemplateTypes(ftype);
+        emit("extends");
+        emit(name + INSTANCE_CLASS_SUFFIX);
+        visitTemplateTypes(ftype);
+        emit("{");
+        indent();
+        emitBreak();
+        visitProperties(ftype, true);
+        unindent();
+        emit("}");
+        emitBreak();
+      }
       if (ftype.isConstructor()) {
         // "proper" class constructor
         emit("class");
@@ -719,7 +731,7 @@ public class DeclarationGenerator {
       } else {
         checkState(false, "Unexpected function type " + ftype);
       }
-      emit(name);
+      emit(emitInstance ? name + INSTANCE_CLASS_SUFFIX : name);
 
       visitTemplateTypes(ftype);
 
@@ -737,7 +749,9 @@ public class DeclarationGenerator {
       // Class extends another class
       if (getSuperType(ftype) != null) {
         emit("extends");
-        visitType(getSuperType(ftype));
+        // There are only two possible cases in visitType - nominal class type (possibly templatized)
+        // TODO(radokirov): refactor so that we don't need to go through the general dispatch.
+        visitType(getSuperType(ftype), emitInstance);
       }
 
       Iterator<ObjectType> it = ftype.getOwnImplementedInterfaces().iterator();
@@ -750,7 +764,7 @@ public class DeclarationGenerator {
           }
         }
       }
-      visitObjectType(ftype, ftype.getPrototype(), !ftype.isInterface());
+      visitObjectType(ftype, ftype.getPrototype());
     }
 
     private void visitVarDeclaration(TypedVar symbol, JSType type) {
@@ -784,7 +798,7 @@ public class DeclarationGenerator {
       emitBreak();
     }
 
-    private void visitEnumType(String symbolName, EnumType type, Iterable<JSType> intersectTypes) {
+    private void visitEnumType(String symbolName, EnumType type) {
       // Enums are top level vars, but also declare a corresponding type:
       // <pre>
       // /** @enum {ValueType} */ var MyEnum = {A: ..., B: ...};
@@ -810,17 +824,6 @@ public class DeclarationGenerator {
       }
       unindent();
       emit("}");
-      // Closure code commonly defines enum types with the same name as nested types. This creates
-      // collisions of "Class static side" properties in TS. This changes an enum that's overriden
-      // into a faux intersection type to mask the error.
-      for (JSType intersect: intersectTypes) {
-        emit("&");
-        emitBreak();
-        emit("(/* Incompatible inherited static property */");
-        emit("typeof");
-        visitType(intersect);
-        emit(")");
-      }
       emitNoSpace(";");
       emitBreak();
     }
@@ -863,6 +866,10 @@ public class DeclarationGenerator {
     }
 
     private void visitType(JSType typeToVisit) {
+      visitType(typeToVisit, /* extendingInstanceClass */ false);
+    }
+
+    private void visitType(JSType typeToVisit, final boolean extendingInstanceClass) {
       // See also JsdocToEs6TypedConverter in the Closure code base. This code is implementing the
       // same algorithm starting from JSType nodes (as opposed to JSDocInfo), and directly
       // generating textual output. Otherwise both algorithms should produce the same output.
@@ -875,6 +882,7 @@ public class DeclarationGenerator {
         return;
       }
       Visitor<Void> visitor = new Visitor<Void>() {
+
         @Override
         public Void caseBooleanType() {
           emit("boolean");
@@ -910,7 +918,8 @@ public class DeclarationGenerator {
           } else if (type.isDict()) {
             emit("{[key: string]: any}");
           } else if (type.getReferenceName() != null) {
-            emit(getAbsoluteName(type));
+            emit(extendingInstanceClass ?
+                getAbsoluteName(type) + INSTANCE_CLASS_SUFFIX : getAbsoluteName(type));
           } else {
             emit("Object");
           }
@@ -932,7 +941,8 @@ public class DeclarationGenerator {
         @Override
         public Void caseTemplatizedType(TemplatizedType type) {
           ObjectType referencedType = type.getReferencedType();
-          String templateTypeName = getAbsoluteName(referencedType);
+          String templateTypeName = extendingInstanceClass ?
+              getAbsoluteName(type) + INSTANCE_CLASS_SUFFIX : getAbsoluteName(type);
           if (typeRegistry.getNativeType(ARRAY_TYPE).equals(referencedType)
               && type.getTemplateTypes().size() == 1) {
             // As per TS type grammar, array types require primary types.
@@ -1132,7 +1142,7 @@ public class DeclarationGenerator {
       }
     }
 
-    private void visitObjectType(ObjectType type, ObjectType prototype, Boolean processStatics) {
+    private void visitObjectType(ObjectType type, ObjectType prototype) {
       emit("{");
       indent();
       emitBreak();
@@ -1163,10 +1173,7 @@ public class DeclarationGenerator {
       }
       // Prototype fields (mostly methods).
       visitProperties(prototype, false, ((ObjectType) instanceType).getOwnPropertyNames());
-      // Statics.
-      if (processStatics) {
-        visitProperties(type, true);
-      }
+      // Statics are handled in INSTANCE_CLASS_SUFFIX class.
       unindent();
       emit("}");
       emitBreak();
@@ -1203,9 +1210,6 @@ public class DeclarationGenerator {
       if (isStatic && propName.equals("apply") || propName.equals("call")) return;
       maybeEmitJsDoc(objType.getOwnPropertyJSDocInfo(propName), /* ignoreParams */ false);
       emitProperty(propName, propertyType, isStatic);
-      if (isStatic) {
-        emitStaticOverloads(propName, objType, propertyType);
-      }
     }
 
     private void emitProperty(String propName, JSType propertyType, boolean isStatic) {
@@ -1218,44 +1222,6 @@ public class DeclarationGenerator {
       }
       emit(";");
       emitBreak();
-    }
-
-    /**
-     * Emit overloads for static methods from super classes that do not match the signature of the
-     * current method.
-     *
-     * In Closure, static methods are completely independent of each other, like regular functions
-     * with different names. In TypeScript, the static side of a class has to extend its parent's
-     * static side, i.e. static methods are inherited and have to subtype the parent's methods.
-     *
-     * E.g. the following code fails as Child incorrectly extends Parent.
-     *
-     * <pre>
-     *   class Parent               { static foo(a: string); }
-     *   class Child extends Parent { static foo(a: number); }
-     * </pre>
-     *
-     * To fix, the code below re-emits (by recursion) any properties that have a colliding type.
-     *
-     * This is necessarily incomplete, and will fail for differences that cannot be dispatched on,
-     * e.g. different return types. It also pretends that functions exist that do not.
-     */
-    private void emitStaticOverloads(String propName, ObjectType objType, JSType propertyType) {
-      Set<JSType> incompatibleSuperTypes =
-          getIncompatibleSuperTypes(objType, propName, propertyType);
-
-      // "I, for one, welcome our new static overloads." - H.G. Wells.
-      for (JSType superPropType : incompatibleSuperTypes) {
-        if (!propertyType.isFunctionType() || !superPropType.isFunctionType()) {
-          compiler.report(JSError.make(currentSymbol.getNode(), CLUTZ_OVERRIDDEN_STATIC_FIELD,
-              objType.getDisplayName(), propName));
-        } else {
-          emit("/** WARNING: emitted for non-matching super type's static method. "
-              + "Only the first overload is actually callable. */");
-          emitBreak();
-          emitProperty(propName, superPropType, true);
-        }
-      }
     }
 
     private void visitFunctionDeclaration(FunctionType ftype) {
@@ -1325,16 +1291,9 @@ public class DeclarationGenerator {
         if (provides.contains(qualifiedName)) continue;
         JSType pType = type.getPropertyType(propName);
 
-        Set<JSType> incompatibleTypes = getIncompatibleSuperTypes(type, propName, pType);
-
-        if ((isClassLike(pType) || isTypedef(pType)) && !incompatibleTypes.isEmpty()) {
-          compiler.report(JSError.make(currentSymbol.getNode(), CLUTZ_OVERRIDDEN_STATIC_FIELD,
-              innerNamespace, propName));
-          continue;
-        }
 
         if (pType.isEnumType()) {
-          visitEnumType(propName, (EnumType) pType, incompatibleTypes);
+          visitEnumType(propName, (EnumType) pType);
         } else if (isClassLike(pType)) {
           visitClassOrInterface(propName, (FunctionType) pType);
         } else if (isTypedef(pType)) {
@@ -1342,34 +1301,6 @@ public class DeclarationGenerator {
           visitTypeAlias(registryType, propName);
         }
       }
-    }
-
-    private Set<JSType> getIncompatibleSuperTypes(ObjectType type, String propName, JSType pType) {
-      Set<JSType> incompatibleTypes = new LinkedHashSet<>();
-      collectSuperTypes(type, propName, incompatibleTypes);
-      Iterator<JSType> it = incompatibleTypes.iterator();
-      while (it.hasNext()) {
-        if (pType.isSubtype(it.next())) it.remove();
-      }
-      return incompatibleTypes;
-    }
-
-    /**
-     * Collects property types from the super type prototype chain that have the same
-     * {@code propName} but an incompatible {@link JSType} into {@code accumulator}.
-     */
-    private void collectSuperTypes(ObjectType type, String propName, Set<JSType> accumulator) {
-      if (!type.isFunctionType()) return;
-      ObjectType superType = getSuperType(type.toMaybeFunctionType());
-      if (superType == null) return;
-      FunctionType superTypeCtor = superType.getConstructor();
-      if (superTypeCtor == null) return;
-      if (superTypeCtor.hasOwnProperty(propName) && !isPrivateProperty(superTypeCtor, propName)) {
-        // If this field is public, but the super field is private, and thus not emitted, it's ok.
-        JSType superPropType = superTypeCtor.getPropertyType(propName);
-        accumulator.add(superPropType);
-      }
-      collectSuperTypes(superTypeCtor, propName, accumulator);
     }
   }
 }

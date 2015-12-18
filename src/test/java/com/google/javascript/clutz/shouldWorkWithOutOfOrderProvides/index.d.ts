@@ -1,5 +1,7 @@
 declare namespace ಠ_ಠ.clutz.dep {
-  class D {
+  class D extends D_Instance {
+  }
+  class D_Instance {
     private noStructuralTyping_: any;
   }
 }
@@ -11,7 +13,9 @@ declare module 'goog:dep.D' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.main {
-  class A {
+  class A extends A_Instance {
+  }
+  class A_Instance {
     private noStructuralTyping_: any;
     fn (a : ಠ_ಠ.clutz.dep.D ) : void ;
   }

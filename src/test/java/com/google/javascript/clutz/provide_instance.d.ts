@@ -1,5 +1,7 @@
 declare namespace ಠ_ಠ.clutz.provides {
-  class C {
+  class C extends C_Instance {
+  }
+  class C_Instance {
     private noStructuralTyping_: any;
   }
 }

@@ -1,16 +1,24 @@
 declare namespace ಠ_ಠ.clutz.multi_class {
-  class A {
+  class A extends A_Instance {
+  }
+  class A_Instance {
     private noStructuralTyping_: any;
     constructor (n : number ) ;
     a : number ;
   }
-  class B extends ಠ_ಠ.clutz.multi_class.A implements ಠ_ಠ.clutz.multi_class.I , ಠ_ಠ.clutz.multi_class.I2 {
+  class B extends B_Instance {
+  }
+  class B_Instance extends ಠ_ಠ.clutz.multi_class.A_Instance implements ಠ_ಠ.clutz.multi_class.I , ಠ_ಠ.clutz.multi_class.I2 {
     b : number ;
     noop ( ) : void ;
   }
-  class C extends ಠ_ಠ.clutz.multi_class.B {
+  class C extends C_Instance {
   }
-  class D implements ಠ_ಠ.clutz.multi_class.I {
+  class C_Instance extends ಠ_ಠ.clutz.multi_class.B_Instance {
+  }
+  class D extends D_Instance {
+  }
+  class D_Instance implements ಠ_ಠ.clutz.multi_class.I {
     private noStructuralTyping_: any;
   }
   interface I {

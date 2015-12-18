@@ -1,5 +1,7 @@
 declare namespace ಠ_ಠ.clutz.ctor_func {
-  class Ctor < T > {
+  class Ctor < T > extends Ctor_Instance < T > {
+  }
+  class Ctor_Instance < T > {
     private noStructuralTyping_: any;
     constructor (a : string , b : number ) ;
   }

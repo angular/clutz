@@ -9,7 +9,9 @@ declare module 'goog:fn' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.fn {
-  class String {
+  class String extends String_Instance {
+  }
+  class String_Instance {
     private noStructuralTyping_: any;
   }
 }

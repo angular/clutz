@@ -4,7 +4,9 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz.interface_exp {
-  class SomeClazz {
+  class SomeClazz extends SomeClazz_Instance {
+  }
+  class SomeClazz_Instance {
     private noStructuralTyping_: any;
   }
   function staticMethod ( ) : number ;

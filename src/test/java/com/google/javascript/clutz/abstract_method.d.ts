@@ -1,5 +1,7 @@
 declare namespace ಠ_ಠ.clutz.abstract_method {
-  class Child extends ಠ_ಠ.clutz.abstract_method.Clazz {
+  class Child extends Child_Instance {
+  }
+  class Child_Instance extends ಠ_ಠ.clutz.abstract_method.Clazz_Instance {
     bar (a : number ) : string ;
   }
 }
@@ -11,11 +13,10 @@ declare module 'goog:abstract_method.Child' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.abstract_method {
-  class Clazz implements ಠ_ಠ.clutz.abstract_method.Interface {
+  class Clazz extends Clazz_Instance {
+  }
+  class Clazz_Instance implements ಠ_ಠ.clutz.abstract_method.Interface {
     private noStructuralTyping_: any;
-    //!! In Closure, abstract methods are just methods that have type Function, which corresponds
-    //!! to a TS method that takes any arguments and returns any. Luckily this is compatible for
-    //!! both the super and the subtype.
     bar ( ...a : any [] ) : any ;
     foo ( ) : string ;
   }

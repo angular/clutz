@@ -1,9 +1,13 @@
 declare namespace ಠ_ಠ.clutz.generics {
   interface ExtendGenericInterface < TYPE > extends ಠ_ಠ.clutz.generics.GenericInterface < TYPE > {
   }
-  class ExtendsGenericClass < TYPE > extends ಠ_ಠ.clutz.generics.Foo < TYPE , number > {
+  class ExtendsGenericClass < TYPE > extends ExtendsGenericClass_Instance < TYPE > {
   }
-  class Foo < T , U > {
+  class ExtendsGenericClass_Instance < TYPE > extends ಠ_ಠ.clutz.generics.Foo_Instance < TYPE , number > {
+  }
+  class Foo < T , U > extends Foo_Instance < T , U > {
+  }
+  class Foo_Instance < T , U > {
     private noStructuralTyping_: any;
     constructor (a : number ) ;
     get ( ) : T ;
@@ -12,7 +16,9 @@ declare namespace ಠ_ಠ.clutz.generics {
   }
   interface GenericInterface < TYPE > {
   }
-  class ImplementsGenericInterface < TYPE > implements ಠ_ಠ.clutz.generics.GenericInterface < TYPE > {
+  class ImplementsGenericInterface < TYPE > extends ImplementsGenericInterface_Instance < TYPE > {
+  }
+  class ImplementsGenericInterface_Instance < TYPE > implements ಠ_ಠ.clutz.generics.GenericInterface < TYPE > {
     private noStructuralTyping_: any;
   }
   var arrayMissingTypeParam : any [] ;
