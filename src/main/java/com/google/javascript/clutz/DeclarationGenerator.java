@@ -23,7 +23,6 @@ import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerInput;
 import com.google.javascript.jscomp.DiagnosticType;
 import com.google.javascript.jscomp.ErrorFormat;
-import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.TypedScope;
 import com.google.javascript.jscomp.TypedVar;
@@ -585,8 +584,6 @@ public class DeclarationGenerator {
     private final JSTypeRegistry typeRegistry;
     private final Set<String> provides;
     private int valueSymbolsWalked = 0;
-    private TypedVar currentSymbol;
-
     private TreeWalker(JSTypeRegistry typeRegistry, Set<String> provides) {
       this.typeRegistry = typeRegistry;
       this.provides = provides;
@@ -621,7 +618,6 @@ public class DeclarationGenerator {
     }
 
     private void walk(TypedVar symbol) {
-      this.currentSymbol = symbol;
       JSType type = symbol.getType();
       if (!type.isInterface() && !isTypedef(type)) valueSymbolsWalked++;
       if (type.isFunctionType()) {
