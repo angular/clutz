@@ -30,6 +30,7 @@ import com.google.javascript.rhino.InputId;
 import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
+import com.google.javascript.rhino.StaticSourceFile;
 import com.google.javascript.rhino.jstype.EnumElementType;
 import com.google.javascript.rhino.jstype.EnumType;
 import com.google.javascript.rhino.jstype.FunctionType;
@@ -59,6 +60,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
@@ -68,6 +71,7 @@ import javax.annotation.Nullable;
 public class DeclarationGenerator {
 
   static final String INSTANCE_CLASS_SUFFIX = "_Instance";
+  public static final Pattern GOOG_MODULE_EXTRACT = Pattern.compile("goog.module\\(['\"](.*)['\"]\\);");
 
   public static void main(String[] args) {
     Options options = null;
@@ -944,8 +948,16 @@ public class DeclarationGenerator {
           } else if (type.isDict()) {
             emit("{[key: string]: any}");
           } else if (type.getReferenceName() != null) {
+            String name;
+            // If a class A is declared in goog.module and exported as default, closure
+            // assigns it a synthetic type $jscomp.scope.A.
+            if (type.getReferenceName().contains("$jscomp.scope")) {
+              name = visitSyntheticModuleTypes(type);
+            } else {
+              name = getAbsoluteName(type);
+            }
             emit(extendingInstanceClass ?
-                getAbsoluteName(type) + INSTANCE_CLASS_SUFFIX : getAbsoluteName(type));
+                name + INSTANCE_CLASS_SUFFIX : name);
           } else {
             emit("Object");
           }
@@ -1112,6 +1124,24 @@ public class DeclarationGenerator {
       }
     }
 
+    // When importing a default export it introduces a synthetic type under $jscomp.scope.
+    // import A from './module' -> type.name is $jscomp.scope.A.
+    private String visitSyntheticModuleTypes(ObjectType type) {
+      // It appears that Closure does not have a convenient API to find the module name given the
+      // synthetically generated type for a default export. So we do this the hard way.
+      // From the constructor function, find the raw source file and parse it to extract the
+      // module name.
+      String code = getSource(type.getConstructor());
+      for (String line : Splitter.on('\n').split(code)) {
+        Matcher matcher = GOOG_MODULE_EXTRACT.matcher(line);
+        if (matcher.find()) {
+          return Constants.INTERNAL_NAMESPACE + "." + matcher.group(1);
+        }
+      }
+      throw new RuntimeException("Did not find a matching goog.module while processing type "
+          + type.getDisplayName());
+    }
+
     private void visitRecordType(RecordType type) {
       emit("{");
       Iterator<String> it = getSortedPublicPropertyNames(type).iterator();
@@ -1206,7 +1236,7 @@ public class DeclarationGenerator {
     }
 
     private void visitProperties(ObjectType objType, boolean isStatic) {
-      visitProperties(objType, isStatic,  Collections.<String>emptySet());
+      visitProperties(objType, isStatic, Collections.<String>emptySet());
     }
 
     private void visitProperties(ObjectType objType, boolean isStatic, Set<String> skipNames) {
@@ -1327,6 +1357,21 @@ public class DeclarationGenerator {
           visitTypeAlias(registryType, propName);
         }
       }
+    }
+  }
+
+  private String getSource(FunctionType ftype) {
+    Node source = ftype.getSource();
+    InputId id = source.getInputId();
+    while (id == null) {
+      source = source.getParent();
+      id = source.getInputId();
+    }
+    try {
+      return compiler.getInput(id).getCode();
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to read input while processing type for "
+          + ftype.getDisplayName(), e);
     }
   }
 }

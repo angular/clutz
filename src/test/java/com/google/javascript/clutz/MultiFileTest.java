@@ -52,8 +52,8 @@ public class MultiFileTest {
   public void googModule() throws Exception {
     String expected = DeclarationGeneratorTests.getTestFileText(input("goog_module.d.ts"));
     assertThatProgram(
-        ImmutableList.of(input("required_module.js"), input("required.js"),
-            input("goog_module.js")),
+        ImmutableList.of(input("required_module.js"), input("required_module_default.js"),
+            input("required.js"), input("goog_module.js")),
         Collections.<File>emptyList())
         .generatesDeclarations(expected);
   }

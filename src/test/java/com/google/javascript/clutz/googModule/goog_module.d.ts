@@ -16,6 +16,7 @@ declare namespace ಠ_ಠ.clutz.googmodule.TheModule {
   var a : number ;
   var b : number ;
   var required : ಠ_ಠ.clutz.googmodule.Required ;
+  var requiredDefault : ಠ_ಠ.clutz.googmodule.requiredModuleDefault ;
 }
 declare namespace ಠ_ಠ.clutz.goog {
   function require(name: 'googmodule.TheModule'): typeof ಠ_ಠ.clutz.googmodule.TheModule;
@@ -33,4 +34,18 @@ declare namespace ಠ_ಠ.clutz.goog {
 declare module 'goog:googmodule.requiredModule' {
   import alias = ಠ_ಠ.clutz.googmodule.requiredModule;
   export = alias;
+}
+declare namespace ಠ_ಠ.clutz.googmodule {
+  class requiredModuleDefault extends requiredModuleDefault_Instance {
+  }
+  class requiredModuleDefault_Instance {
+    private noStructuralTyping_: any;
+  }
+}
+declare namespace ಠ_ಠ.clutz.goog {
+  function require(name: 'googmodule.requiredModuleDefault'): typeof ಠ_ಠ.clutz.googmodule.requiredModuleDefault;
+}
+declare module 'goog:googmodule.requiredModuleDefault' {
+  import alias = ಠ_ಠ.clutz.googmodule.requiredModuleDefault;
+  export default alias;
 }
