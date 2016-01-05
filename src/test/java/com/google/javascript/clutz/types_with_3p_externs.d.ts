@@ -117,3 +117,12 @@ declare namespace ಠ_ಠ.clutz {
 declare namespace ಠ_ಠ.clutz.FunctionNamespace {
   function dom (nodeOrEvent : Node | Event ) : FunctionNamespaceHelperClass ;
 }
+declare namespace ಠ_ಠ.clutz {
+  class ClassNamespace extends ClassNamespace_Instance {
+    //!! Should be {num : number} instead of object. Will be fixed with #202.
+    static constObj : Object ;
+  }
+  class ClassNamespace_Instance {
+    private noStructuralTyping_: any;
+  }
+}

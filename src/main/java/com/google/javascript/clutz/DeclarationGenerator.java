@@ -276,13 +276,17 @@ public class DeclarationGenerator {
       String parentPath = getNamespace(symbol.getName());
       boolean isDefault = isDefaultExport(symbol);
 
+      // skip foo.bar.baz in the following three cases:
+      // * foo.bar is namespace
       if (visitedNamespaces.contains(parentPath)) {
         // Note that this class has been visited before continuing.
         if (isDefault && isClassLike(symbol.getType())) visitedClassLikes.add(symbol.getName());
         continue;
       }
-      // will be handled by class-like emitting code.
+      // * foo.bar is class-like and baz is a static field.
       if (isStaticFieldOrMethod(symbol.getType()) && visitedClassLikes.contains(parentPath)) continue;
+      // * foo is a class-like and foo.bar is a static field.
+      if (visitedClassLikes.contains(getNamespace(parentPath))) continue;
 
       declareNamespace(isDefault ? parentPath : symbol.getName(), symbol, isDefault,
           noTransitiveProvides, true);

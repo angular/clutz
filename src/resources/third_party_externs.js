@@ -113,3 +113,18 @@ var FunctionNamespaceHelperClass = function() {};
  * @return {!FunctionNamespaceHelperClass}
  */
 FunctionNamespace.dom = function(nodeOrEvent) {};
+
+/**
+ * @constructor
+ */
+var ClassNamespace = function() {};
+
+/**
+ * @const
+ */
+ClassNamespace.constObj = {};
+
+/**
+ * @type {number}
+ */
+ClassNamespace.constObj.num;
