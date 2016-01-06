@@ -2,7 +2,7 @@ goog.provide('typesWithExterns');
 goog.provide('typesWithExterns.A');
 goog.provide('typesWithExterns.B');
 goog.provide('typesWithExterns.C');
-
+goog.provide('typesWithExterns.ArrayLike');
 
 /**
  * @return {Element}

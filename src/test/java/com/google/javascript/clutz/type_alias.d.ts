@@ -1,4 +1,5 @@
 declare namespace ಠ_ಠ.clutz.typedefs {
+  /* skipped emitting type alias typedefs.ArrayLike to avoid collision with existing one in lib.d.ts. */
   type strOrFunc = string | ( ( ) => string ) ;
   type strToStr = (a : string ) => string ;
 }

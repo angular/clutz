@@ -30,7 +30,6 @@ import com.google.javascript.rhino.InputId;
 import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
-import com.google.javascript.rhino.StaticSourceFile;
 import com.google.javascript.rhino.jstype.EnumElementType;
 import com.google.javascript.rhino.jstype.EnumType;
 import com.google.javascript.rhino.jstype.FunctionType;
@@ -208,6 +207,16 @@ public class DeclarationGenerator {
         declareModule(provide, true);
         continue;
       }
+      // ArrayLike is defined in lib.d.ts, so we skip any type alias that
+      // would shadow it.
+      // Note that clutz expands type aliases used in closure code,
+      // thus this does not result in undefined types.
+      // This case handles goog.provided typedefs.
+      if (isTypedef(symbol.getType()) && isArrayLike(symbol)) {
+        emitSkipTypeAlias(symbol);
+        emitBreak();
+        continue;
+      }
       checkArgument(symbol.getType() != null, "all symbols should have a type: %s", provide);
       String namespace = provide;
       // These goog.provide's have only one symbol, so users expect to use default import
@@ -232,6 +241,10 @@ public class DeclarationGenerator {
 
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
+  }
+
+  private boolean isArrayLike(TypedVar symbol) {
+    return symbol.getName().endsWith(".ArrayLike");
   }
 
   /**
@@ -412,7 +425,6 @@ public class DeclarationGenerator {
       emitNamespaceEnd();
     }
     return treeWalker.valueSymbolsWalked;
-
   }
 
   // Due to lack of precise definition of a namespace, we look for object types that are not of any
@@ -691,6 +703,16 @@ public class DeclarationGenerator {
           return;
         }
         if (isTypedef(type)) {
+          // ArrayLike is defined in lib.d.ts, so we skip any type alias that
+          // would shadow it.
+          // Note that clutz expands type aliases used in closure code,
+          // thus this does not result in undefined types.
+          // This case handles not goog.provided typedefs.
+          if (isArrayLike(symbol)) {
+            emitSkipTypeAlias(symbol);
+            emitBreak();
+            return;
+          }
           // The aliased type is present in the registry under the symbol name.
           JSType registryType = typeRegistry.getType(symbol.getName());
           if (registryType != null) {
@@ -1362,6 +1384,11 @@ public class DeclarationGenerator {
         }
       }
     }
+  }
+
+  private void emitSkipTypeAlias(TypedVar symbol) {
+    emit("/* skipped emitting type alias " + symbol.getName()
+        + " to avoid collision with existing one in lib.d.ts. */");
   }
 
   private String getSource(FunctionType ftype) {

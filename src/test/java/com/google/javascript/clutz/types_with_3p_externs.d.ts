@@ -1,5 +1,4 @@
 declare namespace ಠ_ಠ.clutz.typesWithExterns {
-  type ArrayLike = NodeList | IArguments | { length : number } ;
   class Error extends Error_Instance {
   }
   class Error_Instance extends GlobalError {
@@ -37,6 +36,7 @@ declare module 'goog:typesWithExterns.A' {
   import alias = ಠ_ಠ.clutz.typesWithExterns.A;
   export default alias;
 }
+/* skipped emitting type alias typesWithExterns.ArrayLike to avoid collision with existing one in lib.d.ts. */
 declare namespace ಠ_ಠ.clutz.typesWithExterns {
   class B extends B_Instance {
   }
