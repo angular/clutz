@@ -8,6 +8,16 @@ declare namespace ಠ_ಠ.clutz {
   type ClosureSymbolNotGoogProvided = void;
   /** Represents a Closure type that is private, represented by an empty interface. */
   type PrivateType = void;
+  /**
+   * Represents a Closure class that is private. Only used for extending. When in
+   * type position PrivateType is used.
+   */
+  class PrivateClass {}
+  /**
+   * Represents a Closure interface that is private. Only used for extending/implementing. When in
+   * type position PrivateType is used.
+   */
+  interface PrivateInterface {}
 }
 
 // Will be extended if base.js is a dependency.

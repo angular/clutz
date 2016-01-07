@@ -793,12 +793,7 @@ public class DeclarationGenerator {
       if (ftype.getExtendedInterfacesCount() > 0) {
         emit("extends");
         Iterator<ObjectType> it = ftype.getExtendedInterfaces().iterator();
-        while (it.hasNext()) {
-          visitType(it.next());
-          if (it.hasNext()) {
-            emit(",");
-          }
-        }
+        emitCommaSeparatedInterfaces(it);
       }
       // Class extends another class
       ObjectType superType = getSuperType(ftype);
@@ -806,20 +801,35 @@ public class DeclarationGenerator {
         emit("extends");
         // There are only two possible cases in visitType - nominal class type (possibly templatized)
         // TODO(radokirov): refactor so that we don't need to go through the general dispatch.
-        visitType(superType, emitInstance && !isDefinedInPlatformExterns(superType));
+        if (isPrivate(superType.getJSDocInfo())) {
+          // TypeScript does not allow public APIs that expose non-exported/private types.
+          emit(Constants.INTERNAL_NAMESPACE + ".PrivateClass");
+        } else {
+          visitType(superType, emitInstance && !isDefinedInPlatformExterns(superType));
+        }
       }
 
       Iterator<ObjectType> it = ftype.getOwnImplementedInterfaces().iterator();
       if (it.hasNext()) {
         emit("implements");
-        while (it.hasNext()) {
-          visitType(it.next());
-          if (it.hasNext()) {
-            emit(",");
-          }
-        }
+        emitCommaSeparatedInterfaces(it);
       }
       visitObjectType(ftype, ftype.getPrototype());
+    }
+
+    private void emitCommaSeparatedInterfaces(Iterator<ObjectType> it) {
+      while (it.hasNext()) {
+        ObjectType type = it.next();
+        if (isPrivate(type.getJSDocInfo())) {
+          // TypeScript does not allow public APIs that expose non-exported/private types.
+          emit(Constants.INTERNAL_NAMESPACE + ".PrivateInterface");
+        } else {
+          visitType(type);
+        }
+        if (it.hasNext()) {
+          emit(",");
+        }
+      }
     }
 
     private void visitVarDeclaration(TypedVar symbol, JSType type) {
