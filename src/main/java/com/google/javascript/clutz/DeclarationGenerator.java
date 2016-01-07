@@ -279,7 +279,7 @@ public class DeclarationGenerator {
       if (symbolInput == null || !symbolInput.isExtern() || symbol.getType() == null) {
         continue;
       }
-      if (isPlatformExtern(symbolInput)) {
+      if (isPlatformExtern(symbolInput.getName())) {
         continue;
       }
       // Closure treats all prototypes as separate symbols, but we handle them in conjunction with
@@ -326,8 +326,7 @@ public class DeclarationGenerator {
   }
 
   // For platform externs we skip emitting .d.ts, to avoid collisions with lib.d.ts.
-  private boolean isPlatformExtern(CompilerInput symbolInput) {
-    String name = symbolInput.getName();
+  private boolean isPlatformExtern(String name) {
     name = name.replace("externs.zip//", "");
     // mostly matching what is in https://github.com/google/closure-compiler/tree/master/externs.
     return name.startsWith("javascript/externs/") || name.startsWith("es") || name.startsWith("w3c")
@@ -802,11 +801,12 @@ public class DeclarationGenerator {
         }
       }
       // Class extends another class
-      if (getSuperType(ftype) != null) {
+      ObjectType superType = getSuperType(ftype);
+      if (superType != null) {
         emit("extends");
         // There are only two possible cases in visitType - nominal class type (possibly templatized)
         // TODO(radokirov): refactor so that we don't need to go through the general dispatch.
-        visitType(getSuperType(ftype), emitInstance);
+        visitType(superType, emitInstance && !isDefinedInPlatformExterns(superType));
       }
 
       Iterator<ObjectType> it = ftype.getOwnImplementedInterfaces().iterator();
@@ -1389,6 +1389,10 @@ public class DeclarationGenerator {
   private void emitSkipTypeAlias(TypedVar symbol) {
     emit("/* skipped emitting type alias " + symbol.getName()
         + " to avoid collision with existing one in lib.d.ts. */");
+  }
+
+  private boolean isDefinedInPlatformExterns(ObjectType type) {
+    return isPlatformExtern(type.getConstructor().getSource().getSourceFileName());
   }
 
   private String getSource(FunctionType ftype) {

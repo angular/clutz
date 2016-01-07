@@ -5,6 +5,10 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
   }
   interface ExtendsIThenable extends PromiseLike < any > {
   }
+  class ExtendsXMLHttpRequest extends ExtendsXMLHttpRequest_Instance {
+  }
+  class ExtendsXMLHttpRequest_Instance extends XMLHttpRequest {
+  }
   var a : { a : number } ;
   var b : IArguments ;
   var c : NodeList | IArguments | { length : number } ;

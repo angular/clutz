@@ -106,6 +106,11 @@ typesWithExterns.ExtendsIThenable = function() {};
  */
 typesWithExterns.Error = function() {};
 
+/**
+ * @constructor
+ * @extends {XMLHttpRequest}
+ */
+typesWithExterns.ExtendsXMLHttpRequest = function() {};
 
 /**
  * @type {namespace.Foo}
