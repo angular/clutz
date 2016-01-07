@@ -982,6 +982,14 @@ public class DeclarationGenerator {
             } else {
               name = getAbsoluteName(type);
             }
+            // Under special conditions (see prototype_inferred_type.js) closure can infer
+            // the type be the prototype object. TypeScript has nothing that matches the shape
+            // of the prototype object (surprisingly typeof A.prototype is A). The best we can do is
+            // any.
+            if (name.endsWith(".prototype")) {
+              emit("any");
+              return null;
+            }
             emit(extendingInstanceClass ?
                 name + INSTANCE_CLASS_SUFFIX : name);
           } else {
