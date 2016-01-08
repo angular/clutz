@@ -368,7 +368,7 @@ public class DeclarationGenerator {
           // private enums has to be tracked in this side channel.
           //
           // NB: This has multiple issues. It requires the enum to be declared before used, and it
-          // requires the enum to be on an exported namespace. In pracice, the rare instances of
+          // requires the enum to be on an exported namespace. In practice, the rare instances of
           // this pattern appear to follow those rules.
           privateEnums.add(namespace + "." + property);
         }
@@ -1376,11 +1376,20 @@ public class DeclarationGenerator {
     void walkInnerSymbols(ObjectType type, String innerNamespace) {
       // TODO(martinprobst): This curiously duplicates visitProperty above. Investigate the code
       // smell and reduce duplication (or figure out & document why it's needed).
+
+      // Populating privateEnums is necessary, because enumType.getJsDocInfo() returns null, while
+      // parentType.getOwnPropertyJSDocInfo(enumName) works fine.
+      for (String propName : type.getPropertyNames()) {
+        JSType pType = type.getPropertyType(propName);
+        if (pType.isEnumType() && isPrivate(type.getOwnPropertyJSDocInfo(propName))) {
+          privateEnums.add(innerNamespace + '.' + propName);
+        }
+      }
+
       for (String propName : getSortedPublicPropertyNames(type)) {
         String qualifiedName = innerNamespace + '.' + propName;
         if (provides.contains(qualifiedName)) continue;
         JSType pType = type.getPropertyType(propName);
-
 
         if (pType.isEnumType()) {
           visitEnumType(propName, (EnumType) pType);

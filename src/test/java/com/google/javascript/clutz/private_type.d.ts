@@ -5,6 +5,24 @@ declare module 'goog:privatetype' {
   export = alias;
 }
 declare namespace ಠ_ಠ.clutz.privatetype {
+  class Foo extends Foo_Instance {
+  }
+  class Foo_Instance {
+    private noStructuralTyping_: any;
+    constructor (a : any ) ;
+  }
+}
+declare namespace ಠ_ಠ.clutz.privatetype.Foo {
+  type typedef = { a : ಠ_ಠ.clutz.PrivateType } ;
+}
+declare namespace ಠ_ಠ.clutz.goog {
+  function require(name: 'privatetype.Foo'): typeof ಠ_ಠ.clutz.privatetype.Foo;
+}
+declare module 'goog:privatetype.Foo' {
+  import alias = ಠ_ಠ.clutz.privatetype.Foo;
+  export default alias;
+}
+declare namespace ಠ_ಠ.clutz.privatetype {
   var enumUser : ಠ_ಠ.clutz.PrivateType ;
 }
 declare namespace ಠ_ಠ.clutz.goog {
