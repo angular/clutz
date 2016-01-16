@@ -131,5 +131,5 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz.FunctionNamespace {
-  // skipping emitting private default export FunctionNamespace.privateClass.
+  var privateClass : ಠ_ಠ.clutz.PrivateType;
 }

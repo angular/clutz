@@ -339,8 +339,8 @@ public class DeclarationGenerator {
     TreeWalker treeWalker = new TreeWalker(compiler.getTypeRegistry(), provides);
     if (isDefault) {
       if (isPrivate(symbol.getJSDocInfo())) {
-        emit("// skipping emitting private default export " + symbol.getName() + ".");
-        emitBreak();
+
+        treeWalker.emitPrivateValue(symbol);
       } else {
         treeWalker.walk(symbol);
       }
@@ -1415,6 +1415,14 @@ public class DeclarationGenerator {
           visitTypeAlias(registryType, propName);
         }
       }
+    }
+
+    public void emitPrivateValue(TypedVar symbol) {
+      emit("var");
+      emit(getUnqualifiedName(symbol));
+      emit(":");
+      emit(Constants.INTERNAL_NAMESPACE + ".PrivateType;");
+      emitBreak();
     }
   }
 
