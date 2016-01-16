@@ -128,3 +128,9 @@ ClassNamespace.constObj = {};
  * @type {number}
  */
 ClassNamespace.constObj.num;
+
+/**
+ * @constructor
+ * @private
+ */
+FunctionNamespace.privateClass = function() {};

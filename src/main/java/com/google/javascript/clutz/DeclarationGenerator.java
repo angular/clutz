@@ -338,7 +338,12 @@ public class DeclarationGenerator {
     emitNamespaceBegin(namespace);
     TreeWalker treeWalker = new TreeWalker(compiler.getTypeRegistry(), provides);
     if (isDefault) {
-      treeWalker.walk(symbol);
+      if (isPrivate(symbol.getJSDocInfo())) {
+        emit("// skipping emitting private default export " + symbol.getName() + ".");
+        emitBreak();
+      } else {
+        treeWalker.walk(symbol);
+      }
     } else {
       // JSCompiler treats "foo.x" as one variable name, so collect all provides that start with
       // $provide + "." but are not sub-properties.

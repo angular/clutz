@@ -130,3 +130,6 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_: any;
   }
 }
+declare namespace ಠ_ಠ.clutz.FunctionNamespace {
+  // skipping emitting private default export FunctionNamespace.privateClass.
+}
