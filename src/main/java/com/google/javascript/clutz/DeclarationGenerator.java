@@ -326,10 +326,12 @@ public class DeclarationGenerator {
   }
 
   // For platform externs we skip emitting .d.ts, to avoid collisions with lib.d.ts.
+  // TODO(rado): Platform is too ill-defined, and this often filters too much.
+  // Replace with a list of externs that *only* contain symbols in lib.d.ts.
   private boolean isPlatformExtern(String name) {
     name = name.replace("externs.zip//", "");
     // mostly matching what is in https://github.com/google/closure-compiler/tree/master/externs.
-    return name.startsWith("javascript/externs/") || name.startsWith("es") || name.startsWith("w3c")
+    return Pattern.matches("javascript/externs/[^/]*.js", name) || name.startsWith("es") || name.startsWith("w3c")
         || name.startsWith("ie_") || name.startsWith("browser");
   }
 
