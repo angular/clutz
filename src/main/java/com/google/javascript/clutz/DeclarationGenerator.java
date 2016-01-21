@@ -768,7 +768,7 @@ public class DeclarationGenerator {
       // class B_Instance { <instance fields and methods> }
       //
       // Emit original name class before Instance in order to match the already emitted JSDoc.
-      boolean emitInstance = !ftype.isInterface();
+      final boolean emitInstance = !ftype.isInterface();
       if (emitInstance) {
         emit("class");
         emit(name);
@@ -806,13 +806,13 @@ public class DeclarationGenerator {
       ObjectType superType = getSuperType(ftype);
       if (superType != null) {
         emit("extends");
-        // There are only two possible cases in visitType - nominal class type (possibly templatized)
-        // TODO(radokirov): refactor so that we don't need to go through the general dispatch.
         if (isPrivate(superType.getJSDocInfo())) {
           // TypeScript does not allow public APIs that expose non-exported/private types.
           emit(Constants.INTERNAL_NAMESPACE + ".PrivateClass");
         } else {
-          visitType(superType, emitInstance && !isDefinedInPlatformExterns(superType));
+          Visitor<Void> visitor = new ExtendsImplementsTypeVisitor(
+              emitInstance && !isDefinedInPlatformExterns(superType));
+          superType.visit(visitor);
         }
       }
 
@@ -831,7 +831,8 @@ public class DeclarationGenerator {
           // TypeScript does not allow public APIs that expose non-exported/private types.
           emit(Constants.INTERNAL_NAMESPACE + ".PrivateInterface");
         } else {
-          visitType(type);
+          ExtendsImplementsTypeVisitor visitor = new ExtendsImplementsTypeVisitor(false);
+          type.visit(visitor);
         }
         if (it.hasNext()) {
           emit(",");
@@ -976,44 +977,9 @@ public class DeclarationGenerator {
 
         @Override
         public Void caseObjectType(ObjectType type) {
-          if (type.getDisplayName() != null && type.getDisplayName().equals("Error")) {
-            // global Error is aliased as GlobalError in closure.lib.d.ts.
-            emit("GlobalError");
-            return null;
-          }
-          // Closure doesn't require that all the type params be declared, but TS does
-          if (!type.getTemplateTypeMap().isEmpty()
-              && !typeRegistry.getNativeType(OBJECT_TYPE).equals(type)) {
-            return caseTemplatizedType(typeRegistry.createTemplatizedType(type));
-          }
-          if (type.isRecordType()) {
-            visitRecordType((RecordType) type);
-          } else if (type.isDict()) {
-            emit("{[key: string]: any}");
-          } else if (type.getReferenceName() != null) {
-            String name;
-            // If a class A is declared in goog.module and exported as default, closure
-            // assigns it a synthetic type $jscomp.scope.A.
-            if (type.getReferenceName().contains("$jscomp.scope")) {
-              name = visitSyntheticModuleTypes(type);
-            } else {
-              name = getAbsoluteName(type);
-            }
-            // Under special conditions (see prototype_inferred_type.js) closure can infer
-            // the type be the prototype object. TypeScript has nothing that matches the shape
-            // of the prototype object (surprisingly typeof A.prototype is A). The best we can do is
-            // any.
-            if (name.endsWith(".prototype")) {
-              emit("any");
-              return null;
-            }
-            emit(extendingInstanceClass ?
-                name + INSTANCE_CLASS_SUFFIX : name);
-          } else {
-            emit("Object");
-          }
-          return null;
+          return emitObjectType(type, false);
         }
+
 
         @Override
         public Void caseUnionType(UnionType type) {
@@ -1029,74 +995,7 @@ public class DeclarationGenerator {
 
         @Override
         public Void caseTemplatizedType(TemplatizedType type) {
-          ObjectType referencedType = type.getReferencedType();
-          String templateTypeName = extendingInstanceClass ?
-              getAbsoluteName(type) + INSTANCE_CLASS_SUFFIX : getAbsoluteName(type);
-          if (typeRegistry.getNativeType(ARRAY_TYPE).equals(referencedType)
-              && type.getTemplateTypes().size() == 1) {
-            // As per TS type grammar, array types require primary types.
-            // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#a-grammar
-            visitTypeAsPrimary(type.getTemplateTypes().get(0));
-            emit("[]");
-            return null;
-          }
-          switch (type.getDisplayName()) {
-            // Arguments<?> and NodeList<?> in es3 externs are correspondinly
-            // IArguments and NodeList interfaces (not-parametrized) in lib.d.ts.
-            // New* are temporary work-arounds for upstream externs.
-            // TODO(rado): upgrade closure compiler and remove them.
-            case "Arguments":
-            case "NewArguments":
-              emit("IArguments");
-              return null;
-            case "NodeList":
-            case "NewNodeList":
-              emit("NodeList");
-              return null;
-            case "IThenable":
-              templateTypeName = "PromiseLike";
-              break;
-            case "IArrayLike":
-              templateTypeName = "ArrayLike";
-              break;
-            default:
-              break;
-          }
-          if (type.getTemplateTypes().isEmpty()) {
-            // In Closure, subtypes of `TemplatizedType`s that do not take type arguments are still
-            // represented by templatized types.
-            emit(templateTypeName);
-            return null;
-          }
-          Iterator<JSType> it = type.getTemplateTypes().iterator();
-          if (typeRegistry.getNativeType(OBJECT_TYPE).equals(referencedType)) {
-            emit("{ [");
-            // TS allows only number or string as index type of an object
-            // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.9.4
-            JSType keyType = it.next();
-            if (keyType.isNumberValueType()) {
-              emit("n: number");
-            } else {
-              if (!keyType.isStringValueType()) {
-                emit("/* warning: coerced from " + keyType + " */");
-              }
-              emit("s: string");
-            }
-            emit("]:");
-            visitType(it.next());
-            emit("}");
-            return null;
-          }
-          emit(templateTypeName);
-          emit("<");
-          while (it.hasNext()) {
-            visitType(it.next());
-            if (it.hasNext()) {
-              emit(",");
-            }
-          }
-          emit(">");
-          return null;
+          return emitTemplatizedType(type, false);
         }
 
         @Override
@@ -1173,6 +1072,77 @@ public class DeclarationGenerator {
       } catch (Exception e) {
         throw new RuntimeException("Failed to emit type " + typeToVisit, e);
       }
+    }
+
+    private Void emitTemplatizedType(TemplatizedType type, boolean extendingInstanceClass) {
+      ObjectType referencedType = type.getReferencedType();
+      String templateTypeName = extendingInstanceClass ?
+          getAbsoluteName(type) + INSTANCE_CLASS_SUFFIX : getAbsoluteName(type);
+      if (typeRegistry.getNativeType(ARRAY_TYPE).equals(referencedType)
+          && type.getTemplateTypes().size() == 1) {
+        // As per TS type grammar, array types require primary types.
+        // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#a-grammar
+        visitTypeAsPrimary(type.getTemplateTypes().get(0));
+        emit("[]");
+        return null;
+      }
+      switch (type.getDisplayName()) {
+        // Arguments<?> and NodeList<?> in es3 externs are correspondingly
+        // IArguments and NodeList interfaces (not-parametrized) in lib.d.ts.
+        // New* are temporary work-arounds for upstream externs.
+        // TODO(rado): upgrade closure compiler and remove them.
+        case "Arguments":
+        case "NewArguments":
+          emit("IArguments");
+          return null;
+        case "NodeList":
+        case "NewNodeList":
+          emit("NodeList");
+          return null;
+        case "IThenable":
+          templateTypeName = "PromiseLike";
+          break;
+        case "IArrayLike":
+          templateTypeName = "ArrayLike";
+          break;
+        default:
+          break;
+      }
+      if (type.getTemplateTypes().isEmpty()) {
+        // In Closure, subtypes of `TemplatizedType`s that do not take type arguments are still
+        // represented by templatized types.
+        emit(templateTypeName);
+        return null;
+      }
+      Iterator<JSType> it = type.getTemplateTypes().iterator();
+      if (typeRegistry.getNativeType(OBJECT_TYPE).equals(referencedType)) {
+        emit("{ [");
+        // TS allows only number or string as index type of an object
+        // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.9.4
+        JSType keyType = it.next();
+        if (keyType.isNumberValueType()) {
+          emit("n: number");
+        } else {
+          if (!keyType.isStringValueType()) {
+            emit("/* warning: coerced from " + keyType + " */");
+          }
+          emit("s: string");
+        }
+        emit("]:");
+        visitType(it.next());
+        emit("}");
+        return null;
+      }
+      emit(templateTypeName);
+      emit("<");
+      while (it.hasNext()) {
+        visitType(it.next());
+        if (it.hasNext()) {
+          emit(",");
+        }
+      }
+      emit(">");
+      return null;
     }
 
     // When importing a default export it introduces a synthetic type under $jscomp.scope.
@@ -1426,6 +1396,149 @@ public class DeclarationGenerator {
       emit(Constants.INTERNAL_NAMESPACE + ".PrivateType;");
       emitBreak();
     }
+
+    public Void emitObjectType(ObjectType type, boolean extendingInstanceClass) {
+      if (type.getDisplayName() != null && type.getDisplayName().equals("Error")) {
+        // global Error is aliased as GlobalError in closure.lib.d.ts.
+        emit("GlobalError");
+        return null;
+      }
+      // Closure doesn't require that all the type params be declared, but TS does
+      if (!type.getTemplateTypeMap().isEmpty()
+          && !typeRegistry.getNativeType(OBJECT_TYPE).equals(type)) {
+        return emitTemplatizedType(typeRegistry.createTemplatizedType(type), false);
+      }
+      if (type.isRecordType()) {
+        visitRecordType((RecordType) type);
+      } else if (type.isDict()) {
+        emit("{[key: string]: any}");
+      } else if (type.getReferenceName() != null) {
+        String name;
+        // If a class A is declared in goog.module and exported as default, closure
+        // assigns it a synthetic type $jscomp.scope.A.
+        if (type.getReferenceName().contains("$jscomp.scope")) {
+          name = visitSyntheticModuleTypes(type);
+        } else {
+          name = getAbsoluteName(type);
+        }
+        // Under special conditions (see prototype_inferred_type.js) closure can infer
+        // the type be the prototype object. TypeScript has nothing that matches the shape
+        // of the prototype object (surprisingly typeof A.prototype is A). The best we can do is
+        // any.
+        if (name.endsWith(".prototype")) {
+          emit("any");
+          return null;
+        }
+        emit(extendingInstanceClass ?
+            name + INSTANCE_CLASS_SUFFIX : name);
+      } else {
+        emit("Object");
+      }
+      return null;
+    }
+
+    /**
+     * A type visitor used for types in Foo extends <...> and Foo implements <...> positions.
+     * Unlike the type visitor for a generic type declaration (i.e. var a: <...>), this visitor
+     * only emits symbols that are valid in an extends/implements position.
+     * For example:
+     *     'class A extends () => any' is invalid, even though () => any is a valid type.
+     */
+    class ExtendsImplementsTypeVisitor implements Visitor<Void> {
+      final boolean emitInstanceForObject;
+
+      ExtendsImplementsTypeVisitor(boolean emitInstanceForObject) {
+        this.emitInstanceForObject = emitInstanceForObject;
+      }
+
+      @Override
+      public Void caseObjectType(ObjectType type) {
+        emitObjectType(type, emitInstanceForObject);
+        return null;
+      }
+
+      @Override
+      public Void caseUnknownType() {
+        return null;
+      }
+
+      @Override
+      public Void caseNullType() {
+        return null;
+      }
+
+      @Override
+      public Void caseNamedType(NamedType type) {
+        return null;
+      }
+
+      @Override
+      public Void caseProxyObjectType(ProxyObjectType type) {
+        return null;
+      }
+
+      @Override
+      public Void caseNumberType() {
+        return null;
+      }
+
+      @Override
+      public Void caseStringType() {
+        return null;
+      }
+
+      @Override
+      public Void caseVoidType() {
+        return null;
+      }
+
+      @Override
+      public Void caseUnionType(UnionType type) {
+        return null;
+      }
+
+      @Override
+      public Void caseTemplatizedType(TemplatizedType type) {
+        emitTemplatizedType(type, emitInstanceForObject);
+        return null;
+      }
+
+      @Override
+      public Void caseTemplateType(TemplateType templateType) {
+        return null;
+      }
+
+      @Override
+      public Void caseNoType(NoType type) {
+        return null;
+      }
+
+      @Override
+      public Void caseEnumElementType(EnumElementType type) {
+        return null;
+      }
+
+      @Override
+      public Void caseAllType() {
+        return null;
+      }
+
+      @Override
+      public Void caseBooleanType() {
+        return null;
+      }
+
+      @Override
+      public Void caseNoObjectType() {
+        return null;
+      }
+
+      @Override
+      public Void caseFunctionType(FunctionType type) {
+        emit("Function");
+        return null;
+      }
+    };
   }
 
   private void emitSkipTypeAlias(TypedVar symbol) {
