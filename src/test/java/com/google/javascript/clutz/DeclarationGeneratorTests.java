@@ -4,7 +4,6 @@ import static com.google.javascript.clutz.ProgramSubject.assertThatProgram;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
-import com.google.javascript.clutz.ProgramSubject.Externs;
 
 import junit.framework.Test;
 import junit.framework.TestResult;
@@ -35,6 +34,14 @@ public class DeclarationGeneratorTests {
       return name.endsWith(".js");
     }
   };
+
+  public static final FilenameFilter JS_NO_EXTERNS = new FilenameFilter() {
+    @Override
+    public boolean accept(File dir, String name) {
+      return name.endsWith(".js") && !name.endsWith(".externs.js");
+    }
+  };
+
   public static final FilenameFilter TS_SOURCES = new FilenameFilter() {
     @Override
     public boolean accept(File dir, String name) {
@@ -45,12 +52,15 @@ public class DeclarationGeneratorTests {
   public static TestSuite suite() throws IOException {
     TestSuite suite = new TestSuite(DeclarationGeneratorTests.class.getName());
 
-    List<File> testFiles = getTestInputFiles(JS);
+    List<File> testFiles = getTestInputFiles(JS_NO_EXTERNS);
     for (final File input : testFiles) {
       File golden = getGoldenFile(input);
       final String goldenText = getTestFileText(golden);
-      Externs externs = Externs.fromTestName(input.getName());
-      ProgramSubject subject = assertThatProgram(input).withExterns(externs);
+      ProgramSubject subject = assertThatProgram(input);
+      if (input.getName().contains("_with_platform")) {
+        subject.withPlatform = true;
+      }
+      subject.extraExternFile = getExternFileNameOrNull(input.getName());
       suite.addTest(new DeclarationTest(input.getName(), goldenText, subject));
     }
     return suite;
@@ -60,13 +70,21 @@ public class DeclarationGeneratorTests {
     return new File(input.getPath().replaceAll("\\.js$", ".d.ts"));
   }
 
+  static String getExternFileNameOrNull(String testFileName) {
+    String possibleFileName = testFileName.replace(".js", ".externs.js");
+    Path externFile = getPackagePath().resolve(possibleFileName);
+    return externFile.toFile().exists() ? externFile.toString() : null;
+  }
+
   static List<File> getTestInputFiles(FilenameFilter filter) {
+    File[] testFiles = getPackagePath().toFile().listFiles(filter);
+    return Arrays.asList(testFiles);
+  }
+
+  private static Path getPackagePath() {
     Path testDir = FileSystems.getDefault().getPath("src", "test", "java");
     String packageName = DeclarationGeneratorTests.class.getPackage().getName();
-    Path testPackage = testDir.resolve(packageName.replace('.', File.separatorChar));
-
-    File[] testFiles = testPackage.toFile().listFiles(filter);
-    return Arrays.asList(testFiles);
+    return testDir.resolve(packageName.replace('.', File.separatorChar));
   }
 
   static String getTestFileText(final File input) throws IOException {

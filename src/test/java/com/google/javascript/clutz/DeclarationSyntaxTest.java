@@ -1,6 +1,6 @@
 package com.google.javascript.clutz;
 
-import static com.google.javascript.clutz.DeclarationGeneratorTests.JS;
+import static com.google.javascript.clutz.DeclarationGeneratorTests.JS_NO_EXTERNS;
 import static com.google.javascript.clutz.DeclarationGeneratorTests.TS_SOURCES;
 import static org.junit.Assert.fail;
 
@@ -40,7 +40,7 @@ public class DeclarationSyntaxTest {
     // This currently runs *all* test files as one test case. This gives less insight into errors,
     // but improves runtime as TypeScript only has to read its lib.d.ts once, amortizing the cost
     // across test cases.
-    List<File> inputs = DeclarationGeneratorTests.getTestInputFiles(JS);
+    List<File> inputs = DeclarationGeneratorTests.getTestInputFiles(JS_NO_EXTERNS);
     List<String> goldenFilePaths = new ArrayList<>();
     for (File input : inputs) {
       goldenFilePaths.add(DeclarationGeneratorTests.getGoldenFile(input).getPath());
