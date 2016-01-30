@@ -263,7 +263,7 @@ public class DeclarationGenerator {
 
       // skip extern symbols (they have a separate pass).
       CompilerInput symbolInput = this.compiler.getInput(new InputId(symbol.getInputName()));
-      if (symbolInput == null || symbolInput.isExtern()) continue;
+      if (symbolInput != null && symbolInput.isExtern()) continue;
       declareNamespace(getNamespace(name), symbol, /* isDefault */ true,
           Collections.<String>emptySet(), /* isExtern */ false);
     }
@@ -914,7 +914,6 @@ public class DeclarationGenerator {
         }
         if (isVarArgs) emit("[]");
       }
-      typesUsed.add(type.getDisplayName());
     }
 
     /**
@@ -1043,6 +1042,7 @@ public class DeclarationGenerator {
         @Override
         public Void caseEnumElementType(EnumElementType type) {
           emit(getAbsoluteName(type));
+          typesUsed.add(type.getDisplayName());
           return null;
         }
 
@@ -1143,24 +1143,6 @@ public class DeclarationGenerator {
       }
       emit(">");
       return null;
-    }
-
-    // When importing a default export it introduces a synthetic type under $jscomp.scope.
-    // import A from './module' -> type.name is $jscomp.scope.A.
-    private String visitSyntheticModuleTypes(ObjectType type) {
-      // It appears that Closure does not have a convenient API to find the module name given the
-      // synthetically generated type for a default export. So we do this the hard way.
-      // From the constructor function, find the raw source file and parse it to extract the
-      // module name.
-      String code = getSource(type.getConstructor());
-      for (String line : Splitter.on('\n').split(code)) {
-        Matcher matcher = GOOG_MODULE_EXTRACT.matcher(line);
-        if (matcher.find()) {
-          return Constants.INTERNAL_NAMESPACE + "." + matcher.group(1);
-        }
-      }
-      throw new RuntimeException("Did not find a matching goog.module while processing type "
-          + type.getDisplayName());
     }
 
     private void visitRecordType(RecordType type) {
@@ -1413,14 +1395,7 @@ public class DeclarationGenerator {
       } else if (type.isDict()) {
         emit("{[key: string]: any}");
       } else if (type.getReferenceName() != null) {
-        String name;
-        // If a class A is declared in goog.module and exported as default, closure
-        // assigns it a synthetic type $jscomp.scope.A.
-        if (type.getReferenceName().contains("$jscomp.scope")) {
-          name = visitSyntheticModuleTypes(type);
-        } else {
-          name = getAbsoluteName(type);
-        }
+        String name = getAbsoluteName(type);
         // Under special conditions (see prototype_inferred_type.js) closure can infer
         // the type be the prototype object. TypeScript has nothing that matches the shape
         // of the prototype object (surprisingly typeof A.prototype is A). The best we can do is
@@ -1431,6 +1406,9 @@ public class DeclarationGenerator {
         }
         emit(extendingInstanceClass ?
             name + INSTANCE_CLASS_SUFFIX : name);
+        if (!type.getDisplayName().equals("Object")) {
+          typesUsed.add(type.getDisplayName());
+        }
       } else {
         emit("Object");
       }
