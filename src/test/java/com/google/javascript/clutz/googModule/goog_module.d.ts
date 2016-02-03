@@ -36,11 +36,8 @@ declare module 'goog:googmodule.requiredModule' {
   export = alias;
 }
 declare namespace ಠ_ಠ.clutz.googmodule {
-  class requiredModuleDefault extends requiredModuleDefault_Instance {
-  }
-  class requiredModuleDefault_Instance {
-    private noStructuralTyping_: any;
-  }
+  type requiredModuleDefault = ಠ_ಠ.clutz.$jscomp.scope.A ;
+  var requiredModuleDefault : typeof ಠ_ಠ.clutz.$jscomp.scope.A ;
 }
 declare namespace ಠ_ಠ.clutz.goog {
   function require(name: 'googmodule.requiredModuleDefault'): typeof ಠ_ಠ.clutz.googmodule.requiredModuleDefault;

@@ -701,7 +701,14 @@ public class DeclarationGenerator {
           visitVarDeclaration(symbol, ftype);
           return;
         }
-        visitClassOrInterface(getUnqualifiedName(symbol), ftype);
+        // The class/interface symbol might be an alias for another symbol.
+        // Since closure inlines all aliases before this step, check against
+        // the type name.
+        if (isAliasedClassOrInterface(symbol, ftype)) {
+          visitClassOrInterface(getUnqualifiedName(symbol), ftype);
+        } else {
+          visitClassOrInterfaceAlias(getUnqualifiedName(symbol), ftype);
+        }
       } else {
         maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
         if (type.isEnumType()) {
@@ -727,6 +734,26 @@ public class DeclarationGenerator {
           }
         }
         visitVarDeclaration(symbol, type);
+      }
+    }
+
+    private void visitClassOrInterfaceAlias(String unqualifiedName, FunctionType ftype) {
+      String typeName = Constants.INTERNAL_NAMESPACE + "." + ftype.getDisplayName();
+      emit("type");
+      emit(unqualifiedName);
+      emit("=");
+      emit(typeName);
+      emit(";");
+      emitBreak();
+      if (!ftype.isInterface()) {
+        // TS type aliases are only useful in type positions.
+        // To emulate closure alias semantics, introduce also an aliased constructor
+        emit("var " + unqualifiedName);
+        emit(":");
+        emit("typeof");
+        emit(typeName);
+        emit(";");
+        emitBreak();
       }
     }
 
@@ -1517,6 +1544,10 @@ public class DeclarationGenerator {
         return null;
       }
     };
+  }
+
+  private boolean isAliasedClassOrInterface(TypedVar symbol, FunctionType ftype) {
+    return symbol.getName().equals(ftype.getDisplayName());
   }
 
   private void emitSkipTypeAlias(TypedVar symbol) {
