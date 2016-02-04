@@ -425,7 +425,9 @@ public class DeclarationGenerator {
     // but not in TS, so we have to generate a namespace-class pair in TS.
     // In the case of the externs, however we *do* go through all symbols so this pass is not
     // needed.
-    if (isDefault && !isExtern && hasNestedTypes(symbol.getType())) {
+    // In the case of aliased classes, we cannot emit inner classes, due to a var-namespace clash.
+    if (isDefault && !isExtern && hasNestedTypes(symbol.getType())
+         && !isAliasedClassOrInterface(symbol, symbol.getType())) {
       emitNamespaceBegin(symbol.getName());
       treeWalker.walkInnerSymbols((ObjectType) symbol.getType(), symbol.getName());
       emitNamespaceEnd();
@@ -704,7 +706,7 @@ public class DeclarationGenerator {
         // The class/interface symbol might be an alias for another symbol.
         // Since closure inlines all aliases before this step, check against
         // the type name.
-        if (isAliasedClassOrInterface(symbol, ftype)) {
+        if (!isAliasedClassOrInterface(symbol, ftype)) {
           visitClassOrInterface(getUnqualifiedName(symbol), ftype);
         } else {
           visitClassOrInterfaceAlias(getUnqualifiedName(symbol), ftype);
@@ -1545,8 +1547,9 @@ public class DeclarationGenerator {
     };
   }
 
-  private boolean isAliasedClassOrInterface(TypedVar symbol, FunctionType ftype) {
-    return symbol.getName().equals(ftype.getDisplayName());
+  private boolean isAliasedClassOrInterface(TypedVar symbol, JSType type) {
+    if (!type.isConstructor() && !type.isInterface()) return false;
+    return !symbol.getName().equals(type.getDisplayName());
   }
 
   private void emitSkipTypeAlias(TypedVar symbol) {
