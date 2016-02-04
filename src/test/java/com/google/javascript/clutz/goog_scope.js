@@ -10,6 +10,6 @@ goog.scope(function() {
   /** @const */ foo.IBar = IBar;
 });
 
-//!! The cannonical type for foo.Bar in closure is $jscomp.scope.
+//!! The cannonical type for foo.Bar in closure is $jscomp.scope.Bar.
 /** @type {foo.Bar} */ foo.boom = null;
 /** @type {foo.IBar} */ foo.iboom = null;

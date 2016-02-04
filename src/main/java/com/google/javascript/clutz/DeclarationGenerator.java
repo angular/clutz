@@ -741,8 +741,10 @@ public class DeclarationGenerator {
       String typeName = Constants.INTERNAL_NAMESPACE + "." + ftype.getDisplayName();
       emit("type");
       emit(unqualifiedName);
+      visitTemplateTypes(ftype);
       emit("=");
       emit(typeName);
+      visitTemplateTypes(ftype);
       emit(";");
       emitBreak();
       if (!ftype.isInterface()) {
@@ -966,10 +968,6 @@ public class DeclarationGenerator {
     }
 
     private void visitType(JSType typeToVisit) {
-      visitType(typeToVisit, /* extendingInstanceClass */ false);
-    }
-
-    private void visitType(JSType typeToVisit, final boolean extendingInstanceClass) {
       // See also JsdocToEs6TypedConverter in the Closure code base. This code is implementing the
       // same algorithm starting from JSType nodes (as opposed to JSDocInfo), and directly
       // generating textual output. Otherwise both algorithms should produce the same output.
@@ -1161,6 +1159,7 @@ public class DeclarationGenerator {
         return null;
       }
       emit(templateTypeName);
+      typesUsed.add(type.getDisplayName());
       emit("<");
       while (it.hasNext()) {
         visitType(it.next());
