@@ -53,7 +53,6 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
           return new ProgramSubject(fs, that);
         }
       };
-  static final List<SourceFile> NO_EXTERNS = Collections.emptyList();
 
   ProgramSubject(FailureStrategy failureStrategy, ProgramSubject.Program subject) {
     super(failureStrategy, subject);
@@ -103,7 +102,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       roots.add("main.js");
     }
 
-    List<SourceFile> externFiles = NO_EXTERNS;
+    List<SourceFile> externFiles = new ArrayList<>();
     if (withPlatform) {
       externFiles = DeclarationGenerator.getDefaultExterns(opts);
     }

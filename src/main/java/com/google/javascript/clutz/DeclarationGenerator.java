@@ -338,7 +338,7 @@ public class DeclarationGenerator {
   private int declareNamespace(String namespace, TypedVar symbol, boolean isDefault,
       Set<String> provides, boolean isExtern) {
     emitNamespaceBegin(namespace);
-    TreeWalker treeWalker = new TreeWalker(compiler.getTypeRegistry(), provides);
+    TreeWalker treeWalker = new TreeWalker(compiler.getTypeRegistry(), provides, isExtern);
     if (isDefault) {
       if (isPrivate(symbol.getJSDocInfo())) {
 
@@ -641,9 +641,12 @@ public class DeclarationGenerator {
     private final JSTypeRegistry typeRegistry;
     private final Set<String> provides;
     private int valueSymbolsWalked = 0;
-    private TreeWalker(JSTypeRegistry typeRegistry, Set<String> provides) {
+    private final boolean isExtern;
+
+    private TreeWalker(JSTypeRegistry typeRegistry, Set<String> provides, boolean isExtern) {
       this.typeRegistry = typeRegistry;
       this.provides = provides;
+      this.isExtern = isExtern;
     }
 
     private String getAbsoluteName(ObjectType objectType) {
@@ -697,7 +700,12 @@ public class DeclarationGenerator {
         }
 
         maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ true);
-        if (!ftype.isNominalConstructor()) {
+        // isNominalConstructor is a bit of misnomer, it returns true for all
+        // classes/interfaces that have = function() {}, even a structural interface
+        // defined with @record.
+        // In externs it is allowed to have interfaces without the dummy = function() {}, so the
+        // heuristic fails. For now assume that this rare pattern does not happen in externs.
+        if (!ftype.isNominalConstructor() && !isExtern) {
           // A top-level field that has a specific constructor function type.
           // <code>/** @type {function(new:X)} */ foo.x;</code>
           visitVarDeclaration(symbol, ftype);
