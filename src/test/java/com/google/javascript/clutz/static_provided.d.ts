@@ -5,8 +5,6 @@ declare namespace ಠ_ಠ.clutz.a.b {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.a.b.StaticHolder {
-}
 declare namespace ಠ_ಠ.clutz.goog {
   function require(name: 'a.b.StaticHolder'): typeof ಠ_ಠ.clutz.a.b.StaticHolder;
 }

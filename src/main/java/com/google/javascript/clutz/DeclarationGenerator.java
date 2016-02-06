@@ -341,7 +341,6 @@ public class DeclarationGenerator {
     TreeWalker treeWalker = new TreeWalker(compiler.getTypeRegistry(), provides, isExtern);
     if (isDefault) {
       if (isPrivate(symbol.getJSDocInfo())) {
-
         treeWalker.emitPrivateValue(symbol);
       } else {
         treeWalker.walk(symbol);
@@ -414,23 +413,15 @@ public class DeclarationGenerator {
       }
     }
     emitNamespaceEnd();
-    // An extra pass is required for default exported interfaces, because in Closure they might have
-    // static methods. TS does not support static methods on interfaces, thus we create a new
-    // namespace for them.
-    if (isDefault && isInterfaceWithStatic(symbol.getType())) {
-      declareNamespace(symbol.getName(), symbol, /* isDefault, prevents infinite recursion */ false,
-          provides, isExtern);
-    }
+
     // extra walk required for inner classes and inner enums. They are allowed in closure,
     // but not in TS, so we have to generate a namespace-class pair in TS.
     // In the case of the externs, however we *do* go through all symbols so this pass is not
     // needed.
     // In the case of aliased classes, we cannot emit inner classes, due to a var-namespace clash.
-    if (isDefault && !isExtern && hasNestedTypes(symbol.getType())
-         && !isAliasedClassOrInterface(symbol, symbol.getType())) {
-      emitNamespaceBegin(symbol.getName());
-      treeWalker.walkInnerSymbols((ObjectType) symbol.getType(), symbol.getName());
-      emitNamespaceEnd();
+    ObjectType otype = symbol.getType().toMaybeObjectType();
+    if (isDefault && !isExtern && otype != null && !isAliasedClassOrInterface(symbol, otype)) {
+      treeWalker.walkInnerSymbols(otype, symbol.getName());
     }
     return treeWalker.valueSymbolsWalked;
   }
@@ -455,18 +446,6 @@ public class DeclarationGenerator {
     return compiler.getTypeRegistry().getNativeType(OBJECT_TYPE).equals(type);
   }
 
-  private boolean hasNestedTypes(JSType type) {
-    if (!isClassLike(type)) return false;
-    FunctionType ftype = (FunctionType) type;
-    for (String name : ((FunctionType) type).getOwnPropertyNames()) {
-      JSType propType = ftype.getPropertyType(name);
-      if (isDefiningType(propType)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   /**
    * Returns true if {@code propType} is creating a new type in the TypeScript sense - i.e. it's a
    * constructor function (class or interface), enum, or typedef.
@@ -483,9 +462,10 @@ public class DeclarationGenerator {
   private boolean isClassLike(JSType propType) {
     // Confusingly, the typedef type returns true on isConstructor checks, so we need to filter
     // the NoType through this utility method.
-    return !isTypedef(propType) && propType.isConstructor()
+    return !isTypedef(propType) && (propType.isConstructor() || propType.isInterface())
         // "Function" is a constructor, but does not define a new type for our purposes.
-        && !propType.toMaybeObjectType().isNativeObjectType();
+        && !propType.toMaybeObjectType().isNativeObjectType()
+        && !propType.isFunctionPrototypeType();
   }
 
   // This indirection exists because the name in the Closure APIs is confusing.
@@ -542,12 +522,6 @@ public class DeclarationGenerator {
 
   private boolean isPrivate(@Nullable JSDocInfo docInfo) {
     return docInfo != null && docInfo.getVisibility() == Visibility.PRIVATE;
-  }
-
-  private boolean isInterfaceWithStatic(JSType type) {
-    if (!type.isInterface() || !type.isFunctionType()) return false;
-    FunctionType ftype = (FunctionType) type;
-    return any(ftype.getOwnPropertyNames(), not(equalTo("prototype")));
   }
 
   private void declareModule(String name, Boolean isDefault) {
@@ -683,19 +657,9 @@ public class DeclarationGenerator {
       if (type.isFunctionType()) {
         FunctionType ftype = (FunctionType) type;
 
-        // Closure represents top-level functions as classes because they might be new-able.
-        // This happens through externs es3.js which has Function marked as constructor.
-        // See https://github.com/angular/closure-to-dts/issues/90
-        boolean ordinaryFunctionAppearingAsClass =
-            ftype.isConstructor() && "Function".equals(ftype.getDisplayName());
-
-        if (ftype.isOrdinaryFunction() || ordinaryFunctionAppearingAsClass) {
+        if (isOrdinaryFunction(ftype)) {
           maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
-          emit("function");
-          emit(getUnqualifiedName(symbol));
-          visitFunctionDeclaration(ftype);
-          emit(";");
-          emitBreak();
+          visitFunctionExpression(getUnqualifiedName(symbol), ftype);
           return;
         }
 
@@ -708,7 +672,7 @@ public class DeclarationGenerator {
         if (!ftype.isNominalConstructor() && !isExtern) {
           // A top-level field that has a specific constructor function type.
           // <code>/** @type {function(new:X)} */ foo.x;</code>
-          visitVarDeclaration(symbol, ftype);
+          visitVarDeclaration(getUnqualifiedName(symbol), ftype);
           return;
         }
         // The class/interface symbol might be an alias for another symbol.
@@ -743,7 +707,7 @@ public class DeclarationGenerator {
             return;
           }
         }
-        visitVarDeclaration(symbol, type);
+        visitVarDeclaration(getUnqualifiedName(symbol), type);
       }
     }
 
@@ -879,9 +843,9 @@ public class DeclarationGenerator {
       }
     }
 
-    private void visitVarDeclaration(TypedVar symbol, JSType type) {
+    private void visitVarDeclaration(String name, JSType type) {
       emit("var");
-      emit(getUnqualifiedName(symbol));
+      emit(name);
       visitTypeDeclaration(type, false);
       emit(";");
       emitBreak();
@@ -1391,20 +1355,42 @@ public class DeclarationGenerator {
         }
       }
 
+      boolean foundNamespaceMembers = false;
       for (String propName : getSortedPublicPropertyNames(type)) {
         String qualifiedName = innerNamespace + '.' + propName;
         if (provides.contains(qualifiedName)) continue;
         JSType pType = type.getPropertyType(propName);
-
         if (pType.isEnumType()) {
+          if (!foundNamespaceMembers) { emitNamespaceBegin(innerNamespace); foundNamespaceMembers = true; }
           visitEnumType(propName, (EnumType) pType);
         } else if (isClassLike(pType)) {
+          if (!foundNamespaceMembers) { emitNamespaceBegin(innerNamespace); foundNamespaceMembers = true; }
           visitClassOrInterface(propName, (FunctionType) pType);
         } else if (isTypedef(pType)) {
+          if (!foundNamespaceMembers) { emitNamespaceBegin(innerNamespace); foundNamespaceMembers = true; }
           JSType registryType = typeRegistry.getType(qualifiedName);
           visitTypeAlias(registryType, propName);
+
+        // An extra pass is required for interfaces, because in Closure they might have
+        // static methods or fields. TS does not support static methods on interfaces, so we handle
+        // them here.
+        } else if (type.isInterface() && isOrdinaryFunction(pType)) {
+          if (!foundNamespaceMembers) { emitNamespaceBegin(innerNamespace); foundNamespaceMembers = true; }
+          visitFunctionExpression(propName, (FunctionType) pType);
+        } else if (type.isInterface() && !pType.isNoType() && !pType.isFunctionPrototypeType()) {
+          if (!foundNamespaceMembers) { emitNamespaceBegin(innerNamespace); foundNamespaceMembers = true; }
+          visitVarDeclaration(propName, pType);
         }
       }
+      if (foundNamespaceMembers) emitNamespaceEnd();
+    }
+
+    private void visitFunctionExpression(String propName, FunctionType ftype) {
+      emit("function");
+      emit(propName);
+      visitFunctionDeclaration(ftype);
+      emit(";");
+      emitBreak();
     }
 
     public void emitPrivateValue(TypedVar symbol) {
@@ -1553,6 +1539,15 @@ public class DeclarationGenerator {
         return null;
       }
     };
+  }
+
+  private boolean isOrdinaryFunction(JSType ftype) {
+    // Closure represents top-level functions as classes because they might be new-able.
+    // This happens through externs es3.js which has Function marked as constructor.
+    // See https://github.com/angular/closure-to-dts/issues/90
+    boolean ordinaryFunctionAppearingAsClass =
+        ftype.isConstructor() && "Function".equals(ftype.getDisplayName());
+    return ftype.isOrdinaryFunction() || ordinaryFunctionAppearingAsClass;
   }
 
   private boolean isAliasedClassOrInterface(TypedVar symbol, JSType type) {

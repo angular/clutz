@@ -20,8 +20,6 @@ declare namespace ಠ_ಠ.clutz.priv2 {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.priv2.PublicClass {
-}
 declare namespace ಠ_ಠ.clutz.goog {
   function require(name: 'priv2.PublicClass'): typeof ಠ_ಠ.clutz.priv2.PublicClass;
 }
