@@ -731,6 +731,7 @@ public class DeclarationGenerator {
         emit(";");
         emitBreak();
       }
+      typesUsed.add(ftype.getDisplayName());
     }
 
     private void maybeEmitJsDoc(JSDocInfo docs, boolean ignoreParams) {
