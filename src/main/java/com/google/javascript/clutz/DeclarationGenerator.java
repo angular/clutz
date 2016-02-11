@@ -2,9 +2,6 @@ package com.google.javascript.clutz;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.base.Predicates.equalTo;
-import static com.google.common.base.Predicates.not;
-import static com.google.common.collect.Iterables.any;
 import static com.google.javascript.rhino.jstype.JSTypeNative.ARRAY_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -59,7 +56,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -201,8 +197,11 @@ public class DeclarationGenerator {
       if (symbol == null) {
         // Sometimes goog.provide statements are used as pure markers for dependency management, or
         // the defined provides do not get a symbol because they don't have a proper type.
-        // Emit an empty namespace and declare an empty module providing that namespace.
-        emitNamespaceBegin(provide);
+        emitNamespaceBegin(getNamespace(provide));
+        emit("var");
+        emit(getUnqualifiedName(provide));
+        emit(": any;");
+        emitBreak();
         emitNamespaceEnd();
         declareModule(provide, true);
         continue;
@@ -217,7 +216,7 @@ public class DeclarationGenerator {
         emitBreak();
         continue;
       }
-      checkArgument(symbol.getType() != null, "all symbols should have a type: %s", provide);
+      // checkArgument(symbol.getType() != null, "all symbols should have a type: %s", provide);
       String namespace = provide;
       // These goog.provide's have only one symbol, so users expect to use default import
       boolean isDefault = isDefaultExport(symbol);
@@ -316,7 +315,9 @@ public class DeclarationGenerator {
   }
 
   private boolean isDefaultExport(TypedVar symbol) {
-    if (symbol.getType() == null) return false;
+    if (symbol.getType() == null) return true;
+    ObjectType otype = symbol.getType().toMaybeObjectType();
+    if (otype != null && otype.getOwnPropertyNames().size() == 0) return true;
     return !symbol.getType().isObject() ||
         symbol.getType().isInterface() ||
         symbol.getType().isInstanceType() ||
@@ -610,6 +611,21 @@ public class DeclarationGenerator {
     if (implicitProto == null) return null;
     return "Object".equals(implicitProto.getDisplayName()) ? null : implicitProto;
   }
+  private String getUnqualifiedName(TypedVar symbol) {
+    return getUnqualifiedName(symbol.getName());
+  }
+
+  private String getUnqualifiedName(String name) {
+    return lastDottedPart(name);
+  }
+
+  private String lastDottedPart(String input) {
+    int dotIdx = input.lastIndexOf('.');
+    if (dotIdx == -1) {
+      return input;
+    }
+    return input.substring(dotIdx + 1, input.length());
+  }
 
   private class TreeWalker {
     private final JSTypeRegistry typeRegistry;
@@ -633,22 +649,6 @@ public class DeclarationGenerator {
       // TODO(martinprobst): Consider aliasing all global symbols into the clutz namespace.
       if (name.indexOf('.') == -1) return name;
       return Constants.INTERNAL_NAMESPACE + "." + name;
-    }
-
-    private String getUnqualifiedName(TypedVar symbol) {
-      return getUnqualifiedName(symbol.getName());
-    }
-
-    private String getUnqualifiedName(String name) {
-      return lastPart(name);
-    }
-
-    private String lastPart(String input) {
-      int dotIdx = input.lastIndexOf('.');
-      if (dotIdx == -1) {
-        return input;
-      }
-      return input.substring(dotIdx + 1, input.length());
     }
 
     private void walk(TypedVar symbol) {
