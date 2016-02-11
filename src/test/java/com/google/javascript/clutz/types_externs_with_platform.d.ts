@@ -76,14 +76,14 @@ declare namespace ಠ_ಠ.clutz.namespace {
     member : string ;
     method (opt_exp ? : (a : ಠ_ಠ.clutz.namespace.Foo ) => any ) : any ;
   }
-  type atypedef = (a : string , b ? : { capacity : number } ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > ;
+  type atypedef = (a : string , b ? : { capacity ? : number } ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > ;
   function bootstrap (arg1 : Element | HTMLDocument , opt_arg2 ? : ( string | ( ( ...a : any [] ) => any ) ) [] ) : any ;
 }
 declare namespace ಠ_ಠ.clutz.namespace.atypedef {
   type get = (a : string ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > ;
 }
 declare namespace ಠ_ಠ.clutz.namespace.atypedef {
-  type Options = { capacity : number } ;
+  type Options = { capacity ? : number } ;
 }
 declare namespace ಠ_ಠ.clutz.namespace.atypedef {
   class Cache < T > extends Cache_Instance < T > {
@@ -92,14 +92,14 @@ declare namespace ಠ_ಠ.clutz.namespace.atypedef {
     private noStructuralTyping_: any;
     destroy ( ) : any ;
     get (key : string ) : T ;
-    info ( ) : { id : string , options : { capacity : number } , size : number } ;
+    info ( ) : { id : string , options : { capacity ? : number } , size : number } ;
     put (key : string , value : T ) : any ;
     remove (key : string ) : any ;
     removeAll ( ) : any ;
   }
 }
 declare namespace ಠ_ಠ.clutz.namespace.atypedef.Cache {
-  type Info = { id : string , options : { capacity : number } , size : number } ;
+  type Info = { id : string , options : { capacity ? : number } , size : number } ;
 }
 declare namespace ಠ_ಠ.clutz.namespace.subNamespace {
   var fieldA : string ;

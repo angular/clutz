@@ -24,6 +24,9 @@ types.functionAndUnion = null;
 /** @type {{a: string, b}} */
 types.recordType = {a: 'a', b: 34};
 
+/** @type {{a: string, optional: (string|undefined)}} */
+types.recordTypeOptional = {a: 'a'};
+
 /** @type {Object<number, string>} */
 types.j = {a: 'a'};
 

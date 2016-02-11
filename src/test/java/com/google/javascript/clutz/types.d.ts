@@ -16,6 +16,7 @@ declare namespace ಠ_ಠ.clutz.types {
   var inferredobj : Object ;
   var j : { [ n: number ]: string } ;
   var recordType : { a : string , b : any } ;
+  var recordTypeOptional : { a : string , optional ? : string } ;
 }
 declare namespace ಠ_ಠ.clutz.goog {
   function require(name: 'types'): typeof ಠ_ಠ.clutz.types;

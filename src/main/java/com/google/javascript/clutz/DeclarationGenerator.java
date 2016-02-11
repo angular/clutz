@@ -2,6 +2,7 @@ package com.google.javascript.clutz;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.Iterables.any;
 import static com.google.javascript.rhino.jstype.JSTypeNative.ARRAY_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -635,6 +636,16 @@ public class DeclarationGenerator {
     private int valueSymbolsWalked = 0;
     private final boolean isExtern;
 
+    /**
+     * The void type in closure contains only the undefined value.
+     */
+    private final Predicate<JSType> isVoidType = new Predicate<JSType>() {
+      @Override
+      public boolean apply(JSType type) {
+        return type.isVoidType();
+      }
+    };
+
     private TreeWalker(JSTypeRegistry typeRegistry, Set<String> provides, boolean isExtern) {
       this.typeRegistry = typeRegistry;
       this.provides = provides;
@@ -1147,6 +1158,10 @@ public class DeclarationGenerator {
       while (it.hasNext()) {
         String propName = it.next();
         emit(propName);
+        UnionType unionType = type.getPropertyType(propName).toMaybeUnionType();
+        if (unionType != null && any(unionType.getAlternates(), isVoidType)) {
+          emit("?");
+        }
         visitTypeDeclaration(type.getPropertyType(propName), false);
         if (it.hasNext()) {
           emit(",");
