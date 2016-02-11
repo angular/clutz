@@ -1089,14 +1089,10 @@ public class DeclarationGenerator {
       switch (type.getDisplayName()) {
         // Arguments<?> and NodeList<?> in es3 externs are correspondingly
         // IArguments and NodeList interfaces (not-parametrized) in lib.d.ts.
-        // New* are temporary work-arounds for upstream externs.
-        // TODO(rado): upgrade closure compiler and remove them.
         case "Arguments":
-        case "NewArguments":
           emit("IArguments");
           return null;
         case "NodeList":
-        case "NewNodeList":
           emit("NodeList");
           return null;
         case "IThenable":

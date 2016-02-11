@@ -11,9 +11,8 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
   }
   var a : { a : number } ;
   var b : IArguments ;
-  var c : NodeList | IArguments | { length : number } ;
+  var c : NodeList ;
   function elementMaybe ( ) : Element ;
-  function id (x : NodeList | IArguments | { length : number } ) : NodeList | IArguments | { length : number } ;
   var myScope : ಠ_ಠ.clutz.namespace.Foo ;
   function topLevelFunction ( ...a : any [] ) : any ;
 }
