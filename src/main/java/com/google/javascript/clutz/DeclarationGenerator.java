@@ -66,7 +66,8 @@ import javax.annotation.Nullable;
 public class DeclarationGenerator {
 
   static final String INSTANCE_CLASS_SUFFIX = "_Instance";
-  public static final Pattern GOOG_MODULE_EXTRACT = Pattern.compile("goog.module\\(['\"](.*)['\"]\\);");
+  public static final Pattern GOOG_MODULE_EXTRACT =
+      Pattern.compile("goog.module\\(['\"](.*)['\"]\\);");
 
   public static void main(String[] args) {
     Options options = null;
@@ -99,9 +100,11 @@ public class DeclarationGenerator {
           + "the referenced code missing dependencies or by missing externs in your build rule.");
 
   private static final Function<Node, String> NODE_GET_STRING = new Function<Node, String>() {
-    @Override public String apply(Node input) {
+    @Override
+    public String apply(Node input) {
       return input.getString();
-    }};
+    }
+  };
 
   private final Options opts;
   private final Compiler compiler;
@@ -109,8 +112,8 @@ public class DeclarationGenerator {
   private StringWriter out = new StringWriter();
   private final Set<String> privateEnums = new LinkedHashSet<>();
   /**
-   * Aggregates all emitted types, used in a final pass to find types emitted in type position
-   * but not declared, possibly due to missing goog.provides.
+   * Aggregates all emitted types, used in a final pass to find types emitted in type position but
+   * not declared, possibly due to missing goog.provides.
    */
   private final Set<String> typesUsed = new LinkedHashSet<>();
 
@@ -136,8 +139,8 @@ public class DeclarationGenerator {
     for (String extern : opts.externs) {
       externFiles.add(SourceFile.fromFile(extern, UTF_8));
     }
-    String result = generateDeclarations(sourceFiles, externFiles,
-        Depgraph.parseFrom(opts.readDepgraphs()));
+    String result =
+        generateDeclarations(sourceFiles, externFiles, Depgraph.parseFrom(opts.readDepgraphs()));
 
     if ("-".equals(opts.output)) {
       System.out.println(result);
@@ -182,12 +185,11 @@ public class DeclarationGenerator {
 
     for (CompilerInput compilerInput : compiler.getInputsById().values()) {
       transitiveProvides.addAll(compilerInput.getProvides());
-      if (depgraph.getRoots().isEmpty() ||
-          depgraph.getRoots().contains(compilerInput.getSourceFile().getOriginalPath())) {
+      if (depgraph.getRoots().isEmpty()
+          || depgraph.getRoots().contains(compilerInput.getSourceFile().getOriginalPath())) {
         provides.addAll(compilerInput.getProvides());
         emitComment(String.format("Processing provides %s from input %s",
-            compilerInput.getProvides(),
-            compilerInput.getSourceFile().getOriginalPath()));
+            compilerInput.getProvides(), compilerInput.getSourceFile().getOriginalPath()));
       }
     }
 
@@ -236,7 +238,7 @@ public class DeclarationGenerator {
     // In order to typecheck in the presence of third-party externs, emit all extern symbols.
     processExternSymbols();
 
-    processUnprovidedTypes(provides, compiler);
+    processUnprovidedTypes(provides);
 
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
@@ -247,11 +249,11 @@ public class DeclarationGenerator {
   }
 
   /**
-   * Closure does not require all types to be explicitly provided, if they are only used in
-   * type positions. However, our emit phases only emits goog.provided symbols and namespaces,
-   * so this extra pass is required, in order to have valid output.
+   * Closure does not require all types to be explicitly provided, if they are only used in type
+   * positions. However, our emit phases only emits goog.provided symbols and namespaces, so this
+   * extra pass is required, in order to have valid output.
    */
-  private void processUnprovidedTypes(Set<String> provides, Compiler compiler) {
+  private void processUnprovidedTypes(Set<String> provides) {
     // AFAIKT, there is no api for going from type to symbol, so iterate all symbols first.
     for (TypedVar symbol : compiler.getTopScope().getAllSymbols()) {
       String name = symbol.getName();
@@ -296,14 +298,16 @@ public class DeclarationGenerator {
         continue;
       }
       // * foo.bar is class-like and baz is a static field.
-      if (isStaticFieldOrMethod(symbol.getType()) && visitedClassLikes.contains(parentPath)) continue;
+      if (isStaticFieldOrMethod(symbol.getType()) && visitedClassLikes.contains(parentPath))
+        continue;
       // * foo is a class-like and foo.bar is a static field.
       if (visitedClassLikes.contains(getNamespace(parentPath))) continue;
 
       declareNamespace(isDefault ? parentPath : symbol.getName(), symbol, isDefault,
           noTransitiveProvides, true);
 
-      if (!isDefault && isLikelyNamespace(symbol.getType())) visitedNamespaces.add(symbol.getName());
+      if (!isDefault && isLikelyNamespace(symbol.getType()))
+        visitedNamespaces.add(symbol.getName());
       if (isDefault && isClassLike(symbol.getType())) visitedClassLikes.add(symbol.getName());
       // we do not declare modules or goog.require support, because externs types should not be
       // visible from TS code.
@@ -318,12 +322,9 @@ public class DeclarationGenerator {
     if (symbol.getType() == null) return true;
     ObjectType otype = symbol.getType().toMaybeObjectType();
     if (otype != null && otype.getOwnPropertyNames().size() == 0) return true;
-    return !symbol.getType().isObject() ||
-        symbol.getType().isInterface() ||
-        symbol.getType().isInstanceType() ||
-        symbol.getType().isEnumType() ||
-        symbol.getType().isFunctionType() ||
-        isTypedef(symbol.getType());
+    return !symbol.getType().isObject() || symbol.getType().isInterface()
+        || symbol.getType().isInstanceType() || symbol.getType().isEnumType()
+        || symbol.getType().isFunctionType() || isTypedef(symbol.getType());
   }
 
   // For platform externs we skip emitting .d.ts, to avoid collisions with lib.d.ts.
@@ -332,8 +333,8 @@ public class DeclarationGenerator {
   private boolean isPlatformExtern(String name) {
     name = name.replace("externs.zip//", "");
     // mostly matching what is in https://github.com/google/closure-compiler/tree/master/externs.
-    return Pattern.matches("javascript/externs/[^/]*.js", name) || name.startsWith("es") || name.startsWith("w3c")
-        || name.startsWith("ie_") || name.startsWith("browser");
+    return Pattern.matches("javascript/externs/[^/]*.js", name) || name.startsWith("es")
+        || name.startsWith("w3c") || name.startsWith("ie_") || name.startsWith("browser");
   }
 
   private int declareNamespace(String namespace, TypedVar symbol, boolean isDefault,
@@ -393,10 +394,11 @@ public class DeclarationGenerator {
       for (TypedVar other : allSymbols) {
         String otherName = other.getName();
         if (desiredSymbols.contains(otherName) && other.getType() != null
-            && !other.getType().isFunctionPrototypeType()
-            && !isPrototypeMethod(other)) {
-          // For safety we need to special case goog.require to return the empty interface by default
-          // For existing namespaces we emit a goog.require string override that has the proper type.
+            && !other.getType().isFunctionPrototypeType() && !isPrototypeMethod(other)) {
+          // For safety we need to special case goog.require to return the empty interface by
+          // default
+          // For existing namespaces we emit a goog.require string override that has the proper
+          // type.
           // See emitGoogRequireSupport method.
           if (otherName.equals("goog.require")) {
             emit("function require (name : string ) : " + Constants.INTERNAL_NAMESPACE
@@ -464,7 +466,7 @@ public class DeclarationGenerator {
     // Confusingly, the typedef type returns true on isConstructor checks, so we need to filter
     // the NoType through this utility method.
     return !isTypedef(propType) && (propType.isConstructor() || propType.isInterface())
-        // "Function" is a constructor, but does not define a new type for our purposes.
+    // "Function" is a constructor, but does not define a new type for our purposes.
         && !propType.toMaybeObjectType().isNativeObjectType()
         && !propType.isFunctionPrototypeType();
   }
@@ -910,7 +912,7 @@ public class DeclarationGenerator {
         emit(":");
         // From https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#a-grammar
         // ArrayType:
-        //   PrimaryType [no LineTerminator here] [ ]
+        // PrimaryType [no LineTerminator here] [ ]
         if (isVarArgs) {
           visitTypeAsPrimary(type);
         } else {
@@ -921,15 +923,12 @@ public class DeclarationGenerator {
     }
 
     /**
-     * Adds parentheses to turn a Type grammar production into a PrimaryType.
-     * See https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#a-grammar
+     * Adds parentheses to turn a Type grammar production into a PrimaryType. See
+     * https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#a-grammar
      *
      * Avoid adding extra parens where the type is already known to be Primary.
      *
-     * PrimaryType:
-     *   ParenthesizedType
-     * ParenthesizedType:
-     *   ( Type )
+     * PrimaryType: ParenthesizedType ParenthesizedType: ( Type )
      */
     private void visitTypeAsPrimary(JSType type) {
       // These types will produce a non-primary grammar production
@@ -1076,8 +1075,8 @@ public class DeclarationGenerator {
 
     private Void emitTemplatizedType(TemplatizedType type, boolean extendingInstanceClass) {
       ObjectType referencedType = type.getReferencedType();
-      String templateTypeName = extendingInstanceClass ?
-          getAbsoluteName(type) + INSTANCE_CLASS_SUFFIX : getAbsoluteName(type);
+      String templateTypeName = extendingInstanceClass
+          ? getAbsoluteName(type) + INSTANCE_CLASS_SUFFIX : getAbsoluteName(type);
       if (typeRegistry.getNativeType(ARRAY_TYPE).equals(referencedType)
           && type.getTemplateTypes().size() == 1) {
         // As per TS type grammar, array types require primary types.
@@ -1189,8 +1188,8 @@ public class DeclarationGenerator {
       Iterator<JSType> it = alts.iterator();
       while (it.hasNext()) {
         // See https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#a-grammar
-        // UnionType:
-        //   UnionOrIntersectionOrPrimaryType | IntersectionOrPrimaryType
+        // UnionType:
+        // UnionOrIntersectionOrPrimaryType | IntersectionOrPrimaryType
         visitTypeAsPrimary(it.next());
         if (it.hasNext()) {
           emit("|");
@@ -1204,13 +1203,13 @@ public class DeclarationGenerator {
       emitBreak();
       // Prevent accidental structural typing - emit every class with a private field.
       if (type.isNominalConstructor() && !type.isInterface()
-          // But only for non-extending classes (TypeScript doesn't like overriding private fields)
+      // But only for non-extending classes (TypeScript doesn't like overriding private fields)
           && getSuperType((FunctionType) type) == null) {
         emit("private noStructuralTyping_: any;");
         emitBreak();
       }
       // Constructors.
-      if (type.isConstructor() && ((FunctionType)type).getParameters().iterator().hasNext()) {
+      if (type.isConstructor() && ((FunctionType) type).getParameters().iterator().hasNext()) {
         maybeEmitJsDoc(type.getJSDocInfo(), /* ignoreParams */ false);
         emit("constructor");
         visitFunctionParameters((FunctionType) type, false);
@@ -1244,7 +1243,7 @@ public class DeclarationGenerator {
         if (skipNames.contains(propName)) continue;
 
         if ("prototype".equals(propName) || "superClass_".equals(propName)
-            // constructors are handled in #visitObjectType
+        // constructors are handled in #visitObjectType
             || "constructor".equals(propName)) {
           continue;
         }
@@ -1313,7 +1312,7 @@ public class DeclarationGenerator {
       Iterator<String> names = null;
       Node functionSource = ftype.getSource();
       if (functionSource != null) {
-        // functionSource AST:  FUNCTION -> (NAME, PARAM_LIST, BLOCK ...)
+        // functionSource AST: FUNCTION -> (NAME, PARAM_LIST, BLOCK ...)
         Iterable<Node> parameterNodes = functionSource.getFirstChild().getNext().children();
         names = Iterables.transform(parameterNodes, NODE_GET_STRING).iterator();
       }
@@ -1358,24 +1357,40 @@ public class DeclarationGenerator {
         if (provides.contains(qualifiedName)) continue;
         JSType pType = type.getPropertyType(propName);
         if (pType.isEnumType()) {
-          if (!foundNamespaceMembers) { emitNamespaceBegin(innerNamespace); foundNamespaceMembers = true; }
+          if (!foundNamespaceMembers) {
+            emitNamespaceBegin(innerNamespace);
+            foundNamespaceMembers = true;
+          }
           visitEnumType(propName, (EnumType) pType);
         } else if (isClassLike(pType)) {
-          if (!foundNamespaceMembers) { emitNamespaceBegin(innerNamespace); foundNamespaceMembers = true; }
+          if (!foundNamespaceMembers) {
+            emitNamespaceBegin(innerNamespace);
+            foundNamespaceMembers = true;
+          }
           visitClassOrInterface(propName, (FunctionType) pType);
         } else if (isTypedef(pType)) {
-          if (!foundNamespaceMembers) { emitNamespaceBegin(innerNamespace); foundNamespaceMembers = true; }
+          if (!foundNamespaceMembers) {
+            emitNamespaceBegin(innerNamespace);
+            foundNamespaceMembers = true;
+          }
           JSType registryType = typeRegistry.getType(qualifiedName);
           visitTypeAlias(registryType, propName);
 
-        // An extra pass is required for interfaces, because in Closure they might have
-        // static methods or fields. TS does not support static methods on interfaces, so we handle
-        // them here.
+          // An extra pass is required for interfaces, because in Closure they might have
+          // static methods or fields. TS does not support static methods on interfaces, so we
+          // handle
+          // them here.
         } else if (type.isInterface() && isOrdinaryFunction(pType)) {
-          if (!foundNamespaceMembers) { emitNamespaceBegin(innerNamespace); foundNamespaceMembers = true; }
+          if (!foundNamespaceMembers) {
+            emitNamespaceBegin(innerNamespace);
+            foundNamespaceMembers = true;
+          }
           visitFunctionExpression(propName, (FunctionType) pType);
         } else if (type.isInterface() && !pType.isNoType() && !pType.isFunctionPrototypeType()) {
-          if (!foundNamespaceMembers) { emitNamespaceBegin(innerNamespace); foundNamespaceMembers = true; }
+          if (!foundNamespaceMembers) {
+            emitNamespaceBegin(innerNamespace);
+            foundNamespaceMembers = true;
+          }
           visitVarDeclaration(propName, pType);
         }
       }
@@ -1423,8 +1438,7 @@ public class DeclarationGenerator {
           emit("any");
           return null;
         }
-        emit(extendingInstanceClass ?
-            name + INSTANCE_CLASS_SUFFIX : name);
+        emit(extendingInstanceClass ? name + INSTANCE_CLASS_SUFFIX : name);
         if (!type.getDisplayName().equals("Object")) {
           typesUsed.add(type.getDisplayName());
         }
@@ -1435,11 +1449,10 @@ public class DeclarationGenerator {
     }
 
     /**
-     * A type visitor used for types in Foo extends <...> and Foo implements <...> positions.
-     * Unlike the type visitor for a generic type declaration (i.e. var a: <...>), this visitor
-     * only emits symbols that are valid in an extends/implements position.
-     * For example:
-     *     'class A extends () => any' is invalid, even though () => any is a valid type.
+     * A type visitor used for types in Foo extends <...> and Foo implements <...> positions. Unlike
+     * the type visitor for a generic type declaration (i.e. var a: <...>), this visitor only emits
+     * symbols that are valid in an extends/implements position. For example: 'class A extends () =>
+     * any' is invalid, even though () => any is a valid type.
      */
     class ExtendsImplementsTypeVisitor implements Visitor<Void> {
       final boolean emitInstanceForObject;
@@ -1535,7 +1548,7 @@ public class DeclarationGenerator {
         emit("Function");
         return null;
       }
-    };
+    }
   }
 
   private boolean isOrdinaryFunction(JSType ftype) {
@@ -1559,20 +1572,5 @@ public class DeclarationGenerator {
 
   private boolean isDefinedInPlatformExterns(ObjectType type) {
     return isPlatformExtern(type.getConstructor().getSource().getSourceFileName());
-  }
-
-  private String getSource(FunctionType ftype) {
-    Node source = ftype.getSource();
-    InputId id = source.getInputId();
-    while (id == null) {
-      source = source.getParent();
-      id = source.getInputId();
-    }
-    try {
-      return compiler.getInput(id).getCode();
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to read input while processing type for "
-          + ftype.getDisplayName(), e);
-    }
   }
 }
