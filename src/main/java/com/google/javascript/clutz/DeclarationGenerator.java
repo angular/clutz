@@ -111,6 +111,7 @@ public class DeclarationGenerator {
   private final ClutzErrorManager errorManager;
   private StringWriter out = new StringWriter();
   private final Set<String> privateEnums = new LinkedHashSet<>();
+
   /**
    * Aggregates all emitted types, used in a final pass to find types emitted in type position but
    * not declared, possibly due to missing goog.provides.
@@ -254,19 +255,34 @@ public class DeclarationGenerator {
    * extra pass is required, in order to have valid output.
    */
   private void processUnprovidedTypes(Set<String> provides) {
-    // AFAIKT, there is no api for going from type to symbol, so iterate all symbols first.
-    for (TypedVar symbol : compiler.getTopScope().getAllSymbols()) {
-      String name = symbol.getName();
-      // skip unused symbols.
-      if (!typesUsed.contains(name)) continue;
-      // skip provided symbols (as default or in an namespace).
-      if (provides.contains(name) || provides.contains(getNamespace(name))) continue;
+    /**
+     * A new set of types can be discovered while visiting unprovided types.
+     * To prevent an infinite loop in a pathological case, limit to a number of passes.
+     * TODO(rado): investigate https://github.com/angular/clutz/pull/246 and removing this pass
+     * altogether.
+     */
+    int maxTypeUsedDepth = 5;
+    Set<String> typesEmitted = new LinkedHashSet<>();
+    while (maxTypeUsedDepth > 0) {
+      int typesUsedCount = typesUsed.size();
+      // AFAIKT, there is no api for going from type to symbol, so iterate all symbols first.
+      for (TypedVar symbol : compiler.getTopScope().getAllSymbols()) {
+        String name = symbol.getName();
+        // skip unused symbols, or already emitted.
+        if (!typesUsed.contains(name) || typesEmitted.contains(name)) continue;
+        // skip provided symbols (as default or in an namespace).
+        if (provides.contains(name) || provides.contains(getNamespace(name))) continue;
 
-      // skip extern symbols (they have a separate pass).
-      CompilerInput symbolInput = this.compiler.getInput(new InputId(symbol.getInputName()));
-      if (symbolInput != null && symbolInput.isExtern()) continue;
-      declareNamespace(getNamespace(name), symbol, /* isDefault */ true,
-          Collections.<String>emptySet(), /* isExtern */ false);
+        // skip extern symbols (they have a separate pass).
+        CompilerInput symbolInput = this.compiler.getInput(new InputId(symbol.getInputName()));
+        if (symbolInput != null && symbolInput.isExtern()) continue;
+        declareNamespace(getNamespace(name), symbol, /* isDefault */ true,
+            Collections.<String>emptySet(), /* isExtern */ false);
+        typesEmitted.add(name);
+      }
+      // if no new types seen, safely break out.
+      if (typesUsed.size() == typesUsedCount) break;
+      maxTypeUsedDepth--;
     }
   }
 
@@ -1107,6 +1123,7 @@ public class DeclarationGenerator {
         // In Closure, subtypes of `TemplatizedType`s that do not take type arguments are still
         // represented by templatized types.
         emit(templateTypeName);
+        typesUsed.add(type.getDisplayName());
         return null;
       }
       Iterator<JSType> it = type.getTemplateTypes().iterator();
