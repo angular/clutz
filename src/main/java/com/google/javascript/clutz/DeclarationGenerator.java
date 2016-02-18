@@ -1002,7 +1002,7 @@ public class DeclarationGenerator {
 
         @Override
         public Void caseObjectType(ObjectType type) {
-          return emitObjectType(type, false);
+          return emitObjectType(type, false, false);
         }
 
 
@@ -1020,7 +1020,7 @@ public class DeclarationGenerator {
 
         @Override
         public Void caseTemplatizedType(TemplatizedType type) {
-          return emitTemplatizedType(type, false);
+          return emitTemplatizedType(type, false, false);
         }
 
         @Override
@@ -1100,7 +1100,8 @@ public class DeclarationGenerator {
       }
     }
 
-    private Void emitTemplatizedType(TemplatizedType type, boolean extendingInstanceClass) {
+    private Void emitTemplatizedType(TemplatizedType type, boolean extendingInstanceClass,
+                                     boolean inImplementsExtendsPosition) {
       ObjectType referencedType = type.getReferencedType();
       String templateTypeName = extendingInstanceClass
           ? getAbsoluteName(type) + INSTANCE_CLASS_SUFFIX : getAbsoluteName(type);
@@ -1108,8 +1109,11 @@ public class DeclarationGenerator {
           && type.getTemplateTypes().size() == 1) {
         // As per TS type grammar, array types require primary types.
         // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#a-grammar
+        if (inImplementsExtendsPosition) {
+          emit("Array<");
+        }
         visitTypeAsPrimary(type.getTemplateTypes().get(0));
-        emit("[]");
+        emit(inImplementsExtendsPosition ? ">" : "[]");
         return null;
       }
       switch (type.getDisplayName()) {
@@ -1445,7 +1449,8 @@ public class DeclarationGenerator {
       emitBreak();
     }
 
-    public Void emitObjectType(ObjectType type, boolean extendingInstanceClass) {
+    public Void emitObjectType(ObjectType type, boolean extendingInstanceClass,
+                               boolean inExtendsImplementsPosition) {
       if (type.getDisplayName() != null && type.getDisplayName().equals("Error")) {
         // global Error is aliased as GlobalError in closure.lib.d.ts.
         emit("GlobalError");
@@ -1454,7 +1459,8 @@ public class DeclarationGenerator {
       // Closure doesn't require that all the type params be declared, but TS does
       if (!type.getTemplateTypeMap().isEmpty()
           && !typeRegistry.getNativeType(OBJECT_TYPE).equals(type)) {
-        return emitTemplatizedType(typeRegistry.createTemplatizedType(type), false);
+        return emitTemplatizedType(typeRegistry.createTemplatizedType(type), false,
+            inExtendsImplementsPosition);
       }
       if (type.isRecordType()) {
         visitRecordType((RecordType) type);
@@ -1495,7 +1501,7 @@ public class DeclarationGenerator {
 
       @Override
       public Void caseObjectType(ObjectType type) {
-        emitObjectType(type, emitInstanceForObject);
+        emitObjectType(type, emitInstanceForObject, true);
         return null;
       }
 
@@ -1541,7 +1547,7 @@ public class DeclarationGenerator {
 
       @Override
       public Void caseTemplatizedType(TemplatizedType type) {
-        emitTemplatizedType(type, emitInstanceForObject);
+        emitTemplatizedType(type, emitInstanceForObject, true);
         return null;
       }
 
@@ -1603,6 +1609,7 @@ public class DeclarationGenerator {
   }
 
   private boolean isDefinedInPlatformExterns(ObjectType type) {
+    if (type.getConstructor() == null || type.getConstructor().getSource() == null) return false;
     return isPlatformExtern(type.getConstructor().getSource().getSourceFileName());
   }
 }
