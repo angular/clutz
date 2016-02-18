@@ -281,12 +281,11 @@ public class DeclarationGenerator {
       if (symbolInput == null || !symbolInput.isExtern() || symbol.getType() == null) {
         continue;
       }
-      if (isPlatformExtern(symbolInput.getName())) {
-        continue;
-      }
       // Closure treats all prototypes as separate symbols, but we handle them in conjunction with
       // parent symbol.
       if (symbol.getName().contains(".prototype")) continue;
+      // For is a reserved word.
+      if (symbol.getName().equals("Symbol.for")) continue;
 
       String parentPath = getNamespace(symbol.getName());
       boolean isDefault = isDefaultExport(symbol);
@@ -299,7 +298,7 @@ public class DeclarationGenerator {
         continue;
       }
       // * foo.bar is class-like and baz is a static field.
-      if (isStaticFieldOrMethod(symbol.getType()) && visitedClassLikes.contains(parentPath))
+      if (isStaticFieldOrMethod(symbol.getType()) || symbol.getName().equals("Object") && visitedClassLikes.contains(parentPath))
         continue;
       // * foo is a class-like and foo.bar is a static field.
       if (visitedClassLikes.contains(getNamespace(parentPath))) continue;
@@ -316,7 +315,7 @@ public class DeclarationGenerator {
   }
 
   private boolean isStaticFieldOrMethod(JSType type) {
-    return !isClassLike(type) && !isTypedef(type);
+    return !isClassLike(type) && !isTypedef(type) && !type.isEnumType();
   }
 
   private boolean isDefaultExport(TypedVar symbol) {
@@ -326,16 +325,6 @@ public class DeclarationGenerator {
     return !symbol.getType().isObject() || symbol.getType().isInterface()
         || symbol.getType().isInstanceType() || symbol.getType().isEnumType()
         || symbol.getType().isFunctionType() || isTypedef(symbol.getType());
-  }
-
-  // For platform externs we skip emitting .d.ts, to avoid collisions with lib.d.ts.
-  // TODO(rado): Platform is too ill-defined, and this often filters too much.
-  // Replace with a list of externs that *only* contain symbols in lib.d.ts.
-  private boolean isPlatformExtern(String name) {
-    name = name.replace("externs.zip//", "");
-    // mostly matching what is in https://github.com/google/closure-compiler/tree/master/externs.
-    return Pattern.matches("javascript/externs/[^/]*.js", name) || name.startsWith("es")
-        || name.startsWith("w3c") || name.startsWith("ie_") || name.startsWith("browser");
   }
 
   private int declareNamespace(String namespace, TypedVar symbol, boolean isDefault,
@@ -681,8 +670,11 @@ public class DeclarationGenerator {
         // classes/interfaces that have = function() {}, even a structural interface
         // defined with @record.
         // In externs it is allowed to have interfaces without the dummy = function() {}, so the
-        // heuristic fails. For now assume that this rare pattern does not happen in externs.
-        if (!ftype.isNominalConstructor() && !isExtern) {
+        // heuristic fails.
+        // This rare pattern occurs only twice in closure externs, so use a white-list for now.
+        // TODO(rado): find a more robust way to detect.
+        if (!ftype.isNominalConstructor() && !isExtern ||
+            knownExternSymbolOfConstructorFunctionType(symbol.getName())) {
           // A top-level field that has a specific constructor function type.
           // <code>/** @type {function(new:X)} */ foo.x;</code>
           visitVarDeclaration(getUnqualifiedName(symbol), ftype);
@@ -722,6 +714,11 @@ public class DeclarationGenerator {
         }
         visitVarDeclaration(getUnqualifiedName(symbol), type);
       }
+    }
+
+    private boolean knownExternSymbolOfConstructorFunctionType(String name) {
+      return name.equals("webkitMediaStream") || name.equals("ActiveXObject")
+          || name.equals("webkitRTCPeerConnection");
     }
 
     private void visitClassOrInterfaceAlias(String unqualifiedName, FunctionType ftype) {
@@ -827,8 +824,7 @@ public class DeclarationGenerator {
           // TypeScript does not allow public APIs that expose non-exported/private types.
           emit(Constants.INTERNAL_NAMESPACE + ".PrivateClass");
         } else {
-          Visitor<Void> visitor = new ExtendsImplementsTypeVisitor(
-              emitInstance && !isDefinedInPlatformExterns(superType));
+          Visitor<Void> visitor = new ExtendsImplementsTypeVisitor(emitInstance);
           superType.visit(visitor);
         }
       }
@@ -866,11 +862,15 @@ public class DeclarationGenerator {
     }
 
     private void visitTemplateTypes(ObjectType type) {
+      // Closure's Object type is templatized
+      if (type.getDisplayName() != null && type.getDisplayName().equals("Object")) return;
       if (type.hasAnyTemplateTypes() && !type.getTemplateTypeMap().isEmpty()) {
         emit("<");
         Iterator<TemplateType> it = type.getTemplateTypeMap().getTemplateKeys().iterator();
         while (it.hasNext()) {
-          emit(it.next().getDisplayName());
+          // For unknown reason, IObject attaches its name to the type vars, which results in
+          // incorrect TS name.
+          emit(it.next().getDisplayName().replace("IObject#", ""));
           if (it.hasNext()) {
             emit(",");
           }
@@ -1096,24 +1096,7 @@ public class DeclarationGenerator {
         emit("[]");
         return null;
       }
-      switch (type.getDisplayName()) {
-        // Arguments<?> and NodeList<?> in es3 externs are correspondingly
-        // IArguments and NodeList interfaces (not-parametrized) in lib.d.ts.
-        case "Arguments":
-          emit("IArguments");
-          return null;
-        case "NodeList":
-          emit("NodeList");
-          return null;
-        case "IThenable":
-          templateTypeName = "PromiseLike";
-          break;
-        case "IArrayLike":
-          templateTypeName = "ArrayLike";
-          break;
-        default:
-          break;
-      }
+
       if (type.getTemplateTypes().isEmpty()) {
         // In Closure, subtypes of `TemplatizedType`s that do not take type arguments are still
         // represented by templatized types.
@@ -1285,13 +1268,22 @@ public class DeclarationGenerator {
     private void emitProperty(String propName, JSType propertyType, boolean isStatic) {
       if (isStatic) emit("static");
       emit(propName);
-      if (propertyType.isFunctionType()) {
+      if (propertyType.isFunctionType() && !visitFunctionAsField(propName)) {
         visitFunctionDeclaration((FunctionType) propertyType);
       } else {
         visitTypeDeclaration(propertyType, false);
       }
       emit(";");
       emitBreak();
+    }
+
+    private boolean visitFunctionAsField(String propName) {
+      // TODO(rado): replace this quick-and-dirty solution for getting the externs to clutz
+      // with proper strategy as outlined in issue #199.
+      return propName.equals("initUIEvent") || propName.equals("close")
+          || propName.equals("open") || propName.equals("") || propName.equals("createTreeWalker")
+          || propName.equals("loadXML") || propName.equals("load")
+          || propName.equals("initMessageEvent") || propName.equals("ref");
     }
 
     private void visitFunctionDeclaration(FunctionType ftype) {
@@ -1331,7 +1323,7 @@ public class DeclarationGenerator {
         Iterable<Node> parameterNodes = functionSource.getFirstChild().getNext().children();
         names = Iterables.transform(parameterNodes, NODE_GET_STRING).iterator();
       }
-      char pName = 'a'; // let's hope for no more than 26 parameters...
+      char pName = 'a'; // let's hope for no more than 52 parameters...
       while (parameters.hasNext()) {
         Node param = parameters.next();
         if (param.isVarArgs()) {
@@ -1340,7 +1332,12 @@ public class DeclarationGenerator {
         if (names != null && names.hasNext()) {
           emitNoSpace(names.next());
         } else {
-          emitNoSpace("" + pName++);
+          emitNoSpace("" + pName);
+          if (pName == 'z') {
+            pName = 'A';
+          } else {
+            pName++;
+          }
         }
         if (param.isOptionalArg()) {
           emit("?");
@@ -1585,7 +1582,4 @@ public class DeclarationGenerator {
         + " to avoid collision with existing one in lib.d.ts. */");
   }
 
-  private boolean isDefinedInPlatformExterns(ObjectType type) {
-    return isPlatformExtern(type.getConstructor().getSource().getSourceFileName());
-  }
 }

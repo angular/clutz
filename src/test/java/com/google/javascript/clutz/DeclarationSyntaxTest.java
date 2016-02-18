@@ -36,32 +36,23 @@ public class DeclarationSyntaxTest {
   }
 
   @Test
-  public void testDeclarationSyntax() throws Exception {
+  public void testDeclarationUsage() throws Exception {
     // This currently runs *all* test files as one test case. This gives less insight into errors,
     // but improves runtime as TypeScript only has to read its lib.d.ts once, amortizing the cost
     // across test cases.
-    List<File> inputs = DeclarationGeneratorTests.getTestInputFiles(JS_NO_EXTERNS);
-    List<String> goldenFilePaths = new ArrayList<>();
-    for (File input : inputs) {
-      goldenFilePaths.add(DeclarationGeneratorTests.getGoldenFile(input).getPath());
-    }
-
-    final List<String> tscCommand =
-        Lists.newArrayList(TSC.toString(), "--noEmit", "--skipDefaultLibCheck", "--noImplicitAny");
-    tscCommand.add("src/resources/closure.lib.d.ts");
-    tscCommand.addAll(goldenFilePaths);
-    runChecked(tscCommand);
-  }
-
-  @Test
-  public void testDeclarationUsage() throws Exception {
     List<File> inputs = DeclarationGeneratorTests.getTestInputFiles(TS_SOURCES);
     final List<String> tscCommand =
         Lists.newArrayList(TSC.toString(), "--noEmit", "--skipDefaultLibCheck", "--noImplicitAny",
             "-m", "commonjs");
     tscCommand.add("src/resources/closure.lib.d.ts");
     for (File input : inputs) {
-      tscCommand.add(input.getPath());
+      // Since we bundle the .d.ts files only a single _with_platform.d.ts can be added without
+      // hitting symbol collisions.
+      // TODO(rado): Create separate tests for each _with_platform test.
+      if (!input.getName().contains("with_platform") ||
+          input.getName().endsWith("types_externs_with_platform.d.ts")) {
+        tscCommand.add(input.getPath());
+      }
     }
     runChecked(tscCommand);
   }
