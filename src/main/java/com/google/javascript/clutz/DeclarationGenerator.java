@@ -412,6 +412,10 @@ public class DeclarationGenerator {
         String otherName = other.getName();
         if (desiredSymbols.contains(otherName) && other.getType() != null
             && !other.getType().isFunctionPrototypeType() && !isPrototypeMethod(other)) {
+          if (!isValidJSProperty(getUnqualifiedName(other))) {
+            emitComment("skipping property " + otherName + "because it is not a valid symbol.");
+            continue;
+          }
           // For safety we need to special case goog.require to return the empty interface by
           // default
           // For existing namespaces we emit a goog.require string override that has the proper
@@ -444,6 +448,12 @@ public class DeclarationGenerator {
       treeWalker.walkInnerSymbols(otype, symbol.getName());
     }
     return treeWalker.valueSymbolsWalked;
+  }
+
+  private boolean isValidJSProperty(String name) {
+    // Ignoring Unicode symbols for now.
+    // see: http://stackoverflow.com/questions/2008279/validate-a-javascript-function-name
+    return Pattern.matches("^[$a-zA-Z_][0-9a-zA-Z_$]*$", name);
   }
 
   // Due to lack of precise definition of a namespace, we look for object types that are not of any
@@ -630,6 +640,7 @@ public class DeclarationGenerator {
     if (implicitProto == null) return null;
     return "Object".equals(implicitProto.getDisplayName()) ? null : implicitProto;
   }
+
   private String getUnqualifiedName(TypedVar symbol) {
     return getUnqualifiedName(symbol.getName());
   }
