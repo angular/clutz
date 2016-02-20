@@ -304,6 +304,9 @@ public class DeclarationGenerator {
       // parent symbol.
       if (symbol.getName().contains(".prototype")) continue;
 
+      // Sub-parts of namespaces in externs can appear as unknown if they miss a @const.
+      if (symbol.getType().isUnknownType()) continue;
+
       String parentPath = getNamespace(symbol.getName());
       boolean isDefault = isDefaultExport(symbol);
 
