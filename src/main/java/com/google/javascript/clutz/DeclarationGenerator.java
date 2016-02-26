@@ -181,7 +181,7 @@ public class DeclarationGenerator {
 
   public String produceDts(Depgraph depgraph) {
     // Tree sets for consistent order.
-    Set<String> provides = new TreeSet<>();
+    TreeSet<String> provides = new TreeSet<>();
     Set<String> transitiveProvides = new TreeSet<>();
     out = new StringWriter();
 
@@ -195,19 +195,25 @@ public class DeclarationGenerator {
       }
     }
 
+    Set<String> shadowedProvides = getShadowedProvides(provides);
+
     TypedScope topScope = compiler.getTopScope();
     for (String provide : provides) {
       TypedVar symbol = topScope.getOwnSlot(provide);
+      String emitName = provide;
+      if (needsAlias(shadowedProvides, provide, symbol)) {
+        emitName += Constants.SYMBOL_ALIAS_POSTFIX;
+      }
       if (symbol == null) {
         // Sometimes goog.provide statements are used as pure markers for dependency management, or
         // the defined provides do not get a symbol because they don't have a proper type.
-        emitNamespaceBegin(getNamespace(provide));
+        emitNamespaceBegin(getNamespace(emitName));
         emit("var");
-        emit(getUnqualifiedName(provide));
+        emit(getUnqualifiedName(emitName));
         emit(": any;");
         emitBreak();
         emitNamespaceEnd();
-        declareModule(provide, true);
+        declareModule(provide, true, emitName);
         continue;
       }
       // ArrayLike is defined in lib.d.ts, so we skip any type alias that
@@ -222,20 +228,21 @@ public class DeclarationGenerator {
       }
       // checkArgument(symbol.getType() != null, "all symbols should have a type: %s", provide);
       String namespace = provide;
-      // These goog.provide's have only one symbol, so users expect to use default import
       boolean isDefault = isDefaultExport(symbol);
+      // These goog.provide's have only one symbol, so users expect to use default import
       if (isDefault) {
         namespace = getNamespace(symbol.getName());
       }
       int valueSymbolsWalked =
-          declareNamespace(namespace, symbol, isDefault, transitiveProvides, false);
+          declareNamespace(namespace, symbol, emitName, isDefault, transitiveProvides, false);
 
       // skip emitting goog.require declarations for value empty namespaces, as calling typeof
       // does not work for them.
       if (valueSymbolsWalked > 0) {
-        emitGoogRequireSupport(namespace, isDefault ? symbol.getName() : namespace);
+        emitGoogRequireSupport(namespace, isDefault ? symbol.getName() : namespace,
+            isDefault ? emitName : namespace);
       }
-      declareModule(provide, isDefault);
+      declareModule(provide, isDefault, emitName);
     }
     // In order to typecheck in the presence of third-party externs, emit all extern symbols.
     processExternSymbols();
@@ -244,6 +251,16 @@ public class DeclarationGenerator {
 
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
+  }
+
+  private Set<String> getShadowedProvides(TreeSet<String> provides) {
+    Set<String> shadowedProvides = new TreeSet<>();
+    for (String provide : provides) {
+      if (!provides.subSet(provide + ".", provide + "\uFFFF").isEmpty()) {
+        shadowedProvides.add(provide);
+      }
+    }
+    return shadowedProvides;
   }
 
   private boolean isArrayLike(TypedVar symbol) {
@@ -277,7 +294,7 @@ public class DeclarationGenerator {
         // skip extern symbols (they have a separate pass).
         CompilerInput symbolInput = this.compiler.getInput(new InputId(symbol.getInputName()));
         if (symbolInput != null && symbolInput.isExtern()) continue;
-        declareNamespace(getNamespace(name), symbol, /* isDefault */ true,
+        declareNamespace(getNamespace(name), symbol, name, /* isDefault */ true,
             Collections.<String>emptySet(), /* isExtern */ false);
         typesEmitted.add(name);
       }
@@ -289,8 +306,11 @@ public class DeclarationGenerator {
 
   private void processExternSymbols() {
     Set<String> noTransitiveProvides = Collections.emptySet();
-    LinkedHashSet<String> visitedNamespaces = new LinkedHashSet<>();
-    LinkedHashSet<String> visitedClassLikes = new LinkedHashSet<>();
+    Set<String> visitedNamespaces = new TreeSet<>();
+    Set<String> visitedClassLikes = new TreeSet<>();
+
+    List<TypedVar> externSymbols = new ArrayList<>();
+    TreeSet<String> externSymbolNames = new TreeSet<>();
 
     for (TypedVar symbol : compiler.getTopScope().getAllSymbols()) {
       CompilerInput symbolInput = compiler.getInput(new InputId(symbol.getInputName()));
@@ -306,12 +326,22 @@ public class DeclarationGenerator {
 
       // Sub-parts of namespaces in externs can appear as unknown if they miss a @const.
       if (symbol.getType().isUnknownType()) continue;
+      externSymbols.add(symbol);
+      externSymbolNames.add(symbol.getName());
+    }
 
+    Set<String> shadowedSymbols = getShadowedProvides(externSymbolNames);
+
+    for (TypedVar symbol : externSymbols) {
       String parentPath = getNamespace(symbol.getName());
       boolean isDefault = isDefaultExport(symbol);
+      String emitName = symbol.getName();
+      if (needsAlias(shadowedSymbols, symbol.getName(), symbol)) {
+        emitName += Constants.SYMBOL_ALIAS_POSTFIX;
+      }
 
       // skip foo.bar.baz in the following three cases:
-      // * foo.bar is namespace
+      // * foo.bar is namespacesub
       if (visitedNamespaces.contains(parentPath)) {
         // Note that this class has been visited before continuing.
         if (isDefault && isClassLike(symbol.getType())) visitedClassLikes.add(symbol.getName());
@@ -323,7 +353,7 @@ public class DeclarationGenerator {
       // * foo is a class-like and foo.bar is a static field.
       if (visitedClassLikes.contains(getNamespace(parentPath))) continue;
 
-      declareNamespace(isDefault ? parentPath : symbol.getName(), symbol, isDefault,
+      declareNamespace(isDefault ? parentPath : symbol.getName(), symbol, emitName, isDefault,
           noTransitiveProvides, true);
 
       if (!isDefault && isLikelyNamespace(symbol.getType()))
@@ -332,6 +362,21 @@ public class DeclarationGenerator {
       // we do not declare modules or goog.require support, because externs types should not be
       // visible from TS code.
     }
+  }
+
+  private boolean needsAlias(Set<String> shadowedSymbols, String provide, TypedVar symbol) {
+    if (!shadowedSymbols.contains(provide)) return false;
+    // Emit var foo : any for provided but not declared symbols.
+    if (symbol == null) return true;
+    JSType type = symbol.getType();
+    // Emit var foo : PrivateType for private symbols.
+    if (isPrivate(type.getJSDocInfo())) return true;
+    // Only var declarations have collisions, while class, interface, and functions can coexist with
+    // namespaces.
+    if (type != null && (type.isInterface() || type.isConstructor() || type.isFunctionType())) {
+      return false;
+    }
+    return isDefaultExport(symbol);
   }
 
   private boolean isStaticFieldOrMethod(JSType type) {
@@ -357,15 +402,15 @@ public class DeclarationGenerator {
         || name.startsWith("w3c") || name.startsWith("ie_") || name.startsWith("browser");
   }
 
-  private int declareNamespace(String namespace, TypedVar symbol, boolean isDefault,
-      Set<String> provides, boolean isExtern) {
+  private int declareNamespace(String namespace, TypedVar symbol, String emitName, boolean isDefault,
+                               Set<String> provides, boolean isExtern) {
     emitNamespaceBegin(namespace);
     TreeWalker treeWalker = new TreeWalker(compiler.getTypeRegistry(), provides, isExtern);
     if (isDefault) {
       if (isPrivate(symbol.getJSDocInfo())) {
-        treeWalker.emitPrivateValue(symbol);
+        treeWalker.emitPrivateValue(emitName);
       } else {
-        treeWalker.walk(symbol);
+        treeWalker.walk(symbol, emitName);
       }
     } else {
       // JSCompiler treats "foo.x" as one variable name, so collect all provides that start with
@@ -411,12 +456,12 @@ public class DeclarationGenerator {
         }
       }
 
-      for (TypedVar other : allSymbols) {
-        String otherName = other.getName();
-        if (desiredSymbols.contains(otherName) && other.getType() != null
-            && !other.getType().isFunctionPrototypeType() && !isPrototypeMethod(other)) {
-          if (!isValidJSProperty(getUnqualifiedName(other))) {
-            emitComment("skipping property " + otherName + "because it is not a valid symbol.");
+      for (TypedVar propertySymbol : allSymbols) {
+        String propertyName = propertySymbol.getName();
+        if (desiredSymbols.contains(propertyName) && propertySymbol.getType() != null
+            && !propertySymbol.getType().isFunctionPrototypeType() && !isPrototypeMethod(propertySymbol)) {
+          if (!isValidJSProperty(getUnqualifiedName(propertySymbol))) {
+            emitComment("skipping property " + propertyName + "because it is not a valid symbol.");
             continue;
           }
           // For safety we need to special case goog.require to return the empty interface by
@@ -424,17 +469,17 @@ public class DeclarationGenerator {
           // For existing namespaces we emit a goog.require string override that has the proper
           // type.
           // See emitGoogRequireSupport method.
-          if (otherName.equals("goog.require")) {
+          if (propertyName.equals("goog.require")) {
             emit("function require (name : string ) : " + Constants.INTERNAL_NAMESPACE
                 + ".ClosureSymbolNotGoogProvided;");
             emitBreak();
             continue;
           }
           try {
-            treeWalker.walk(other);
+            treeWalker.walk(propertySymbol, propertyName);
           } catch (RuntimeException e) {
             // Do not throw DeclarationGeneratorException - this is an unexpected runtime error.
-            throw new RuntimeException("Failed to emit for " + other, e);
+            throw new RuntimeException("Failed to emit for " + propertySymbol, e);
           }
         }
       }
@@ -508,14 +553,13 @@ public class DeclarationGenerator {
     return type.isNoType();
   }
 
-  private void emitGoogRequireSupport(String namespace, String closureNamespace) {
+  private void emitGoogRequireSupport(String namespace, String nameToBeRequired, String emitName) {
     // goog namespace doesn't need to be goog.required.
     if (namespace.equals("goog")) return;
     emitNamespaceBegin("goog");
-    String qualifiedClosureNamespace = Constants.INTERNAL_NAMESPACE + "." + closureNamespace;
     // TS supports overloading the require declaration with a fixed string argument.
-    emit("function require(name: '" + closureNamespace + "'): typeof " + qualifiedClosureNamespace
-        + ";");
+    emit("function require(name: '" + nameToBeRequired + "'): typeof " +
+        Constants.INTERNAL_NAMESPACE + "." + emitName + ";");
     emitBreak();
     emitNamespaceEnd();
   }
@@ -557,7 +601,7 @@ public class DeclarationGenerator {
     return docInfo != null && docInfo.getVisibility() == Visibility.PRIVATE;
   }
 
-  private void declareModule(String name, Boolean isDefault) {
+  private void declareModule(String name, Boolean isDefault, String emitName) {
     emitNoSpace("declare module '");
     emitNoSpace("goog:" + name);
     emitNoSpace("' {");
@@ -566,7 +610,7 @@ public class DeclarationGenerator {
     // workaround for https://github.com/Microsoft/TypeScript/issues/4325
     emit("import alias = ");
     emitNoSpace(Constants.INTERNAL_NAMESPACE);
-    emitNoSpace("." + name);
+    emitNoSpace("." + emitName);
     emitNoSpace(";");
     emitBreak();
     if (isDefault) {
@@ -694,7 +738,7 @@ public class DeclarationGenerator {
       return Constants.INTERNAL_NAMESPACE + "." + name;
     }
 
-    private void walk(TypedVar symbol) {
+    private void walk(TypedVar symbol, String emitName) {
       JSType type = symbol.getType();
       if (!type.isInterface() && !isTypedef(type)) valueSymbolsWalked++;
       if (type.isFunctionType()) {
@@ -715,7 +759,7 @@ public class DeclarationGenerator {
         if (!ftype.isNominalConstructor() && !isExtern) {
           // A top-level field that has a specific constructor function type.
           // <code>/** @type {function(new:X)} */ foo.x;</code>
-          visitVarDeclaration(getUnqualifiedName(symbol), ftype);
+          visitVarDeclaration(getUnqualifiedName(emitName), ftype);
           return;
         }
         // The class/interface symbol might be an alias for another symbol.
@@ -729,7 +773,7 @@ public class DeclarationGenerator {
       } else {
         maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
         if (type.isEnumType()) {
-          visitEnumType(symbol.getName(), (EnumType) type);
+          visitEnumType(emitName, (EnumType) type);
           return;
         }
         if (isTypedef(type)) {
@@ -750,7 +794,7 @@ public class DeclarationGenerator {
             return;
           }
         }
-        visitVarDeclaration(getUnqualifiedName(symbol), type);
+        visitVarDeclaration(getUnqualifiedName(emitName), type);
       }
     }
 
@@ -1492,9 +1536,9 @@ public class DeclarationGenerator {
       emitBreak();
     }
 
-    public void emitPrivateValue(TypedVar symbol) {
+    public void emitPrivateValue(String emitName) {
       emit("var");
-      emit(getUnqualifiedName(symbol));
+      emit(getUnqualifiedName(emitName));
       emit(":");
       emit(Constants.INTERNAL_NAMESPACE + ".PrivateType;");
       emitBreak();
