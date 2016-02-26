@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Iterables.any;
 import static com.google.javascript.rhino.jstype.JSTypeNative.ARRAY_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
+import static com.google.javascript.rhino.jstype.JSTypeNative.STRING_OBJECT_FUNCTION_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.base.Function;
@@ -1247,22 +1248,22 @@ public class DeclarationGenerator {
       }
     }
 
-    private void visitObjectType(ObjectType type, ObjectType prototype) {
+    private void visitObjectType(FunctionType type, ObjectType prototype) {
       emit("{");
       indent();
       emitBreak();
       // Prevent accidental structural typing - emit every class with a private field.
       if (type.isNominalConstructor() && !type.isInterface()
       // But only for non-extending classes (TypeScript doesn't like overriding private fields)
-          && getSuperType((FunctionType) type) == null) {
+          && getSuperType(type) == null) {
         emit("private noStructuralTyping_: any;");
         emitBreak();
       }
       // Constructors.
-      if (type.isConstructor() && ((FunctionType) type).getParameters().iterator().hasNext()) {
+      if (type.isConstructor() && (type).getParameters().iterator().hasNext()) {
         maybeEmitJsDoc(type.getJSDocInfo(), /* ignoreParams */ false);
         emit("constructor");
-        visitFunctionParameters((FunctionType) type, false);
+        visitFunctionParameters(type, false);
         emit(";");
         emitBreak();
       }
@@ -1276,8 +1277,11 @@ public class DeclarationGenerator {
         emit("[key: string]: any;");
         emitBreak();
       }
+      Set<String> superClassFields = getSuperClassFields(type);
+
       // Prototype fields (mostly methods).
-      visitProperties(prototype, false, ((ObjectType) instanceType).getOwnPropertyNames());
+      visitProperties(prototype, false, ((ObjectType) instanceType).getOwnPropertyNames(),
+          superClassFields);
       // Statics are handled in INSTANCE_CLASS_SUFFIX class.
       unindent();
       emit("}");
@@ -1285,10 +1289,12 @@ public class DeclarationGenerator {
     }
 
     private void visitProperties(ObjectType objType, boolean isStatic) {
-      visitProperties(objType, isStatic, Collections.<String>emptySet());
+      visitProperties(objType, isStatic, Collections.<String>emptySet(),
+          Collections.<String>emptySet());
     }
 
-    private void visitProperties(ObjectType objType, boolean isStatic, Set<String> skipNames) {
+    private void visitProperties(ObjectType objType, boolean isStatic, Set<String> skipNames,
+                                 Set<String> forceProps) {
       for (String propName : getSortedPublicPropertyNames(objType)) {
         if (skipNames.contains(propName)) continue;
 
@@ -1297,11 +1303,42 @@ public class DeclarationGenerator {
             || "constructor".equals(propName)) {
           continue;
         }
-        visitProperty(propName, objType, isStatic);
+        visitProperty(propName, objType, isStatic, forceProps.contains(propName));
       }
     }
 
-    private void visitProperty(String propName, ObjectType objType, boolean isStatic) {
+    /**
+     * Returns the names of props that would be output as fields (not methods)
+     * on superclasses of the given class.
+     */
+    private Set<String> getSuperClassFields(FunctionType ftype) {
+      Set<String> fields = new LinkedHashSet<>();
+      ObjectType superType = getSuperType(ftype);
+      while (superType != null) {
+        aggregateFieldsFromClass(fields, superType);
+        superType = getSuperType(superType.getConstructor());
+      }
+      return fields;
+    }
+
+    private void aggregateFieldsFromClass(Set<String> fields, ObjectType superType) {
+      // visit instance properties.
+      for (String field : superType.getOwnPropertyNames()) {
+        if (!superType.getPropertyType(field).isFunctionType()) {
+          fields.add(field);
+        }
+      }
+      // visit prototype properties.
+      for (String field : superType.getConstructor().getPrototype().getOwnPropertyNames()) {
+        // getPropertyType works with non-owned property names, i.e. names from the prototype chain.
+        if (!superType.getPropertyType(field).isFunctionType()) {
+          fields.add(field);
+        }
+      }
+    }
+
+    private void visitProperty(String propName, ObjectType objType, boolean isStatic,
+                               boolean forcePropDeclaration) {
       JSType propertyType = objType.getPropertyType(propName);
       // Some symbols might be emitted as provides, so don't duplicate them
       String qualifiedName = objType.getDisplayName() + "." + propName;
@@ -1314,16 +1351,17 @@ public class DeclarationGenerator {
       // The static methods apply and call are provided by lib.d.ts.
       if (isStatic && propName.equals("apply") || propName.equals("call")) return;
       maybeEmitJsDoc(objType.getOwnPropertyJSDocInfo(propName), /* ignoreParams */ false);
-      emitProperty(propName, propertyType, isStatic);
+      emitProperty(propName, propertyType, isStatic, forcePropDeclaration);
     }
 
-    private void emitProperty(String propName, JSType propertyType, boolean isStatic) {
+    private void emitProperty(String propName, JSType propertyType, boolean isStatic,
+                              boolean forcePropDeclaration) {
       if (isStatic) emit("static");
       emit(propName);
-      if (propertyType.isFunctionType()) {
-        visitFunctionDeclaration((FunctionType) propertyType);
-      } else {
+      if (!propertyType.isFunctionType() || forcePropDeclaration) {
         visitTypeDeclaration(propertyType, false);
+      } else {
+        visitFunctionDeclaration((FunctionType) propertyType);
       }
       emit(";");
       emitBreak();
