@@ -1366,7 +1366,7 @@ public class DeclarationGenerator {
         Iterable<Node> parameterNodes = functionSource.getFirstChild().getNext().children();
         names = Iterables.transform(parameterNodes, NODE_GET_STRING).iterator();
       }
-      char pName = 'a'; // let's hope for no more than 26 parameters...
+      int paramCount = 0;
       while (parameters.hasNext()) {
         Node param = parameters.next();
         if (param.isVarArgs()) {
@@ -1375,7 +1375,14 @@ public class DeclarationGenerator {
         if (names != null && names.hasNext()) {
           emitNoSpace(names.next());
         } else {
-          emitNoSpace("" + pName++);
+          String pName;
+          if (paramCount < 26) {
+            pName = Character.toString((char) (97 + paramCount));
+          } else {
+            pName = "p" + (paramCount - 26);
+          }
+          emitNoSpace("" + pName);
+          paramCount++;
         }
         if (param.isOptionalArg()) {
           emit("?");
