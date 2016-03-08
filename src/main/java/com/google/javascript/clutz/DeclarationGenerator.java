@@ -311,6 +311,7 @@ public class DeclarationGenerator {
 
     List<TypedVar> externSymbols = new ArrayList<>();
     TreeSet<String> externSymbolNames = new TreeSet<>();
+    final TreeSet<String> enumElementSymbols = new TreeSet<>();
 
     for (TypedVar symbol : compiler.getTopScope().getAllSymbols()) {
       CompilerInput symbolInput = compiler.getInput(new InputId(symbol.getInputName()));
@@ -320,14 +321,30 @@ public class DeclarationGenerator {
       if (isPlatformExtern(symbolInput.getName())) {
         continue;
       }
+      JSType type = symbol.getType();
       // Closure treats all prototypes as separate symbols, but we handle them in conjunction with
       // parent symbol.
       if (symbol.getName().contains(".prototype")) continue;
 
       // Sub-parts of namespaces in externs can appear as unknown if they miss a @const.
-      if (symbol.getType().isUnknownType()) continue;
+      if (type.isUnknownType()) continue;
+
+      if (type.isEnumType()) {
+        EnumType eType = (EnumType) type;
+        for (String element : eType.getElements()) {
+          enumElementSymbols.add(symbol.getName() + "." + element);
+        }
+      }
       externSymbols.add(symbol);
       externSymbolNames.add(symbol.getName());
+    }
+
+    // Enum values like Enum.A will appear as stand-alone symbols, but we do not need to emit them.
+    externSymbolNames.removeAll(enumElementSymbols);
+    for (TypedVar symbol : externSymbols) {
+      if (enumElementSymbols.contains(symbol.getName())) {
+        externSymbols.remove(symbol);
+      }
     }
 
     Set<String> shadowedSymbols = getShadowedProvides(externSymbolNames);
