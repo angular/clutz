@@ -256,7 +256,7 @@ public class DeclarationGenerator {
   private Set<String> getShadowedProvides(TreeSet<String> provides) {
     Set<String> shadowedProvides = new TreeSet<>();
     for (String provide : provides) {
-      if (!provides.subSet(provide + ".", provide + "\uFFFF").isEmpty()) {
+      if (!provides.subSet(provide + ".", provide + ".\uFFFF").isEmpty()) {
         shadowedProvides.add(provide);
       }
     }

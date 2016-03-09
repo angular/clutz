@@ -1,4 +1,28 @@
 declare namespace ಠ_ಠ.clutz.nested {
+  type NotNested = number ;
+  var NotNested : {
+  };
+}
+declare namespace ಠ_ಠ.clutz.goog {
+  function require(name: 'nested.NotNested'): typeof ಠ_ಠ.clutz.nested.NotNested;
+}
+declare module 'goog:nested.NotNested' {
+  import alias = ಠ_ಠ.clutz.nested.NotNested;
+  export default alias;
+}
+declare namespace ಠ_ಠ.clutz.nested {
+  type NotNestedEither = number ;
+  var NotNestedEither : {
+  };
+}
+declare namespace ಠ_ಠ.clutz.goog {
+  function require(name: 'nested.NotNestedEither'): typeof ಠ_ಠ.clutz.nested.NotNestedEither;
+}
+declare module 'goog:nested.NotNestedEither' {
+  import alias = ಠ_ಠ.clutz.nested.NotNestedEither;
+  export default alias;
+}
+declare namespace ಠ_ಠ.clutz.nested {
   var PrivateC__clutz_alias : ಠ_ಠ.clutz.PrivateType;
 }
 declare module 'goog:nested.PrivateC' {

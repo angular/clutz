@@ -2,6 +2,8 @@ goog.provide('nested.foo');
 goog.provide('nested.foo.Klass');
 goog.provide('nested.PrivateC');
 goog.provide('nested.PrivateC.Enum');
+goog.provide('nested.NotNested');
+goog.provide('nested.NotNestedEither');
 
 /** @constructor @private */
 nested.PrivateC = function() {};
@@ -14,3 +16,9 @@ nested.foo = null;
 
 /** @constructor */
 nested.foo.Klass = function() {};
+
+/** @enum */
+nested.NotNested = {};
+
+/** @enum */
+nested.NotNestedEither = {};
