@@ -65,7 +65,12 @@ import javax.annotation.Nullable;
  * A tool that generates {@code .d.ts} declarations from a Google Closure JavaScript program.
  */
 public class DeclarationGenerator {
-
+  private static final Predicate<? super ObjectType> IS_IARRYLIKE = new Predicate<ObjectType>() {
+    @Override
+    public boolean apply(@Nullable ObjectType input) {
+      return input != null && input.getDisplayName().equals("IArrayLike");
+    }
+  };
   static final String INSTANCE_CLASS_SUFFIX = "_Instance";
   public static final Pattern GOOG_MODULE_EXTRACT =
       Pattern.compile("goog.module\\(['\"](.*)['\"]\\);");
@@ -929,7 +934,9 @@ public class DeclarationGenerator {
         emit("implements");
         emitCommaSeparatedInterfaces(it);
       }
-      visitObjectType(ftype, ftype.getPrototype());
+
+      boolean implementsIArrayLike = any(ftype.getAllImplementedInterfaces(), IS_IARRYLIKE);
+      visitObjectType(ftype, ftype.getPrototype(), implementsIArrayLike || ftype.isDict());
     }
 
     private void emitCommaSeparatedInterfaces(Iterator<ObjectType> it) {
@@ -1308,7 +1315,8 @@ public class DeclarationGenerator {
       }
     }
 
-    private void visitObjectType(FunctionType type, ObjectType prototype) {
+    private void visitObjectType(FunctionType type, ObjectType prototype,
+                                 boolean emitIndexSignature) {
       emit("{");
       indent();
       emitBreak();
@@ -1333,7 +1341,7 @@ public class DeclarationGenerator {
           + instanceType + " which is a " + instanceType.getClass().getSimpleName());
       visitProperties((ObjectType) instanceType, false);
       // Bracket-style property access
-      if (type.isDict()) {
+      if (emitIndexSignature) {
         emit("[key: string]: any;");
         emitBreak();
       }
@@ -1408,8 +1416,8 @@ public class DeclarationGenerator {
         // enums and classes are emitted in a namespace later.
         return;
       }
-      // The static methods apply and call are provided by lib.d.ts.
-      if (isStatic && propName.equals("apply") || propName.equals("call")) return;
+      // The static methods from the function prototype are provided by lib.d.ts.
+      if (isStatic && isFunctionPrototypeProp(propName)) return;
       maybeEmitJsDoc(objType.getOwnPropertyJSDocInfo(propName), /* ignoreParams */ false);
       emitProperty(propName, propertyType, isStatic, forcePropDeclaration);
     }
@@ -1536,6 +1544,9 @@ public class DeclarationGenerator {
           // handle
           // them here.
         } else if (type.isInterface() && isOrdinaryFunction(pType)) {
+          // Interfaces are "backed" by a function() {} assignment in closure,
+          // which adds some function prototype methods, that are not truely part of the interface.
+          if (isFunctionPrototypeProp(propName)) continue;
           if (!foundNamespaceMembers) {
             emitNamespaceBegin(innerNamespace);
             foundNamespaceMembers = true;
@@ -1705,6 +1716,17 @@ public class DeclarationGenerator {
         emit("Function");
         return null;
       }
+    }
+  }
+
+  private boolean isFunctionPrototypeProp(String propName) {
+    switch (propName) {
+      case "apply":
+      case "call":
+      case "bind":
+        return true;
+      default:
+        return false;
     }
   }
 
