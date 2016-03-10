@@ -14,6 +14,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.javascript.jscomp.AbstractCommandLineRunner;
@@ -51,7 +52,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -69,6 +69,14 @@ public class DeclarationGenerator {
   static final String INSTANCE_CLASS_SUFFIX = "_Instance";
   public static final Pattern GOOG_MODULE_EXTRACT =
       Pattern.compile("goog.module\\(['\"](.*)['\"]\\);");
+
+  public static final Predicate<ObjectType> IS_IARRAYLIKE = new Predicate<ObjectType>() {
+    @Override
+    public boolean apply(@Nullable ObjectType type) {
+      return type != null && (type.getDisplayName().equals("IArrayLike") ||
+          type.getDisplayName().equals("fa"));
+    }
+  };
 
   public static void main(String[] args) {
     Options options = null;
@@ -117,7 +125,7 @@ public class DeclarationGenerator {
    * Aggregates all emitted types, used in a final pass to find types emitted in type position but
    * not declared, possibly due to missing goog.provides.
    */
-  private final Set<String> typesUsed = new LinkedHashSet<>();
+  private final Set<String> typesUsed = new TreeSet<>();
 
   DeclarationGenerator(Options opts) {
     this.opts = opts;
@@ -280,7 +288,7 @@ public class DeclarationGenerator {
      * altogether.
      */
     int maxTypeUsedDepth = 5;
-    Set<String> typesEmitted = new LinkedHashSet<>();
+    Set<String> typesEmitted = new TreeSet<>();
     while (maxTypeUsedDepth > 0) {
       int typesUsedCount = typesUsed.size();
       // AFAIKT, there is no api for going from type to symbol, so iterate all symbols first.
@@ -318,13 +326,23 @@ public class DeclarationGenerator {
       if (symbolInput == null || !symbolInput.isExtern() || symbol.getType() == null) {
         continue;
       }
-      if (isPlatformExtern(symbolInput.getName())) {
+      if (isLanguageExtern(symbolInput.getName(), symbol.getName())) {
         continue;
       }
       JSType type = symbol.getType();
       // Closure treats all prototypes as separate symbols, but we handle them in conjunction with
       // parent symbol.
       if (symbol.getName().contains(".prototype")) continue;
+
+      // All top-level symbols are repeated as foo and window.foo. TS does not make such a
+      // distinction, so no need to emit them.
+      if (symbol.getName().startsWith("window.")) continue;
+
+      // Symbol.for cannot be emitted because it is not valid.
+      if (symbol.getName().equals("Symbol.for")) continue;
+
+      // Array.of causes clutz.Array namespace to shadow the es3 built-in Array.
+      if (symbol.getName().equals("Array.of")) continue;
 
       // Sub-parts of namespaces in externs can appear as unknown if they miss a @const.
       if (type.isUnknownType()) continue;
@@ -341,13 +359,16 @@ public class DeclarationGenerator {
 
     // Enum values like Enum.A will appear as stand-alone symbols, but we do not need to emit them.
     externSymbolNames.removeAll(enumElementSymbols);
-    for (TypedVar symbol : externSymbols) {
-      if (enumElementSymbols.contains(symbol.getName())) {
-        externSymbols.remove(symbol);
+    Iterator<TypedVar> it = externSymbols.iterator();
+    while (it.hasNext()) {
+      if (enumElementSymbols.contains(it.next().getName())) {
+        it.remove();
       }
     }
 
     Set<String> shadowedSymbols = getShadowedProvides(externSymbolNames);
+
+    sortSymbols(externSymbols);
 
     for (TypedVar symbol : externSymbols) {
       String parentPath = getNamespace(symbol.getName());
@@ -381,6 +402,17 @@ public class DeclarationGenerator {
     }
   }
 
+  private void sortSymbols(List<TypedVar> symbols) {
+    Collections.sort(symbols, Ordering.natural().onResultOf(new Function<TypedVar, Comparable>() {
+      @Nullable
+      @Override
+      public Comparable apply(@Nullable TypedVar input) {
+        if (input == null) return null;
+        return input.getName();
+      }
+    }));
+  }
+
   private boolean needsAlias(Set<String> shadowedSymbols, String provide, TypedVar symbol) {
     if (!shadowedSymbols.contains(provide)) return false;
     // Emit var foo : any for provided but not declared symbols.
@@ -409,14 +441,17 @@ public class DeclarationGenerator {
         || symbol.getType().isFunctionType() || isTypedef(symbol.getType());
   }
 
-  // For platform externs we skip emitting .d.ts, to avoid collisions with lib.d.ts.
-  // TODO(rado): Platform is too ill-defined, and this often filters too much.
-  // Replace with a list of externs that *only* contain symbols in lib.d.ts.
-  private boolean isPlatformExtern(String name) {
-    name = name.replace("externs.zip//", "");
-    // mostly matching what is in https://github.com/google/closure-compiler/tree/master/externs.
-    return Pattern.matches("javascript/externs/[^/]*.js", name) || name.startsWith("es")
-        || name.startsWith("w3c") || name.startsWith("ie_") || name.startsWith("browser");
+  // Only emit language externs. There are a number of differences between types in externs and
+  // lib.d.ts for browser APIs, so the safest approach is to reemit the closure types for as much
+  // as possible. However, that creates tension at the interface between .ts and closure code,
+  // so we reuse TS types for language (es3 and es5) features.
+  // For example: In TS there two unique signatures - Array vs ArrayConstructor, vs just Array in
+  // Closure.
+  private boolean isLanguageExtern(String filePath, String objectName) {
+    // Defined in w3c_dom1, but special cased in Closure internals which makes its type signature
+    // very odd. Looks like we can get away with swapping with TS's Window interface.
+    if (objectName.equals("Window")) return true;
+    return Pattern.matches(".*/es[3,5].js", filePath);
   }
 
   private int declareNamespace(String namespace, TypedVar symbol, String emitName, boolean isDefault,
@@ -434,12 +469,7 @@ public class DeclarationGenerator {
       // $provide + "." but are not sub-properties.
       Set<String> desiredSymbols = new TreeSet<>();
       List<TypedVar> allSymbols = Lists.newArrayList(compiler.getTopScope().getAllSymbols());
-      Collections.sort(allSymbols, new Comparator<TypedVar>() {
-        @Override
-        public int compare(TypedVar o1, TypedVar o2) {
-          return o1.getName().compareTo(o2.getName());
-        }
-      });
+      sortSymbols(allSymbols);
 
       ObjectType objType = (ObjectType) symbol.getType();
       // Can be null if the symbol is provided, but not defined.
@@ -772,8 +802,11 @@ public class DeclarationGenerator {
         // classes/interfaces that have = function() {}, even a structural interface
         // defined with @record.
         // In externs it is allowed to have interfaces without the dummy = function() {}, so the
-        // heuristic fails. For now assume that this rare pattern does not happen in externs.
-        if (!ftype.isNominalConstructor() && !isExtern) {
+        // heuristic fails.
+        // This rare pattern occurs only twice in closure externs, so use a white-list for now.
+        // TODO(rado): find a more robust way to detect.
+        if (!ftype.isNominalConstructor() && !isExtern ||
+            knownExternSymbolOfConstructorFunctionType(symbol.getName())) {
           // A top-level field that has a specific constructor function type.
           // <code>/** @type {function(new:X)} */ foo.x;</code>
           visitVarDeclaration(getUnqualifiedName(emitName), ftype);
@@ -813,6 +846,11 @@ public class DeclarationGenerator {
         }
         visitVarDeclaration(getUnqualifiedName(emitName), type);
       }
+    }
+
+    private boolean knownExternSymbolOfConstructorFunctionType(String name) {
+      return name.equals("webkitMediaStream") || name.equals("ActiveXObject") ||
+          name.equals("webkitRTCPeerConnection");
     }
 
     private void visitClassOrInterfaceAlias(String unqualifiedName, FunctionType ftype) {
@@ -929,7 +967,9 @@ public class DeclarationGenerator {
         emit("implements");
         emitCommaSeparatedInterfaces(it);
       }
-      visitObjectType(ftype, ftype.getPrototype());
+
+      boolean implementsIArrayLike = any(ftype.getAllImplementedInterfaces(), IS_IARRAYLIKE);
+      visitObjectType(ftype, ftype.getPrototype(), ftype.isDict() || implementsIArrayLike);
     }
 
     private void emitCommaSeparatedInterfaces(Iterator<ObjectType> it) {
@@ -1192,13 +1232,10 @@ public class DeclarationGenerator {
         return null;
       }
       switch (type.getDisplayName()) {
-        // Arguments<?> and NodeList<?> in es3 externs are correspondingly
-        // IArguments and NodeList interfaces (not-parametrized) in lib.d.ts.
+        // Arguments<?> in es3, is IArguments (non-parametrized) in lib.d.ts.
+        // IObject<?,?> in es3, is Object (non-parametrized) in lib.d.ts,
         case "Arguments":
           emit("IArguments");
-          return null;
-        case "NodeList":
-          emit("NodeList");
           return null;
         case "IThenable":
           templateTypeName = "PromiseLike";
@@ -1206,6 +1243,11 @@ public class DeclarationGenerator {
         case "IArrayLike":
           templateTypeName = "ArrayLike";
           break;
+        case "IObject":
+          // TODO(rado): generate an index signature with the parametrized types.
+          // IObject<S, T>  -> [key: S]: T
+          emit("Object");
+          return null;
         default:
           break;
       }
@@ -1308,7 +1350,8 @@ public class DeclarationGenerator {
       }
     }
 
-    private void visitObjectType(FunctionType type, ObjectType prototype) {
+    private void visitObjectType(FunctionType type, ObjectType prototype,
+                                 boolean emitIndexSignature) {
       emit("{");
       indent();
       emitBreak();
@@ -1333,7 +1376,7 @@ public class DeclarationGenerator {
           + instanceType + " which is a " + instanceType.getClass().getSimpleName());
       visitProperties((ObjectType) instanceType, false);
       // Bracket-style property access
-      if (type.isDict()) {
+      if (emitIndexSignature) {
         emit("[key: string]: any;");
         emitBreak();
       }
@@ -1729,6 +1772,6 @@ public class DeclarationGenerator {
 
   private boolean isDefinedInPlatformExterns(ObjectType type) {
     if (type.getConstructor() == null || type.getConstructor().getSource() == null) return false;
-    return isPlatformExtern(type.getConstructor().getSource().getSourceFileName());
+    return isLanguageExtern(type.getConstructor().getSource().getSourceFileName(), type.getDisplayName());
   }
 }

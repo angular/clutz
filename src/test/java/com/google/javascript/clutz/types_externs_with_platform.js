@@ -3,6 +3,7 @@ goog.provide('typesWithExterns.A');
 goog.provide('typesWithExterns.B');
 goog.provide('typesWithExterns.C');
 goog.provide('typesWithExterns.ArrayLike');
+goog.provide('type_renaming_with_externs');
 
 /**
  * @return {Element}
@@ -81,3 +82,12 @@ typesWithExterns.ExtendsXMLHttpRequest = function() {};
  * @type {namespace.Foo}
  */
 typesWithExterns.myScope = null;
+
+/** @type {IArrayLike<number>} */
+type_renaming_with_externs.arrayLike;
+
+/** @type {Arguments<string>} */
+type_renaming_with_externs.args;
+
+/** @type {IThenable<string>} */
+type_renaming_with_externs.thenable;
