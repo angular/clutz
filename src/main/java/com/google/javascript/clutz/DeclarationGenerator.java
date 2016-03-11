@@ -96,6 +96,16 @@ public class DeclarationGenerator {
       "v8.js", "webgl.js", "webstorage.js", "whatwg_encoding.js",
       "window.js");
 
+  /**
+   * List of global platfom platform symbols that are redirected through an alias in closure.lib.d.ts
+   * This allows the following pattern to work:
+   * namespace foo {
+   *   class Error extends Error {}
+   * }
+   * by replacing the second Error with GlobalError.
+   */
+  private static final Set<String> globalSymbolAliases = ImmutableSet.of("Error", "Event");
+
   public static void main(String[] args) {
     Options options = null;
     try {
@@ -1618,9 +1628,8 @@ public class DeclarationGenerator {
 
     public Void emitObjectType(ObjectType type, boolean extendingInstanceClass,
                                boolean inExtendsImplementsPosition) {
-      if (type.getDisplayName() != null && type.getDisplayName().equals("Error")) {
-        // global Error is aliased as GlobalError in closure.lib.d.ts.
-        emit("GlobalError");
+      if (type.getDisplayName() != null && globalSymbolAliases.contains(type.getDisplayName())) {
+        emit("Global" + type.getDisplayName());
         return null;
       }
       // Closure doesn't require that all the type params be declared, but TS does

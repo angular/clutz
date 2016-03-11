@@ -262,13 +262,13 @@ declare namespace ಠ_ಠ.clutz {
   }
   class WebWorker_Instance implements EventTarget {
     private noStructuralTyping_: any;
-    addEventListener (type : string , listener : EventListener | ( (a : Event ) => boolean ) , opt_useCapture ? : boolean ) : void ;
-    dispatchEvent (evt : Event ) : boolean ;
+    addEventListener (type : string , listener : EventListener | ( (a : GlobalEvent ) => boolean ) , opt_useCapture ? : boolean ) : void ;
+    dispatchEvent (evt : GlobalEvent ) : boolean ;
     /**
      * Sent when the worker thread encounters an error.
      * TODO(tbreisacher): Should this change to function(!ErrorEvent)?
      */
-    onerror : (a : Event ) => any ;
+    onerror : (a : GlobalEvent ) => any ;
     /**
      * Sent when the worker thread posts a message to its creator.
      */
@@ -277,7 +277,7 @@ declare namespace ಠ_ಠ.clutz {
      * Posts a message to the worker thread.
      */
     postMessage (message : string ) : any ;
-    removeEventListener (type : string , listener : EventListener | ( (a : Event ) => boolean ) , opt_useCapture ? : boolean ) : void ;
+    removeEventListener (type : string , listener : EventListener | ( (a : GlobalEvent ) => boolean ) , opt_useCapture ? : boolean ) : void ;
     /**
      * Stops the worker process
      */
@@ -295,15 +295,15 @@ declare namespace ಠ_ಠ.clutz {
     /**
      * Sent when the worker encounters an error.
      */
-    onerror : (a : Event ) => any ;
+    onerror : (a : GlobalEvent ) => any ;
     /**
      * Sent when the worker goes offline.
      */
-    onoffline : (a : Event ) => any ;
+    onoffline : (a : GlobalEvent ) => any ;
     /**
      * Sent when the worker goes online.
      */
-    ononline : (a : Event ) => any ;
+    ononline : (a : GlobalEvent ) => any ;
     self : WorkerGlobalScope ;
   }
 }
