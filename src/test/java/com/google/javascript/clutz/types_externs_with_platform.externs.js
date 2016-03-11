@@ -101,36 +101,36 @@ namespace.subNamespace.fieldB = 0;
 /**
  * @param {!{is: string}} descriptor
  */
-var FunctionNamespace = function(descriptor) {};
+var functionNamespace = function(descriptor) {};
 
 /**
  * @constructor
  */
-var FunctionNamespaceHelperClass = function() {};
+var functionNamespaceHelperClass = function() {};
 
 /**
  * @param {?Node|?Event} nodeOrEvent
- * @return {!FunctionNamespaceHelperClass}
+ * @return {!functionNamespaceHelperClass}
  */
-FunctionNamespace.dom = function(nodeOrEvent) {};
+functionNamespace.dom = function(nodeOrEvent) {};
 
 /**
  * @constructor
  */
-var ClassNamespace = function() {};
+var classNamespace = function() {};
 
 /**
  * @const
  */
-ClassNamespace.constObj = {};
+classNamespace.constObj = {};
 
 /**
  * @type {number}
  */
-ClassNamespace.constObj.num;
+classNamespace.constObj.num;
 
 /**
  * @constructor
  * @private
  */
-FunctionNamespace.privateClass = function() {};
+functionNamespace.privateClass = function() {};

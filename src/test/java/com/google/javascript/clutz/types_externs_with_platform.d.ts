@@ -66,6 +66,31 @@ declare module 'goog:typesWithExterns.C' {
   import alias = ಠ_ಠ.clutz.typesWithExterns.C;
   export default alias;
 }
+/** Insert general_with_platform.d.ts here */
+declare namespace ಠ_ಠ.clutz {
+  class classNamespace extends classNamespace_Instance {
+    static constObj : Object ;
+  }
+  class classNamespace_Instance {
+    private noStructuralTyping_: any;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  function functionNamespace (descriptor : { is : string } ) : any ;
+}
+declare namespace ಠ_ಠ.clutz.functionNamespace {
+  function dom (nodeOrEvent : Node | Event ) : functionNamespaceHelperClass ;
+}
+declare namespace ಠ_ಠ.clutz.functionNamespace {
+  var privateClass : ಠ_ಠ.clutz.PrivateType;
+}
+declare namespace ಠ_ಠ.clutz {
+  class functionNamespaceHelperClass extends functionNamespaceHelperClass_Instance {
+  }
+  class functionNamespaceHelperClass_Instance {
+    private noStructuralTyping_: any;
+  }
+}
 declare namespace ಠ_ಠ.clutz.namespace {
   class Foo extends Foo_Instance {
     static staticField : string ;
@@ -78,12 +103,6 @@ declare namespace ಠ_ಠ.clutz.namespace {
   }
   type atypedef = (a : string , b ? : { capacity ? : number } ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > ;
   function bootstrap (arg1 : Element | HTMLDocument , opt_arg2 ? : ( string | ( ( ...a : any [] ) => any ) ) [] ) : any ;
-}
-declare namespace ಠ_ಠ.clutz.namespace.atypedef {
-  type get = (a : string ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > ;
-}
-declare namespace ಠ_ಠ.clutz.namespace.atypedef {
-  type Options = { capacity ? : number } ;
 }
 declare namespace ಠ_ಠ.clutz.namespace.atypedef {
   class Cache < T > extends Cache_Instance < T > {
@@ -101,34 +120,15 @@ declare namespace ಠ_ಠ.clutz.namespace.atypedef {
 declare namespace ಠ_ಠ.clutz.namespace.atypedef.Cache {
   type Info = { id : string , options : { capacity ? : number } , size : number } ;
 }
+declare namespace ಠ_ಠ.clutz.namespace.atypedef {
+  type Options = { capacity ? : number } ;
+}
+declare namespace ಠ_ಠ.clutz.namespace.atypedef {
+  type get = (a : string ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > ;
+}
 declare namespace ಠ_ಠ.clutz.namespace.subNamespace {
   var fieldA : string ;
 }
 declare namespace ಠ_ಠ.clutz.namespace.subNamespace {
   var fieldB : number ;
-}
-declare namespace ಠ_ಠ.clutz {
-  function FunctionNamespace (descriptor : { is : string } ) : any ;
-}
-declare namespace ಠ_ಠ.clutz {
-  class FunctionNamespaceHelperClass extends FunctionNamespaceHelperClass_Instance {
-  }
-  class FunctionNamespaceHelperClass_Instance {
-    private noStructuralTyping_: any;
-  }
-}
-declare namespace ಠ_ಠ.clutz.FunctionNamespace {
-  function dom (nodeOrEvent : Node | Event ) : FunctionNamespaceHelperClass ;
-}
-declare namespace ಠ_ಠ.clutz {
-  class ClassNamespace extends ClassNamespace_Instance {
-    //!! Should be {num : number} instead of object. Will be fixed with #202.
-    static constObj : Object ;
-  }
-  class ClassNamespace_Instance {
-    private noStructuralTyping_: any;
-  }
-}
-declare namespace ಠ_ಠ.clutz.FunctionNamespace {
-  var privateClass : ಠ_ಠ.clutz.PrivateType;
 }

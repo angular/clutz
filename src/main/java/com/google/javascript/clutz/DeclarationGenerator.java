@@ -12,8 +12,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.javascript.jscomp.AbstractCommandLineRunner;
@@ -51,7 +53,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -72,8 +73,28 @@ public class DeclarationGenerator {
     }
   };
   static final String INSTANCE_CLASS_SUFFIX = "_Instance";
-  public static final Pattern GOOG_MODULE_EXTRACT =
-      Pattern.compile("goog.module\\(['\"](.*)['\"]\\);");
+
+  /**
+   * Contains symbols that are part of platform externs, but not yet in lib.d.ts
+   * This list is incomplete and will grow as needed.
+   */
+  private static final Set<String> platformSymbolsMissingInTypeScript = ImmutableSet.of(
+      "Image", "IDBDatabaseException", "WebWorker", "WorkerGlobalScope", "RequestCache",
+      "RequestCredentials", "Request", "Headers", "RequestMode", "WorkerLocation", "Promise",
+      "RequestContext", "Response", "ReadableByteStream", "ResponseType",
+      "ReadableStreamController", "CountQueuingStrategy", "ByteLengthQueuingStrategy",
+      "ReadableByteStreamReader", "ReadableStream", "WritableStream", "ReadableStreamReader");
+
+  /**
+   * List of files that are part of closures platform externs.
+   * Not exhaustive, see isPlatformExtern for the rest.
+   */
+  private static final Set<String> platformExternsFilenames = ImmutableSet.of(
+      "chrome.js", "deprecated.js", "fetchapi.js", "fileapi.js", "flash.js",
+      "google.js", "html5.js", "intl.js", "iphone.js", "mediakeys.js",
+      "mediasource.js", "page_visibility.js", "streamapi.js", "url.js",
+      "v8.js", "webgl.js", "webstorage.js", "whatwg_encoding.js",
+      "window.js");
 
   public static void main(String[] args) {
     Options options = null;
@@ -323,7 +344,7 @@ public class DeclarationGenerator {
       if (symbolInput == null || !symbolInput.isExtern() || symbol.getType() == null) {
         continue;
       }
-      if (isPlatformExtern(symbolInput.getName())) {
+      if (isPlatformExtern(symbolInput.getName(), symbol.getName())) {
         continue;
       }
       JSType type = symbol.getType();
@@ -352,6 +373,7 @@ public class DeclarationGenerator {
       }
     }
 
+    sortSymbols(externSymbols);
     Set<String> shadowedSymbols = getShadowedProvides(externSymbolNames);
 
     for (TypedVar symbol : externSymbols) {
@@ -386,6 +408,15 @@ public class DeclarationGenerator {
     }
   }
 
+  private void sortSymbols(List<TypedVar> symbols) {
+    Collections.sort(symbols, Ordering.natural().onResultOf(new Function<TypedVar, Comparable>() {
+      @Nullable @Override public Comparable apply(@Nullable TypedVar input) {
+        if (input == null) return null;
+        return input.getName();
+      }
+    }));
+  }
+
   private boolean needsAlias(Set<String> shadowedSymbols, String provide, TypedVar symbol) {
     if (!shadowedSymbols.contains(provide)) return false;
     // Emit var foo : any for provided but not declared symbols.
@@ -414,14 +445,18 @@ public class DeclarationGenerator {
         || symbol.getType().isFunctionType() || isTypedef(symbol.getType());
   }
 
-  // For platform externs we skip emitting .d.ts, to avoid collisions with lib.d.ts.
-  // TODO(rado): Platform is too ill-defined, and this often filters too much.
-  // Replace with a list of externs that *only* contain symbols in lib.d.ts.
-  private boolean isPlatformExtern(String name) {
-    name = name.replace("externs.zip//", "");
-    // mostly matching what is in https://github.com/google/closure-compiler/tree/master/externs.
-    return Pattern.matches("javascript/externs/[^/]*.js", name) || name.startsWith("es")
-        || name.startsWith("w3c") || name.startsWith("ie_") || name.startsWith("browser");
+  /** For platform externs we skip emitting, to avoid collisions with lib.d.ts. */
+  private boolean isPlatformExtern(String filePath, String symbolName) {
+    // Some symbols are not yet provided by lib.d.ts, so we have to emit them.
+    if (platformSymbolsMissingInTypeScript.contains(symbolName)) return false;
+    // This matches our test setup.
+    if (filePath.startsWith("externs.zip//")) return true;
+    String fileName = new File(filePath).getName();
+    // This loosly matches the filenames from
+    // https://github.com/google/closure-compiler/tree/master/externs
+    return platformExternsFilenames.contains(fileName) ||
+        fileName.startsWith("es") || fileName.startsWith("gecko_") ||
+        fileName.startsWith("w3c_") || fileName.startsWith("ie_") || fileName.startsWith("webkit_");
   }
 
   private int declareNamespace(String namespace, TypedVar symbol, String emitName, boolean isDefault,
@@ -439,12 +474,7 @@ public class DeclarationGenerator {
       // $provide + "." but are not sub-properties.
       Set<String> desiredSymbols = new TreeSet<>();
       List<TypedVar> allSymbols = Lists.newArrayList(compiler.getTopScope().getAllSymbols());
-      Collections.sort(allSymbols, new Comparator<TypedVar>() {
-        @Override
-        public int compare(TypedVar o1, TypedVar o2) {
-          return o1.getName().compareTo(o2.getName());
-        }
-      });
+      sortSymbols(allSymbols);
 
       ObjectType objType = (ObjectType) symbol.getType();
       // Can be null if the symbol is provided, but not defined.
@@ -1207,6 +1237,9 @@ public class DeclarationGenerator {
         case "NodeList":
           emit("NodeList");
           return null;
+        case "MessageEvent":
+          emit("MessageEvent");
+          return null;
         case "IThenable":
           templateTypeName = "PromiseLike";
           break;
@@ -1751,6 +1784,7 @@ public class DeclarationGenerator {
 
   private boolean isDefinedInPlatformExterns(ObjectType type) {
     if (type.getConstructor() == null || type.getConstructor().getSource() == null) return false;
-    return isPlatformExtern(type.getConstructor().getSource().getSourceFileName());
+    return isPlatformExtern(type.getConstructor().getSource().getSourceFileName(),
+        type.getDisplayName());
   }
 }

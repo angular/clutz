@@ -48,6 +48,7 @@ public class DeclarationGeneratorTests {
       return name.endsWith(".ts");
     }
   };
+  public static final String PLATFORM_MARKER = "/** Insert general_with_platform.d.ts here */\n";
 
   public static TestSuite suite() throws IOException {
     TestSuite suite = new TestSuite(DeclarationGeneratorTests.class.getName());
@@ -89,7 +90,17 @@ public class DeclarationGeneratorTests {
 
   static String getTestFileText(final File input) throws IOException {
     String text = Files.asCharSource(input, Charsets.UTF_8).read();
-    return GOLDEN_FILE_COMMENTS_REGEXP.matcher(text).replaceAll("");
+    if (input.getName().endsWith("_with_platform.d.ts")) {
+      File platformGolden = getPackagePath().resolve("general_with_platform.d.ts").toFile();
+      String platformGoldenText = Files.asCharSource(platformGolden, Charsets.UTF_8).read();
+      if (text.contains(PLATFORM_MARKER)) {
+        text = text.replace(PLATFORM_MARKER, platformGoldenText);
+      } else {
+        text += platformGoldenText;
+      }
+    }
+    String cleanText = GOLDEN_FILE_COMMENTS_REGEXP.matcher(text).replaceAll("");
+    return cleanText;
   }
 
   private static final class DeclarationTest implements Test, Describable {
