@@ -649,6 +649,11 @@ public class DeclarationGenerator {
     return isPrivate(info);
   }
 
+  private boolean isTypeCheckSuppressedProperty(ObjectType obj, String propName) {
+    JSDocInfo info = obj.getOwnPropertyJSDocInfo(propName);
+    return info != null && info.getSuppressions().contains("checkTypes");
+  }
+
   private boolean isPrivate(@Nullable JSDocInfo docInfo) {
     return docInfo != null && docInfo.getVisibility() == Visibility.PRIVATE;
   }
@@ -1290,7 +1295,7 @@ public class DeclarationGenerator {
 
     private void visitRecordType(RecordType type) {
       emit("{");
-      Iterator<String> it = getSortedPublicPropertyNames(type).iterator();
+      Iterator<String> it = getSortedPropertyNamesToEmit(type).iterator();
       while (it.hasNext()) {
         String propName = it.next();
         emit(propName);
@@ -1306,11 +1311,10 @@ public class DeclarationGenerator {
       emit("}");
     }
 
-    private Set<String> getSortedPublicPropertyNames(final ObjectType type) {
+    private Set<String> getSortedPropertyNamesToEmit(final ObjectType type) {
       return sorted(Sets.filter(type.getOwnPropertyNames(), new Predicate<String>() {
-        @Override
-        public boolean apply(String propName) {
-          return !isPrivateProperty(type, propName);
+        @Override public boolean apply(String propName) {
+          return !isPrivateProperty(type, propName) && !isTypeCheckSuppressedProperty(type, propName);
         }
       }));
     }
@@ -1396,7 +1400,7 @@ public class DeclarationGenerator {
 
     private void visitProperties(ObjectType objType, boolean isStatic, Set<String> skipNames,
                                  Set<String> forceProps) {
-      for (String propName : getSortedPublicPropertyNames(objType)) {
+      for (String propName : getSortedPropertyNamesToEmit(objType)) {
         if (skipNames.contains(propName)) continue;
 
         if ("prototype".equals(propName) || "superClass_".equals(propName)
@@ -1548,7 +1552,7 @@ public class DeclarationGenerator {
       }
 
       boolean foundNamespaceMembers = false;
-      for (String propName : getSortedPublicPropertyNames(type)) {
+      for (String propName : getSortedPropertyNamesToEmit(type)) {
         String qualifiedName = innerNamespace + '.' + propName;
         if (provides.contains(qualifiedName)) continue;
         JSType pType = type.getPropertyType(propName);
