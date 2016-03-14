@@ -1382,17 +1382,20 @@ public class DeclarationGenerator {
         emit(";");
         emitBreak();
       }
+
+      Set<String> superClassFields = getSuperClassFields(type);
+
       // Fields.
       JSType instanceType = type.getTypeOfThis();
       checkArgument(instanceType.isObject(), "expected an ObjectType for this, but got "
           + instanceType + " which is a " + instanceType.getClass().getSimpleName());
-      visitProperties((ObjectType) instanceType, false);
+      visitProperties((ObjectType) instanceType, false, Collections.<String>emptySet(),
+          superClassFields);
       // Bracket-style property access
       if (emitIndexSignature) {
         emit("[key: string]: any;");
         emitBreak();
       }
-      Set<String> superClassFields = getSuperClassFields(type);
 
       // Prototype fields (mostly methods).
       visitProperties(prototype, false, ((ObjectType) instanceType).getOwnPropertyNames(),
