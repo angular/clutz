@@ -17,6 +17,120 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  class DirectoryEntry extends DirectoryEntry_Instance {
+  }
+  class DirectoryEntry_Instance extends Entry_Instance {
+    createReader ( ) : DirectoryReader ;
+    getDirectory (path : string , options ? : Object , successCallback ? : (a : DirectoryEntry ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+    getFile (path : string , options ? : Object , successCallback ? : (a : FileEntry ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+    removeRecursively (successCallback : ( ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class DirectoryReader extends DirectoryReader_Instance {
+  }
+  class DirectoryReader_Instance {
+    private noStructuralTyping_: any;
+    readEntries (successCallback : (a : Entry [] ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class Entry extends Entry_Instance {
+  }
+  class Entry_Instance {
+    private noStructuralTyping_: any;
+    copyTo (parent : DirectoryEntry , newName ? : string , successCallback ? : (a : Entry ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+    filesystem : FileSystem ;
+    fullPath : string ;
+    getMetadata (successCallback : (a : Metadata ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+    getParent (successCallback : (a : Entry ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+    isDirectory : boolean ;
+    isFile : boolean ;
+    moveTo (parent : DirectoryEntry , newName ? : string , successCallback ? : (a : Entry ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+    name : string ;
+    remove (successCallback : ( ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+    toURL (mimeType ? : string ) : string ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class FileEntry extends FileEntry_Instance {
+  }
+  class FileEntry_Instance extends Entry_Instance {
+    createWriter (successCallback : (a : FileWriter ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+    file (successCallback : (a : File ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class FileError extends FileError_Instance {
+    static ABORT_ERR : number ;
+    static ENCODING_ERR : number ;
+    static INVALID_MODIFICATION_ERR : number ;
+    static INVALID_STATE_ERR : number ;
+    static NOT_FOUND_ERR : number ;
+    static NOT_READABLE_ERR : number ;
+    static NO_MODIFICATION_ALLOWED_ERR : number ;
+    static PATH_EXISTS_ERR : number ;
+    static QUOTA_EXCEEDED_ERR : number ;
+    static SECURITY_ERR : number ;
+    static SYNTAX_ERR : number ;
+    static TYPE_MISMATCH_ERR : number ;
+  }
+  class FileError_Instance extends DOMError {
+    ABORT_ERR : number ;
+    ENCODING_ERR : number ;
+    INVALID_MODIFICATION_ERR : number ;
+    INVALID_STATE_ERR : number ;
+    NOT_FOUND_ERR : number ;
+    NOT_READABLE_ERR : number ;
+    NO_MODIFICATION_ALLOWED_ERR : number ;
+    PATH_EXISTS_ERR : number ;
+    QUOTA_EXCEEDED_ERR : number ;
+    SECURITY_ERR : number ;
+    SYNTAX_ERR : number ;
+    TYPE_MISMATCH_ERR : number ;
+    code : number ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class FileSaver extends FileSaver_Instance {
+  }
+  class FileSaver_Instance {
+    private noStructuralTyping_: any;
+    DONE : number ;
+    INIT : number ;
+    WRITING : number ;
+    abort ( ) : any ;
+    error : FileError ;
+    onabort : (a : ProgressEvent ) => any ;
+    onerror : (a : ProgressEvent ) => any ;
+    onprogress : (a : ProgressEvent ) => any ;
+    onwrite : (a : ProgressEvent ) => any ;
+    onwriteend : (a : ProgressEvent ) => any ;
+    onwritestart : (a : ProgressEvent ) => any ;
+    readyState : number ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class FileSystem extends FileSystem_Instance {
+  }
+  class FileSystem_Instance {
+    private noStructuralTyping_: any;
+    name : string ;
+    root : DirectoryEntry ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class FileWriter extends FileWriter_Instance {
+  }
+  class FileWriter_Instance extends FileSaver_Instance {
+    length : number ;
+    position : number ;
+    seek (offset : number ) : any ;
+    truncate (size : number ) : any ;
+    write (blob : Blob ) : any ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   class Headers extends Headers_Instance {
   }
   class Headers_Instance {
@@ -55,6 +169,18 @@ declare namespace ಠ_ಠ.clutz {
   }
   class Image_Instance extends HTMLImageElement {
     constructor (opt_width ? : number , opt_height ? : number ) ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * Metadata interface.
+   */
+  class Metadata extends Metadata_Instance {
+  }
+  class Metadata_Instance {
+    private noStructuralTyping_: any;
+    modificationTime : Date ;
+    size : number ;
   }
 }
 declare namespace ಠ_ಠ.clutz {

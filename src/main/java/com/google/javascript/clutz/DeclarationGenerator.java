@@ -83,7 +83,9 @@ public class DeclarationGenerator {
       "RequestCredentials", "Request", "Headers", "RequestMode", "WorkerLocation", "Promise",
       "RequestContext", "Response", "ReadableByteStream", "ResponseType",
       "ReadableStreamController", "CountQueuingStrategy", "ByteLengthQueuingStrategy",
-      "ReadableByteStreamReader", "ReadableStream", "WritableStream", "ReadableStreamReader");
+      "ReadableByteStreamReader", "ReadableStream", "WritableStream", "ReadableStreamReader",
+      "Entry", "DirectoryEntry", "FileSystem", "Metadata", "FileError", "DirectoryReader",
+      "FileEntry", "FileWriter", "FileSaver");
 
   /**
    * List of files that are part of closures platform externs.
