@@ -324,8 +324,11 @@ public class DeclarationGenerator {
       // AFAIKT, there is no api for going from type to symbol, so iterate all symbols first.
       for (TypedVar symbol : compiler.getTopScope().getAllSymbols()) {
         String name = symbol.getName();
-        // skip unused symbols, or already emitted.
-        if (!typesUsed.contains(name) || typesEmitted.contains(name)) continue;
+        // skip unused symbols, symbols already emitted or symbols whose namespace is emitted.
+        if (!typesUsed.contains(name) || typesEmitted.contains(name) ||
+            typesEmitted.contains(getNamespace(name))) {
+          continue;
+        }
         // skip provided symbols (as default or in an namespace).
         if (provides.contains(name) || provides.contains(getNamespace(name))) continue;
 
