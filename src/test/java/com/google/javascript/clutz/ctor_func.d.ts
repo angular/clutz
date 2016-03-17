@@ -6,6 +6,7 @@ declare namespace ಠ_ಠ.clutz.ctor_func {
     constructor (a : string , b : number ) ;
   }
   var ctorFuncField : { new (a : string , b : number ) : ಠ_ಠ.clutz.ctor_func.Ctor < any > } ;
+  var ctorFuncFieldAlias : { new (a : string , b : number ) : ಠ_ಠ.clutz.ctor_func.Ctor < any > } ;
   function ctorFuncParam (ctor : { new (a : number ) : ಠ_ಠ.clutz.ctor_func.Ctor < any > } ) : void ;
 }
 declare namespace ಠ_ಠ.clutz.goog {

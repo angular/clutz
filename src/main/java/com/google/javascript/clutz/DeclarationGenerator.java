@@ -813,7 +813,7 @@ public class DeclarationGenerator {
     private void walk(TypedVar symbol, String emitName) {
       JSType type = symbol.getType();
       if (!type.isInterface() && !isTypedef(type)) valueSymbolsWalked++;
-      if (type.isFunctionType()) {
+      if (type.isFunctionType() && !isNewableFunctionType((FunctionType) type)) {
         FunctionType ftype = (FunctionType) type;
 
         if (isOrdinaryFunction(ftype)) {
@@ -823,17 +823,7 @@ public class DeclarationGenerator {
         }
 
         maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ true);
-        // isNominalConstructor is a bit of misnomer, it returns true for all
-        // classes/interfaces that have = function() {}, even a structural interface
-        // defined with @record.
-        // In externs it is allowed to have interfaces without the dummy = function() {}, so the
-        // heuristic fails. For now assume that this rare pattern does not happen in externs.
-        if (!ftype.isNominalConstructor() && !isExtern) {
-          // A top-level field that has a specific constructor function type.
-          // <code>/** @type {function(new:X)} */ foo.x;</code>
-          visitVarDeclaration(getUnqualifiedName(emitName), ftype);
-          return;
-        }
+
         // The class/interface symbol might be an alias for another symbol.
         // Since closure inlines all aliases before this step, check against
         // the type name.
@@ -868,6 +858,21 @@ public class DeclarationGenerator {
         }
         visitVarDeclaration(getUnqualifiedName(emitName), type);
       }
+    }
+
+
+    /**
+     * Used to differentiate a function with a constructor function type, from ordinary ones.
+     * <code> @type {function(new:X)} foo.x;</code>
+     * isNominalConstructor cannot be used because it returns true for all
+     * classes/interfaces that have = function() {} (even if they are structural interfaces!).
+     * That means valid interfaces are considered non-nominal, like
+     * var I; (in externs)  // or
+     * ns.I = goog.nullFunction();
+     */
+    private boolean isNewableFunctionType(FunctionType type) {
+      // Not sure why, but null display name is a good differentiator of newable functions.
+      return type.isConstructor() && type.getDisplayName() == null;
     }
 
     private void visitClassOrInterfaceAlias(String unqualifiedName, FunctionType ftype) {
