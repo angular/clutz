@@ -423,13 +423,16 @@ public class DeclarationGenerator {
     }
   }
 
+  private static final Ordering<TypedVar> BY_VAR_NAME =
+      Ordering.natural().onResultOf(new Function<TypedVar, Comparable<String>>() {
+        @Nullable @Override public Comparable<String> apply(@Nullable TypedVar input) {
+          if (input == null) return null;
+          return input.getName();
+        }
+      });
+
   private void sortSymbols(List<TypedVar> symbols) {
-    Collections.sort(symbols, Ordering.natural().onResultOf(new Function<TypedVar, Comparable>() {
-      @Nullable @Override public Comparable apply(@Nullable TypedVar input) {
-        if (input == null) return null;
-        return input.getName();
-      }
-    }));
+    Collections.sort(symbols, BY_VAR_NAME);
   }
 
   private boolean needsAlias(Set<String> shadowedSymbols, String provide, TypedVar symbol) {
@@ -477,7 +480,7 @@ public class DeclarationGenerator {
   private int declareNamespace(String namespace, TypedVar symbol, String emitName, boolean isDefault,
                                Set<String> provides, boolean isExtern) {
     emitNamespaceBegin(namespace);
-    TreeWalker treeWalker = new TreeWalker(compiler.getTypeRegistry(), provides, isExtern);
+    TreeWalker treeWalker = new TreeWalker(compiler.getTypeRegistry(), provides);
     if (isDefault) {
       if (isPrivate(symbol.getJSDocInfo())) {
         treeWalker.emitPrivateValue(emitName);
@@ -780,8 +783,6 @@ public class DeclarationGenerator {
     private final JSTypeRegistry typeRegistry;
     private final Set<String> provides;
     private int valueSymbolsWalked = 0;
-    private final boolean isExtern;
-
     /**
      * The void type in closure contains only the undefined value.
      */
@@ -792,10 +793,9 @@ public class DeclarationGenerator {
       }
     };
 
-    private TreeWalker(JSTypeRegistry typeRegistry, Set<String> provides, boolean isExtern) {
+    private TreeWalker(JSTypeRegistry typeRegistry, Set<String> provides) {
       this.typeRegistry = typeRegistry;
       this.provides = provides;
-      this.isExtern = isExtern;
     }
 
     private String getAbsoluteName(ObjectType objectType) {
