@@ -43,6 +43,10 @@ public class Options {
       usage = "run faster by skipping the externs parsing (useful for tests)")
   boolean skipParseExterns;
 
+  @Option(name = "--emitPlatformExterns",
+      usage = "emits platform externs, instead of omitting them in favor of TS lib.d.ts")
+  boolean emitPlatformExterns;
+
   @Argument
   List<String> arguments = new ArrayList<>();
 

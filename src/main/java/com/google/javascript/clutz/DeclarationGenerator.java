@@ -359,7 +359,7 @@ public class DeclarationGenerator {
       if (symbolInput == null || !symbolInput.isExtern() || symbol.getType() == null) {
         continue;
       }
-      if (isPlatformExtern(symbolInput.getName(), symbol.getName())) {
+      if (!opts.emitPlatformExterns && isPlatformExtern(symbolInput.getName(), symbol.getName())) {
         continue;
       }
       JSType type = symbol.getType();
@@ -979,8 +979,9 @@ public class DeclarationGenerator {
           // TypeScript does not allow public APIs that expose non-exported/private types.
           emit(Constants.INTERNAL_NAMESPACE + ".PrivateClass");
         } else {
-          Visitor<Void> visitor = new ExtendsImplementsTypeVisitor(
-              emitInstance && !isDefinedInPlatformExterns(superType));
+          boolean emitInstanceForObject = emitInstance &&
+              (opts.emitPlatformExterns || !isDefinedInPlatformExterns(superType));
+          Visitor<Void> visitor = new ExtendsImplementsTypeVisitor(emitInstanceForObject);
           superType.visit(visitor);
         }
       }
@@ -1254,27 +1255,31 @@ public class DeclarationGenerator {
         emit(inImplementsExtendsPosition ? ">" : "[]");
         return null;
       }
-      switch (type.getDisplayName()) {
-        // Arguments<?> and NodeList<?> in es3 externs are correspondingly
-        // IArguments and NodeList interfaces (not-parametrized) in lib.d.ts.
-        case "Arguments":
-          emit("IArguments");
-          return null;
-        case "NodeList":
-          emit("NodeList");
-          return null;
-        case "MessageEvent":
-          emit("MessageEvent");
-          return null;
-        case "IThenable":
-          templateTypeName = "PromiseLike";
-          break;
-        case "IArrayLike":
-          templateTypeName = "ArrayLike";
-          break;
-        default:
-          break;
+
+      if (!opts.emitPlatformExterns) {
+        switch (type.getDisplayName()) {
+          // Arguments<?> and NodeList<?> in es3 externs are correspondingly
+          // IArguments and NodeList interfaces (not-parametrized) in lib.d.ts.
+          case "Arguments":
+            emit("IArguments");
+            return null;
+          case "NodeList":
+            emit("NodeList");
+            return null;
+          case "MessageEvent":
+            emit("MessageEvent");
+            return null;
+          case "IThenable":
+            templateTypeName = "PromiseLike";
+            break;
+          case "IArrayLike":
+            templateTypeName = "ArrayLike";
+            break;
+          default:
+            break;
+        }
       }
+
       if (type.getTemplateTypes().isEmpty()) {
         // In Closure, subtypes of `TemplatizedType`s that do not take type arguments are still
         // represented by templatized types.

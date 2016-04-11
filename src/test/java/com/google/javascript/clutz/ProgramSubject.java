@@ -31,6 +31,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       SourceFile.fromFile("src/test/java/com/google/javascript/clutz/base.js", UTF_8);
   public boolean withPlatform = false;
   public String extraExternFile = null;
+  public boolean emitPlatformExterns;
 
   static ProgramSubject assertThatProgram(String... sourceLines) {
     String sourceText = Joiner.on('\n').join(sourceLines);
@@ -78,6 +79,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
     Options opts = new Options(
         /* include externs */ withPlatform == false && extraExternFile == null);
     opts.debug = true;
+    opts.emitPlatformExterns = emitPlatformExterns;
     List<SourceFile> sourceFiles = new ArrayList<>();
 
     // base.js is needed for the type declaration of goog.require for
