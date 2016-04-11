@@ -43,6 +43,10 @@ public class Options {
       usage = "run faster by skipping the externs parsing (useful for tests)")
   boolean skipParseExterns;
 
+  @Option(name = "--allowPlatformExterns",
+      usage = "Allow platform externs conversion.")
+  boolean allowPlatformExterns;
+
   @Argument
   List<String> arguments = new ArrayList<>();
 
