@@ -382,9 +382,10 @@ public class DeclarationGenerator {
 
     // Enum values like Enum.A will appear as stand-alone symbols, but we do not need to emit them.
     externSymbolNames.removeAll(enumElementSymbols);
-    for (TypedVar symbol : externSymbols) {
-      if (enumElementSymbols.contains(symbol.getName())) {
-        externSymbols.remove(symbol);
+    Iterator<TypedVar> it = externSymbols.iterator();
+    while (it.hasNext()) {
+      if (enumElementSymbols.contains(it.next().getName())) {
+        it.remove();
       }
     }
 
