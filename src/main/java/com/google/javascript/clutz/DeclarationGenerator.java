@@ -359,7 +359,7 @@ public class DeclarationGenerator {
       if (symbolInput == null || !symbolInput.isExtern() || symbol.getType() == null) {
         continue;
       }
-      if (!opts.allowPlatformExterns && isPlatformExtern(symbolInput.getName(), symbol.getName())) {
+      if (!opts.emitPlatformExterns && isPlatformExtern(symbolInput.getName(), symbol.getName())) {
         continue;
       }
       JSType type = symbol.getType();
@@ -979,8 +979,8 @@ public class DeclarationGenerator {
           // TypeScript does not allow public APIs that expose non-exported/private types.
           emit(Constants.INTERNAL_NAMESPACE + ".PrivateClass");
         } else {
-          boolean emitInstanceForObject =  emitInstance &&
-              (opts.allowPlatformExterns || !isDefinedInPlatformExterns(superType));
+          boolean emitInstanceForObject = emitInstance &&
+              (opts.emitPlatformExterns || !isDefinedInPlatformExterns(superType));
           Visitor<Void> visitor = new ExtendsImplementsTypeVisitor(emitInstanceForObject);
           superType.visit(visitor);
         }
@@ -1256,7 +1256,7 @@ public class DeclarationGenerator {
         return null;
       }
 
-      if (!opts.allowPlatformExterns) {
+      if (!opts.emitPlatformExterns) {
         switch (type.getDisplayName()) {
           // Arguments<?> and NodeList<?> in es3 externs are correspondingly
           // IArguments and NodeList interfaces (not-parametrized) in lib.d.ts.
