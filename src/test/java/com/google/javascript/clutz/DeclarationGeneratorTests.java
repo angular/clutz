@@ -61,6 +61,9 @@ public class DeclarationGeneratorTests {
       if (input.getName().contains("_with_platform")) {
         subject.withPlatform = true;
       }
+      if (input.getName().contains("_emit_platform_externs")) {
+        subject.emitPlatformExterns = true;
+      }
       subject.extraExternFile = getExternFileNameOrNull(input.getName());
       suite.addTest(new DeclarationTest(input.getName(), goldenText, subject));
     }
