@@ -65,16 +65,16 @@ public class DeclarationSyntaxTest {
 
   @Test
   public void testDeclarationSyntax() throws Exception {
-    doTestDeclarationSyntaxWithPlatformExterns(JS_NO_EXTERNS_WITHOUT_PLATFORM_EXTERNS, false);
+    doTestDeclarationSyntaxWithPlatformExterns(JS_NO_EXTERNS_WITHOUT_PLATFORM_EXTERNS);
   }
 
 
   @Test
   public void testDeclarationSyntaxWithPlatformExterns() throws Exception {
-    doTestDeclarationSyntaxWithPlatformExterns(JS_NO_EXTERNS_WITH_PLATFORM_EXTERNS, true);
+    doTestDeclarationSyntaxWithPlatformExterns(JS_NO_EXTERNS_WITH_PLATFORM_EXTERNS);
   }
 
-  private void doTestDeclarationSyntaxWithPlatformExterns(FilenameFilter filenameFilter, boolean noLib)
+  private void doTestDeclarationSyntaxWithPlatformExterns(FilenameFilter filenameFilter)
       throws Exception {
     // This currently runs *all* test files as one test case. This gives less insight into errors,
     // but improves runtime as TypeScript only has to read its lib.d.ts once, amortizing the cost
@@ -88,13 +88,7 @@ public class DeclarationSyntaxTest {
 
     List<String> tscCommand =
         Lists.newArrayList(TSC.toString(), "--noEmit", "--skipDefaultLibCheck", "--noImplicitAny");
-
-    if (noLib) {
-      tscCommand.add("--noLib");
-      tscCommand.add("src/resources/min-lib.d.ts");
-    } else {
-      tscCommand.add("src/resources/closure.lib.d.ts");
-    }
+    tscCommand.add("src/resources/closure.lib.d.ts");
 
     tscCommand.addAll(goldenFilePaths);
     runChecked(tscCommand);
@@ -103,26 +97,21 @@ public class DeclarationSyntaxTest {
 
   @Test
   public void testDeclarationUsage() throws Exception {
-    doTestDeclarationUsage(TS_SOURCES_WITHOUT_PLATFORM_EXTERNS, false);
+    doTestDeclarationUsage(TS_SOURCES_WITHOUT_PLATFORM_EXTERNS);
   }
 
   @Test
   public void testDeclarationUsageWithPlatformExterns() throws Exception {
-    doTestDeclarationUsage(TS_SOURCES_WITH_PLATFORM_EXTERNS, true);
+    doTestDeclarationUsage(TS_SOURCES_WITH_PLATFORM_EXTERNS);
   }
 
-  private void doTestDeclarationUsage(FilenameFilter filenameFilter, boolean noLib) throws Exception {
+  private void doTestDeclarationUsage(FilenameFilter filenameFilter) throws Exception {
     List<File> inputs = DeclarationGeneratorTests.getTestInputFiles(filenameFilter);
     final List<String> tscCommand =
         Lists.newArrayList(TSC.toString(), "--noEmit", "--skipDefaultLibCheck", "--noImplicitAny",
             "-m", "commonjs");
 
-    if (noLib) {
-      tscCommand.add("--noLib");
-      tscCommand.add("src/resources/min-lib.d.ts");
-    } else {
-      tscCommand.add("src/resources/closure.lib.d.ts");
-    }
+    tscCommand.add("src/resources/closure.lib.d.ts");
 
     for (File input : inputs) {
       tscCommand.add(input.getPath());

@@ -44,7 +44,7 @@ public class Options {
   boolean skipParseExterns;
 
   @Option(name = "--emitPlatformExterns",
-      usage = "emits platform externs.")
+      usage = "emits platform externs, instead of omitting them in favor of TS lib.d.ts")
   boolean emitPlatformExterns;
 
   @Argument
