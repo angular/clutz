@@ -99,7 +99,20 @@ public class DeclarationGenerator {
       "window.js");
 
   /**
-   * List of global platfom platform symbols that are redirected through an alias in closure.lib.d.ts
+   * Reserved words in ES6.1.
+   * Thanks to https://mathiasbynens.be/notes/reserved-keywords.
+   */
+  private static final Set<String> reservedJsWords = ImmutableSet.of(
+      "arguments", "await", "break", "case", "catch", "class", "const",
+      "continue", "debugger", "default", "delete", "do", "else", "enum", "eval",
+      "export", "extends", "false", "finally", "for", "function", "if",
+      "implements", "import", "in", "instanceof", "interface", "let", "new",
+      "null", "package", "private", "protected", "public", "return", "static",
+      "super", "switch", "this", "throw", "true", "try", "typeof", "var",
+      "void", "while", "with", "yield");
+
+  /**
+   * List of global platform symbols that are redirected through an alias in closure.lib.d.ts
    * This allows the following pattern to work:
    * namespace foo {
    *   class Error extends Error {}
@@ -236,6 +249,9 @@ public class DeclarationGenerator {
     Set<String> shadowedProvides = getShadowedProvides(provides);
 
     TypedScope topScope = compiler.getTopScope();
+
+    processReservedSymbols(provides, topScope);
+
     for (String provide : provides) {
       TypedVar symbol = topScope.getOwnSlot(provide);
       String emitName = provide;
@@ -291,10 +307,75 @@ public class DeclarationGenerator {
     return out.toString();
   }
 
+  /**
+   * Reserved words are problematic because they cannot be used as var declarations, but are valid
+   * properties. For example:
+   * var switch = 0;  // parses badly in JS.
+   * foo.switch = 0;  // ok.
+   *
+   * This means that closure code is allowed to goog.provide('ng.components.switch'), which cannot
+   * trivially translate in TS to:
+   * namespace ng.components {
+   *   var switch : ...;
+   * }
+   * Instead, go one step higher and generate:
+   * namespace ng {
+   *   var components : {switch: ..., };
+   * }
+   * This turns a namespace into a property of its parent namespace.
+   * Note: this violates the invariant that generated namespaces are 1-1 with getNamespace of
+   * goog.provides.
+   */
+  private void processReservedSymbols(TreeSet<String> provides, TypedScope topScope) {
+    Set<String> collapsedNamespaces = new TreeSet<>();
+    for (String reservedProvide : provides) {
+      if (reservedJsWords.contains(getUnqualifiedName(reservedProvide))) {
+        String namespace = getNamespace(reservedProvide);
+        if (collapsedNamespaces.contains(namespace)) continue;
+        collapsedNamespaces.add(namespace);
+        Set<String> properties = getSubNamespace(provides, namespace);
+        emitNamespaceBegin(getNamespace(namespace));
+        emit("var");
+        emit(getUnqualifiedName(namespace));
+        emit(": {");
+        Iterator<String> bundledIt = properties.iterator();
+        while (bundledIt.hasNext()) {
+          emit(getUnqualifiedName(bundledIt.next()));
+          emit(":");
+          TypedVar var = topScope.getOwnSlot(reservedProvide);
+          if (var != null) {
+            TreeWalker walker = new TreeWalker(compiler.getTypeRegistry(), provides);
+            walker.visitType(var.getType());
+          } else {
+            emit("any");
+          }
+          if (bundledIt.hasNext()) emit(",");
+        }
+        emit("};");
+        emitBreak();
+        emitNamespaceEnd();
+        for (String property : properties) {
+          // Assume that all symbols that are siblings of the reserved word are default exports.
+          declareModule(property, true, property, true);
+        }
+      }
+    }
+    // Remove the symbols that we have emitted above.
+    Iterator<String> it = provides.iterator();
+    while(it.hasNext()) {
+      if (collapsedNamespaces.contains(getNamespace(it.next()))) it.remove();
+    }
+  }
+
+  private Set<String> getSubNamespace(TreeSet<String> symbols, String namespace) {
+    return symbols.subSet(namespace  + ".",  namespace + ".\uFFFF");
+  }
+
   private Set<String> getShadowedProvides(TreeSet<String> provides) {
     Set<String> shadowedProvides = new TreeSet<>();
     for (String provide : provides) {
-      if (!provides.subSet(provide + ".", provide + ".\uFFFF").isEmpty()) {
+      if (!getSubNamespace(provides, provide).isEmpty()) {
+
         shadowedProvides.add(provide);
       }
     }
@@ -677,7 +758,12 @@ public class DeclarationGenerator {
     return docInfo != null && docInfo.getVisibility() == Visibility.PRIVATE;
   }
 
-  private void declareModule(String name, Boolean isDefault, String emitName) {
+  private void declareModule(String name, boolean isDefault, String emitName) {
+    declareModule(name, isDefault, emitName, false);
+  }
+
+  private void declareModule(String name, boolean isDefault, String emitName,
+                             boolean inParentNamespace) {
     emitNoSpace("declare module '");
     emitNoSpace("goog:" + name);
     emitNoSpace("' {");
@@ -686,13 +772,16 @@ public class DeclarationGenerator {
     // workaround for https://github.com/Microsoft/TypeScript/issues/4325
     emit("import alias = ");
     emitNoSpace(Constants.INTERNAL_NAMESPACE);
-    emitNoSpace("." + emitName);
+    emitNoSpace(".");
+    emitNoSpace(inParentNamespace ? getNamespace(emitName) : emitName);
     emitNoSpace(";");
     emitBreak();
     if (isDefault) {
-      emit("export default alias;");
+      emitNoSpace("export default alias");
+      if (inParentNamespace) emitNoSpace("." + getUnqualifiedName(name));
+      emitNoSpace(";");
     } else {
-      emit("export = alias;");
+      emitNoSpace("export = alias;");
     }
     emitBreak();
     unindent();
