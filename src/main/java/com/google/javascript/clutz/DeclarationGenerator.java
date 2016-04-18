@@ -559,8 +559,16 @@ public class DeclarationGenerator {
         fileName.startsWith("w3c_") || fileName.startsWith("ie_") || fileName.startsWith("webkit_");
   }
 
+  /**
+   * @return the number of value symbols emitted. If this number is greater than zero, the namespace
+   * can be used in a value position, for example `typeof foo`.
+   */
   private int declareNamespace(String namespace, TypedVar symbol, String emitName, boolean isDefault,
                                Set<String> provides, boolean isExtern) {
+    if (!isValidJSProperty(getUnqualifiedName(symbol))) {
+      emitComment("skipping property " + symbol.getName() + " because it is not a valid symbol.");
+      return 0;
+    }
     emitNamespaceBegin(namespace);
     TreeWalker treeWalker = new TreeWalker(compiler.getTypeRegistry(), provides);
     if (isDefault) {
@@ -583,7 +591,7 @@ public class DeclarationGenerator {
       for (String property : propertyNames) {
         // When parsing externs namespaces are explicitly declared with a var of Object type
         // Do not emit the var declaration, as it will conflict with the namespace.
-        if (!(isPrivateProperty(objType, property)
+        if (!(isPrivateProperty(objType, property) && isValidJSProperty(property)
             || (isExtern && isLikelyNamespace(objType.getPropertyType(property))))) {
           desiredSymbols.add(symbol.getName() + "." + property);
         } else if (objType.getPropertyType(property).isEnumType()) {
@@ -613,7 +621,7 @@ public class DeclarationGenerator {
         if (desiredSymbols.contains(propertyName) && propertySymbol.getType() != null
             && !propertySymbol.getType().isFunctionPrototypeType() && !isPrototypeMethod(propertySymbol)) {
           if (!isValidJSProperty(getUnqualifiedName(propertySymbol))) {
-            emitComment("skipping property " + propertyName + "because it is not a valid symbol.");
+            emitComment("skipping property " + propertyName + " because it is not a valid symbol.");
             continue;
           }
           // For safety we need to special case goog.require to return the empty interface by
