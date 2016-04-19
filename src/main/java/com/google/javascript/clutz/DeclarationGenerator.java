@@ -489,7 +489,7 @@ public class DeclarationGenerator {
         continue;
       }
       // * foo.bar is class-like and baz is a static field.
-      if (isStaticFieldOrMethod(symbol.getType()) && visitedClassLikes.contains(parentPath))
+      if (!isDefiningType(symbol.getType()) && visitedClassLikes.contains(parentPath))
         continue;
       // * foo is a class-like and foo.bar is a static field.
       if (visitedClassLikes.contains(getNamespace(parentPath))) continue;
@@ -530,10 +530,6 @@ public class DeclarationGenerator {
       return false;
     }
     return isDefaultExport(symbol);
-  }
-
-  private boolean isStaticFieldOrMethod(JSType type) {
-    return !isClassLike(type) && !isTypedef(type);
   }
 
   private boolean isDefaultExport(TypedVar symbol) {
