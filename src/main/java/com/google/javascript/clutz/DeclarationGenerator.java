@@ -8,6 +8,7 @@ import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
@@ -1115,16 +1116,35 @@ public class DeclarationGenerator {
 
     private void visitTemplateTypes(ObjectType type) {
       if (type.hasAnyTemplateTypes() && !type.getTemplateTypeMap().isEmpty()) {
-        emit("<");
-        Iterator<TemplateType> it = type.getTemplateTypeMap().getTemplateKeys().iterator();
-        while (it.hasNext()) {
-          emit(it.next().getDisplayName());
-          if (it.hasNext()) {
-            emit(",");
+        List<String> templateKeys = new ArrayList<>();
+        for (TemplateType templateType: type.getTemplateTypeMap().getTemplateKeys()) {
+          String displayName = templateType.getDisplayName();
+          if (displayName.contains("IObject#")) {
+            String normalizedName = normalizeIObjectTemplateName(type, displayName);
+            if (normalizedName != null) {
+              templateKeys.add(normalizedName);
+            }
+          } else {
+            templateKeys.add(displayName);
           }
         }
-        emit(">");
+
+        if (!templateKeys.isEmpty()) {
+          emit("<");
+          emit(Joiner.on(" , ").join(templateKeys));
+          emit(">");
+        }
       }
+    }
+
+    private String normalizeIObjectTemplateName(ObjectType type, String displayName) {
+      // IObject itself needs too keep the template names, as it is a trully parametric type.
+      if (type.getDisplayName().equals("IObject")) {
+        return displayName.substring(displayName.indexOf('#') + 1);
+      }
+      // For other types, we use index signatures in TS to express the same concept, so skip
+      // emitting.
+      return null;
     }
 
     private void visitTypeAlias(JSType registryType, String unqualifiedName) {

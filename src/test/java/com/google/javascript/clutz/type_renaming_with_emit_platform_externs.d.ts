@@ -8,8 +8,22 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  interface IArrayLike < VALUE2 > {
+  class Array < T > extends Array_Instance < T > {
+  }
+  class Array_Instance < T > implements IArrayLike < T > {
+    private noStructuralTyping_: any;
+    constructor ( ...var_args : any [] ) ;
+    [key: string]: any;
     length : number ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface IArrayLike < VALUE2 > extends IObject < number , VALUE2 > {
+    length : number ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface IObject < KEY1 , VALUE > {
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -32,6 +46,14 @@ declare namespace ಠ_ಠ.clutz {
     [key: string]: any;
     item (index : number ) : T ;
     length : number ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class Object extends Object_Instance {
+  }
+  class Object_Instance {
+    private noStructuralTyping_: any;
+    constructor (opt_value ? : any ) ;
   }
 }
 declare namespace ಠ_ಠ.clutz {

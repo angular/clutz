@@ -5,7 +5,14 @@
  */
 
 /**
+ * @interface
+ * @template KEY1, VALUE1
+ */
+function IObject() {}
+
+/**
  * @record
+ * @extends {IObject<number, VALUE2>}
  * @template VALUE2
  */
 function IArrayLike() {}
@@ -54,10 +61,30 @@ function MessageEvent() {}
  */
 MessageEvent.prototype.data;
 
-
 /**
  * @interface
  * @template TYPE
  */
 function IThenable() {}
+
+/**
+ * @constructor
+ * @param {*=} opt_value
+ * @return {!Object}
+ */
+function Object(opt_value) {}
+
+/**
+ * @constructor
+ * @implements {IArrayLike<T>}
+ * @param {...*} var_args
+ * @return {!Array<?>}
+ * @template T
+ */
+function Array(var_args) {}
+
+/**
+ * @type {number}
+ */
+Array.prototype.length;
 
