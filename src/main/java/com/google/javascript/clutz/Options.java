@@ -63,7 +63,7 @@ public class Options {
     options.setWarningLevel(DiagnosticGroups.DUPLICATE_VARS, CheckLevel.ERROR);
 
     // Late Provides are errors by default, but they do not prevent clutz from transpiling.
-    options.setWarningLevel("lateProvide", CheckLevel.OFF);
+    options.setWarningLevel(DiagnosticGroups.LATE_PROVIDE, CheckLevel.OFF);
 
     options.setLanguage(CompilerOptions.LanguageMode.ECMASCRIPT6);
     options.setLanguageOut(CompilerOptions.LanguageMode.ECMASCRIPT5);

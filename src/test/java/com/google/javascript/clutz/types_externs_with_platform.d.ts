@@ -132,3 +132,16 @@ declare namespace ಠ_ಠ.clutz.namespace.subNamespace {
 declare namespace ಠ_ಠ.clutz.namespace.subNamespace {
   var fieldB : number ;
 }
+declare namespace ಠ_ಠ.clutz.window {
+  type classNamespace = ಠ_ಠ.clutz.classNamespace ;
+  var classNamespace : typeof ಠ_ಠ.clutz.classNamespace ;
+}
+declare namespace ಠ_ಠ.clutz.window {
+  function functionNamespace (a : { is : string } ) : any ;
+}
+declare namespace ಠ_ಠ.clutz.window {
+  type functionNamespaceHelperClass = ಠ_ಠ.clutz.functionNamespaceHelperClass ;
+  var functionNamespaceHelperClass : typeof ಠ_ಠ.clutz.functionNamespaceHelperClass ;
+}
+declare namespace ಠ_ಠ.clutz.window.namespace {
+}

@@ -795,7 +795,8 @@ public class DeclarationGenerator {
 
   static public List<SourceFile> getDefaultExterns(Options opts) {
     try {
-      return AbstractCommandLineRunner.getBuiltinExterns(opts.getCompilerOptions());
+      return AbstractCommandLineRunner.getBuiltinExterns(
+          opts.getCompilerOptions().getEnvironment());
     } catch (IOException e) {
       throw new RuntimeException("Could not locate builtin externs", e);
     }

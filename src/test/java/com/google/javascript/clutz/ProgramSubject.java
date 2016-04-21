@@ -6,6 +6,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.common.truth.FailureStrategy;
 import com.google.common.truth.StringSubject;
 import com.google.common.truth.Subject;
@@ -76,8 +77,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
   }
 
   private String[] parse() throws AssertionError {
-    Options opts = new Options(
-        /* include externs */ withPlatform == false && extraExternFile == null);
+    Options opts = new Options(false);
     opts.debug = true;
     opts.emitPlatformExterns = emitPlatformExterns;
     List<SourceFile> sourceFiles = new ArrayList<>();
@@ -104,10 +104,13 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       roots.add("main.js");
     }
 
-    List<SourceFile> externFiles = new ArrayList<>();
+    List<SourceFile> externFiles;
     if (withPlatform) {
       externFiles = DeclarationGenerator.getDefaultExterns(opts);
+    } else {
+      externFiles = Lists.newArrayList(SourceFile.fromFile("src/resources/es6_min.js", UTF_8));
     }
+
     if (extraExternFile != null) {
       externFiles.add(SourceFile.fromFile(extraExternFile, UTF_8));
     }
