@@ -219,7 +219,7 @@ declare namespace ಠ_ಠ.clutz {
     constructor (stream : ReadableByteStream ) ;
     cancel (reason : any ) : any ;
     closed : boolean ;
-    read ( ) : Promise < { done : boolean , value : any } > ;
+    read ( ) : Promise < { done : boolean , value ? : any } > ;
     releaseLock ( ) : void ;
   }
 }
@@ -257,7 +257,7 @@ declare namespace ಠ_ಠ.clutz {
     constructor (stream : ReadableStream ) ;
     cancel (reason : any ) : any ;
     closed : boolean ;
-    read ( ) : Promise < { done : boolean , value : any } > ;
+    read ( ) : Promise < { done : boolean , value ? : any } > ;
     releaseLock ( ) : void ;
   }
 }

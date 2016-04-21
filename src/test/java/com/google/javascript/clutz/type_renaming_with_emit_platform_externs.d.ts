@@ -34,3 +34,6 @@ declare namespace ಠ_ಠ.clutz {
     length : number ;
   }
 }
+declare namespace ಠ_ಠ.clutz {
+  function Symbol (description : string ) : any ;
+}

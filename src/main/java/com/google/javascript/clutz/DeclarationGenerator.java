@@ -209,13 +209,7 @@ public class DeclarationGenerator {
 
   String generateDeclarations(List<SourceFile> sourceFiles, List<SourceFile> externs,
       Depgraph depgraph) throws AssertionError {
-    if (externs.isEmpty()) {
-      externs =
-          opts.skipParseExterns ? Collections.<SourceFile>emptyList() : getDefaultExterns(opts);
-    } else {
-      Preconditions.checkArgument(!opts.skipParseExterns,
-          "Cannot pass --skipParseExterns and --externs.");
-    }
+
     compiler.compile(externs, sourceFiles, opts.getCompilerOptions());
     String dts = produceDts(depgraph);
     errorManager.doGenerateReport();
@@ -447,6 +441,10 @@ public class DeclarationGenerator {
       // Closure treats all prototypes as separate symbols, but we handle them in conjunction with
       // parent symbol.
       if (symbol.getName().contains(".prototype")) continue;
+
+      // Some extern symbols appear twice, once unprefixed, and once prefixed with window.
+      // Skip the second one.
+      if (symbol.getName().startsWith("window.")) continue;
 
       // Sub-parts of namespaces in externs can appear as unknown if they miss a @const.
       if (type.isUnknownType()) continue;
@@ -795,7 +793,8 @@ public class DeclarationGenerator {
 
   static public List<SourceFile> getDefaultExterns(Options opts) {
     try {
-      return AbstractCommandLineRunner.getBuiltinExterns(opts.getCompilerOptions());
+      return AbstractCommandLineRunner.getBuiltinExterns(
+          opts.getCompilerOptions().getEnvironment());
     } catch (IOException e) {
       throw new RuntimeException("Could not locate builtin externs", e);
     }
