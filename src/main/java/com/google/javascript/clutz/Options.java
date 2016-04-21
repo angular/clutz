@@ -37,10 +37,6 @@ public class Options {
       usage = "include all sources in compilation that appear (anywhere) in the given depgraphs")
   boolean filterSourcesWithDepgraphs = false;
 
-  @Option(name = "--emitPlatformExterns",
-      usage = "emits platform externs, instead of omitting them in favor of TS lib.d.ts")
-  boolean emitPlatformExterns;
-
   @Argument
   List<String> arguments = new ArrayList<>();
 
