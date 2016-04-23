@@ -338,7 +338,7 @@ public class DeclarationGenerator {
           emit(":");
           TypedVar var = topScope.getOwnSlot(reservedProvide);
           if (var != null) {
-            TreeWalker walker = new TreeWalker(compiler.getTypeRegistry(), provides);
+            TreeWalker walker = new TreeWalker(compiler.getTypeRegistry(), provides, false);
             walker.visitType(var.getType());
           } else {
             emit("any");
@@ -479,8 +479,8 @@ public class DeclarationGenerator {
         emitName += Constants.SYMBOL_ALIAS_POSTFIX;
       }
 
-      // skip foo.bar.baz in the following three cases:
-      // * foo.bar is namespacesub
+      // skip foo.bar.baz in the following two cases:
+      // * foo.bar is namespace
       if (visitedNamespaces.contains(parentPath)) {
         // Note that this class has been visited before continuing.
         if (isDefault && isClassLike(symbol.getType())) visitedClassLikes.add(symbol.getName());
@@ -489,8 +489,6 @@ public class DeclarationGenerator {
       // * foo.bar is class-like and baz is a static field.
       if (!isDefiningType(symbol.getType()) && visitedClassLikes.contains(parentPath))
         continue;
-      // * foo is a class-like and foo.bar is a static field.
-      if (visitedClassLikes.contains(getNamespace(parentPath))) continue;
 
       declareNamespace(isDefault ? parentPath : symbol.getName(), symbol, emitName, isDefault,
           noTransitiveProvides, true);
@@ -564,7 +562,7 @@ public class DeclarationGenerator {
       return 0;
     }
     emitNamespaceBegin(namespace);
-    TreeWalker treeWalker = new TreeWalker(compiler.getTypeRegistry(), provides);
+    TreeWalker treeWalker = new TreeWalker(compiler.getTypeRegistry(), provides, isExtern);
     if (isDefault) {
       if (isPrivate(symbol.getJSDocInfo())) {
         treeWalker.emitPrivateValue(emitName);
@@ -875,6 +873,8 @@ public class DeclarationGenerator {
   private class TreeWalker {
     private final JSTypeRegistry typeRegistry;
     private final Set<String> provides;
+    /** Whether the symbol we are walking was defined in an extern file */
+    private final boolean isExtern;
     private int valueSymbolsWalked = 0;
     /**
      * The void type in closure contains only the undefined value.
@@ -886,9 +886,10 @@ public class DeclarationGenerator {
       }
     };
 
-    private TreeWalker(JSTypeRegistry typeRegistry, Set<String> provides) {
+    private TreeWalker(JSTypeRegistry typeRegistry, Set<String> provides, boolean isExtern) {
       this.typeRegistry = typeRegistry;
       this.provides = provides;
+      this.isExtern = isExtern;
     }
 
     private String getAbsoluteName(ObjectType objectType) {
@@ -1522,6 +1523,10 @@ public class DeclarationGenerator {
     private void visitProperties(ObjectType objType, boolean isStatic, Set<String> skipNames,
                                  Set<String> forceProps) {
       for (String propName : getSortedPropertyNamesToEmit(objType)) {
+        // Extern processing goes through all known symbols, thus statics that are representable as
+        // a namespace, are skipped here and emitted as namespaces only.
+        // (see: extern_static_namespace output.d.ts)
+        if (isExtern && isStatic && isLikelyNamespace(objType.getPropertyType(propName))) continue;
         if (skipNames.contains(propName)) continue;
 
         if ("prototype".equals(propName) || "superClass_".equals(propName)
