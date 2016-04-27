@@ -116,21 +116,6 @@ functionNamespace.dom = function(nodeOrEvent) {};
 
 /**
  * @constructor
- */
-var classNamespace = function() {};
-
-/**
- * @const
- */
-classNamespace.constObj = {};
-
-/**
- * @type {number}
- */
-classNamespace.constObj.num;
-
-/**
- * @constructor
  * @private
  */
 functionNamespace.privateClass = function() {};

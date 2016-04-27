@@ -68,16 +68,6 @@ declare module 'goog:typesWithExterns.C' {
 }
 /** Insert general_with_platform.d.ts here */
 declare namespace ಠ_ಠ.clutz {
-  class classNamespace extends classNamespace_Instance {
-  }
-  class classNamespace_Instance {
-    private noStructuralTyping_: any;
-  }
-}
-declare namespace ಠ_ಠ.clutz.classNamespace.constObj {
-  var num : number ;
-}
-declare namespace ಠ_ಠ.clutz {
   function functionNamespace (descriptor : { is : string } ) : any ;
 }
 declare namespace ಠ_ಠ.clutz.functionNamespace {
