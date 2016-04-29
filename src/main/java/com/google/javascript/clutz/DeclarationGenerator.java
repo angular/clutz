@@ -55,6 +55,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -166,6 +167,11 @@ public class DeclarationGenerator {
   private StringWriter out = new StringWriter();
 
   /**
+   * If symbols x.y.z and x.y.w exist, childListMap['x.y'] contains the TypedVars for z and w.
+   */
+  private HashMap<String, List<TypedVar>> childListMap = new HashMap<>();
+
+  /**
    * Aggregates all emitted types, used in a final pass to find types emitted in type position but
    * not declared, possibly due to missing goog.provides.
    */
@@ -182,6 +188,20 @@ public class DeclarationGenerator {
 
   boolean hasErrors() {
     return errorManager.getErrorCount() > 0;
+  }
+
+  /**
+   * Precompute the list of children symbols for all top-scope symbols.
+   * I.e. For each x.y -> [x.y.z, x.y.w]
+   */
+  void precomputeChildLists() {
+    for (TypedVar var : compiler.getTopScope().getAllSymbols()) {
+      String namespace = getNamespace(var.getName());
+      if (!namespace.equals("")) {
+        if (!childListMap.containsKey(namespace)) childListMap.put(namespace, new ArrayList<TypedVar>());
+        childListMap.get(namespace).add(var);
+      }
+    }
   }
 
   void generateDeclarations() {
@@ -212,6 +232,7 @@ public class DeclarationGenerator {
       Depgraph depgraph) throws AssertionError {
 
     compiler.compile(externs, sourceFiles, opts.getCompilerOptions());
+    precomputeChildLists();
     String dts = produceDts(depgraph);
     errorManager.doGenerateReport();
     return dts;
@@ -396,7 +417,7 @@ public class DeclarationGenerator {
     Set<String> typesEmitted = new LinkedHashSet<>();
     while (maxTypeUsedDepth > 0) {
       int typesUsedCount = typesUsed.size();
-      // AFAIKT, there is no api for going from type to symbol, so iterate all symbols first.
+      // AFAICT, there is no api for going from type to symbol, so iterate all symbols first.
       for (TypedVar symbol : compiler.getTopScope().getAllSymbols()) {
         String name = symbol.getName();
         // skip unused symbols, symbols already emitted or symbols whose namespace is emitted.
@@ -1695,11 +1716,29 @@ public class DeclarationGenerator {
       // TODO(martinprobst): This curiously duplicates visitProperty above. Investigate the code
       // smell and reduce duplication (or figure out & document why it's needed).
 
+      Set<NamedTypePair> innerProps = new TreeSet<>();
+      // No type means the symbol is a typedef.
+      if (type.isNoType() && childListMap.containsKey(innerNamespace)) {
+        // For typedefs, the inner symbols are not accessible as properties.
+        // We iterate over all symbols to find possible inner symbols.
+        for (TypedVar symbol : childListMap.get(innerNamespace)) {
+          if (getNamespace(symbol.getName()).equals(innerNamespace)) {
+            innerProps.add(new NamedTypePair(symbol.getType(),
+                getUnqualifiedName(symbol.getName())));
+          }
+        }
+      } else {
+        for (String propName : getSortedPropertyNamesToEmit(type)) {
+          innerProps.add(new NamedTypePair(type.getPropertyType(propName), propName));
+        }
+      }
+
       boolean foundNamespaceMembers = false;
-      for (String propName : getSortedPropertyNamesToEmit(type)) {
+      for (NamedTypePair namedType : innerProps) {
+        String propName = namedType.name;
+        JSType pType = namedType.type;
         String qualifiedName = innerNamespace + '.' + propName;
         if (provides.contains(qualifiedName)) continue;
-        JSType pType = type.getPropertyType(propName);
         if (pType.isEnumType()) {
           if (!foundNamespaceMembers) {
             emitNamespaceBegin(innerNamespace);
@@ -1897,6 +1936,23 @@ public class DeclarationGenerator {
         return null;
       }
     }
+
+    private class NamedTypePair implements Comparable<NamedTypePair> {
+      private final String name;
+      private final JSType type;
+
+      NamedTypePair(JSType type, String name) {
+        this.type = type;
+        this.name = name;
+      }
+
+      @Override
+      public int compareTo(NamedTypePair other) {
+        int nameCmp = name.compareTo(other.name);
+        if (nameCmp != 0) return nameCmp;
+        return type.toString().compareTo(other.type.toString());
+      }
+    }
   }
 
   private boolean isFunctionPrototypeProp(String propName) {
@@ -1920,6 +1976,8 @@ public class DeclarationGenerator {
   }
 
   private boolean isAliasedClassOrInterface(TypedVar symbol, JSType type) {
+    // Confusingly typedefs are constructors. However, they cannot be aliased AFAICT.
+    if (type.isNoType()) return false;
     if (!type.isConstructor() && !type.isInterface()) return false;
     return !symbol.getName().equals(type.getDisplayName());
   }
