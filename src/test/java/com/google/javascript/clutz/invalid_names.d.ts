@@ -8,9 +8,9 @@ declare module 'goog:invalid.names' {
   import alias = ಠ_ಠ.clutz.invalid.names;
   export = alias;
 }
-declare namespace ಠ_ಠ.clutz.ext {
+declare namespace ಠ_ಠ.clutz.ext.invalidNames {
   var valid : any ;
 }
-declare namespace ಠ_ಠ.clutz.ext.invalidNames {
+declare namespace ಠ_ಠ.clutz.ext {
   var valid : any ;
 }

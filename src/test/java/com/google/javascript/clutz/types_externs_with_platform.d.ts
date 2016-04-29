@@ -93,8 +93,9 @@ declare namespace ಠ_ಠ.clutz.namespace {
     member : string ;
     method (opt_exp ? : (a : ಠ_ಠ.clutz.namespace.Foo ) => any ) : any ;
   }
+}
+declare namespace ಠ_ಠ.clutz.namespace {
   type atypedef = (a : string , b ? : { capacity ? : number } ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > ;
-  function bootstrap (arg1 : Element | HTMLDocument , opt_arg2 ? : ( string | ( ( ...a : any [] ) => any ) ) [] ) : any ;
 }
 declare namespace ಠ_ಠ.clutz.namespace.atypedef {
   class Cache < T > extends Cache_Instance < T > {
@@ -118,9 +119,6 @@ declare namespace ಠ_ಠ.clutz.namespace.atypedef {
 declare namespace ಠ_ಠ.clutz.namespace.atypedef {
   type get = (a : string ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > ;
 }
-declare namespace ಠ_ಠ.clutz.namespace.subNamespace {
-  var fieldA : string ;
-}
-declare namespace ಠ_ಠ.clutz.namespace.subNamespace {
-  var fieldB : number ;
+declare namespace ಠ_ಠ.clutz.namespace {
+  function bootstrap (arg1 : Element | HTMLDocument , opt_arg2 ? : ( string | ( ( ...a : any [] ) => any ) ) [] ) : any ;
 }

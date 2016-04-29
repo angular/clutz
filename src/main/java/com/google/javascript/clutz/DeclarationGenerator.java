@@ -30,6 +30,7 @@ import com.google.javascript.jscomp.TypedVar;
 import com.google.javascript.rhino.InputId;
 import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.JSDocInfo.Visibility;
+import com.google.javascript.rhino.JSTypeExpression;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.jstype.EnumElementType;
 import com.google.javascript.rhino.jstype.EnumType;
@@ -370,7 +371,6 @@ public class DeclarationGenerator {
     Set<String> shadowedProvides = new TreeSet<>();
     for (String provide : provides) {
       if (!getSubNamespace(provides, provide).isEmpty()) {
-
         shadowedProvides.add(provide);
       }
     }
@@ -480,22 +480,18 @@ public class DeclarationGenerator {
         emitName += Constants.SYMBOL_ALIAS_POSTFIX;
       }
 
-      // skip foo.bar.baz in the following two cases:
-      // * foo.bar is namespace
-      if (visitedNamespaces.contains(parentPath)) {
-        // Note that this class has been visited before continuing.
-        if (isDefault && isClassLike(symbol.getType())) visitedClassLikes.add(symbol.getName());
-        continue;
-      }
-      // * foo.bar is class-like and baz is a static field.
+      // There is nothing to emit for a namespace, because all its symbols will be visited later,
+      // thus implicitly defining the namespace.
+      if (isLikelyNamespace(symbol.getJSDocInfo())) continue;
+
+      // Do not emit static fields as symbols, since they were already emitted in the class
+      // definition.
       if (!isDefiningType(symbol.getType()) && visitedClassLikes.contains(parentPath))
         continue;
 
       declareNamespace(isDefault ? parentPath : symbol.getName(), symbol, emitName, isDefault,
-          noTransitiveProvides, true);
+          shadowedSymbols, true);
 
-      if (!isDefault && isLikelyNamespace(symbol.getType()))
-        visitedNamespaces.add(symbol.getName());
       if (isDefault && isClassLike(symbol.getType())) visitedClassLikes.add(symbol.getName());
       // we do not declare modules or goog.require support, because externs types should not be
       // visible from TS code.
@@ -585,7 +581,7 @@ public class DeclarationGenerator {
         // When parsing externs namespaces are explicitly declared with a var of Object type
         // Do not emit the var declaration, as it will conflict with the namespace.
         if (!(isPrivateProperty(objType, property) && isValidJSProperty(property)
-            || (isExtern && isLikelyNamespace(objType.getPropertyType(property))))) {
+            || (isExtern && isLikelyNamespace(objType.getOwnPropertyJSDocInfo(property))))) {
           desiredSymbols.add(symbol.getName() + "." + property);
         } else if (objType.getPropertyType(property).isEnumType()) {
           // For enum types (unlike classes or interfaces), Closure does not track the visibility on
@@ -657,24 +653,22 @@ public class DeclarationGenerator {
     return Pattern.matches("^[$a-zA-Z_][0-9a-zA-Z_$]*$", name);
   }
 
-  // Due to lack of precise definition of a namespace, we look for object types that are not of any
-  // other type. This will need more refinement as more cases appear.
-  private boolean isLikelyNamespace(JSType type) {
-    UnionType utype = type.toMaybeUnionType();
-    if (utype != null) {
-      return isNativeObjectType(utype.restrictByNotNullOrUndefined());
+  /**
+   * Returns whether the author tried to express the concept of a namespace in Closure.
+   * TS has a first-class keyword for it, but in Closure we need to infer it from the JSDoc.
+   * Roughly, a namespace is a static object used for hierarchically organizing values.
+   * TODO(rado): this might still have some false positives. A more robust check would also
+   * verify that there are child properties (an empty namespace is not useful).
+   */
+  private boolean isLikelyNamespace(JSDocInfo doc) {
+    if (doc == null) return false;
+    // Authors should prefer @const to express a namespace in externs, and just goog.provide it
+    // in non-extern code. However, there are still usages of @type {Object}.
+    JSTypeExpression type = doc.getType();
+    if (type != null && type.getRoot().isString() && type.getRoot().getString().equals("Object")) {
+      return true;
     }
-    // The inferred type for an namespace-like object is not the native object,
-    // but rather PrototypeObjectType.
-    return isNativeObjectType(type) ||
-        // TODO(rado): find a better api to use here (if it exists).
-        (type.isObject() && !type.isConstructor() && !type.isInstanceType()
-            && !type.isFunctionType());
-  }
-
-  // TODO(rado): refactor so that the native object type is a final field.
-  private boolean isNativeObjectType(JSType type) {
-    return compiler.getTypeRegistry().getNativeType(OBJECT_TYPE).equals(type);
+    return doc.hasConstAnnotation() && !doc.hasType();
   }
 
   /**
@@ -1546,7 +1540,7 @@ public class DeclarationGenerator {
         // Extern processing goes through all known symbols, thus statics that are representable as
         // a namespace, are skipped here and emitted as namespaces only.
         // (see: extern_static_namespace output.d.ts)
-        if (isExtern && isStatic && isLikelyNamespace(objType.getPropertyType(propName))) continue;
+        if (isExtern && isStatic && isLikelyNamespace(objType.getOwnPropertyJSDocInfo(propName))) continue;
         if (skipNames.contains(propName)) continue;
 
         if ("prototype".equals(propName) || "superClass_".equals(propName)

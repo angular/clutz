@@ -84,21 +84,6 @@ namespace.atypedef.Cache.prototype.destroy = function() {};
 namespace.atypedef.Cache.Info;
 
 /**
- * @type {Object}
- */
-namespace.subNamespace = {};
-
-/**
- * @type {string}
- */
-namespace.subNamespace.fieldA = '';
-
-/**
- * @type {number}
- */
-namespace.subNamespace.fieldB = 0;
-
-/**
  * @param {!{is: string}} descriptor
  */
 var functionNamespace = function(descriptor) {};
