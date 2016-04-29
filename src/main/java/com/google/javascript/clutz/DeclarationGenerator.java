@@ -443,9 +443,6 @@ public class DeclarationGenerator {
       // parent symbol.
       if (symbol.getName().contains(".prototype")) continue;
 
-      // Some extern symbols appear twice, once unprefixed, and once prefixed with window.
-      // Skip the second one.
-      if (symbol.getName().startsWith("window.")) continue;
 
       // Sub-parts of namespaces in externs can appear as unknown if they miss a @const.
       if (type.isUnknownType()) continue;
@@ -460,9 +457,22 @@ public class DeclarationGenerator {
       externSymbolNames.add(symbol.getName());
     }
 
+    Iterator<TypedVar> it = externSymbols.iterator();
+
+    while (it.hasNext()) {
+      // Some extern symbols appear twice, once unprefixed, and once prefixed with window.
+      // Skip the second one, if both exist.
+      TypedVar symbol = it.next();
+      if (symbol.getName().startsWith("window.") &&
+          externSymbolNames.contains(symbol.getName().substring(7))) {
+        it.remove();
+        externSymbolNames.remove(symbol.getName());
+      }
+    }
+
     // Enum values like Enum.A will appear as stand-alone symbols, but we do not need to emit them.
     externSymbolNames.removeAll(enumElementSymbols);
-    Iterator<TypedVar> it = externSymbols.iterator();
+    it = externSymbols.iterator();
     while (it.hasNext()) {
       if (enumElementSymbols.contains(it.next().getName())) {
         it.remove();
