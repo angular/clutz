@@ -164,7 +164,6 @@ public class DeclarationGenerator {
   private final Compiler compiler;
   private final ClutzErrorManager errorManager;
   private StringWriter out = new StringWriter();
-  private final Set<String> privateEnums = new LinkedHashSet<>();
 
   /**
    * Aggregates all emitted types, used in a final pass to find types emitted in type position but
@@ -593,16 +592,6 @@ public class DeclarationGenerator {
         if (!(isPrivateProperty(objType, property) && isValidJSProperty(property)
             || (isExtern && isLikelyNamespace(objType.getOwnPropertyJSDocInfo(property))))) {
           desiredSymbols.add(symbol.getName() + "." + property);
-        } else if (objType.getPropertyType(property).isEnumType()) {
-          // For enum types (unlike classes or interfaces), Closure does not track the visibility on
-          // the created type. Clutz still needs to skip emitting the values, as the original enum
-          // is not emitted here. JSTypeRegistry etc do not provide access to this, so the list of
-          // private enums has to be tracked in this side channel.
-          //
-          // NB: This has multiple issues. It requires the enum to be declared before used, and it
-          // requires the enum to be on an exported namespace. In practice, the rare instances of
-          // this pattern appear to follow those rules.
-          privateEnums.add(namespace + "." + property);
         }
       }
       // Any provides have their own namespace and should not be emitted in this namespace.
@@ -757,6 +746,21 @@ public class DeclarationGenerator {
   private boolean isTypeCheckSuppressedProperty(ObjectType obj, String propName) {
     JSDocInfo info = obj.getOwnPropertyJSDocInfo(propName);
     return info != null && info.getSuppressions().contains("checkTypes");
+  }
+
+  private boolean isPrivate(JSType type) {
+    // For unknown reasons, enum types do not keep their defining jsdoc info.
+    if (type.isEnumType() || type.isEnumElementType()) {
+      return isPrivate(type.getDisplayName());
+    } else {
+      return isPrivate(type.getJSDocInfo());
+    }
+  }
+
+  private boolean isPrivate(String name) {
+    TypedVar var = compiler.getTopScope().getOwnSlot(name);
+    if (var == null) return false;
+    return isPrivate(var.getJSDocInfo());
   }
 
   private boolean isPrivate(@Nullable JSDocInfo docInfo) {
@@ -1228,8 +1232,7 @@ public class DeclarationGenerator {
       // See also JsdocToEs6TypedConverter in the Closure code base. This code is implementing the
       // same algorithm starting from JSType nodes (as opposed to JSDocInfo), and directly
       // generating textual output. Otherwise both algorithms should produce the same output.
-      if (isPrivate(typeToVisit.getJSDocInfo())
-          || privateEnums.contains(typeToVisit.getDisplayName())) {
+      if (isPrivate(typeToVisit)) {
         // TypeScript does not allow public APIs that expose non-exported/private types. Just emit
         // an empty object literal type for those, i.e. something that cannot be used for anything,
         // except being passed around.
@@ -1691,15 +1694,6 @@ public class DeclarationGenerator {
     void walkInnerSymbols(ObjectType type, String innerNamespace) {
       // TODO(martinprobst): This curiously duplicates visitProperty above. Investigate the code
       // smell and reduce duplication (or figure out & document why it's needed).
-
-      // Populating privateEnums is necessary, because enumType.getJsDocInfo() returns null, while
-      // parentType.getOwnPropertyJSDocInfo(enumName) works fine.
-      for (String propName : type.getPropertyNames()) {
-        JSType pType = type.getPropertyType(propName);
-        if (pType.isEnumType() && isPrivate(type.getOwnPropertyJSDocInfo(propName))) {
-          privateEnums.add(innerNamespace + '.' + propName);
-        }
-      }
 
       boolean foundNamespaceMembers = false;
       for (String propName : getSortedPropertyNamesToEmit(type)) {

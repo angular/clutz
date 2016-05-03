@@ -21,6 +21,9 @@ privatetype.X_ = function() {};
 /** @constructor */
 privatetype.Foo = function(a) {}
 
+/** @return {privatetype.Foo.AnotherPrivateEnum_} */
+privatetype.Foo.prototype.foo = function() {};
+
 /**
  * @enum {number}
  * @private
@@ -29,4 +32,3 @@ privatetype.Foo.AnotherPrivateEnum_ = { A: 0 };
 
 /** @typedef {{ a: privatetype.Foo.AnotherPrivateEnum_}} */
 privatetype.Foo.typedef;
-

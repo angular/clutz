@@ -10,6 +10,7 @@ declare namespace ಠ_ಠ.clutz.privatetype {
   class Foo_Instance {
     private noStructuralTyping_: any;
     constructor (a : any ) ;
+    foo ( ) : ಠ_ಠ.clutz.PrivateType ;
   }
 }
 declare namespace ಠ_ಠ.clutz.privatetype.Foo {
