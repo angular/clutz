@@ -169,7 +169,7 @@ public class DeclarationGenerator {
   /**
    * If symbols x.y.z and x.y.w exist, childListMap['x.y'] contains the TypedVars for z and w.
    */
-  private HashMap<String, List<TypedVar>> childListMap = new HashMap<>();
+  private final HashMap<String, List<TypedVar>> childListMap = new HashMap<>();
 
   /**
    * Aggregates all emitted types, used in a final pass to find types emitted in type position but
@@ -442,8 +442,6 @@ public class DeclarationGenerator {
   }
 
   private void processExternSymbols() {
-    Set<String> noTransitiveProvides = Collections.emptySet();
-    Set<String> visitedNamespaces = new TreeSet<>();
     Set<String> visitedClassLikes = new TreeSet<>();
 
     List<TypedVar> externSymbols = new ArrayList<>();
