@@ -19,7 +19,6 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
@@ -248,6 +247,7 @@ public class DeclarationGenerator {
   public String produceDts(Depgraph depgraph) {
     // Tree sets for consistent order.
     TreeSet<String> provides = new TreeSet<>();
+    Set<String> rewrittenProvides = new TreeSet<>();
     Set<String> transitiveProvides = new TreeSet<>();
     out = new StringWriter();
 
@@ -269,6 +269,14 @@ public class DeclarationGenerator {
     for (String provide : provides) {
       TypedVar symbol = topScope.getOwnSlot(provide);
       String emitName = provide;
+      String rewritenProvide = "module$exports$" + provide.replace('.', '$');
+      TypedVar moduleTypeVar = topScope.getOwnSlot(rewritenProvide);
+      if (moduleTypeVar != null) {
+        // The provide came from a goog.module.
+        symbol = moduleTypeVar;
+        emitName = rewritenProvide;
+        rewrittenProvides.add(rewritenProvide);
+      }
       if (needsAlias(shadowedProvides, provide, symbol)) {
         emitName += Constants.SYMBOL_ALIAS_POSTFIX;
       }
@@ -295,7 +303,7 @@ public class DeclarationGenerator {
         continue;
       }
       // checkArgument(symbol.getType() != null, "all symbols should have a type: %s", provide);
-      String namespace = provide;
+      String namespace = symbol.getName();
       boolean isDefault = isDefaultExport(symbol);
       // These goog.provide's have only one symbol, so users expect to use default import
       if (isDefault) {
@@ -315,6 +323,9 @@ public class DeclarationGenerator {
     // In order to typecheck in the presence of third-party externs, emit all extern symbols.
     processExternSymbols();
 
+    // For the purposes of determining which provides have been emitted
+    // combine original provides and rewritten ones.
+    provides.addAll(rewrittenProvides);
     processUnprovidedTypes(provides);
 
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
