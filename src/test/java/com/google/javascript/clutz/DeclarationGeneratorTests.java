@@ -85,6 +85,10 @@ public class DeclarationGeneratorTests {
     return Arrays.asList(testFiles);
   }
 
+  static Path getTestInputFile(String fileName) {
+    return getPackagePath().resolve(fileName);
+  }
+
   private static Path getPackagePath() {
     Path testDir = FileSystems.getDefault().getPath("src", "test", "java");
     String packageName = DeclarationGeneratorTests.class.getPackage().getName();

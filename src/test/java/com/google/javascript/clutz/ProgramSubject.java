@@ -18,7 +18,9 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -92,7 +94,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       sourceFiles.add(SourceFile.fromFile(nonroot, UTF_8));
     }
 
-    List<String> roots = new ArrayList<>();
+    Set<String> roots = new LinkedHashSet<>();
 
     for (File root : getSubject().roots) {
       sourceFiles.add(SourceFile.fromFile(root, UTF_8));
@@ -125,7 +127,8 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       System.setErr(new PrintStream(out));
       DeclarationGenerator generator = new DeclarationGenerator(opts);
-      String dts = generator.generateDeclarations(sourceFiles, externFiles, new Depgraph(roots));
+      String dts =
+          generator.generateDeclarations(sourceFiles, externFiles, new Depgraph(roots));
       String diagnostics = out.toString();
       return new String[] {dts, diagnostics};
     } finally {

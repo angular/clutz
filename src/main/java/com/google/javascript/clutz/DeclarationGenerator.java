@@ -213,8 +213,7 @@ public class DeclarationGenerator {
     for (String extern : opts.externs) {
       externFiles.add(SourceFile.fromFile(extern, UTF_8));
     }
-    String result =
-        generateDeclarations(sourceFiles, externFiles, Depgraph.parseFrom(opts.readDepgraphs()));
+    String result = generateDeclarations(sourceFiles, externFiles, opts.depgraph);
 
     if ("-".equals(opts.output)) {
       System.out.println(result);
@@ -254,8 +253,7 @@ public class DeclarationGenerator {
 
     for (CompilerInput compilerInput : compiler.getInputsById().values()) {
       transitiveProvides.addAll(compilerInput.getProvides());
-      if (depgraph.getRoots().isEmpty()
-          || depgraph.getRoots().contains(compilerInput.getSourceFile().getOriginalPath())) {
+      if (depgraph.isRoot(compilerInput.getSourceFile().getOriginalPath())) {
         provides.addAll(compilerInput.getProvides());
         emitComment(String.format("Processing provides %s from input %s",
             compilerInput.getProvides(), compilerInput.getSourceFile().getOriginalPath()));

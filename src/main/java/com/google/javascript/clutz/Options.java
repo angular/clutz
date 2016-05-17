@@ -1,8 +1,5 @@
 package com.google.javascript.clutz;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-import com.google.common.io.Files;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DiagnosticGroups;
@@ -13,9 +10,6 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,10 +28,14 @@ public class Options {
   List<String> externs = new ArrayList<>();
 
   @Option(name = "--depgraphs",
-      usage = "file(s) which contains the JSON representation of the dependency graph",
+      usage = "only generate output for files listed as a root in the given depgraphs",
       metaVar = "file.depgraph...",
       handler = StringArrayOptionHandler.class)
   List<String> depgraphFiles = new ArrayList<>();
+
+  @Option(name = "--depgraphs_filter_sources",
+      usage = "include all sources in compilation that appear (anywhere) in the given depgraphs")
+  boolean filterSourcesWithDepgraphs = false;
 
   @Option(name = "--emitPlatformExterns",
       usage = "emits platform externs, instead of omitting them in favor of TS lib.d.ts")
@@ -45,6 +43,8 @@ public class Options {
 
   @Argument
   List<String> arguments = new ArrayList<>();
+
+  Depgraph depgraph;
 
   public CompilerOptions getCompilerOptions() {
     final CompilerOptions options = new CompilerOptions();
@@ -72,24 +72,17 @@ public class Options {
   Options(String[] args) throws CmdLineException {
     CmdLineParser parser = new CmdLineParser(this);
     parser.parseArgument(args);
+    this.depgraph = Depgraph.parseFrom(this.filterSourcesWithDepgraphs, depgraphFiles);
+    if (filterSourcesWithDepgraphs) {
+      // Clutz still takes the list of files to compile from the outside, because Closure depends
+      // on source order in many places. The depgraph files are not sorted, build order is instead
+      // established by the outside tool driving compilation (e.g. bazel).
+      arguments.retainAll(depgraph.getRoots());
+    }
     if (arguments.isEmpty()) {
       throw new CmdLineException(parser, "No files were given");
     }
   }
 
   Options() {}
-
-  public List<String> readDepgraphs() {
-    List<String> result = new ArrayList<>();
-    for (String file : depgraphFiles) {
-      try {
-        result.add(Files.toString(new File(file), UTF_8));
-      } catch (FileNotFoundException e) {
-        throw new IllegalArgumentException("depgraph file not found: " + file, e);
-      } catch (IOException e) {
-        throw new RuntimeException("error reading depgraph file " + file, e);
-      }
-    }
-    return result;
-  }
 }
