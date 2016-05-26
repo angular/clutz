@@ -874,9 +874,6 @@ public class DeclarationGenerator {
   }
 
   private ObjectType getSuperType(FunctionType type) {
-    if (type == null) {
-      return null;
-    }
     ObjectType proto = type.getPrototype();
     if (proto == null) return null;
     ObjectType implicitProto = proto.getImplicitPrototype();
