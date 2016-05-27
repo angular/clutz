@@ -8,17 +8,6 @@ index_signature.SomeType = function() {}
 
 /**
  * @constructor
- * @implements {IArrayLike<index_signature.SomeType>}
- * @implements {IObject<string, index_signature.SomeType>}
- * @return {!index_signature.ImplementsIArrayLikeAndIObject}
- */
-index_signature.ImplementsIArrayLikeAndIObject = function() {}
-
-/** @type {number} */
-index_signature.ImplementsIArrayLikeAndIObject.prototype.length;
-
-/**
- * @constructor
  * @implements {IArrayLike<string>}
  * @return {!index_signature.ImplementsIArrayLike}
  */

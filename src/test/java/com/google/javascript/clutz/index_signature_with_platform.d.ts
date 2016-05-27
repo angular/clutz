@@ -6,14 +6,6 @@ declare namespace ಠ_ಠ.clutz.index_signature {
     [ key: number ]: string ;
     length : number ;
   }
-  class ImplementsIArrayLikeAndIObject extends ImplementsIArrayLikeAndIObject_Instance {
-  }
-  class ImplementsIArrayLikeAndIObject_Instance implements ArrayLike < ಠ_ಠ.clutz.index_signature.SomeType > , IObject < string , ಠ_ಠ.clutz.index_signature.SomeType > {
-    private noStructuralTyping_: any;
-    [ key: number ]: ಠ_ಠ.clutz.index_signature.SomeType ;
-    [ key: string ]: ಠ_ಠ.clutz.index_signature.SomeType ;
-    length : number ;
-  }
   class ImplementsIArrayLikeWithGeneric < T > extends ImplementsIArrayLikeWithGeneric_Instance < T > {
   }
   class ImplementsIArrayLikeWithGeneric_Instance < T > implements ArrayLike < T > {

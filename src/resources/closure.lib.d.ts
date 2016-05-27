@@ -20,6 +20,8 @@ declare namespace ಠ_ಠ.clutz {
    * type position PrivateType is used.
    */
   interface PrivateInterface {}
+
+  interface IObject<KEY1, VALUE> {}
 }
 
 // Will be extended if base.js is a dependency.
