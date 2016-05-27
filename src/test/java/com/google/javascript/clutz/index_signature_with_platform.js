@@ -42,3 +42,25 @@ index_signature.ImplementsIArrayLikeWithGeneric.prototype.length;
  */
 index_signature.ImplementsIObjectWithGeneric = function() {}
 
+/**
+ * @constructor
+ * @extends {index_signature.ImplementsIArrayLike}
+ * @return {!index_signature.ShouldNotContainIndexSignature}
+ */
+index_signature.ShouldNotContainIndexSignature = function() {}
+
+/**
+ * @interface
+ * @extends {IArrayLike<string>}
+ */
+index_signature.InterfaceExtendingIArrayLike = function() {};
+
+/**
+ * @constructor
+ * @implements {index_signature.InterfaceExtendingIArrayLike}
+ * @return {!index_signature.ShouldContainIndexSignature}
+ */
+index_signature.ShouldContainIndexSignature = function() {}
+
+/** @type {number} */
+index_signature.ShouldContainIndexSignature.prototype.length;

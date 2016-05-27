@@ -25,6 +25,19 @@ declare namespace ಠ_ಠ.clutz.index_signature {
     private noStructuralTyping_: any;
     [ key: string ]: T ;
   }
+  interface InterfaceExtendingIArrayLike extends ArrayLike < string > {
+  }
+  class ShouldContainIndexSignature extends ShouldContainIndexSignature_Instance {
+  }
+  class ShouldContainIndexSignature_Instance implements ಠ_ಠ.clutz.index_signature.InterfaceExtendingIArrayLike {
+    private noStructuralTyping_: any;
+    [ key: number ]: string ;
+    length : number ;
+  }
+  class ShouldNotContainIndexSignature extends ShouldNotContainIndexSignature_Instance {
+  }
+  class ShouldNotContainIndexSignature_Instance extends ಠ_ಠ.clutz.index_signature.ImplementsIArrayLike {
+  }
   class SomeType extends SomeType_Instance {
   }
   class SomeType_Instance {

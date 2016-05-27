@@ -59,6 +59,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -977,7 +978,6 @@ public class DeclarationGenerator {
       }
     }
 
-
     /**
      * Used to differentiate a function with a constructor function type, from ordinary ones.
      * <code> @type {function(new:X)} foo.x;</code>
@@ -1561,7 +1561,7 @@ public class DeclarationGenerator {
       // IArrayLike<T> extends IObject<number, T>. Normally only looking for IObject interface
       // should be enough. But the closure compiler seems to process these two interfaces as if they
       // were independent. A type can even implements both.
-      for (ObjectType implementedInterface : type.getAllImplementedInterfaces()) {
+      for (ObjectType implementedInterface : getAllDirectlyImplementedInterfaces(type)) {
         String displayName = implementedInterface.getDisplayName();
         if ("IObject".equals(displayName)) {
           List<JSType> iObjectTemplateTypes = implementedInterface.getTemplateTypes();
@@ -1581,6 +1581,30 @@ public class DeclarationGenerator {
       unindent();
       emit("}");
       emitBreak();
+    }
+
+    /**
+     * Returns all interfaces implemented by a class and any
+     * superclasses for any of those interfaces.
+     */
+    public Iterable<ObjectType> getAllDirectlyImplementedInterfaces(FunctionType type) {
+      Set<ObjectType> interfaces = new HashSet<>();
+
+      for (ObjectType implementedInterface : type.getOwnImplementedInterfaces()) {
+        addRelatedInterfaces(implementedInterface, interfaces);
+      }
+      return interfaces;
+    }
+
+    private void addRelatedInterfaces(ObjectType instance, Set<ObjectType> interfaces) {
+      FunctionType constructor = instance.getConstructor();
+      if (constructor != null && constructor.isInterface() && !interfaces.contains(instance)) {
+        interfaces.add(instance);
+
+        for (ObjectType interfaceType : instance.getCtorExtendedInterfaces()) {
+          addRelatedInterfaces(interfaceType, interfaces);
+        }
+      }
     }
 
     private void visitProperties(ObjectType objType, boolean isStatic) {
