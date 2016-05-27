@@ -3,7 +3,7 @@ declare namespace ಠ_ಠ.clutz {
   }
   class Arguments_Instance < T > implements IArrayLike < T > {
     private noStructuralTyping_: any;
-    [key: string]: any;
+    [ key: number ]: T ;
     length : number ;
   }
 }
@@ -13,7 +13,7 @@ declare namespace ಠ_ಠ.clutz {
   class Array_Instance < T > implements IArrayLike < T > {
     private noStructuralTyping_: any;
     constructor ( ...var_args : any [] ) ;
-    [key: string]: any;
+    [ key: number ]: T ;
     length : number ;
   }
 }
@@ -43,7 +43,7 @@ declare namespace ಠ_ಠ.clutz {
   }
   class NodeList_Instance < T > implements IArrayLike < T > {
     private noStructuralTyping_: any;
-    [key: string]: any;
+    [ key: number ]: T ;
     item (index : number ) : T ;
     length : number ;
   }

@@ -3,7 +3,7 @@ declare namespace ಠ_ಠ.clutz.dict {
   }
   class ClassWithDottedProperties_Instance {
     private noStructuralTyping_: any;
-    [key: string]: any;
+    [ key: string ]: any ;
     foo : number ;
   }
   class DictClass extends DictClass_Instance {
@@ -11,7 +11,7 @@ declare namespace ಠ_ಠ.clutz.dict {
   class DictClass_Instance {
     private noStructuralTyping_: any;
     constructor (n : any ) ;
-    [key: string]: any;
+    [ key: string ]: any ;
     foo ( ) : void ;
   }
   var typed : { a : ( ...a : any [] ) => any } ;

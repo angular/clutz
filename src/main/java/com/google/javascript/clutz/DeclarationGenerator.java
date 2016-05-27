@@ -3,8 +3,11 @@ package com.google.javascript.clutz;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Iterables.any;
+import static com.google.javascript.rhino.jstype.JSTypeNative.ALL_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.ARRAY_TYPE;
+import static com.google.javascript.rhino.jstype.JSTypeNative.NUMBER_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
+import static com.google.javascript.rhino.jstype.JSTypeNative.STRING_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.base.Function;
@@ -69,12 +72,6 @@ import javax.annotation.Nullable;
  * A tool that generates {@code .d.ts} declarations from a Google Closure JavaScript program.
  */
 public class DeclarationGenerator {
-  private static final Predicate<? super ObjectType> IS_IARRYLIKE = new Predicate<ObjectType>() {
-    @Override
-    public boolean apply(@Nullable ObjectType input) {
-      return input != null && input.getDisplayName().equals("IArrayLike");
-    }
-  };
   static final String INSTANCE_CLASS_SUFFIX = "_Instance";
 
   /**
@@ -1111,8 +1108,7 @@ public class DeclarationGenerator {
         emitCommaSeparatedInterfaces(it);
       }
 
-      boolean implementsIArrayLike = any(ftype.getAllImplementedInterfaces(), IS_IARRYLIKE);
-      visitObjectType(ftype, ftype.getPrototype(), implementsIArrayLike || ftype.isDict());
+      visitObjectType(ftype, ftype.getPrototype());
     }
 
     private void emitCommaSeparatedInterfaces(Iterator<ObjectType> it) {
@@ -1426,20 +1422,8 @@ public class DeclarationGenerator {
       }
       Iterator<JSType> it = type.getTemplateTypes().iterator();
       if (typeRegistry.getNativeType(OBJECT_TYPE).equals(referencedType)) {
-        emit("{ [");
-        // TS allows only number or string as index type of an object
-        // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.9.4
-        JSType keyType = it.next();
-        if (keyType.isNumberValueType()) {
-          emit("n: number");
-        } else {
-          if (!keyType.isStringValueType()) {
-            emit("/* warning: coerced from " + keyType + " */");
-          }
-          emit("s: string");
-        }
-        emit("]:");
-        visitType(it.next());
+        emit("{");
+        emitIndexSignature(it.next(), it.next(), false);
         emit("}");
         return null;
       }
@@ -1454,6 +1438,27 @@ public class DeclarationGenerator {
       }
       emit(">");
       return null;
+    }
+
+    private void emitIndexSignature(JSType keyType, JSType returnType, boolean emitBreak) {
+      emit("[");
+      // TS allows only number or string as index type of an object
+      // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.9.4
+      if (keyType.isNumberValueType()) {
+        emit("key: number");
+      } else {
+        if (!keyType.isStringValueType()) {
+          emit("/* warning: coerced from " + keyType + " */");
+        }
+        emit("key: string");
+      }
+      emit("]:");
+      visitType(returnType);
+
+      if (emitBreak) {
+        emit(";");
+        emitBreak();
+      }
     }
 
     private void visitRecordType(RecordType type) {
@@ -1515,8 +1520,7 @@ public class DeclarationGenerator {
       }
     }
 
-    private void visitObjectType(FunctionType type, ObjectType prototype,
-                                 boolean emitIndexSignature) {
+    private void visitObjectType(FunctionType type, ObjectType prototype) {
       emit("{");
       indent();
       emitBreak();
@@ -1544,10 +1548,30 @@ public class DeclarationGenerator {
           + instanceType + " which is a " + instanceType.getClass().getSimpleName());
       visitProperties((ObjectType) instanceType, false, Collections.<String>emptySet(),
           superClassFields);
-      // Bracket-style property access
-      if (emitIndexSignature) {
-        emit("[key: string]: any;");
-        emitBreak();
+
+      // Bracket-style property access for dictionnary...
+      if (type.isDict()) {
+        emitIndexSignature(
+            compiler.getTypeRegistry().getNativeType(STRING_TYPE),
+            compiler.getTypeRegistry().getNativeType(ALL_TYPE),
+            true);
+      }
+
+      // ... and type that extends IObject or IArrayLike interfaces.
+      // IArrayLike<T> extends IObject<number, T>. Normally only looking for IObject interface
+      // should be enough. But the closure compiler seems to process these two interfaces as if they
+      // were independent. A type can even implements both.
+      for (ObjectType implementedInterface : type.getAllImplementedInterfaces()) {
+        String displayName = implementedInterface.getDisplayName();
+        if ("IObject".equals(displayName)) {
+          List<JSType> iObjectTemplateTypes = implementedInterface.getTemplateTypes();
+          emitIndexSignature(iObjectTemplateTypes.get(0), iObjectTemplateTypes.get(1), true);
+        } else if ("IArrayLike".equals(displayName)) {
+          emitIndexSignature(
+              compiler.getTypeRegistry().getNativeType(NUMBER_TYPE),
+              implementedInterface.getTemplateTypes().get(0),
+              true);
+        }
       }
 
       // Prototype fields (mostly methods).

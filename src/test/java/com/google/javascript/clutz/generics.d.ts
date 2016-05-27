@@ -26,7 +26,7 @@ declare namespace ಠ_ಠ.clutz.generics {
   var fooMissingOneTypeParam : ಠ_ಠ.clutz.generics.Foo < string , any > ;
   function genericFunction < T > (a : T ) : T ;
   function identity < T > (a : T ) : T ;
-  function objectWithGenericKeyType < K , V > (obj : { [ /* warning: coerced from K */ s: string ]: V } ) : void ;
+  function objectWithGenericKeyType < K , V > (obj : { [ /* warning: coerced from K */ key: string ]: V } ) : void ;
 }
 declare namespace ಠ_ಠ.clutz.goog {
   function require(name: 'generics'): typeof ಠ_ಠ.clutz.generics;

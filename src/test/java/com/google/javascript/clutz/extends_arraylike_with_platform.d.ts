@@ -3,7 +3,7 @@ declare namespace ಠ_ಠ.clutz.extend.arraylike {
   }
   class A_Instance implements ArrayLike < any > {
     private noStructuralTyping_: any;
-    [key: string]: any;
+    [ key: number ]: any ;
     length : number ;
   }
 }
@@ -19,7 +19,7 @@ declare namespace ಠ_ಠ.clutz.extend.arraylike {
   }
   class B_Instance implements ಠ_ಠ.clutz.extend.arraylike.I {
     private noStructuralTyping_: any;
-    [key: string]: any;
+    [ key: number ]: any ;
     length : number ;
   }
 }
