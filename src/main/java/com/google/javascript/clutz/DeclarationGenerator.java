@@ -1585,7 +1585,7 @@ public class DeclarationGenerator {
 
     /**
      * Returns all interfaces implemented by a class and any
-     * superclasses for any of those interfaces.
+     * superinterface for any of those interfaces.
      */
     public Iterable<ObjectType> getAllDirectlyImplementedInterfaces(FunctionType type) {
       Set<ObjectType> interfaces = new HashSet<>();
