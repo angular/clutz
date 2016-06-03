@@ -59,12 +59,13 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -923,6 +924,14 @@ public class DeclarationGenerator {
       }
     };
 
+    /**
+     * Maps types to names for all emitted typedefs, so that further type walks just use the name.
+     *
+     * This is a reverse subset of the private map namesToTypes that Closure keeps in TypeRegistry.
+     * TODO(rado): Try to extract that info in a single pass, instead of rebuilding it.
+     */
+    private Map<JSType, String> typedefs = new HashMap<>();
+
     private TreeWalker(JSTypeRegistry typeRegistry, Set<String> provides, boolean isExtern) {
       this.typeRegistry = typeRegistry;
       this.provides = provides;
@@ -983,7 +992,7 @@ public class DeclarationGenerator {
           // The aliased type is present in the registry under the symbol name.
           JSType registryType = typeRegistry.getType(symbol.getName());
           if (registryType != null) {
-            visitTypeAlias(registryType, getUnqualifiedName(symbol));
+            visitTypeAlias(registryType, symbol);
             return;
           }
         }
@@ -1196,11 +1205,16 @@ public class DeclarationGenerator {
       return null;
     }
 
+    private void visitTypeAlias(JSType registryType, TypedVar symbol) {
+      typedefs.put(registryType, symbol.getName());
+      visitTypeAlias(registryType, getUnqualifiedName(symbol));
+    }
+
     private void visitTypeAlias(JSType registryType, String unqualifiedName) {
       emit("type");
       emit(unqualifiedName);
       emit("=");
-      visitType(registryType);
+      visitType(registryType, true);
       emit(";");
       emitBreak();
     }
@@ -1270,6 +1284,15 @@ public class DeclarationGenerator {
     }
 
     private void visitType(JSType typeToVisit) {
+      visitType(typeToVisit, false);
+    }
+
+    private void visitType(JSType typeToVisit, boolean skipDefCheck) {
+      // Known typedefs will be emitted symbolically instead of expanded.
+      if (!skipDefCheck && typedefs.containsKey(typeToVisit)) {
+        emit(typedefs.get(typeToVisit));
+        return;
+      }
       // See also JsdocToEs6TypedConverter in the Closure code base. This code is implementing the
       // same algorithm starting from JSType nodes (as opposed to JSDocInfo), and directly
       // generating textual output. Otherwise both algorithms should produce the same output.
