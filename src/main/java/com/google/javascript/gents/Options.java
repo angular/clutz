@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A class that parses the command line arguments and generates {@code CompilerOptions} to
- * use with Closure Compiler.
+ * A class that parses the command line arguments and generates {@code CompilerOptions} to use with
+ * Closure Compiler.
  */
 public class Options {
 
@@ -61,5 +61,6 @@ public class Options {
     }
   }
 
-  Options() {}
+  Options() {
+  }
 }

@@ -13,7 +13,7 @@ public class OptionsTest {
 
   @Test
   public void testFullUsage() throws Exception {
-    Options opts = new Options(new String[] {
+    Options opts = new Options(new String[]{
         "foo.js", "--externs", "extern1.js", "extern2.js", "-o", "output"
     });
     assertThat(opts.arguments).containsExactly("foo.js");

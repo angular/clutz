@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 @RunWith(AllTests.class)
 public class DeclarationGeneratorTests {
   /** Comments in .d.ts and .js golden files starting with '//!!' are stripped. */
-  static final Pattern GOLDEN_FILE_COMMENTS_REGEXP = Pattern.compile("(?m)^\\s*//!!.*\\n");
+  public static final Pattern GOLDEN_FILE_COMMENTS_REGEXP = Pattern.compile("(?m)^\\s*//!!.*\\n");
 
   public static final FilenameFilter JS = new FilenameFilter() {
     @Override
@@ -55,7 +55,7 @@ public class DeclarationGeneratorTests {
 
     List<File> testFiles = getTestInputFiles(JS_NO_EXTERNS);
     for (final File input : testFiles) {
-      File golden = getGoldenFile(input);
+      File golden = getGoldenFile(input, ".d.ts");
       final String goldenText = getTestFileText(golden);
       ProgramSubject subject = assertThatProgram(input);
       if (input.getName().contains("_with_platform")) {
@@ -70,8 +70,8 @@ public class DeclarationGeneratorTests {
     return suite;
   }
 
-  static File getGoldenFile(final File input) {
-    return new File(input.getPath().replaceAll("\\.js$", ".d.ts"));
+  public static File getGoldenFile(final File input, String ext) {
+    return new File(input.getPath().replaceAll("\\.js$", ext));
   }
 
   static String getExternFileNameOrNull(String testFileName) {

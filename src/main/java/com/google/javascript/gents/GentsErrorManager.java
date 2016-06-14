@@ -8,12 +8,13 @@ import com.google.javascript.jscomp.PrintStreamErrorManager;
 import java.io.PrintStream;
 
 /**
- * An error manager that delays reporting through {@link #doGenerateReport()} and allows
- * failing fast.
+ * An error manager that delays reporting through {@link #doGenerateReport()} and allows failing
+ * fast.
  *
  * This error manager is a simplified version of the {@code ClutzErrorManager} from Clutz.
  */
 final class GentsErrorManager extends PrintStreamErrorManager {
+
   private final boolean debug;
 
   GentsErrorManager(PrintStream stream, MessageFormatter formatter, boolean debug) {
@@ -24,7 +25,9 @@ final class GentsErrorManager extends PrintStreamErrorManager {
   @Override
   public void report(CheckLevel level, JSError error) {
     // Ignore warnings in non-debug mode.
-    if (!debug && level == CheckLevel.WARNING) return;
+    if (!debug && level == CheckLevel.WARNING) {
+      return;
+    }
     super.report(level, error);
   }
 

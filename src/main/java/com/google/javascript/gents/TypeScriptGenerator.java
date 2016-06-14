@@ -11,6 +11,7 @@ import com.google.javascript.jscomp.ErrorFormat;
 import com.google.javascript.jscomp.JsdocToEs6TypedConverter;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.rhino.Node;
+
 import org.kohsuke.args4j.CmdLineException;
 
 import java.io.File;
@@ -21,7 +22,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A tool that transpiles {@code .js} ES6 and ES5 Closure annotated JavaScript to {@code .ts} TypeScript.
+ * A tool that transpiles {@code .js} ES6 and ES5 Closure annotated JavaScript to {@code .ts}
+ * TypeScript.
  */
 public class TypeScriptGenerator {
 
@@ -140,8 +142,8 @@ public class TypeScriptGenerator {
   }
 
   /**
-   * Returns the file name without its file extension or path.
-   * The result does not include the '{@code .}'.
+   * Returns the file name without its file extension or path. The result does not include the
+   * '{@code .}'.
    */
   static String getFileNameWithoutExtension(String filepath) {
     String filename = new File(filepath).getName();

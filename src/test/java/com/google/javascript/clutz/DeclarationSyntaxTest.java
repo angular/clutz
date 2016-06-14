@@ -83,7 +83,7 @@ public class DeclarationSyntaxTest {
         DeclarationGeneratorTests.getTestInputFiles(filenameFilter);
     List<String> goldenFilePaths = new ArrayList<>();
     for (File input : inputs) {
-      goldenFilePaths.add(DeclarationGeneratorTests.getGoldenFile(input).getPath());
+      goldenFilePaths.add(DeclarationGeneratorTests.getGoldenFile(input, ".d.ts").getPath());
     }
 
     List<String> tscCommand =
