@@ -4,6 +4,15 @@ var x;
 /** @type {?} */
 var y;
 
+/** @type {void} */
+var v;
+
+/** @type {undefined} */
+var u = undefined;
+
+/** @type {null} */
+var nil = null;
+
 /** @type {number} */
 var n = 4;
 

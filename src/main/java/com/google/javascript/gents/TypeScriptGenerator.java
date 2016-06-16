@@ -8,7 +8,6 @@ import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.ErrorFormat;
-import com.google.javascript.jscomp.JsdocToEs6TypedConverter;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.rhino.Node;
 
@@ -116,7 +115,7 @@ public class TypeScriptGenerator {
     compiler.compile(externs, sourceFiles, compilerOpts);
 
     // Type annotate javascript AST
-    CompilerPass typingPass = new JsdocToEs6TypedConverter(compiler);
+    CompilerPass typingPass = new TypeAnnotationPass(compiler);
     Node externRoot = compiler.getRoot().getFirstChild();
     Node srcRoot = compiler.getRoot().getLastChild();
     // Manually execute compiler pass
