@@ -172,6 +172,15 @@ public class DeclarationGenerator {
   private final HashMap<String, List<TypedVar>> childListMap = new HashMap<>();
 
   /**
+   * Maps types to names for all emitted typedefs, so that further type walks just use the name.
+   *
+   * This is a reverse subset of the private map namesToTypes that Closure keeps in TypeRegistry.
+   *
+   * Currently, this map only contains templatized types and record types.
+   */
+  private Map<JSType, String> typedefs = new HashMap<>();
+
+  /**
    * Aggregates all emitted types, used in a final pass to find types emitted in type position but
    * not declared, possibly due to missing goog.provides.
    */
@@ -204,6 +213,48 @@ public class DeclarationGenerator {
     }
   }
 
+  /**
+   * Finds all typedefs in the program and build a Type -> typedef name mapping.
+   * The mapping is needed because when walking type definitions closure inlines the typedefs
+   * values.
+   */
+  void collectTypedefs() {
+    for (TypedVar var : compiler.getTopScope().getAllSymbols()) {
+      // In Closure, unlike TypeScript there is no pure type space. Thus even typedefs declare
+      // symbols. The type of the symbol corresponding to the typedef is *not* the same as the type
+      // declared by the typedef.
+      JSType type = var.getType();
+      if (type == null || !isTypedef(type) || var.getName().startsWith("window.") || isPrivate(var.getJSDocInfo())) continue;
+      JSType realType = compiler.getTypeRegistry().getType(var.getName());
+
+      if (realType != null && shouldEmitTypedefByName(realType)) {
+        typedefs.put(realType, var.getName());
+      }
+    }
+  }
+
+  /**
+   * Whether the typedef should be emitted by name or by the type it is defining.
+   *
+   * Because, we do not access the original type signature, the replacement is done for
+   * all references of the type (through the typedef or direct). Thus it is undesirable to always
+   * emit by name.
+   * For example:
+   *   @constructor A;
+   *   @typedef {A} B;
+   *   @const {A} var a;
+   * If we emit the name, we would emit `var a: B;`, which is undesirable (consider A being string).
+   *
+   * For now, only emit by name typedefs that are unlikely to have more than one name referring to
+   * them - record types and templatized types.
+   */
+  private boolean shouldEmitTypedefByName(JSType realType) {
+    if (realType.isUnionType()) {
+      realType = realType.restrictByNotNullOrUndefined();
+    }
+    return realType.isRecordType() || realType.isTemplatizedType();
+  }
+
   void generateDeclarations() {
     List<SourceFile> sourceFiles = new ArrayList<>();
     for (String source : opts.arguments) {
@@ -232,6 +283,7 @@ public class DeclarationGenerator {
 
     compiler.compile(externs, sourceFiles, opts.getCompilerOptions());
     precomputeChildLists();
+    collectTypedefs();
     String dts = produceDts(depgraph);
     errorManager.doGenerateReport();
     return dts;
@@ -509,7 +561,6 @@ public class DeclarationGenerator {
 
     sortSymbols(externSymbols);
     Set<String> shadowedSymbols = getShadowedProvides(externSymbolNames);
-
     for (TypedVar symbol : externSymbols) {
       String parentPath = getNamespace(symbol.getName());
       boolean isDefault = isDefaultExport(symbol);
@@ -924,14 +975,6 @@ public class DeclarationGenerator {
       }
     };
 
-    /**
-     * Maps types to names for all emitted typedefs, so that further type walks just use the name.
-     *
-     * This is a reverse subset of the private map namesToTypes that Closure keeps in TypeRegistry.
-     * TODO(rado): Try to extract that info in a single pass, instead of rebuilding it.
-     */
-    private Map<JSType, String> typedefs = new HashMap<>();
-
     private TreeWalker(JSTypeRegistry typeRegistry, Set<String> provides, boolean isExtern) {
       this.typeRegistry = typeRegistry;
       this.provides = provides;
@@ -994,6 +1037,9 @@ public class DeclarationGenerator {
           if (registryType != null) {
             visitTypeAlias(registryType, symbol);
             return;
+          } else {
+            emitComment("Intended to visit type alias '" + symbol.getName() +
+                  " but type not found in Closure type registry.");
           }
         }
         visitVarDeclaration(getUnqualifiedName(emitName), type);
@@ -1206,7 +1252,6 @@ public class DeclarationGenerator {
     }
 
     private void visitTypeAlias(JSType registryType, TypedVar symbol) {
-      typedefs.put(registryType, symbol.getName());
       visitTypeAlias(registryType, getUnqualifiedName(symbol));
     }
 
@@ -1290,7 +1335,9 @@ public class DeclarationGenerator {
     private void visitType(JSType typeToVisit, boolean skipDefCheck) {
       // Known typedefs will be emitted symbolically instead of expanded.
       if (!skipDefCheck && typedefs.containsKey(typeToVisit)) {
-        emit(typedefs.get(typeToVisit));
+        String typedefName = typedefs.get(typeToVisit);
+        emit(Constants.INTERNAL_NAMESPACE + "." + typedefName);
+        typesUsed.add(typedefName);
         return;
       }
       // See also JsdocToEs6TypedConverter in the Closure code base. This code is implementing the
@@ -1880,8 +1927,12 @@ public class DeclarationGenerator {
             foundNamespaceMembers = true;
           }
           JSType registryType = typeRegistry.getType(qualifiedName);
-          visitTypeAlias(registryType, propName);
-
+          if (registryType != null) {
+            visitTypeAlias(registryType, propName);
+          } else {
+            emitComment("Intended to visit type alias '" + innerNamespace + "." + propName +
+                " but type not found in Closure type registry.");
+          }
           // An extra pass is required for interfaces, because in Closure they might have
           // static methods or fields. TS does not support static methods on interfaces, so we
           // handle

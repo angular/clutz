@@ -1,4 +1,12 @@
+goog.provide('rec.Aclass');
 goog.provide('rec.ns');
+
+/** @constructor */
+rec.Aclass = function() {};
+
+// Using the typedef before the declaration typedef is visited.
+/** @type {rec.ns.Arr} */
+rec.Aclass.prototype.foo = [];
 
 // Simple recursive typedefs silently turn into '?' in closure.
 /** @typedef {{t: rec.ns.T}} */

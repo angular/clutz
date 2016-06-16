@@ -95,7 +95,7 @@ declare namespace ಠ_ಠ.clutz.namespace {
   }
 }
 declare namespace ಠ_ಠ.clutz.namespace {
-  type atypedef = (a : string , b ? : { capacity ? : number } ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > ;
+  type atypedef = (a : string , b ? : ಠ_ಠ.clutz.namespace.atypedef.Options ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > ;
 }
 declare namespace ಠ_ಠ.clutz.namespace.atypedef {
   class Cache < T > extends Cache_Instance < T > {
@@ -104,14 +104,14 @@ declare namespace ಠ_ಠ.clutz.namespace.atypedef {
     private noStructuralTyping_: any;
     destroy ( ) : any ;
     get (key : string ) : T ;
-    info ( ) : { id : string , options : { capacity ? : number } , size : number } ;
+    info ( ) : ಠ_ಠ.clutz.namespace.atypedef.Cache.Info ;
     put (key : string , value : T ) : any ;
     remove (key : string ) : any ;
     removeAll ( ) : any ;
   }
 }
 declare namespace ಠ_ಠ.clutz.namespace.atypedef.Cache {
-  type Info = { id : string , options : { capacity ? : number } , size : number } ;
+  type Info = { id : string , options : ಠ_ಠ.clutz.namespace.atypedef.Options , size : number } ;
 }
 declare namespace ಠ_ಠ.clutz.namespace.atypedef {
   type Options = { capacity ? : number } ;
