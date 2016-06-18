@@ -18,6 +18,7 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.NodeTraversal;
@@ -31,6 +32,7 @@ import com.google.javascript.rhino.Node.TypeDeclarationNode;
 import com.google.javascript.rhino.Token;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -124,6 +126,14 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
           }
         };
 
+    private static final Function<Node, TypeDeclarationNode> CAST_TYPE_NODE =
+        new Function<Node, TypeDeclarationNode>() {
+          @Override
+          public TypeDeclarationNode apply(Node node) {
+            return (TypeDeclarationNode) node;
+          }
+        };
+
     @Nullable
     public static TypeDeclarationNode convert(@Nullable JSTypeExpression typeExpr) {
       if (typeExpr == null) {
@@ -157,10 +167,15 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
           return convertTypeNodeAST(n.getFirstChild());
         case Token.QMARK:
           Node child = n.getFirstChild();
-          return child == null
-              ? anyType()
-              // TODO(renez): convert {?type} to "null | type" instead of "type"
-              : convertTypeNodeAST(child);
+          if (child == null) {
+            return anyType();
+          } else {
+            ImmutableList<TypeDeclarationNode> types = ImmutableList.of(
+                new TypeDeclarationNode(Token.NULL),
+                convertTypeNodeAST(child)
+            );
+            return flatUnionType(types);
+          }
         case Token.STRING:
           String typeName = n.getString();
           switch (typeName) {
@@ -221,7 +236,7 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
             case 1:
               return types.get(0);
             default:
-              return unionType(types);
+              return flatUnionType(types);
           }
         // Convert function types
         case Token.FUNCTION:
@@ -274,6 +289,46 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
               "Unsupported node type: " + Token.name(n.getType())
                   + " " + n.toStringTree());
       }
+    }
+
+    /**
+     * Helper function to recursively flatten union types.
+     */
+    static void flatten(Iterable<TypeDeclarationNode> types,
+        List<TypeDeclarationNode> result, boolean hasNull) {
+      for (TypeDeclarationNode t : types) {
+        switch (t.getType()) {
+          case Token.NULL:
+            if (!hasNull) {
+              result.add(new TypeDeclarationNode(Token.NULL));
+              hasNull = true;
+            }
+            break;
+          case Token.UNION_TYPE:
+            Iterable<TypeDeclarationNode> children = FluentIterable
+                .from(t.children())
+                .transform(CAST_TYPE_NODE)
+                .toList();
+            // We had to invoke .toList() as detachChildren() breaks the Iterable.
+            t.detachChildren();
+            flatten(children, result, hasNull);
+            break;
+          default:
+            result.add(t);
+            break;
+        }
+      }
+    }
+
+    /**
+     * Deep flattens a list of types into a single union type.
+     *
+     * @return A flattened union type with at most 1 null.
+     */
+    static TypeDeclarationNode flatUnionType(Iterable<TypeDeclarationNode> types) {
+      List<TypeDeclarationNode> flatTypes = Lists.newArrayList();
+      flatten(types, flatTypes, false);
+      return unionType(flatTypes);
     }
   }
 }
