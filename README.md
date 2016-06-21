@@ -37,3 +37,10 @@ Note that clutz requires that your code can be compiled with Closure Compiler. I
 without clutz, just compiling your code with Closure. You can find the options we pass to Closure Compiler in
 `src/main/java/com/google/javascript/clutz/Options.java`. If the failure is reproducible this way, then you have a mistake
 in your code (or a bug in Closure Compiler).
+
+## Supported Version of TypeScript
+Clutz produces declaration files that are guaranteed to be accepted by a version
+of TypeScript newer than
+[ac6224d6](https://github.com/Microsoft/TypeScript/archive/ac6224d6.zip). The
+current test suite runs against `typescript@next`, so that is always a good
+choice.

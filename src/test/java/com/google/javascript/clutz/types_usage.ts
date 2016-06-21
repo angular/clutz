@@ -6,4 +6,4 @@ function thing({a, b}: {a: string, b: number}) {
 }
 thing(t.recordType);
 
-t.f = [];
+let arr: any[] = t.f;

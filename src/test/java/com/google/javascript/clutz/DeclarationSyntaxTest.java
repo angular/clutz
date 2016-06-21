@@ -5,6 +5,7 @@ import static com.google.javascript.clutz.DeclarationGeneratorTests.TS_SOURCES;
 import static org.junit.Assert.fail;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
 
@@ -55,11 +56,15 @@ public class DeclarationSyntaxTest {
   static final Path TSC = FileSystems.getDefault()
       .getPath("node_modules", "typescript", "bin", "tsc");
 
+  private static final ImmutableList<String> TSC_FLAGS = ImmutableList
+      .of("--noEmit", "--skipDefaultLibCheck",
+          "--noImplicitAny", "--strictNullChecks");
+
   @BeforeClass
   public static void setUpTsc() throws Exception {
     if (!TSC.toFile().exists()) {
       System.err.println("Installing typescript...");
-      runChecked("npm", "install", "typescript@1.8.7");
+      runChecked("npm", "install", "typescript@next");
     }
   }
 
@@ -86,8 +91,8 @@ public class DeclarationSyntaxTest {
       goldenFilePaths.add(DeclarationGeneratorTests.getGoldenFile(input, ".d.ts").getPath());
     }
 
-    List<String> tscCommand =
-        Lists.newArrayList(TSC.toString(), "--noEmit", "--skipDefaultLibCheck", "--noImplicitAny");
+    List<String> tscCommand = Lists.newArrayList(TSC.toString());
+    tscCommand.addAll(TSC_FLAGS);
     tscCommand.add("src/resources/closure.lib.d.ts");
 
     tscCommand.addAll(goldenFilePaths);
@@ -107,9 +112,8 @@ public class DeclarationSyntaxTest {
 
   private void doTestDeclarationUsage(FilenameFilter filenameFilter) throws Exception {
     List<File> inputs = DeclarationGeneratorTests.getTestInputFiles(filenameFilter);
-    final List<String> tscCommand =
-        Lists.newArrayList(TSC.toString(), "--noEmit", "--skipDefaultLibCheck", "--noImplicitAny",
-            "-m", "commonjs");
+    final List<String> tscCommand = Lists.newArrayList(TSC.toString(), "-m", "commonjs");
+    tscCommand.addAll(TSC_FLAGS);
 
     tscCommand.add("src/resources/closure.lib.d.ts");
 
