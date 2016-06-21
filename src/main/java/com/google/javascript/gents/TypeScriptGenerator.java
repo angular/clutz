@@ -114,11 +114,13 @@ public class TypeScriptGenerator {
     // Compile javascript code
     compiler.compile(externs, sourceFiles, compilerOpts);
 
-    // Type annotate javascript AST
-    CompilerPass typingPass = new TypeAnnotationPass(compiler);
     Node externRoot = compiler.getRoot().getFirstChild();
     Node srcRoot = compiler.getRoot().getLastChild();
-    // Manually execute compiler pass
+
+    CompilerPass classPass = new ClassConversionPass(compiler);
+    classPass.process(externRoot, srcRoot);
+
+    CompilerPass typingPass = new TypeAnnotationPass(compiler);
     typingPass.process(externRoot, srcRoot);
 
     // TODO(renez): implement ts code generation here
