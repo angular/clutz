@@ -14,3 +14,9 @@ class C extends A {
     this.b = b;
   }
 }
+var D = class extends B {
+  constructor(a, b) {
+    B.call(this, a);
+    this.b = b;
+  }
+};

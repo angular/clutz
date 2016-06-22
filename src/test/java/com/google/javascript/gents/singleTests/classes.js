@@ -1,4 +1,5 @@
 /**
+ * Anonymous class
  * @param {number} a
  * @constructor
  */
@@ -7,6 +8,7 @@ var A = function(a) {
 };
 
 /**
+ * Named class
  * @constructor
  */
 function B(a) {
@@ -14,6 +16,7 @@ function B(a) {
 }
 
 /**
+ * Named class extension
  * @constructor
  * @extends {A}
  */
@@ -21,3 +24,13 @@ function C(a, b) {
   A.call(this, a);
   this.b = b;
 }
+
+/**
+ * Anonymous class extension
+ * @constructor
+ * @extends {B}
+ */
+var D = function(a, b) {
+  B.call(this, a);
+  this.b = b;
+};
