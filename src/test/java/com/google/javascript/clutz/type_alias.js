@@ -20,20 +20,20 @@ typedefs.strOrFunc;
  */
 typedefs.Aclass = function() {};
 
-/** @typedef {typedefs.Aclass} */
+/** @typedef {!typedefs.Aclass} */
 typedefs.aclassalias;
 
 // The type should be kept as rec.Aclass and not replaced with the aclassalias.
-/** @const {typedefs.Aclass} */
-typedefs.a = null;
+/** @const {!typedefs.Aclass} */
+typedefs.a = new typedefs.Aclass();
 
-/** @typedef {Array<typedefs.Aclass>} */
+/** @typedef {!Array<!typedefs.Aclass>} */
 typedefs.arrayA;
 
-/** @const {typedefs.arrayA} */
+/** @const {!typedefs.arrayA} */
 typedefs.arrT = [];
 
-/** @const {Array<typedefs.Aclass>} */
+/** @const {!Array<!typedefs.Aclass>} */
 typedefs.arr = [];
 
 /** @const {typedefs.strToStr} */

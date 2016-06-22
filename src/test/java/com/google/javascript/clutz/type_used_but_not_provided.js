@@ -13,6 +13,6 @@ used.not.provided.I = function() {};
 used.not.provided.C = function() {};
 
 /**
- * @type {used.not.provided.C}
+ * @type {!used.not.provided.C}
  */
-used.not.provided.a = null;
+used.not.provided.a = new used.not.provided.C();

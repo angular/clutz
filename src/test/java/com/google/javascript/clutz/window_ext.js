@@ -1,4 +1,4 @@
 goog.provide('nswindow.c');
 
-/** @type {window.C} */
+/** @type {!window.C} */
 nswindow.c = new window.C();

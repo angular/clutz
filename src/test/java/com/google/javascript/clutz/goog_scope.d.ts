@@ -17,7 +17,7 @@ declare module 'goog:foo.IBar' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.foo {
-  var boom : ಠ_ಠ.clutz.$jscomp.scope.Bar ;
+  var boom : ಠ_ಠ.clutz.$jscomp.scope.Bar | null ;
 }
 declare namespace ಠ_ಠ.clutz.goog {
   function require(name: 'foo.boom'): typeof ಠ_ಠ.clutz.foo.boom;
@@ -27,7 +27,7 @@ declare module 'goog:foo.boom' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.foo {
-  var iboom : ಠ_ಠ.clutz.$jscomp.scope.IBar ;
+  var iboom : ಠ_ಠ.clutz.$jscomp.scope.IBar | null ;
 }
 declare namespace ಠ_ಠ.clutz.goog {
   function require(name: 'foo.iboom'): typeof ಠ_ಠ.clutz.foo.iboom;

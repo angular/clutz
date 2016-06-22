@@ -4,13 +4,17 @@ goog.provide('fn.field');
 fn.field.A = function() {
   //!! This pattern is non-sense, because base instance functions will shadow functions
   //!! from the prototype. However, we still need to generate non-erring TS code.
+  /** @type {?} */
   this.f = null;
+  /** @type {?} */
   this.g = null;
   /** @type {function(): number} */
   this.h = function() {return 0;};
 };
 
+/** @type {?} */
 fn.field.A.prototype.pf = null;
+/** @type {?} */
 fn.field.A.prototype.pg = null;
 /** @type {function(): number} */
 fn.field.A.prototype.ph = function() {return 0;};

@@ -44,7 +44,7 @@ declare namespace ಠ_ಠ.clutz {
   class NodeList_Instance < T > implements IArrayLike < T > {
     private noStructuralTyping_: any;
     [ key: number ]: T ;
-    item (index : number ) : T ;
+    item (index : number ) : T | null ;
     length : number ;
   }
 }

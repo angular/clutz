@@ -5,7 +5,7 @@ var innerEnumNs = {};
 innerEnumNs.Foo = function() {};
 
 /**
- * @type {!innerEnumNs.Foo.Bar|undefined}
+ * @type {!innerEnumNs.Foo.Bar}
  */
 innerEnumNs.Foo.prototype.bar;
 

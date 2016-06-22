@@ -9,10 +9,10 @@ goog.provide('privatetype.Foo');
  */
 privatetype.PrivateEnum_ = { VALUE: '' };
 
-/** @type {privatetype.PrivateEnum_} */
+/** @type {!privatetype.PrivateEnum_} */
 privatetype.enumUser = privatetype.PrivateEnum_.VALUE;
 
-/** @type {privatetype.X_} */
+/** @type {!privatetype.X_} */
 privatetype.user = new privatetype.X_();
 
 /** @constructor @private */
@@ -21,7 +21,7 @@ privatetype.X_ = function() {};
 /** @constructor */
 privatetype.Foo = function(a) {}
 
-/** @return {privatetype.Foo.AnotherPrivateEnum_} */
+/** @return {!privatetype.Foo.AnotherPrivateEnum_} */
 privatetype.Foo.prototype.foo = function() {};
 
 /**
@@ -30,5 +30,5 @@ privatetype.Foo.prototype.foo = function() {};
  */
 privatetype.Foo.AnotherPrivateEnum_ = { A: 0 };
 
-/** @typedef {{ a: privatetype.Foo.AnotherPrivateEnum_}} */
+/** @typedef {{ a: !privatetype.Foo.AnotherPrivateEnum_}} */
 privatetype.Foo.typedef;

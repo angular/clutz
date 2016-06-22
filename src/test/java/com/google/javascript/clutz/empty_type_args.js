@@ -16,6 +16,6 @@ empty_type_args.NoMoreTemplateArgs = function() {};
 
 /**
  * @constructor
- * @param {empty_type_args.NoMoreTemplateArgs} a
+ * @param {!empty_type_args.NoMoreTemplateArgs} a
  */
 empty_type_args.X = function(a) {};

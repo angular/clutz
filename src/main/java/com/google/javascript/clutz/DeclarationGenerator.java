@@ -59,13 +59,13 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -78,11 +78,11 @@ public class DeclarationGenerator {
   static final String INSTANCE_CLASS_SUFFIX = "_Instance";
 
   /**
-   * Contains symbols that are part of platform externs, but not yet in lib.d.ts
-   * This list is incomplete and will grow as needed.
+   * Contains symbols that are part of platform externs, but not yet in lib.d.ts This list is
+   * incomplete and will grow as needed.
    */
   private static final Set<String> platformSymbolsMissingInTypeScript = ImmutableSet.of(
-      "Image", "IDBDatabaseException", "WebWorker", "WorkerGlobalScope", "RequestCache",
+      "Image", "IDBDatabaseException", "RequestCache",
       "RequestCredentials", "Request", "Headers", "RequestMode", "WorkerLocation", "Promise",
       "RequestContext", "Response", "ReadableByteStream", "ResponseType",
       "ReadableStreamController", "CountQueuingStrategy", "ByteLengthQueuingStrategy",
@@ -249,9 +249,6 @@ public class DeclarationGenerator {
    * them - record types and templatized types.
    */
   private boolean shouldEmitTypedefByName(JSType realType) {
-    if (realType.isUnionType()) {
-      realType = realType.restrictByNotNullOrUndefined();
-    }
     return realType.isRecordType() || realType.isTemplatizedType();
   }
 
@@ -1200,7 +1197,7 @@ public class DeclarationGenerator {
     private void visitVarDeclaration(String name, JSType type) {
       emit("var");
       emit(name);
-      visitTypeDeclaration(type, false);
+      visitTypeDeclaration(type, false, false);
       emit(";");
       emitBreak();
     }
@@ -1259,7 +1256,7 @@ public class DeclarationGenerator {
       emit("type");
       emit(unqualifiedName);
       emit("=");
-      visitType(registryType, true);
+      visitType(registryType, true, false);
       emit(";");
       emitBreak();
     }
@@ -1294,7 +1291,7 @@ public class DeclarationGenerator {
       emitBreak();
     }
 
-    private void visitTypeDeclaration(JSType type, boolean isVarArgs) {
+    private void visitTypeDeclaration(JSType type, boolean isVarArgs, boolean isOptionalPosition) {
       if (type != null) {
         emit(":");
         // From https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#a-grammar
@@ -1303,7 +1300,7 @@ public class DeclarationGenerator {
         if (isVarArgs) {
           visitTypeAsPrimary(type);
         } else {
-          visitType(type);
+          visitType(type, false, isOptionalPosition);
         }
         if (isVarArgs) emit("[]");
       }
@@ -1329,10 +1326,10 @@ public class DeclarationGenerator {
     }
 
     private void visitType(JSType typeToVisit) {
-      visitType(typeToVisit, false);
+      visitType(typeToVisit, false, false);
     }
 
-    private void visitType(JSType typeToVisit, boolean skipDefCheck) {
+    private void visitType(JSType typeToVisit, boolean skipDefCheck, final boolean inOptionalPosition) {
       // Known typedefs will be emitted symbolically instead of expanded.
       if (!skipDefCheck && typedefs.containsKey(typeToVisit)) {
         String typedefName = typedefs.get(typeToVisit);
@@ -1378,7 +1375,7 @@ public class DeclarationGenerator {
 
         @Override
         public Void caseUnionType(UnionType type) {
-          visitUnionType(type);
+          visitUnionType(type, inOptionalPosition);
           return null;
         }
 
@@ -1425,13 +1422,18 @@ public class DeclarationGenerator {
 
         @Override
         public Void caseNullType() {
-          emit("any");
+          emit("null");
           return null;
         }
 
         @Override
         public Void caseVoidType() {
-          emit("void");
+          // In Closure "void" and "undefined" are type synonyms. Both types are
+          // inhabited only by the value undefined.
+          // In TS emitting "undefined" is more ideomatic in a general type position.
+          // For function return types clutz emits "void" in visitFunctionDeclaration.
+          // see: https://github.com/google/closure-compiler/blob/caec92d5f62e745d20a0b4b8edb757d43b06baa0/src/com/google/javascript/rhino/jstype/JSTypeRegistry.java#L1011
+          emit("undefined");
           return null;
         }
 
@@ -1568,8 +1570,10 @@ public class DeclarationGenerator {
         UnionType unionType = type.getPropertyType(propName).toMaybeUnionType();
         if (unionType != null && any(unionType.getAlternates(), isVoidType)) {
           emit("?");
+          visitTypeDeclaration(type.getPropertyType(propName), false, true);
+        } else {
+          visitTypeDeclaration(type.getPropertyType(propName), false, false);
         }
-        visitTypeDeclaration(type.getPropertyType(propName), false);
         if (it.hasNext()) {
           emit(",");
         }
@@ -1589,17 +1593,24 @@ public class DeclarationGenerator {
       return new TreeSet<>(elements);
     }
 
-    private void visitUnionType(UnionType ut) {
-      Collection<JSType> alts = Collections2.filter(ut.getAlternates(), new Predicate<JSType>() {
-        @Override
-        public boolean apply(JSType input) {
-          // Skip - TypeScript does not have explicit null or optional types.
-          // Optional types must be handled at the declaration name (`foo?` syntax).
-          return !input.isNullType() && !input.isVoidType();
-        }
-      });
+    private void visitUnionType(UnionType ut, boolean inOptionalPosition) {
+      Collection<JSType> alts = ut.getAlternates();
+
+      // When visiting an optional function argument or optional field (`foo?` syntax),
+      // TypeScript will augment the provided type with an union of undefined, i.e. `foo?: T` will
+      // means defacto `foo` has type `T | undefined` in the body.
+      // Skip explicitly emitting the undefined union in such cases.
+      if (inOptionalPosition) {
+        alts = Collections2.filter(alts, new Predicate<JSType>() {
+          @Override
+          public boolean apply(JSType input) {
+            return !input.isVoidType();
+          }
+        });
+      }
       if (alts.size() == 0) {
-        emit("any");
+        // If the only type was "undefined" and it got filtered, emit it explicitly.
+        emit("undefined");
         return;
       }
       if (alts.size() == 1) {
@@ -1786,7 +1797,7 @@ public class DeclarationGenerator {
       if (isStatic) emit("static");
       emit(propName);
       if (!propertyType.isFunctionType() || forcePropDeclaration) {
-        visitTypeDeclaration(propertyType, false);
+        visitTypeDeclaration(propertyType, false, false);
       } else {
         // Avoid re-emitting template variables defined on the class level if method is not static.
         Set<String> objTemplateTypes =
@@ -1818,8 +1829,15 @@ public class DeclarationGenerator {
     private void visitFunctionDeclaration(FunctionType ftype, Set<String> objTemplateTypes) {
       visitFunctionParameters(ftype, true, objTemplateTypes);
       JSType type = ftype.getReturnType();
-      if (type != null) {
-        emit(":");
+      if (type == null) return;
+      emit(":");
+      // Closure conflates 'undefined' and 'void', and in general visitType always emits `undefined`
+      // for that type.
+      // In ideomatic TypeScript, `void` is used for function return types, and the types
+      // are not strictly the same.
+      if (type.isVoidType()) {
+        emit("void");
+      } else {
         visitType(type);
       }
     }
@@ -1873,8 +1891,10 @@ public class DeclarationGenerator {
         }
         if (param.isOptionalArg()) {
           emit("?");
+          visitTypeDeclaration(param.getJSType(), param.isVarArgs(), true);
+        } else {
+          visitTypeDeclaration(param.getJSType(), param.isVarArgs(), false);
         }
-        visitTypeDeclaration(param.getJSType(), param.isVarArgs());
         if (parameters.hasNext()) {
           emit(", ");
         }

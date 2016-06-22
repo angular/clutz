@@ -2,10 +2,10 @@ declare namespace ಠ_ಠ.clutz.types {
   var a : number ;
   var b : boolean ;
   var c : string ;
-  var d : Object ;
-  var e : any [] ;
-  var f : ( ( ) => string ) [] ;
-  var functionAndUnion : (a : number , b : any ) => any ;
+  var d : Object | null ;
+  var e : any [] | null ;
+  var f : ( ( ) => string ) [] | null ;
+  var functionAndUnion : null | ( (a : number , b : any ) => any ) ;
   /**
    * marked const to appear in `compiler.getTopScope().getAllSymbols()`
    */
@@ -14,7 +14,7 @@ declare namespace ಠ_ಠ.clutz.types {
    * marked const to appear in `compiler.getTopScope().getAllSymbols()`
    */
   var inferredobj : Object ;
-  var j : { [ key: number ]: string } ;
+  var j : { [ key: number ]: string } | null ;
   var recordType : { a : string , b : any } ;
   var recordTypeOptional : { a : string , optional ? : string } ;
 }

@@ -10,10 +10,10 @@ exports.a = 1;
 /** @const */
 exports.b = requiredModule.rm;
 
-/** @type {Required} */
+/** @type {!Required} */
 exports.required;
 
-/** @type {RequiredDefault} */
+/** @type {!RequiredDefault} */
 exports.requiredDefault;
 
 /** @type {number} */

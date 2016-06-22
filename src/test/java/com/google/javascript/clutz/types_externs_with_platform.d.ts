@@ -12,7 +12,7 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
   var a : { a : number } ;
   var b : IArguments ;
   var c : NodeList ;
-  function elementMaybe ( ) : Element ;
+  function elementMaybe ( ) : Element | null ;
   var myScope : ಠ_ಠ.clutz.namespace.Foo ;
   function topLevelFunction ( ...a : any [] ) : any ;
 }
@@ -71,7 +71,7 @@ declare namespace ಠ_ಠ.clutz {
   function functionNamespace (descriptor : { is : string } ) : any ;
 }
 declare namespace ಠ_ಠ.clutz.functionNamespace {
-  function dom (nodeOrEvent : Node | GlobalEvent ) : functionNamespaceHelperClass ;
+  function dom (nodeOrEvent : Node | null | GlobalEvent ) : functionNamespaceHelperClass ;
 }
 declare namespace ಠ_ಠ.clutz.functionNamespace {
   var privateClass : ಠ_ಠ.clutz.PrivateType;
@@ -117,8 +117,8 @@ declare namespace ಠ_ಠ.clutz.namespace.atypedef {
   type Options = { capacity ? : number } ;
 }
 declare namespace ಠ_ಠ.clutz.namespace.atypedef {
-  type get = (a : string ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > ;
+  type get = (a : string ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > | null ;
 }
 declare namespace ಠ_ಠ.clutz.namespace {
-  function bootstrap (arg1 : Element | HTMLDocument , opt_arg2 ? : ( string | ( ( ...a : any [] ) => any ) ) [] ) : any ;
+  function bootstrap (arg1 : Element | null | HTMLDocument , opt_arg2 ? : ( string | ( ( ...a : any [] ) => any ) | null ) [] | null ) : any ;
 }

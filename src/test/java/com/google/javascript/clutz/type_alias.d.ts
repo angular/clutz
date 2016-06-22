@@ -10,7 +10,7 @@ declare namespace ಠ_ಠ.clutz.typedefs {
   //!! TODO(rado): arr should use the unexpanded ( ಠ_ಠ.clutz.typedefs.Aclass ) [].
   var arr : ಠ_ಠ.clutz.typedefs.arrayA ;
   var arrT : ಠ_ಠ.clutz.typedefs.arrayA ;
-  type arrayA = ( ಠ_ಠ.clutz.typedefs.Aclass ) [] ;
+  type arrayA = ಠ_ಠ.clutz.typedefs.Aclass [] ;
   //!! TODO(rado): fn should use the strToStr typedef.
   function fn (a : string ) : string ;
   type strOrFunc = string | ( ( ) => string ) ;

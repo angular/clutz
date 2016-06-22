@@ -8,5 +8,5 @@ goog.forwardDeclare('forward.D');
 forward.A = function() {
 };
 
-/** @param {forward.D} a*/
+/** @param {!forward.D} a*/
 forward.A.prototype.fn;

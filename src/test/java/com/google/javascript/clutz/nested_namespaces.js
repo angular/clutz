@@ -11,8 +11,8 @@ nested.PrivateC = function() {};
 /** @enum {number} */
 nested.PrivateC.Enum = {};
 
-/** @type {nested.PrivateC} */
-nested.foo = null;
+/** @type {!nested.PrivateC} */
+nested.foo = new nested.PrivateC();
 
 /** @constructor */
 nested.foo.Klass = function() {};

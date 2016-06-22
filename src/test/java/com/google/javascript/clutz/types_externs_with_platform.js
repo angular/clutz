@@ -45,11 +45,11 @@ typesWithExterns.C = function() {
 };
 goog.inherits(typesWithExterns.C, typesWithExterns.A);
 
-/** @type {Arguments} */
-typesWithExterns.b = null;
+/** @type {!Arguments} */
+typesWithExterns.b;
 
-/** @type {NodeList} */
-typesWithExterns.c = null;
+/** @type {!NodeList} */
+typesWithExterns.c;
 
 /** @typedef {IArrayLike} */
 typesWithExterns.ArrayLike;
@@ -78,6 +78,6 @@ typesWithExterns.Error = function() {};
 typesWithExterns.ExtendsXMLHttpRequest = function() {};
 
 /**
- * @type {namespace.Foo}
+ * @type {!namespace.Foo}
  */
-typesWithExterns.myScope = null;
+typesWithExterns.myScope = new namespace.Foo();

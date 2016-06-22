@@ -7,5 +7,5 @@ goog.require('dep.D');
 main.A = function() {
 };
 
-/** @param {dep.D} a*/
+/** @param {!dep.D} a*/
 main.A.prototype.fn = function(a) {};

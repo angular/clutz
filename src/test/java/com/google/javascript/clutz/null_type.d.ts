@@ -1,5 +1,5 @@
 declare namespace ಠ_ಠ.clutz {
-  function nulltypes (a : any , b ? : any ) : void ;
+  function nulltypes (a : null , b ? : null ) : void ;
 }
 declare namespace ಠ_ಠ.clutz.goog {
   function require(name: 'nulltypes'): typeof ಠ_ಠ.clutz.nulltypes;

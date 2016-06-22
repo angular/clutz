@@ -22,17 +22,17 @@ generics.Foo.prototype.set = function(t) { };
  */
 generics.Foo.prototype.loop = function(t, v) { return v(t); };
 
-/** @type {generics.Foo<string>} */
+/** @type {!generics.Foo<string>} */
 generics.fooMissingOneTypeParam = new generics.Foo(0);
 
-/** @type {generics.Foo} */
+/** @type {!generics.Foo} */
 generics.fooMissingAllTypeParams = new generics.Foo(0);
 
-/** @type {Array} */
+/** @type {!Array} */
 generics.arrayMissingTypeParam = [];
 
 /**
- * @param {Object<K,V>} obj
+ * @param {!Object<K,V>} obj
  * @template K,V
  */
 generics.objectWithGenericKeyType = function(obj) { };

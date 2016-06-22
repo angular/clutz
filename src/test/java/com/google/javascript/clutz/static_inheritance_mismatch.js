@@ -16,11 +16,11 @@ static_inherit.Parent.privateParentOverrideField;
  */
 static_inherit.Parent.privateChildOverrideField;
 /**
- * @type {Object}
+ * @type {!Object}
  */
 static_inherit.Parent.subTypeField;
 /**
- * @type {static_inherit.Parent}
+ * @type {!static_inherit.Parent}
  */
 static_inherit.Parent.subTypeFieldMirrorType;
 
@@ -37,11 +37,11 @@ static_inherit.Child.privateParentOverrideField;
  */
 static_inherit.Child.privateChildOverrideField;
 /**
- * @type {Array}
+ * @type {!Array}
  */
 static_inherit.Child.subTypeField;
 /**
- * @type {static_inherit.Child}
+ * @type {!static_inherit.Child}
  */
 static_inherit.Child.subTypeFieldMirrorType;
 
@@ -51,6 +51,6 @@ static_inherit.GrandChild = function() {};
 /** @param {boolean} a */
 static_inherit.GrandChild.static_fn = function(a) {};
 /**
- * @type {static_inherit.GrandChild}
+ * @type {!static_inherit.GrandChild}
  */
 static_inherit.GrandChild.subTypeFieldMirrorType;

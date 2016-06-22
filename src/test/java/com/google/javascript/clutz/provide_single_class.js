@@ -42,7 +42,7 @@ foo.bar.Baz.prototype.method = function(a) {
 };
 
 /**
- * @param {foo.bar.Baz.NestedClass} b
+ * @param {!foo.bar.Baz.NestedClass} b
  * @return {boolean}
  */
 foo.bar.Baz.prototype.equals = function(b) {

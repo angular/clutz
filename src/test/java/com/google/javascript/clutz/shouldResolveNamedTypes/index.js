@@ -7,5 +7,5 @@ goog.provide('namedType.A');
 namedType.A = function() {
 };
 
-/** @param {namedType.D<U>} a*/
+/** @param {!namedType.D<U>} a*/
 namedType.A.prototype.fn;

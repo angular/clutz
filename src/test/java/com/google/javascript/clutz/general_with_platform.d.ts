@@ -21,8 +21,8 @@ declare namespace ಠ_ಠ.clutz {
   }
   class DirectoryEntry_Instance extends Entry_Instance {
     createReader ( ) : DirectoryReader ;
-    getDirectory (path : string , options ? : Object , successCallback ? : (a : DirectoryEntry ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
-    getFile (path : string , options ? : Object , successCallback ? : (a : FileEntry ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+    getDirectory (path : string , options ? : Object | null , successCallback ? : (a : DirectoryEntry ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+    getFile (path : string , options ? : Object | null , successCallback ? : (a : FileEntry ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
     removeRecursively (successCallback : ( ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
   }
 }
@@ -100,13 +100,13 @@ declare namespace ಠ_ಠ.clutz {
     INIT : number ;
     WRITING : number ;
     abort ( ) : any ;
-    error : FileError ;
-    onabort : (a : ProgressEvent ) => any ;
-    onerror : (a : ProgressEvent ) => any ;
-    onprogress : (a : ProgressEvent ) => any ;
-    onwrite : (a : ProgressEvent ) => any ;
-    onwriteend : (a : ProgressEvent ) => any ;
-    onwritestart : (a : ProgressEvent ) => any ;
+    error : FileError | null ;
+    onabort : ( (a : ProgressEvent ) => any ) | null ;
+    onerror : ( (a : ProgressEvent ) => any ) | null ;
+    onprogress : ( (a : ProgressEvent ) => any ) | null ;
+    onwrite : ( (a : ProgressEvent ) => any ) | null ;
+    onwriteend : ( (a : ProgressEvent ) => any ) | null ;
+    onwritestart : ( (a : ProgressEvent ) => any ) | null ;
     readyState : number ;
   }
 }
@@ -138,7 +138,7 @@ declare namespace ಠ_ಠ.clutz {
     constructor (opt_headersInit ? : Headers | string [] [] ) ;
     append (name : string , value : string ) : any ;
     delete (name : string ) : any ;
-    get (name : string ) : string ;
+    get (name : string ) : string | null ;
     getAll (name : string ) : string [] ;
     has (name : string ) : boolean ;
     set (name : string , value : string ) : any ;
@@ -192,9 +192,9 @@ declare namespace ಠ_ಠ.clutz {
   }
   class Promise_Instance < TYPE > implements PromiseLike < TYPE > {
     private noStructuralTyping_: any;
-    constructor (resolver : (a : (a ? : TYPE | PromiseLike < TYPE > | { then : any } ) => any , b : (a ? : any ) => any ) => any ) ;
+    constructor (resolver : (a : (a ? : TYPE | PromiseLike < TYPE > | null | { then : any } ) => any , b : (a ? : any ) => any ) => any ) ;
     catch < RESULT > (onRejected : (a : any ) => RESULT ) : Promise < RESULT > ;
-    then < VALUE , RESULT > (opt_onFulfilled ? : (a : TYPE ) => VALUE , opt_onRejected ? : (a : any ) => any ) : RESULT ;
+    then < VALUE , RESULT > (opt_onFulfilled ? : ( (a : TYPE ) => VALUE ) | null , opt_onRejected ? : ( (a : any ) => any ) | null ) : RESULT ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -202,7 +202,7 @@ declare namespace ಠ_ಠ.clutz {
   }
   class ReadableByteStream_Instance {
     private noStructuralTyping_: any;
-    constructor (opt_underlyingSource ? : { cancel ? : (a : any ) => Promise < any > , pull ? : (a : ReadableStreamController ) => Promise < any > , start ? : (a : ReadableStreamController ) => Promise < any > } , opt_strategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark : number , size ? : (a : any ) => number } ) ;
+    constructor (opt_underlyingSource ? : { cancel ? : (a : any ) => Promise < any > | undefined , pull ? : (a : ReadableStreamController ) => Promise < any > | undefined , start ? : (a : ReadableStreamController ) => Promise < any > | undefined } | null , opt_strategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark : number , size ? : (a : any ) => number } ) ;
     cancel (reason : any ) : any ;
     getReader ( ) : ReadableByteStreamReader ;
     locked : boolean ;
@@ -228,7 +228,7 @@ declare namespace ಠ_ಠ.clutz {
   }
   class ReadableStream_Instance {
     private noStructuralTyping_: any;
-    constructor (opt_underlyingSource ? : { cancel ? : (a : any ) => Promise < any > , pull ? : (a : ReadableStreamController ) => Promise < any > , start ? : (a : ReadableStreamController ) => Promise < any > } , opt_strategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark : number , size ? : (a : any ) => number } ) ;
+    constructor (opt_underlyingSource ? : { cancel ? : (a : any ) => Promise < any > | undefined , pull ? : (a : ReadableStreamController ) => Promise < any > | undefined , start ? : (a : ReadableStreamController ) => Promise < any > | undefined } | null , opt_strategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark : number , size ? : (a : any ) => number } ) ;
     cancel (reason : any ) : any ;
     getReader ( ) : ReadableStreamReader ;
     locked : boolean ;
@@ -351,8 +351,8 @@ declare namespace ಠ_ಠ.clutz {
 }
 declare namespace ಠ_ಠ.clutz {
   class Response extends Response_Instance {
-    static error ( ) : Response ;
-    static redirect (url : string , opt_status ? : number ) : Response ;
+    static error ( ) : Response | null ;
+    static redirect (url : string , opt_status ? : number ) : Response | null ;
   }
   class Response_Instance {
     private noStructuralTyping_: any;
@@ -384,56 +384,6 @@ declare namespace ಠ_ಠ.clutz {
   };
 }
 declare namespace ಠ_ಠ.clutz {
-  class WebWorker extends WebWorker_Instance {
-  }
-  class WebWorker_Instance implements EventTarget {
-    private noStructuralTyping_: any;
-    addEventListener (type : string , listener : EventListener | ( (a : GlobalEvent ) => boolean ) , opt_useCapture ? : boolean ) : void ;
-    dispatchEvent (evt : GlobalEvent ) : boolean ;
-    /**
-     * Sent when the worker thread encounters an error.
-     * TODO(tbreisacher): Should this change to function(!ErrorEvent)?
-     */
-    onerror : (a : GlobalEvent ) => any ;
-    /**
-     * Sent when the worker thread posts a message to its creator.
-     */
-    onmessage : (a : MessageEvent ) => any ;
-    /**
-     * Posts a message to the worker thread.
-     */
-    postMessage (message : string ) : any ;
-    removeEventListener (type : string , listener : EventListener | ( (a : GlobalEvent ) => boolean ) , opt_useCapture ? : boolean ) : void ;
-    /**
-     * Stops the worker process
-     */
-    terminate ( ) : any ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  interface WorkerGlobalScope extends EventTarget {
-    /**
-     * Closes the worker represented by this WorkerGlobalScope.
-     */
-    close ( ) : any ;
-    fetch (input : Request | string , opt_init ? : { body ? : Blob | FormData | string , cache ? : RequestCache , credentials ? : RequestCredentials , headers ? : Headers | string [] [] , method ? : string , mode ? : RequestMode } ) : Promise < Response > ;
-    location : WorkerLocation ;
-    /**
-     * Sent when the worker encounters an error.
-     */
-    onerror : (a : GlobalEvent ) => any ;
-    /**
-     * Sent when the worker goes offline.
-     */
-    onoffline : (a : GlobalEvent ) => any ;
-    /**
-     * Sent when the worker goes online.
-     */
-    ononline : (a : GlobalEvent ) => any ;
-    self : WorkerGlobalScope ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
   interface WorkerLocation {
     hash : string ;
     host : string ;
@@ -451,9 +401,9 @@ declare namespace ಠ_ಠ.clutz {
   }
   class WritableStream_Instance {
     private noStructuralTyping_: any;
-    constructor (opt_underlyingSink ? : { abort ? : (a : any ) => Promise < any > , close ? : ( ) => Promise < any > , start ? : (a : any ) => Promise < any > , write ? : (a : any ) => Promise < any > } , opt_strategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark : number , size ? : (a : any ) => number } ) ;
-    abort (reason : any ) : Promise < void > ;
-    close ( ) : Promise < void > ;
+    constructor (opt_underlyingSink ? : { abort ? : (a : any ) => Promise < any > | undefined , close ? : ( ) => Promise < any > | undefined , start ? : (a : any ) => Promise < any > | undefined , write ? : (a : any ) => Promise < any > | undefined } , opt_strategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark : number , size ? : (a : any ) => number } ) ;
+    abort (reason : any ) : Promise < undefined > ;
+    close ( ) : Promise < undefined > ;
     closed : Promise < any > ;
     ready : Promise < any > ;
     state : string ;

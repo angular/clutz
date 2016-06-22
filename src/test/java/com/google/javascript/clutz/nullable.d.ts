@@ -1,5 +1,5 @@
 declare namespace ಠ_ಠ.clutz.nullable {
-  var w : boolean ;
+  var w : boolean | null ;
   /**
    * Explicitly non-nullable.
    */
@@ -7,11 +7,11 @@ declare namespace ಠ_ಠ.clutz.nullable {
   /**
    * Implicitly nullable.
    */
-  var y : Object ;
+  var y : Object | null ;
   /**
    * Explicitly nullable.
    */
-  var z : Object ;
+  var z : Object | null ;
 }
 declare namespace ಠ_ಠ.clutz.goog {
   function require(name: 'nullable'): typeof ಠ_ಠ.clutz.nullable;
