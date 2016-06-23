@@ -31,3 +31,23 @@ function snapple() { return 4; }
  * @return {string}
  */
 var pop = function(b, s, x) { if (b) { return s; }};
+
+// Undefined params
+
+/**
+ * @param {undefined} u
+ * @param {void} v
+ */
+var paramUndef = function(u, v) {};
+
+// Void returns
+
+/**
+ * @return {void}
+ */
+var retVoid = function() {};
+
+/**
+ * @return {undefined}
+ */
+var retUndef = function() {};

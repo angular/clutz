@@ -62,7 +62,7 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
       // Functions are annotated with their return type
       case Token.FUNCTION:
         if (bestJSDocInfo != null) {
-          setTypeExpression(n, bestJSDocInfo.getReturnType());
+          setTypeExpression(n, bestJSDocInfo.getReturnType(), true);
         }
         break;
       // Names and properties are annotated with their types
@@ -74,7 +74,7 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
         if (parent.isVar() || parent.isLet()) { // Variable declaration
           // TODO(renez): convert all vars into lets
           if (bestJSDocInfo != null) {
-            setTypeExpression(n, bestJSDocInfo.getType());
+            setTypeExpression(n, bestJSDocInfo.getType(), false);
           }
         } else if (parent.isParamList()) { // Function parameters
           JSDocInfo parentDocInfo = NodeUtil.getBestJSDocInfo(parent.getParent());
@@ -92,7 +92,7 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
               n.getParent().replaceChild(n, attachTypeExpr);
               compiler.reportCodeChange();
             }
-            setTypeExpression(attachTypeExpr, parameterType);
+            setTypeExpression(attachTypeExpr, parameterType, false);
           }
         }
         break;
@@ -104,8 +104,8 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
   /**
    * Sets the annotated type expression corresponding to Node {@code n}.
    */
-  private void setTypeExpression(Node n, JSTypeExpression type) {
-    TypeDeclarationNode node = TypeDeclarationsIRFactory.convert(type);
+  private void setTypeExpression(Node n, JSTypeExpression type, boolean isReturnType) {
+    TypeDeclarationNode node = TypeDeclarationsIRFactory.convert(type, isReturnType);
     if (node != null) {
       n.setDeclaredTypeExpression(node);
       compiler.reportCodeChange();
@@ -135,11 +135,12 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
         };
 
     @Nullable
-    public static TypeDeclarationNode convert(@Nullable JSTypeExpression typeExpr) {
+    public static TypeDeclarationNode convert(@Nullable JSTypeExpression typeExpr,
+        boolean isReturnType) {
       if (typeExpr == null) {
         return null;
       }
-      return convertTypeNodeAST(typeExpr.getRoot());
+      return convertTypeNodeAST(typeExpr.getRoot(), isReturnType);
     }
 
     /**
@@ -151,6 +152,11 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
      */
     @Nullable
     public static TypeDeclarationNode convertTypeNodeAST(Node n) {
+      return convertTypeNodeAST(n, false);
+    }
+
+    @Nullable
+    public static TypeDeclarationNode convertTypeNodeAST(Node n, boolean isReturnType) {
       int token = n.getType();
       switch (token) {
         // for function types that don't declare a return type
@@ -161,7 +167,7 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
         case Token.STAR:
           return anyType();
         case Token.VOID:
-          return voidType();
+          return isReturnType ? voidType() : namedType("undefined");
         // TypeScript types are non-nullable by default with --strictNullChecks
         case Token.BANG:
           return convertTypeNodeAST(n.getFirstChild());
@@ -188,12 +194,16 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
             case "null":
               // TODO(renez): refactor this once Token.NULL_TYPE exists
               return new TypeDeclarationNode(Token.NULL);
+            // Both undefined and void are converted to undefined for all non-return types.
+            // In closure, "void" and "undefined" are type aliases and thus, equivalent types.
+            // However, in TS, it is more ideomatic to emit "void" for return types.
+            // Additionally, there is semantic difference to note: TS "undefined" return types require
+            // a return statement, while "void" does not.
             case "undefined":
+            case "void":
               // TODO(renez): refactor this once CodeGenerator provides support for
               // Token.UNDEFINED_TYPE
-              return namedType("undefined");
-            case "void":
-              return voidType();
+              return isReturnType ? voidType() : namedType("undefined");
             default:
               TypeDeclarationNode root = namedType(typeName);
               if (n.getChildCount() > 0 && n.getFirstChild().isBlock()) {
@@ -272,7 +282,7 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
               // Not expressible in TypeScript syntax, so we omit them from the tree.
               // They could be added as properties on the result node.
             } else {
-              returnType = convertTypeNodeAST(child2);
+              returnType = convertTypeNodeAST(child2, true);
             }
           }
           return functionType(returnType, requiredParams, optionalParams, restName, restType);

@@ -1,6 +1,6 @@
 var x: any;
 var y: any;
-var v: void;
+var v: undefined;
 var u: undefined = undefined;
 var nil: null = null;
 var n: number = 4;

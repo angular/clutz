@@ -15,3 +15,9 @@ var pop = function(b: boolean, s: string, x: any): string {
     return s;
   }
 };
+var paramUndef = function(u: undefined, v: undefined) {
+};
+var retVoid = function(): void {
+};
+var retUndef = function(): void {
+};
