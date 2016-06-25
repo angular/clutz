@@ -52,19 +52,23 @@ public final class ClassConversionPass extends AbstractPostOrderCallback impleme
 
   @Override
   public void visit(NodeTraversal t, Node n, Node parent) {
-    JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
     switch (n.getType()) {
       case Token.CLASS:
         addClassToScope(n);
         break;
       case Token.FUNCTION:
+        JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
         if (bestJSDocInfo != null && bestJSDocInfo.isConstructor()) {
           constructorToClass(n, bestJSDocInfo);
         }
         break;
       case Token.EXPR_RESULT:
-        if (NodeUtil.isPrototypePropertyDeclaration(n) && isValidMember(n)) {
-          movePrototypeDefinitionsIntoClasses(n, bestJSDocInfo);
+        ClassMemberDeclaration declaration = new ClassMemberDeclaration(n);
+        if (declaration.isValid()) {
+          // TODO(renez): extend this to handle fields as well
+          if (declaration.rhs.isFunction()) {
+            maybeMoveMethodsIntoClasses(declaration);
+          }
         }
         break;
       default:
@@ -125,39 +129,39 @@ public final class ClassConversionPass extends AbstractPostOrderCallback impleme
   }
 
   /**
-   * Moves prototype definitions in their respective classes.
+   * Attempts to move a method declaration into a class definition. This generates a new
+   * MEMBER_FUNCTION_DEF Node while removing the old function node from the AST.
    *
-   * All prototype declarations must be an assignment:
-   * ie. A.B.C.prototype.f = RHS;
+   * This fails to move a method declaration when referenced class does not exist in scope.
    */
-  void movePrototypeDefinitionsIntoClasses(Node n, JSDocInfo jsDoc) {
-    Node assignNode = n.getFirstChild();
-    Node fullname = assignNode.getFirstChild();
-    Node rhs = assignNode.getLastChild();
-
-    String className = getClassName(fullname);
-    String memberName = getMemberName(fullname);
-
-    if (!classes.containsKey(className)) {
-      compiler.report(JSError.make(fullname, GENTS_UNKNOWN_CLASS_ERROR, className));
+  void maybeMoveMethodsIntoClasses(ClassMemberDeclaration declaration) {
+    if (!classes.containsKey(declaration.getClassName())) {
+      // Only emit error on non-static (prototype) methods.
+      // This is because we can assign to non-class objects such as records.
+      if (!declaration.isStatic()) {
+        compiler.report(JSError.make(
+            declaration.fullName,
+            GENTS_UNKNOWN_CLASS_ERROR,
+            declaration.getClassName()
+        ));
+      }
       return;
     }
-    Node classNode = classes.get(className);
+
+    Node classNode = classes.get(declaration.getClassName());
     Node classMembers = classNode.getLastChild();
 
-    // TODO(renez): extend this to handle fields as well
-    if (rhs.isFunction()) {
-      // Detach nodes in order to move them around in the AST.
-      n.detachFromParent();
-      rhs.detachFromParent();
+    // Detach nodes in order to move them around in the AST.
+    declaration.exprRoot.detachFromParent();
+    declaration.rhs.detachFromParent();
 
-      Node memberFunc = IR.memberFunctionDef(memberName, rhs);
-      memberFunc.setJSDocInfo(jsDoc);
+    Node memberFunc = IR.memberFunctionDef(declaration.getMemberName(), declaration.rhs);
+    memberFunc.setStaticMember(declaration.isStatic());
+    memberFunc.setJSDocInfo(declaration.jsDoc);
 
-      // Append the new method to the class
-      classMembers.addChildToBack(memberFunc);
-      compiler.reportCodeChange();
-    }
+    // Append the new method to the class
+    classMembers.addChildToBack(memberFunc);
+    compiler.reportCodeChange();
   }
 
   /**
@@ -186,48 +190,6 @@ public final class ClassConversionPass extends AbstractPostOrderCallback impleme
   }
 
   /**
-   * Converts a prototype declaration name into its qualified class name.
-   *
-   * ex. A.B.C.prototype.foo is converted to A.B.C
-   */
-  static String getClassName(Node n) {
-    while (n.isGetProp()) {
-      if (n.getLastChild().getString().equals("prototype")) {
-        return n.getFirstChild().getQualifiedName();
-      }
-      n = n.getFirstChild();
-    }
-    throw new IllegalArgumentException("Invalid prototype declaration name: " + n.toStringTree());
-  }
-
-  /**
-   * Converts a prototype declaration name into the method name we are defining.
-   *
-   * We only care about top level members of a prototype.
-   * ex. A.B.C.prototype.foo is converted to foo
-   */
-  static String getMemberName(Node n) {
-    if (n.isGetProp()) {
-      return n.getLastChild().getString();
-    }
-    throw new IllegalArgumentException("Invalid prototype declaration name: " + n.toStringTree());
-  }
-
-  /**
-   * If the node {@code n} is a top level member of a prototype, such as
-   * A.B.prototype.foo or A.prototype.bar
-   */
-  static boolean isValidMember(Node n) {
-    Node fullname = n.getFirstFirstChild();
-    if (fullname.isGetProp()) {
-      if (fullname.getFirstChild().getLastChild().getString().equals("prototype")) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
    * Converts a qualified name string into a tree of GETPROP.
    *
    * ex. "foo.bar.baz" is converted to GETPROP(GETPROP(NAME(foo), STRING(bar)), STRING(baz)).
@@ -239,6 +201,67 @@ public final class ClassConversionPass extends AbstractPostOrderCallback impleme
       return root;
     }
     return IR.getprop(root, propList.next(), Iterators.toArray(propList, String.class));
+  }
+
+  /**
+   * Represents an assignment to a class member.
+   */
+  private final class ClassMemberDeclaration {
+    Node exprRoot;
+    Node assignNode;
+    Node fullName;
+    Node rhs;
+    JSDocInfo jsDoc;
+
+    ClassMemberDeclaration(Node n) {
+      this.exprRoot = n;
+      this.assignNode = n.getFirstChild();
+      this.fullName = assignNode.getFirstChild();
+      this.rhs = assignNode.getLastChild();
+      this.jsDoc = NodeUtil.getBestJSDocInfo(n);
+    }
+
+    boolean isValid() {
+      return assignNode.isAssign() && fullName.isGetProp();
+    }
+
+    boolean isStatic() {
+      if (NodeUtil.isPrototypePropertyDeclaration(exprRoot)) {
+        if (fullName.getFirstChild().getLastChild().getString().equals("prototype")) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    /**
+     * Gets the full class name of this declaration.
+     * ex. A.B.C.prototype.foo -> A.B.C
+     * ex. A.B.C.D.bar -> A.B.C.D
+     */
+    String getClassName() {
+      Node n = fullName;
+      if (isStatic()) {
+        return n.getFirstChild().getQualifiedName();
+      }
+      while (n.isGetProp()) {
+        if (n.getLastChild().getString().equals("prototype")) {
+          return n.getFirstChild().getQualifiedName();
+        }
+        n = n.getFirstChild();
+      }
+      throw new IllegalArgumentException("Invalid declaration name: " + n.toStringTree());
+    }
+
+    /**
+     * Gets the name of the method this defines.
+     */
+    String getMemberName() {
+      if (fullName.isGetProp()) {
+        return fullName.getLastChild().getString();
+      }
+      throw new IllegalArgumentException("Invalid declaration name: " + fullName.toStringTree());
+    }
   }
 
 }
