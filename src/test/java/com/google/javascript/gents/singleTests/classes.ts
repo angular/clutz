@@ -4,19 +4,20 @@ var A = class {
   }
 };
 class B {
-  constructor(a) {
+  constructor(a, b) {
     this.a = a;
+    this.b = b;
   }
 }
 class C extends A {
   constructor(a, b) {
-    A.call(this, a);
+    super(a);
     this.b = b;
   }
 }
 var D = class extends B {
-  constructor(a, b) {
-    B.call(this, a);
-    this.b = b;
+  constructor(a, b, c) {
+    super(a, b);
+    this.c = c;
   }
 };

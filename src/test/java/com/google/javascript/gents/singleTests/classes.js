@@ -11,8 +11,9 @@ var A = function(a) {
  * Named class
  * @constructor
  */
-function B(a) {
+function B(a, b) {
   this.a = a;
+  this.b = b;
 }
 
 /**
@@ -21,16 +22,18 @@ function B(a) {
  * @extends {A}
  */
 function C(a, b) {
-  A.call(this, a);
+  C.base(this, 'constructor', a);
   this.b = b;
 }
+goog.inherits(C, A);
 
 /**
  * Anonymous class extension
  * @constructor
  * @extends {B}
  */
-var D = function(a, b) {
-  B.call(this, a);
-  this.b = b;
+var D = function(a, b, c) {
+  B.call(this, a, b);
+  this.c = c;
 };
+goog.inherits(D, B);

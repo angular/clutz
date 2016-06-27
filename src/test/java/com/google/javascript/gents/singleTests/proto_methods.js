@@ -23,9 +23,10 @@ goog.A = class {
  * @extends {goog.A}
  */
 function B(a, b) {
-  A.call(this, a);
+  goog.A.call(this, a);
   this.b = b;
 }
+goog.inherits(B, goog.A);
 
 /**
  * Untyped method

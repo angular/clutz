@@ -9,7 +9,7 @@ goog.A = class {
 };
 class B extends goog.A {
   constructor(a: number, b: boolean) {
-    A.call(this, a);
+    super(a);
     this.b = b;
   }
   bar(n: number): boolean {

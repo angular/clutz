@@ -22,14 +22,10 @@ import java.util.Map;
  * Converts ES5 JavaScript classes into ES6 JavaScript classes. Prototype declarations are
  * converted into the new class definitions of ES6.
  */
-public final class ClassConversionPass extends AbstractPostOrderCallback implements CompilerPass {
+public final class ClassConversionPass implements CompilerPass {
 
-  static final DiagnosticType GENTS_CLASS_REDEFINED_ERROR = DiagnosticType.error(
-      "GENTS_CLASS_REDEFINED_ERROR",
-      "The class {0} has been defined multiple times within the same file.");
-  static final DiagnosticType GENTS_UNKNOWN_CLASS_ERROR = DiagnosticType.error(
-      "GENTS_UNKNOWN_CLASS_ERROR",
-      "The class {0} could not be found.");
+  static final DiagnosticType GENTS_CLASS_PASS_ERROR = DiagnosticType.error(
+      "GENTS_CLASS_PASS_ERROR", "{0}");
 
   private final AbstractCompiler compiler;
   private Map<String, Node> classes;
@@ -45,34 +41,56 @@ public final class ClassConversionPass extends AbstractPostOrderCallback impleme
       // We convert each file independently to avoid merging class methods from different files.
       if (child.isScript()) {
         this.classes = new LinkedHashMap<>();
-        NodeTraversal.traverseEs6(compiler, child, this);
+        NodeTraversal.traverseEs6(compiler, child, new ClassDefinitionConverter());
+        NodeTraversal.traverseEs6(compiler, child, new ClassMemberConverter());
       }
     }
   }
 
-  @Override
-  public void visit(NodeTraversal t, Node n, Node parent) {
-    switch (n.getType()) {
-      case Token.CLASS:
-        addClassToScope(n);
-        break;
-      case Token.FUNCTION:
-        JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
-        if (bestJSDocInfo != null && bestJSDocInfo.isConstructor()) {
-          constructorToClass(n, bestJSDocInfo);
-        }
-        break;
-      case Token.EXPR_RESULT:
-        ClassMemberDeclaration declaration = new ClassMemberDeclaration(n);
-        if (declaration.isValid()) {
-          // TODO(renez): extend this to handle fields as well
-          if (declaration.rhs.isFunction()) {
-            maybeMoveMethodsIntoClasses(declaration);
+  /**
+   * Converts @constructor annotated functions into classes.
+   */
+  private class ClassDefinitionConverter extends AbstractPostOrderCallback {
+    @Override
+    public void visit(NodeTraversal t, Node n, Node parent) {
+      switch (n.getType()) {
+        case Token.FUNCTION:
+          JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
+          if (bestJSDocInfo != null && bestJSDocInfo.isConstructor()) {
+            constructorToClass(n, bestJSDocInfo);
           }
-        }
-        break;
-      default:
-        break;
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  /**
+   * Converts class methods, static methods, inheritance and superclass calls.
+   */
+  private class ClassMemberConverter extends AbstractPostOrderCallback {
+    @Override
+    public void visit(NodeTraversal t, Node n, Node parent) {
+      switch (n.getType()) {
+        case Token.CLASS:
+          addClassToScope(n);
+          break;
+        case Token.EXPR_RESULT:
+          maybeRemoveInherits(n);
+          maybeReplaceSuperCall(n);
+
+          ClassMemberDeclaration declaration = new ClassMemberDeclaration(n);
+          if (declaration.isValid()) {
+            // TODO(renez): extend this to handle fields as well
+            if (declaration.rhs.isFunction()) {
+              maybeMoveMethodsIntoClasses(declaration);
+            }
+          }
+          break;
+        default:
+          break;
+      }
     }
   }
 
@@ -124,8 +142,6 @@ public final class ClassConversionPass extends AbstractPostOrderCallback impleme
 
     n.getParent().replaceChild(n, classNode);
     compiler.reportCodeChange();
-
-    addClassToScope(className, classNode);
   }
 
   /**
@@ -141,9 +157,8 @@ public final class ClassConversionPass extends AbstractPostOrderCallback impleme
       if (!declaration.isStatic()) {
         compiler.report(JSError.make(
             declaration.fullName,
-            GENTS_UNKNOWN_CLASS_ERROR,
-            declaration.getClassName()
-        ));
+            GENTS_CLASS_PASS_ERROR,
+            String.format("Class %s could not be found", declaration.getClassName())));
       }
       return;
     }
@@ -165,6 +180,111 @@ public final class ClassConversionPass extends AbstractPostOrderCallback impleme
   }
 
   /**
+   * Attempts to remove an inheritance statement.
+   * ex. goog.inherits(base, super)
+   *
+   * This returns without any modification if the node is not an inheritance statement.
+   * This fails by reporting an error when the node is an invalid inheritance statement.
+   */
+  void maybeRemoveInherits(Node exprNode) {
+    if (exprNode.getFirstChild().isCall()) {
+      Node callNode = exprNode.getFirstChild();
+      // Remove goog.inherits calls
+      if (!callNode.getFirstChild().getQualifiedName().equals("goog.inherits")) {
+        return;
+      }
+      String className = callNode.getSecondChild().getQualifiedName();
+      String superClassName = callNode.getLastChild().getQualifiedName();
+
+      // Check that class exists
+      if (!classes.containsKey(className)) {
+        compiler.report(JSError.make(
+            exprNode,
+            GENTS_CLASS_PASS_ERROR,
+            String.format("Class %s could not be found.", className)));
+        return;
+      }
+
+      // Check that superclass is consistent
+      Node classNode = classes.get(className);
+      String storedSuperClassName = classNode.getSecondChild().getQualifiedName();
+      if (classNode.getSecondChild().isEmpty() || !storedSuperClassName.equals(superClassName)) {
+        compiler.report(JSError.make(
+            exprNode,
+            GENTS_CLASS_PASS_ERROR,
+            String.format("Invalid superclass for %s", className)));
+        return;
+      }
+
+      exprNode.detachFromParent();
+      compiler.reportCodeChange();
+    } else if (exprNode.getFirstChild().isAssign()) {
+      Node assignNode = exprNode.getFirstChild();
+      // Report error if trying to assign to prototype directly
+      Node lhs = assignNode.getFirstChild();
+      if (lhs.getLastChild().getString().equals("prototype")) {
+        compiler.report(JSError.make(
+            exprNode,
+            GENTS_CLASS_PASS_ERROR,
+            String.format("Cannot directly assign to prototype for %s",
+                lhs.getFirstChild().getQualifiedName())));
+      }
+    }
+  }
+
+  /**
+   * Attempts to convert a ES5 superclass constructor call into a ES6 super() call.
+   *
+   * ex. B.call(this, args) -> super(args);
+   * ex. A.base(this, 'constructor', args) -> super(args);
+   *
+   * This returns without any modification if the node is not an superclass call statement.
+   */
+  void maybeReplaceSuperCall(Node exprNode) {
+    if (exprNode.getFirstChild().isCall()) {
+      Node callNode = exprNode.getFirstChild();
+      // First validate that we are inside a constructor call that extends another class
+      Node classNode = NodeUtil.getEnclosingClass(exprNode);
+      if (classNode == null) {
+        return;
+      }
+
+      String className = NodeUtil.getName(classNode);
+      // Super calls for root classes are not converted
+      if (classNode.getSecondChild().isEmpty()) {
+        compiler.report(JSError.make(
+            exprNode,
+            GENTS_CLASS_PASS_ERROR,
+            String.format("Cannot call superclass in root class %s", className)));
+        return;
+      }
+      String superClassName = classNode.getSecondChild().getQualifiedName();
+
+      // super.call(this, args...) -> super(args...)
+      if (callNode.getFirstChild().getQualifiedName().equals(superClassName + ".call")) {
+        if (callNode.getSecondChild().isThis()) {
+          callNode.replaceChild(callNode.getFirstChild(), IR.superNode());
+          callNode.removeChild(callNode.getSecondChild());
+          compiler.reportCodeChange();
+          return;
+        }
+      }
+
+      // name.base(this, 'constructor', args...) -> super(args...)
+      if (callNode.getFirstChild().getQualifiedName().equals(className + ".base")) {
+        if (callNode.getSecondChild().isThis() &&
+            callNode.getChildAtIndex(2).getString().equals("constructor")) {
+          callNode.replaceChild(callNode.getFirstChild(), IR.superNode());
+          callNode.removeChild(callNode.getSecondChild());
+          callNode.removeChild(callNode.getSecondChild());
+          compiler.reportCodeChange();
+          return;
+        }
+      }
+    }
+  }
+
+  /**
    * Adds a class node to the top level scope.
    *
    * This determines the classname using the nearest available name node.
@@ -175,15 +295,11 @@ public final class ClassConversionPass extends AbstractPostOrderCallback impleme
       // We do not emit an error here as there can be anonymous classes without names.
       return;
     }
-    addClassToScope(className, n);
-  }
-
-  /**
-   * Adds a class node to the top level scope.
-   */
-  void addClassToScope(String className, Node n) {
     if (classes.containsKey(className)) {
-      compiler.report(JSError.make(n, GENTS_CLASS_REDEFINED_ERROR, className));
+      compiler.report(JSError.make(
+          n,
+          GENTS_CLASS_PASS_ERROR,
+          String.format("Class %s has been defined multiple times.", className)));
       return;
     }
     classes.put(className, n);
