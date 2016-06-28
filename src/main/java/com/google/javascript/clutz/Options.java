@@ -41,6 +41,13 @@ public class Options {
       usage = "emits platform externs, instead of omitting them in favor of TS lib.d.ts")
   boolean emitPlatformExterns;
 
+  @Option(name = "--closure_entry_points",
+      usage = "only generate output for the given entry points to the program. Must be" +
+              " goog.provide'd symbols.",
+      metaVar = "ENTRYPOINT...",
+      handler = StringArrayOptionHandler.class)
+  List<String> entryPoints = new ArrayList<>();
+
   @Argument
   List<String> arguments = new ArrayList<>();
 
@@ -49,6 +56,10 @@ public class Options {
   public CompilerOptions getCompilerOptions() {
     final CompilerOptions options = new CompilerOptions();
     options.setClosurePass(true);
+
+    if (!this.entryPoints.isEmpty()) {
+      options.setManageClosureDependencies(this.entryPoints);
+    }
 
     // All diagnostics are WARNINGs (or off) and thus ignored unless debug == true.
     // Only report issues (and fail for them) that are specifically causing problems for Clutz.

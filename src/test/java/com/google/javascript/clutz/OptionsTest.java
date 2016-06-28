@@ -42,6 +42,17 @@ public class OptionsTest {
   }
 
   @Test
+  public void testClosureEntryPoint() throws Exception {
+    Options opts = new Options(new String[] {
+            "foo.js", "--closure_entry_points", "ns.entryPoint1", "ns.entryPoint2", "--externs", "extern1.js", "extern2.js", "-o", "output.d.ts"
+    });
+    assertThat(opts.arguments).containsExactly("foo.js");
+    assertThat(opts.entryPoints).containsExactly("ns.entryPoint1", "ns.entryPoint2");
+    assertThat(opts.externs).containsExactly("extern1.js", "extern2.js").inOrder();
+    assertThat(opts.output).isEqualTo("output.d.ts");
+  }
+
+  @Test
   public void testHandleEmptyCommandLine() throws Exception {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     System.setErr(new PrintStream(out));
