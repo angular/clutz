@@ -37,3 +37,12 @@ var D = function(a, b, c) {
   this.c = c;
 };
 goog.inherits(D, B);
+
+/**
+ * goog.defineClass based classes
+ */
+var E = goog.defineClass(C, {
+  constructor: function(a, b) {
+    C.call(this, a, b);
+  }
+});

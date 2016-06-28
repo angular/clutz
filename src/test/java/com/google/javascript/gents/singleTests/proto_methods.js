@@ -46,3 +46,16 @@ B.prototype.bar = function(n) { return n > 0; };
  * @return {void}
  */
 C.prototype.baz = function(n) {};
+
+/**
+ * goog.defineClass based classes
+ */
+goog.B = goog.defineClass(goog.A, {
+  constructor: function(a) {
+    goog.A.call(this, a);
+  },
+  /**
+   * @returns {number}
+   */
+  foo: function() { return 0; }
+});

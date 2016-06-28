@@ -60,6 +60,11 @@ public final class ClassConversionPass implements CompilerPass {
             constructorToClass(n, bestJSDocInfo);
           }
           break;
+        case Token.CALL:
+          if ("goog.defineClass".equals(n.getFirstChild().getQualifiedName())) {
+            defineClassToClass(n);
+          }
+          break;
         default:
           break;
       }
@@ -98,7 +103,6 @@ public final class ClassConversionPass implements CompilerPass {
    * Converts @constructor annotated functions into class definitions.
    */
   void constructorToClass(Node n, JSDocInfo jsDoc) {
-    String className = NodeUtil.getNearestFunctionName(n);
     // Break up function
     Node name = n.getFirstChild();
     Node params = n.getSecondChild();
@@ -109,7 +113,7 @@ public final class ClassConversionPass implements CompilerPass {
     // The name is usually located in the surrounding context.
     // ie. /** @constructor */ var A = function() {};
     // is converted to: var A = class {};
-    if (name.getString().equals("")) {
+    if (name.getString().isEmpty()) {
       name = IR.empty();
     }
 
@@ -142,6 +146,46 @@ public final class ClassConversionPass implements CompilerPass {
 
     n.getParent().replaceChild(n, classNode);
     compiler.reportCodeChange();
+  }
+
+  /**
+   * Converts goog.defineClass calls into class definitions.
+   */
+  void defineClassToClass(Node n) {
+    Node superClass = n.getSecondChild();
+    if (superClass.isNull()) {
+      superClass = IR.empty();
+    } else {
+      superClass.detachFromParent();
+    }
+
+    Node classMembers = new Node(Token.CLASS_MEMBERS);
+    for (Node child : n.getLastChild().children()) {
+      // Handle static methods
+      if ("statics".equals(child.getString())) {
+        for (Node child2 : child.getFirstChild().children()) {
+          classMembers.addChildToBack(objectLiteralMethodToMethodDef(child2, true));
+        }
+      } else { // prototype methods
+        classMembers.addChildToBack(objectLiteralMethodToMethodDef(child, false));
+      }
+    }
+    Node classNode = new Node(Token.CLASS, IR.empty(), superClass, classMembers);
+
+    n.getParent().replaceChild(n, classNode);
+    compiler.reportCodeChange();
+  }
+
+  /**
+   * Converts functions declared in object literals into a member function definition.
+   */
+  Node objectLiteralMethodToMethodDef(Node objectLiteralMethod, boolean isStatic) {
+    Node fn = objectLiteralMethod.getFirstChild();
+    fn.detachFromParent();
+    Node methodDef = IR.memberFunctionDef(objectLiteralMethod.getString(), fn);
+    methodDef.setJSDocInfo(objectLiteralMethod.getJSDocInfo());
+    methodDef.setStaticMember(isStatic);
+    return methodDef;
   }
 
   /**
@@ -190,7 +234,7 @@ public final class ClassConversionPass implements CompilerPass {
     if (exprNode.getFirstChild().isCall()) {
       Node callNode = exprNode.getFirstChild();
       // Remove goog.inherits calls
-      if (!callNode.getFirstChild().getQualifiedName().equals("goog.inherits")) {
+      if (!"goog.inherits".equals(callNode.getFirstChild().getQualifiedName())) {
         return;
       }
       String className = callNode.getSecondChild().getQualifiedName();
@@ -222,7 +266,7 @@ public final class ClassConversionPass implements CompilerPass {
       Node assignNode = exprNode.getFirstChild();
       // Report error if trying to assign to prototype directly
       Node lhs = assignNode.getFirstChild();
-      if (lhs.getLastChild().getString().equals("prototype")) {
+      if ("prototype".equals(lhs.getLastChild().getString())) {
         compiler.report(JSError.make(
             exprNode,
             GENTS_CLASS_PASS_ERROR,
@@ -273,7 +317,7 @@ public final class ClassConversionPass implements CompilerPass {
       // name.base(this, 'constructor', args...) -> super(args...)
       if (callNode.getFirstChild().getQualifiedName().equals(className + ".base")) {
         if (callNode.getSecondChild().isThis() &&
-            callNode.getChildAtIndex(2).getString().equals("constructor")) {
+            "constructor".equals(callNode.getChildAtIndex(2).getString())) {
           callNode.replaceChild(callNode.getFirstChild(), IR.superNode());
           callNode.removeChild(callNode.getSecondChild());
           callNode.removeChild(callNode.getSecondChild());
@@ -343,7 +387,7 @@ public final class ClassConversionPass implements CompilerPass {
 
     boolean isStatic() {
       if (NodeUtil.isPrototypePropertyDeclaration(exprRoot)) {
-        if (fullName.getFirstChild().getLastChild().getString().equals("prototype")) {
+        if ("prototype".equals(fullName.getFirstChild().getLastChild().getString())) {
           return false;
         }
       }
@@ -361,7 +405,7 @@ public final class ClassConversionPass implements CompilerPass {
         return n.getFirstChild().getQualifiedName();
       }
       while (n.isGetProp()) {
-        if (n.getLastChild().getString().equals("prototype")) {
+        if ("prototype".equals(n.getLastChild().getString())) {
           return n.getFirstChild().getQualifiedName();
         }
         n = n.getFirstChild();

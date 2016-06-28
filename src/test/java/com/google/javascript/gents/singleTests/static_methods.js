@@ -31,3 +31,22 @@ goog.A.B = {};
  * @return {void}
  */
 goog.A.B.baz = function(n) {};
+
+/**
+ * goog.defineClass based classes
+ */
+goog.B = goog.defineClass(goog.A, {
+  constructor: function(a) {
+    goog.A.call(this, a);
+  },
+  statics: {
+    /**
+     * @returns {boolean}
+     */
+    foo: function() { return false; },
+    /**
+     * @returns {boolean}
+     */
+    bar: function() { return true; }
+  }
+});

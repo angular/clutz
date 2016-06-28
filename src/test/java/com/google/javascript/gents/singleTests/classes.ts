@@ -21,3 +21,8 @@ var D = class extends B {
     this.c = c;
   }
 };
+var E = class extends C {
+  constructor(a, b) {
+    super(a, b);
+  }
+};

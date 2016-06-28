@@ -18,3 +18,11 @@ class B extends goog.A {
 }
 C.prototype.baz = function(n: number): void {
 };
+goog.B = class extends goog.A {
+  constructor(a) {
+    super(a);
+  }
+  foo(): number {
+    return 0;
+  }
+};
