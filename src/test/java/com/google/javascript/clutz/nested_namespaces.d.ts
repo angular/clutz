@@ -23,10 +23,17 @@ declare module 'goog:nested.NotNestedEither' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.nested {
-  var PrivateC__clutz_alias : ಠ_ಠ.clutz.PrivateType;
+  class PrivateC extends PrivateC_Instance {
+  }
+  class PrivateC_Instance {
+    private noStructuralTyping_: any;
+  }
+}
+declare namespace ಠ_ಠ.clutz.goog {
+  function require(name: 'nested.PrivateC'): typeof ಠ_ಠ.clutz.nested.PrivateC;
 }
 declare module 'goog:nested.PrivateC' {
-  import alias = ಠ_ಠ.clutz.nested.PrivateC__clutz_alias;
+  import alias = ಠ_ಠ.clutz.nested.PrivateC;
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.nested.PrivateC {
