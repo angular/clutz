@@ -647,7 +647,7 @@ public class DeclarationGenerator {
     emitNamespaceBegin(namespace);
     TreeWalker treeWalker = new TreeWalker(compiler.getTypeRegistry(), provides, isExtern);
     if (isDefault) {
-      if (isPrivate(symbol.getJSDocInfo())) {
+      if (isPrivate(symbol.getJSDocInfo()) && !symbol.getJSDocInfo().isConstructor()) {
         treeWalker.emitPrivateValue(emitName);
       } else {
         treeWalker.walk(symbol, emitName);
@@ -1644,6 +1644,7 @@ public class DeclarationGenerator {
       // Constructors.
       if (type.isConstructor() && (type).getParameters().iterator().hasNext()) {
         maybeEmitJsDoc(type.getJSDocInfo(), /* ignoreParams */ false);
+        // TODO mark constuctor as private when source is annoated with @private for ts v2.0 and greater
         emit("constructor");
         visitFunctionParameters(type, false, classTemplateTypeNames);
         emit(";");
