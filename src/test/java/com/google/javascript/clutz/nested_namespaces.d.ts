@@ -49,7 +49,7 @@ declare module 'goog:nested.PrivateC.Enum' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.nested {
-  var foo__clutz_alias : ಠ_ಠ.clutz.PrivateType ;
+  var foo__clutz_alias : ಠ_ಠ.clutz.nested.PrivateC ;
 }
 declare namespace ಠ_ಠ.clutz.goog {
   function require(name: 'nested.foo'): typeof ಠ_ಠ.clutz.nested.foo__clutz_alias;
