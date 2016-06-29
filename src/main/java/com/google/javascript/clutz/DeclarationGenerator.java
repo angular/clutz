@@ -88,7 +88,9 @@ public class DeclarationGenerator {
       "ReadableStreamController", "CountQueuingStrategy", "ByteLengthQueuingStrategy",
       "ReadableByteStreamReader", "ReadableStream", "WritableStream", "ReadableStreamReader",
       "Entry", "DirectoryEntry", "FileSystem", "Metadata", "FileError", "DirectoryReader",
-      "FileEntry", "FileWriter", "FileSaver");
+      "FileEntry", "FileWriter", "FileSaver", "ChromeEvent", "Tab", "ChromeStringArrayEvent",
+      "ChromeStringStringEvent", "ChromeObjectEvent", "ChromeStringEvent", "ChromeBooleanEvent",
+      "MessageSender", "Port");
 
   /**
    * List of files that are part of closures platform externs.
