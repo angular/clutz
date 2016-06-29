@@ -1748,7 +1748,9 @@ public class DeclarationGenerator {
     private Set<String> getSuperClassFields(FunctionType ftype) {
       Set<String> fields = new LinkedHashSet<>();
       ObjectType superType = getSuperType(ftype);
-      while (superType != null) {
+      // The UNKONWN type has a null constructor. One cannot extend UNKNOWN directly, but this
+      // code can be reached when clutzing a non-closure-valid program.
+      while (superType != null && superType.getConstructor() != null) {
         aggregateFieldsFromClass(fields, superType);
         superType = getSuperType(superType.getConstructor());
       }
