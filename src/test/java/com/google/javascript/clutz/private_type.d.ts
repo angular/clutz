@@ -24,6 +24,22 @@ declare module 'goog:privatetype.Foo' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.privatetype {
+  class X_ extends X__Instance {
+    static staticMethod ( ) : ಠ_ಠ.clutz.privatetype.X_ | null ;
+  }
+  class X__Instance {
+    private noStructuralTyping_: any;
+    method ( ) : void ;
+  }
+}
+declare namespace ಠ_ಠ.clutz.goog {
+  function require(name: 'privatetype.X_'): typeof ಠ_ಠ.clutz.privatetype.X_;
+}
+declare module 'goog:privatetype.X_' {
+  import alias = ಠ_ಠ.clutz.privatetype.X_;
+  export default alias;
+}
+declare namespace ಠ_ಠ.clutz.privatetype {
   var enumUser : ಠ_ಠ.clutz.PrivateType ;
 }
 declare namespace ಠ_ಠ.clutz.goog {
@@ -34,7 +50,7 @@ declare module 'goog:privatetype.enumUser' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.privatetype {
-  var user : ಠ_ಠ.clutz.PrivateType ;
+  var user : ಠ_ಠ.clutz.privatetype.X_ ;
 }
 declare namespace ಠ_ಠ.clutz.goog {
   function require(name: 'privatetype.user'): typeof ಠ_ಠ.clutz.privatetype.user;
