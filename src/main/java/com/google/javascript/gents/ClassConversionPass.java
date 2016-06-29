@@ -1,8 +1,6 @@
 package com.google.javascript.gents;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterators;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.DiagnosticType;
@@ -15,9 +13,10 @@ import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import javax.annotation.Nullable;
 
 /**
  * Converts ES5 JavaScript classes into ES6 JavaScript classes. Prototype declarations are
@@ -44,6 +43,7 @@ public final class ClassConversionPass implements CompilerPass {
         this.classes = new LinkedHashMap<>();
         NodeTraversal.traverseEs6(compiler, child, new ClassDefinitionConverter());
         NodeTraversal.traverseEs6(compiler, child, new ClassMemberConverter());
+        NodeTraversal.traverseEs6(compiler, child, new FieldOnThisConverter());
         NodeTraversal.traverseEs6(compiler, child, new InheritanceConverter());
       }
     }
@@ -84,16 +84,39 @@ public final class ClassConversionPass implements CompilerPass {
           addClassToScope(n);
           break;
         case EXPR_RESULT:
-          ClassMemberDeclaration declaration = new ClassMemberDeclaration(n);
-          if (declaration.isValid()) {
-            // TODO(renez): extend this to handle fields as well
-            if (declaration.rhs.isFunction()) {
-              maybeMoveMethodsIntoClasses(declaration);
+          ClassMemberDeclaration declaration = ClassMemberDeclaration.newDeclaration(n, classes);
+          if (declaration == null) {
+            break;
+          }
+          if (declaration.rhs != null && declaration.rhs.isFunction()) {
+            moveMethodsIntoClasses(declaration);
+          } else {
+            // Ignore field declarations without a type annotation
+            if (declaration.jsDoc != null && declaration.jsDoc.getType() != null) {
+              moveFieldsIntoClasses(declaration);
             }
           }
           break;
         default:
           break;
+      }
+    }
+  }
+
+  /**
+   * Converts fields declared internally inside a class using the "this" keyword.
+   */
+  private class FieldOnThisConverter extends AbstractPostOrderCallback {
+    @Override
+    public void visit(NodeTraversal t, Node n, Node parent) {
+      if (n.isExprResult()) {
+        ClassMemberDeclaration declaration = ClassMemberDeclaration.newDeclarationOnThis(n);
+        // Ignore field declarations without a type annotation
+        if (declaration != null &&
+            declaration.jsDoc != null &&
+            declaration.jsDoc.getType() != null) {
+          moveFieldsIntoClasses(declaration);
+        }
       }
     }
   }
@@ -150,7 +173,7 @@ public final class ClassConversionPass implements CompilerPass {
           .getRoot()
           .getFirstChild() // ignore the ! node as we always output non nullable types
           .getString();
-      superClass = getProp(superClassName);
+      superClass = NodeUtil.newQName(compiler, superClassName);
     }
 
     // TODO(renez): traverse function body to pull out field declaration info
@@ -217,35 +240,38 @@ public final class ClassConversionPass implements CompilerPass {
   /**
    * Attempts to move a method declaration into a class definition. This generates a new
    * MEMBER_FUNCTION_DEF Node while removing the old function node from the AST.
-   *
-   * This fails to move a method declaration when referenced class does not exist in scope.
    */
-  void maybeMoveMethodsIntoClasses(ClassMemberDeclaration declaration) {
-    if (!classes.containsKey(declaration.getClassName())) {
-      // Only emit error on non-static (prototype) methods.
-      // This is because we can assign to non-class objects such as records.
-      if (!declaration.isStatic()) {
-        compiler.report(JSError.make(
-            declaration.fullName,
-            GENTS_CLASS_PASS_ERROR,
-            String.format("Class %s could not be found", declaration.getClassName())));
-      }
-      return;
-    }
-
-    Node classNode = classes.get(declaration.getClassName());
-    Node classMembers = classNode.getLastChild();
+  void moveMethodsIntoClasses(ClassMemberDeclaration declaration) {
+    Node classMembers = declaration.classNode.getLastChild();
+    String fieldName = declaration.memberName;
 
     // Detach nodes in order to move them around in the AST.
     declaration.exprRoot.detachFromParent();
     declaration.rhs.detachFromParent();
 
-    Node memberFunc = IR.memberFunctionDef(declaration.getMemberName(), declaration.rhs);
-    memberFunc.setStaticMember(declaration.isStatic());
+    Node memberFunc = IR.memberFunctionDef(fieldName, declaration.rhs);
+    memberFunc.setStaticMember(declaration.isStatic);
     memberFunc.setJSDocInfo(declaration.jsDoc);
 
     // Append the new method to the class
     classMembers.addChildToBack(memberFunc);
+    compiler.reportCodeChange();
+  }
+
+  /**
+   * Attempts to move a field declaration into a class definition. This generates a new
+   * MEMBER_VARIABLE_DEF Node while persisting the old node in the AST.
+   */
+  void moveFieldsIntoClasses(ClassMemberDeclaration declaration) {
+    Node classMembers = declaration.classNode.getLastChild();
+    String fieldName = declaration.memberName;
+
+    // TODO(renez): After the closure compiler CodeGenerator update, add field default values here
+    // to allow us to delete the original node
+    Node fieldNode = Node.newString(Token.MEMBER_VARIABLE_DEF, fieldName);
+    fieldNode.setJSDocInfo(declaration.jsDoc);
+    fieldNode.setStaticMember(declaration.isStatic);
+    classMembers.addChildToFront(fieldNode);
     compiler.reportCodeChange();
   }
 
@@ -372,7 +398,8 @@ public final class ClassConversionPass implements CompilerPass {
       if ("constructor".equals(methodName)) {
         callNode.replaceChild(callNode.getFirstChild(), IR.superNode());
       } else {
-        callNode.replaceChild(callNode.getFirstChild(), getProp("super." + methodName));
+        callNode.replaceChild(callNode.getFirstChild(),
+            NodeUtil.newQName(compiler, "super." + methodName));
       }
 
       callNode.removeChild(callNode.getSecondChild());
@@ -405,92 +432,117 @@ public final class ClassConversionPass implements CompilerPass {
   }
 
   /**
-   * Converts a qualified name string into a tree of GETPROP.
-   *
-   * ex. "foo.bar.baz" is converted to GETPROP(GETPROP(NAME(foo), STRING(bar)), STRING(baz)).
+   * Represents a declaration of a class member.
    */
-  static Node getProp(String fullname) {
-    Iterator<String> propList = Splitter.on('.').split(fullname).iterator();
-    String rootName = propList.next();
-    Node root;
-
-    switch (rootName) {
-      case "this":
-        root = IR.thisNode();
-        break;
-      case "super":
-        root = IR.superNode();
-        break;
-      default:
-        root = IR.name(rootName);
-        break;
-    }
-
-    if (!propList.hasNext()) {
-      return root;
-    }
-    return IR.getprop(root, propList.next(), Iterators.toArray(propList, String.class));
-  }
-
-  /**
-   * Represents an assignment to a class member.
-   */
-  private final class ClassMemberDeclaration {
+  private static class ClassMemberDeclaration {
     Node exprRoot;
-    Node assignNode;
-    Node fullName;
     Node rhs;
     JSDocInfo jsDoc;
 
-    ClassMemberDeclaration(Node n) {
+    boolean isStatic;
+    Node classNode;
+    String memberName;
+
+    private ClassMemberDeclaration(Node n, boolean isStatic, Node classNode, String memberName) {
       this.exprRoot = n;
-      this.assignNode = n.getFirstChild();
-      this.fullName = assignNode.getFirstChild();
-      this.rhs = assignNode.getLastChild();
+      this.rhs = getRhs(n);
       this.jsDoc = NodeUtil.getBestJSDocInfo(n);
-    }
-
-    boolean isValid() {
-      return assignNode.isAssign() && fullName.isGetProp();
-    }
-
-    boolean isStatic() {
-      if (NodeUtil.isPrototypePropertyDeclaration(exprRoot)) {
-        if ("prototype".equals(fullName.getFirstChild().getLastChild().getString())) {
-          return false;
-        }
-      }
-      return true;
+      this.isStatic = isStatic;
+      this.classNode = classNode;
+      this.memberName = memberName;
     }
 
     /**
-     * Gets the full class name of this declaration.
-     * ex. A.B.C.prototype.foo -> A.B.C
-     * ex. A.B.C.D.bar -> A.B.C.D
+     * Factory method for creating a new ClassMemberDeclaration on a declaration external to
+     * a class.
+     * <ul>
+     * <li>{@code A.prototype.foo = function() {...}}</li>
+     * <li>{@code A.prototype.w = 4}</li>
+     * <li>{@code A.prototype.x}</li>
+     * <li>{@code A.bar = function() {...}}</li>
+     * <li>{@code A.y = 6}</li>
+     * <li>{@code A.z}</li>
+     * </ul>
+     *
+     * Returns null if the expression node is an invalid member declaration.
      */
-    String getClassName() {
-      Node n = fullName;
-      if (isStatic()) {
-        return n.getFirstChild().getQualifiedName();
+    @Nullable
+    static ClassMemberDeclaration newDeclaration(Node n, Map<String, Node> classes) {
+      Node fullName = getFullName(n);
+      // Node MUST NOT start with "this."
+      if (!fullName.isGetProp() || containsThis(fullName)) {
+        return null;
       }
-      while (n.isGetProp()) {
-        if ("prototype".equals(n.getLastChild().getString())) {
-          return n.getFirstChild().getQualifiedName();
-        }
-        n = n.getFirstChild();
+
+      boolean isStatic = isStatic(fullName);
+      String className = isStatic ?
+          fullName.getFirstChild().getQualifiedName() :
+          fullName.getFirstFirstChild().getQualifiedName();
+
+      // Class must exist in scope
+      if (!classes.containsKey(className)) {
+        return null;
       }
-      throw new IllegalArgumentException("Invalid declaration name: " + n.toStringTree());
+      Node classNode = classes.get(className);
+      String memberName = fullName.getLastChild().getString();
+
+      return new ClassMemberDeclaration(n, isStatic, classNode, memberName);
     }
 
     /**
-     * Gets the name of the method this defines.
+     * Factory method for creating a new ClassMemberDeclarationOnThis on a declaration internal
+     * to a class via the "this" keyword.
+     * <ul>
+     * <li>{@code this.a = 5}</li>
+     * <li>{@code this.b}</li>
+     * </ul>
+     *
+     * Returns null if the expression node is an invalid member declaration.
      */
-    String getMemberName() {
-      if (fullName.isGetProp()) {
-        return fullName.getLastChild().getString();
+    @Nullable
+    static ClassMemberDeclaration newDeclarationOnThis(Node n) {
+      Node fullName = getFullName(n);
+      // Node MUST start with "this."
+      if (!fullName.isGetProp() || !containsThis(fullName)) {
+        return null;
       }
-      throw new IllegalArgumentException("Invalid declaration name: " + fullName.toStringTree());
+
+      Node classNode = NodeUtil.getEnclosingClass(n);
+      String memberName = fullName.getLastChild().getString();
+      if (classNode == null) {
+        return null;
+      }
+
+      return new ClassMemberDeclaration(n, false, classNode, memberName);
+    }
+
+    /**
+     * Returns the full name of the class member being declared.
+     */
+    static Node getFullName(Node n) {
+      return n.getFirstChild().isAssign() ? n.getFirstFirstChild() : n.getFirstChild();
+    }
+
+    /**
+     * Returns the right hand side of the member declaration.
+     */
+    static Node getRhs(Node n) {
+      return n.getFirstChild().isAssign() ? n.getFirstChild().getLastChild() : null;
+    }
+
+    /**
+     * Returns whether a name starts with "this."
+     */
+    static boolean containsThis(Node fullName) {
+      return fullName.isThis() || (fullName.isGetProp() && containsThis(fullName.getFirstChild()));
+    }
+
+    /**
+     * Returns if a name refers to a static member of a class.
+     */
+    static boolean isStatic(Node fullName) {
+      return !(fullName.getFirstChild().isGetProp() &&
+          "prototype".equals(fullName.getFirstChild().getLastChild().getString()));
     }
   }
-
 }

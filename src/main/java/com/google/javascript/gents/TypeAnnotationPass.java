@@ -59,6 +59,14 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
   public void visit(NodeTraversal t, Node n, Node parent) {
     JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
     switch (n.getType()) {
+      // Fields default to any type
+      case MEMBER_VARIABLE_DEF:
+        if (bestJSDocInfo != null && bestJSDocInfo.getType() != null) {
+          setTypeExpression(n, bestJSDocInfo.getType(), false);
+        } else {
+          n.setDeclaredTypeExpression(anyType());
+        }
+        break;
       // Functions are annotated with their return type
       case FUNCTION:
         if (bestJSDocInfo != null) {
