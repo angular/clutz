@@ -8,6 +8,87 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  /**
+   * Event whose listeners take a boolean parameter.
+   */
+  class ChromeBooleanEvent extends ChromeBooleanEvent_Instance {
+  }
+  class ChromeBooleanEvent_Instance {
+    private noStructuralTyping_: any;
+    addListener (callback : (a : boolean ) => undefined ) : any ;
+    hasListener (callback : (a : boolean ) => undefined ) : boolean ;
+    hasListeners ( ) : boolean ;
+    removeListener (callback : (a : boolean ) => undefined ) : any ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class ChromeEvent extends ChromeEvent_Instance {
+  }
+  class ChromeEvent_Instance {
+    private noStructuralTyping_: any;
+    addListener (callback : Function ) : void ;
+    hasListener (callback : Function ) : boolean ;
+    hasListeners ( ) : boolean ;
+    removeListener (callback : Function ) : void ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * Event whose listeners take an Object parameter.
+   */
+  class ChromeObjectEvent extends ChromeObjectEvent_Instance {
+  }
+  class ChromeObjectEvent_Instance {
+    private noStructuralTyping_: any;
+    addListener (callback : (a : Object ) => undefined ) : any ;
+    hasListener (callback : (a : Object ) => undefined ) : boolean ;
+    hasListeners ( ) : boolean ;
+    removeListener (callback : (a : Object ) => undefined ) : any ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * Event whose listeners take a string array parameter.
+   */
+  class ChromeStringArrayEvent extends ChromeStringArrayEvent_Instance {
+  }
+  class ChromeStringArrayEvent_Instance {
+    private noStructuralTyping_: any;
+    addListener (callback : (a : string [] ) => undefined ) : any ;
+    hasListener (callback : (a : string [] ) => undefined ) : boolean ;
+    hasListeners ( ) : boolean ;
+    removeListener (callback : (a : string [] ) => undefined ) : any ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * Event whose listeners take a string parameter.
+   */
+  class ChromeStringEvent extends ChromeStringEvent_Instance {
+  }
+  class ChromeStringEvent_Instance {
+    private noStructuralTyping_: any;
+    addListener (callback : (a : string ) => undefined ) : any ;
+    hasListener (callback : (a : string ) => undefined ) : boolean ;
+    hasListeners ( ) : boolean ;
+    removeListener (callback : (a : string ) => undefined ) : any ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * Event whose listeners take two strings as parameters.
+   */
+  class ChromeStringStringEvent extends ChromeStringStringEvent_Instance {
+  }
+  class ChromeStringStringEvent_Instance {
+    private noStructuralTyping_: any;
+    addListener (callback : (a : string , b : string ) => undefined ) : any ;
+    hasListener (callback : (a : string , b : string ) => undefined ) : boolean ;
+    hasListeners ( ) : boolean ;
+    removeListener (callback : (a : string , b : string ) => undefined ) : any ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   class CountQueuingStrategy extends CountQueuingStrategy_Instance {
   }
   class CountQueuingStrategy_Instance {
@@ -172,6 +253,18 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  class MessageSender extends MessageSender_Instance {
+  }
+  class MessageSender_Instance {
+    private noStructuralTyping_: any;
+    frameId : number | undefined ;
+    id : string | undefined ;
+    tab : Tab | undefined ;
+    tlsChannelId : string | undefined ;
+    url : string | undefined ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   /**
    * Metadata interface.
    */
@@ -181,6 +274,19 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_: any;
     modificationTime : Date ;
     size : number ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class Port extends Port_Instance {
+  }
+  class Port_Instance {
+    private noStructuralTyping_: any;
+    disconnect ( ) : void ;
+    name : string ;
+    onDisconnect : ChromeEvent ;
+    onMessage : ChromeEvent ;
+    postMessage (obj : any ) : void ;
+    sender : MessageSender | undefined ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -382,6 +488,28 @@ declare namespace ಠ_ಠ.clutz {
     ERROR : ResponseType ,
     OPAQUE : ResponseType ,
   };
+}
+declare namespace ಠ_ಠ.clutz {
+  class Tab extends Tab_Instance {
+  }
+  class Tab_Instance {
+    private noStructuralTyping_: any;
+    active : boolean ;
+    favIconUrl : string ;
+    height : number | undefined ;
+    highlighted : boolean ;
+    id : number ;
+    incognito : boolean ;
+    index : number ;
+    openerTabId : number ;
+    pinned : boolean ;
+    sessionId : string | undefined ;
+    status : string ;
+    title : string ;
+    url : string ;
+    width : number | undefined ;
+    windowId : number ;
+  }
 }
 declare namespace ಠ_ಠ.clutz {
   interface WorkerLocation {
