@@ -602,7 +602,7 @@ public class DeclarationGenerator {
     if (symbol == null) return true;
     JSType type = symbol.getType();
     // Emit var foo : PrivateType for private symbols.
-    if (isPrivate(type.getJSDocInfo())) return true;
+    if (isPrivate(type.getJSDocInfo()) && !type.isConstructor()) return true;
     // Only var declarations have collisions, while class, interface, and functions can coexist with
     // namespaces.
     if (type != null && (type.isInterface() || type.isConstructor() || type.isFunctionType())) {

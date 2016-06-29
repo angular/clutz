@@ -74,7 +74,11 @@ declare namespace ಠ_ಠ.clutz.functionNamespace {
   function dom (nodeOrEvent : Node | null | GlobalEvent ) : functionNamespaceHelperClass ;
 }
 declare namespace ಠ_ಠ.clutz.functionNamespace {
-  var privateClass : ಠ_ಠ.clutz.PrivateType;
+  class privateClass extends privateClass_Instance {
+  }
+  class privateClass_Instance {
+    private noStructuralTyping_: any;
+  }
 }
 declare namespace ಠ_ಠ.clutz {
   class functionNamespaceHelperClass extends functionNamespaceHelperClass_Instance {
