@@ -40,6 +40,7 @@ import com.google.javascript.rhino.jstype.EnumElementType;
 import com.google.javascript.rhino.jstype.EnumType;
 import com.google.javascript.rhino.jstype.FunctionType;
 import com.google.javascript.rhino.jstype.JSType;
+import com.google.javascript.rhino.jstype.JSTypeNative;
 import com.google.javascript.rhino.jstype.JSTypeRegistry;
 import com.google.javascript.rhino.jstype.NamedType;
 import com.google.javascript.rhino.jstype.NoType;
@@ -1316,7 +1317,8 @@ public class DeclarationGenerator {
      */
     private void visitTypeAsPrimary(JSType type) {
       // These types will produce a non-primary grammar production
-      if (type.isConstructor() || type.isFunctionType() || type.isUnionType()) {
+      if (!isLiteralFunction(type) &&
+          (type.isConstructor() || type.isFunctionType()  || type.isUnionType())) {
         emit("(");
         visitType(type);
         emit(")");
@@ -1446,6 +1448,10 @@ public class DeclarationGenerator {
 
         @Override
         public Void caseFunctionType(FunctionType type) {
+          if (isLiteralFunction(type)) {
+            emit("Function");
+            return null;
+          }
           if (type.isConstructor() && !"Function".equals(type.getDisplayName())) {
             visitConstructorFunctionDeclaration(type);
             return null;
@@ -1470,6 +1476,11 @@ public class DeclarationGenerator {
       } catch (Exception e) {
         throw new RuntimeException("Failed to emit type " + typeToVisit, e);
       }
+    }
+
+    /** Whether the type was written as the literal 'Function' type */
+    private boolean isLiteralFunction(JSType type) {
+      return type == typeRegistry.getNativeType(JSTypeNative.FUNCTION_INSTANCE_TYPE);
     }
 
     private Void emitTemplatizedType(TemplatizedType type, boolean extendingInstanceClass,

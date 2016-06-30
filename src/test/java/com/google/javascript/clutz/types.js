@@ -41,3 +41,9 @@ types.inferredobj = {};
  * @const
  */
 types.inferrednum = 1;
+
+/**
+ * @param {!Function} f
+ * @return {Function}
+ * */
+types.fn = function(f) { return null};

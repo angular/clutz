@@ -14,7 +14,7 @@ declare namespace ಠ_ಠ.clutz.dict {
     [ key: string ]: any ;
     foo ( ) : void ;
   }
-  var typed : { a : ( ( ...a : any [] ) => any ) | null } ;
+  var typed : { a : Function | null } ;
   var untyped : {[key: string]: any} ;
 }
 declare namespace ಠ_ಠ.clutz.goog {

@@ -6,7 +6,7 @@ declare namespace ಠ_ಠ.clutz.fn_params {
    * Parameters intentionally documented in the wrong order
    */
   function varargs (x : string ,  ...y : ( number | undefined ) [] ) : void ;
-  function varargs_fns ( ...var_args : ( ( ( ...a : any [] ) => any ) | null | undefined ) [] ) : void ;
+  function varargs_fns ( ...var_args : ( Function | null | undefined ) [] ) : void ;
 }
 declare namespace ಠ_ಠ.clutz.goog {
   function require(name: 'fn_params'): typeof ಠ_ಠ.clutz.fn_params;

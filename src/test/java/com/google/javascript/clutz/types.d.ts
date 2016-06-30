@@ -5,6 +5,7 @@ declare namespace ಠ_ಠ.clutz.types {
   var d : Object | null ;
   var e : any [] | null ;
   var f : ( ( ) => string ) [] | null ;
+  function fn (f : Function ) : Function | null ;
   var functionAndUnion : null | ( (a : number , b : any ) => any ) ;
   /**
    * marked const to appear in `compiler.getTopScope().getAllSymbols()`

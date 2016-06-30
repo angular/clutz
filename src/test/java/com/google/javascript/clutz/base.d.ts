@@ -1,5 +1,5 @@
 declare namespace ಠ_ಠ.clutz.goog {
-  function inherits (childCtor : ( ...a : any [] ) => any , parentCtor : ( ...a : any [] ) => any ) : void ;
+  function inherits (childCtor : Function , parentCtor : Function ) : void ;
   function isDef (val : any ) : boolean ;
   function require (name : string ) : ಠ_ಠ.clutz.ClosureSymbolNotGoogProvided;
 }
