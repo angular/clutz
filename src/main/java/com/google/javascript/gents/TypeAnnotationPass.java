@@ -60,14 +60,14 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
     JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
     switch (n.getType()) {
       // Functions are annotated with their return type
-      case Token.FUNCTION:
+      case FUNCTION:
         if (bestJSDocInfo != null) {
           setTypeExpression(n, bestJSDocInfo.getReturnType(), true);
         }
         break;
       // Names and properties are annotated with their types
-      case Token.NAME:
-      case Token.GETPROP:
+      case NAME:
+      case GETPROP:
         if (parent == null) {
           break;
         }
@@ -157,21 +157,20 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
 
     @Nullable
     public static TypeDeclarationNode convertTypeNodeAST(Node n, boolean isReturnType) {
-      int token = n.getType();
-      switch (token) {
+      switch (n.getType()) {
         // for function types that don't declare a return type
         // ex. /** @return */ var f = function() {};
-        case Token.EMPTY:
+        case EMPTY:
           return null;
         // TODO(renez): re-evaluate whether or not we want to convert {*} to the any type.
-        case Token.STAR:
+        case STAR:
           return anyType();
-        case Token.VOID:
+        case VOID:
           return isReturnType ? voidType() : namedType("undefined");
         // TypeScript types are non-nullable by default with --strictNullChecks
-        case Token.BANG:
+        case BANG:
           return convertTypeNodeAST(n.getFirstChild());
-        case Token.QMARK:
+        case QMARK:
           Node child = n.getFirstChild();
           if (child == null) {
             return anyType();
@@ -182,7 +181,7 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
             );
             return flatUnionType(types);
           }
-        case Token.STRING:
+        case STRING:
           String typeName = n.getString();
           switch (typeName) {
             case "boolean":
@@ -221,7 +220,7 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
               return root;
           }
         // Convert records
-        case Token.LC:
+        case LC:
           LinkedHashMap<String, TypeDeclarationNode> properties = new LinkedHashMap<>();
           for (Node field : n.getFirstChild().children()) {
             boolean isFieldTypeDeclared = field.getType() == Token.COLON;
@@ -236,7 +235,7 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
           }
           return recordType(properties);
         // Convert unions
-        case Token.PIPE:
+        case PIPE:
           ImmutableList<TypeDeclarationNode> types = FluentIterable
               .from(n.children()).transform(CONVERT_TYPE_NODE)
               .filter(Predicates.notNull()).toList();
@@ -249,7 +248,7 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
               return flatUnionType(types);
           }
         // Convert function types
-        case Token.FUNCTION:
+        case FUNCTION:
           Node returnType = anyType();
           LinkedHashMap<String, TypeDeclarationNode> requiredParams = new LinkedHashMap<>();
           LinkedHashMap<String, TypeDeclarationNode> optionalParams = new LinkedHashMap<>();
@@ -287,11 +286,11 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
           }
           return functionType(returnType, requiredParams, optionalParams, restName, restType);
         // TODO(renez): confirm this is unreachable code and remove in future.
-        case Token.ELLIPSIS:
+        case ELLIPSIS:
           return arrayType(convertTypeNodeAST(n.getFirstChild()));
         // TODO(renez): this is incorrect. optional parameters only modify the parameter name and
         // ignore the type. This logic should be hoisted up into visit()
-        case Token.EQUALS:
+        case EQUALS:
           TypeDeclarationNode optionalParam = convertTypeNodeAST(n.getFirstChild());
           return optionalParam == null ? null : optionalParameter(optionalParam);
         default:
@@ -307,13 +306,13 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
         List<TypeDeclarationNode> result, boolean hasNull) {
       for (TypeDeclarationNode t : types) {
         switch (t.getType()) {
-          case Token.NULL:
+          case NULL:
             if (!hasNull) {
               result.add(new TypeDeclarationNode(Token.NULL));
               hasNull = true;
             }
             break;
-          case Token.UNION_TYPE:
+          case UNION_TYPE:
             Iterable<TypeDeclarationNode> children = FluentIterable
                 .from(t.children())
                 .transform(CAST_TYPE_NODE)

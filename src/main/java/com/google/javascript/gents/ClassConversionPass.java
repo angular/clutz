@@ -54,13 +54,13 @@ public final class ClassConversionPass implements CompilerPass {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
       switch (n.getType()) {
-        case Token.FUNCTION:
+        case FUNCTION:
           JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
           if (bestJSDocInfo != null && bestJSDocInfo.isConstructor()) {
             constructorToClass(n, bestJSDocInfo);
           }
           break;
-        case Token.CALL:
+        case CALL:
           if ("goog.defineClass".equals(n.getFirstChild().getQualifiedName())) {
             defineClassToClass(n);
           }
@@ -78,10 +78,10 @@ public final class ClassConversionPass implements CompilerPass {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
       switch (n.getType()) {
-        case Token.CLASS:
+        case CLASS:
           addClassToScope(n);
           break;
-        case Token.EXPR_RESULT:
+        case EXPR_RESULT:
           maybeRemoveInherits(n);
           maybeReplaceSuperCall(n);
 
