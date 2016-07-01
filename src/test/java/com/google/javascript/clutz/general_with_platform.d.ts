@@ -185,8 +185,8 @@ declare namespace ಠ_ಠ.clutz {
 }
 declare namespace ಠ_ಠ.clutz {
   class Promise < TYPE > extends Promise_Instance < TYPE > {
-    static all < T > (iterable : ( T | Promise < T > ) [] ) : Promise < T [] > ;
-    static race < T > (iterable : T [] ) : Promise < T > ;
+    static all < T > (iterable : ( T | Promise < T > ) [] | Iterable < T | Promise < T > > ) : Promise < T [] > ;
+    static race < T > (iterable : T [] | Iterable < T > ) : Promise < T > ;
     static reject (opt_error ? : any ) : Promise < any > ;
     static resolve < VALUE , RESULT > (opt_value ? : VALUE ) : RESULT ;
   }

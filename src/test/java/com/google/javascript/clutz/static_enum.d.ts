@@ -14,7 +14,7 @@ declare namespace ಠ_ಠ.clutz {
   }
   class module$contents$foo$C_C_Instance {
     private noStructuralTyping_: any;
-    f (a : ಠ_ಠ.clutz.module$contents$foo$C_C.Enum ) : void ;
+    f (a : ಠ_ಠ.clutz.module$contents$foo$C_C.Enum | null ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz.module$contents$foo$C_C {

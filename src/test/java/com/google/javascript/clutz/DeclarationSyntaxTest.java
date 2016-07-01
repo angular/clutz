@@ -57,7 +57,7 @@ public class DeclarationSyntaxTest {
       .getPath("node_modules", "typescript", "bin", "tsc");
 
   private static final ImmutableList<String> TSC_FLAGS = ImmutableList
-      .of("--noEmit", "--skipDefaultLibCheck",
+      .of("--noEmit", "--skipDefaultLibCheck", "--lib", "es5,dom,es2015.iterable",
           "--noImplicitAny", "--strictNullChecks");
 
   @BeforeClass
