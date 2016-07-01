@@ -1,5 +1,6 @@
 package com.google.javascript.gents;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterators;
 import com.google.javascript.jscomp.AbstractCompiler;
@@ -43,6 +44,7 @@ public final class ClassConversionPass implements CompilerPass {
         this.classes = new LinkedHashMap<>();
         NodeTraversal.traverseEs6(compiler, child, new ClassDefinitionConverter());
         NodeTraversal.traverseEs6(compiler, child, new ClassMemberConverter());
+        NodeTraversal.traverseEs6(compiler, child, new InheritanceConverter());
       }
     }
   }
@@ -57,12 +59,12 @@ public final class ClassConversionPass implements CompilerPass {
         case FUNCTION:
           JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
           if (bestJSDocInfo != null && bestJSDocInfo.isConstructor()) {
-            constructorToClass(n, bestJSDocInfo);
+            convertConstructorToClass(n, bestJSDocInfo);
           }
           break;
         case CALL:
           if ("goog.defineClass".equals(n.getFirstChild().getQualifiedName())) {
-            defineClassToClass(n);
+            convertDefineClassToClass(n);
           }
           break;
         default:
@@ -72,7 +74,7 @@ public final class ClassConversionPass implements CompilerPass {
   }
 
   /**
-   * Converts class methods, static methods, inheritance and superclass calls.
+   * Converts class prototype methods and static methods.
    */
   private class ClassMemberConverter extends AbstractPostOrderCallback {
     @Override
@@ -82,9 +84,6 @@ public final class ClassConversionPass implements CompilerPass {
           addClassToScope(n);
           break;
         case EXPR_RESULT:
-          maybeRemoveInherits(n);
-          maybeReplaceSuperCall(n);
-
           ClassMemberDeclaration declaration = new ClassMemberDeclaration(n);
           if (declaration.isValid()) {
             // TODO(renez): extend this to handle fields as well
@@ -100,9 +99,32 @@ public final class ClassConversionPass implements CompilerPass {
   }
 
   /**
+   * Converts inheritance and superclass calls.
+   */
+  private class InheritanceConverter extends AbstractPostOrderCallback {
+    @Override
+    public void visit(NodeTraversal t, Node n, Node parent) {
+      switch (n.getType()) {
+        case EXPR_RESULT:
+          maybeRemoveInherits(n);
+          break;
+        case CALL:
+          maybeReplaceSuperCall(n);
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  /**
    * Converts @constructor annotated functions into class definitions.
    */
-  void constructorToClass(Node n, JSDocInfo jsDoc) {
+  void convertConstructorToClass(Node n, JSDocInfo jsDoc) {
+    Preconditions.checkState(n.isFunction());
+    Preconditions.checkState(n.getFirstChild().isName());
+    Preconditions.checkState(n.getSecondChild().isParamList());
+    Preconditions.checkState(n.getLastChild().isBlock());
     // Break up function
     Node name = n.getFirstChild();
     Node params = n.getSecondChild();
@@ -151,7 +173,8 @@ public final class ClassConversionPass implements CompilerPass {
   /**
    * Converts goog.defineClass calls into class definitions.
    */
-  void defineClassToClass(Node n) {
+  void convertDefineClassToClass(Node n) {
+    Preconditions.checkState(n.isCall());
     Node superClass = n.getSecondChild();
     if (superClass.isNull()) {
       superClass = IR.empty();
@@ -180,6 +203,9 @@ public final class ClassConversionPass implements CompilerPass {
    * Converts functions declared in object literals into a member function definition.
    */
   Node objectLiteralMethodToMethodDef(Node objectLiteralMethod, boolean isStatic) {
+    Preconditions.checkState(objectLiteralMethod.isStringKey());
+    Preconditions.checkState(objectLiteralMethod.getFirstChild().isFunction());
+
     Node fn = objectLiteralMethod.getFirstChild();
     fn.detachFromParent();
     Node methodDef = IR.memberFunctionDef(objectLiteralMethod.getString(), fn);
@@ -231,6 +257,7 @@ public final class ClassConversionPass implements CompilerPass {
    * This fails by reporting an error when the node is an invalid inheritance statement.
    */
   void maybeRemoveInherits(Node exprNode) {
+    Preconditions.checkState(exprNode.isExprResult());
     if (exprNode.getFirstChild().isCall()) {
       Node callNode = exprNode.getFirstChild();
       // Remove goog.inherits calls
@@ -277,54 +304,81 @@ public final class ClassConversionPass implements CompilerPass {
   }
 
   /**
-   * Attempts to convert a ES5 superclass constructor call into a ES6 super() call.
+   * Attempts to convert a ES5 superclass call into a ES6 super() call.
    *
    * ex. B.call(this, args) -> super(args);
+   * ex. B.prototype.foo.call(this, args) -> super.foo(args);
    * ex. A.base(this, 'constructor', args) -> super(args);
+   * ex. A.base(this, 'foo', args) -> super.foo(args);
    *
    * This returns without any modification if the node is not an superclass call statement.
    */
-  void maybeReplaceSuperCall(Node exprNode) {
-    if (exprNode.getFirstChild().isCall()) {
-      Node callNode = exprNode.getFirstChild();
-      // First validate that we are inside a constructor call that extends another class
-      Node classNode = NodeUtil.getEnclosingClass(exprNode);
-      if (classNode == null) {
+  void maybeReplaceSuperCall(Node callNode) {
+    Preconditions.checkState(callNode.isCall());
+    String callName = callNode.getFirstChild().getQualifiedName();
+
+    // First validate that we are inside a constructor call that extends another class
+    Node classNode = NodeUtil.getEnclosingClass(callNode);
+    if (classNode == null) {
+      return;
+    }
+
+    String className = NodeUtil.getName(classNode);
+    // Super calls for root classes are not converted
+    if (classNode.getSecondChild().isEmpty()) {
+      compiler.report(JSError.make(
+          callNode,
+          GENTS_CLASS_PASS_ERROR,
+          String.format("Cannot call superclass in root class %s", className)));
+      return;
+    }
+    String superClassName = classNode.getSecondChild().getQualifiedName();
+
+    // B.call(this, args) -> super(args);
+    if (callName.equals(superClassName + ".call") &&
+        callNode.getSecondChild().isThis()) {
+      callNode.replaceChild(callNode.getFirstChild(), IR.superNode());
+      callNode.removeChild(callNode.getSecondChild());
+      compiler.reportCodeChange();
+      return;
+    }
+
+    // B.prototype.foo.call(this, args) -> super.foo(args);
+    if (callName.startsWith(superClassName + ".prototype.") &&
+        callName.endsWith(".call")) {
+      if (callNode.getSecondChild().isThis()) {
+        // Determine name of method being called
+        Node nameNode = callNode.getFirstChild().getFirstChild();
+        Node n = nameNode;
+        while (!n.getLastChild().getString().equals("prototype")) {
+          n = n.getFirstChild();
+        }
+        n.getParent().replaceChild(n, IR.superNode());
+        nameNode.detachFromParent();
+
+        callNode.replaceChild(callNode.getFirstChild(), nameNode);
+        callNode.removeChild(callNode.getSecondChild());
+        compiler.reportCodeChange();
         return;
       }
+    }
 
-      String className = NodeUtil.getName(classNode);
-      // Super calls for root classes are not converted
-      if (classNode.getSecondChild().isEmpty()) {
-        compiler.report(JSError.make(
-            exprNode,
-            GENTS_CLASS_PASS_ERROR,
-            String.format("Cannot call superclass in root class %s", className)));
-        return;
-      }
-      String superClassName = classNode.getSecondChild().getQualifiedName();
+    // A.base(this, 'constructor', args) -> super(args);
+    // A.base(this, 'foo', args) -> super.foo(args);
+    if (callName.equals(className + ".base") &&
+        callNode.getSecondChild().isThis()) {
+      String methodName = callNode.getChildAtIndex(2).getString();
 
-      // super.call(this, args...) -> super(args...)
-      if (callNode.getFirstChild().getQualifiedName().equals(superClassName + ".call")) {
-        if (callNode.getSecondChild().isThis()) {
-          callNode.replaceChild(callNode.getFirstChild(), IR.superNode());
-          callNode.removeChild(callNode.getSecondChild());
-          compiler.reportCodeChange();
-          return;
-        }
+      if ("constructor".equals(methodName)) {
+        callNode.replaceChild(callNode.getFirstChild(), IR.superNode());
+      } else {
+        callNode.replaceChild(callNode.getFirstChild(), getProp("super." + methodName));
       }
 
-      // name.base(this, 'constructor', args...) -> super(args...)
-      if (callNode.getFirstChild().getQualifiedName().equals(className + ".base")) {
-        if (callNode.getSecondChild().isThis() &&
-            "constructor".equals(callNode.getChildAtIndex(2).getString())) {
-          callNode.replaceChild(callNode.getFirstChild(), IR.superNode());
-          callNode.removeChild(callNode.getSecondChild());
-          callNode.removeChild(callNode.getSecondChild());
-          compiler.reportCodeChange();
-          return;
-        }
-      }
+      callNode.removeChild(callNode.getSecondChild());
+      callNode.removeChild(callNode.getSecondChild());
+      compiler.reportCodeChange();
+      return;
     }
   }
 
@@ -334,6 +388,7 @@ public final class ClassConversionPass implements CompilerPass {
    * This determines the classname using the nearest available name node.
    */
   void addClassToScope(Node n) {
+    Preconditions.checkState(n.isClass());
     String className = NodeUtil.getName(n);
     if (className == null) {
       // We do not emit an error here as there can be anonymous classes without names.
@@ -356,7 +411,21 @@ public final class ClassConversionPass implements CompilerPass {
    */
   static Node getProp(String fullname) {
     Iterator<String> propList = Splitter.on('.').split(fullname).iterator();
-    Node root = IR.name(propList.next());
+    String rootName = propList.next();
+    Node root;
+
+    switch (rootName) {
+      case "this":
+        root = IR.thisNode();
+        break;
+      case "super":
+        root = IR.superNode();
+        break;
+      default:
+        root = IR.name(rootName);
+        break;
+    }
+
     if (!propList.hasNext()) {
       return root;
     }

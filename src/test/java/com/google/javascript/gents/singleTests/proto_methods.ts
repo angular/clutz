@@ -13,7 +13,10 @@ class B extends goog.A {
     this.b = b;
   }
   bar(n: number): boolean {
-    return n > 0;
+    return super.foo(n) > 0;
+  }
+  baz(n: number): boolean {
+    return super.foo(n) > 0;
   }
 }
 C.prototype.baz = function(n: number): void {
