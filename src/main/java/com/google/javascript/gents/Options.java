@@ -45,6 +45,9 @@ public class Options {
     options.setLanguage(CompilerOptions.LanguageMode.ECMASCRIPT6);
     options.setLanguageOut(CompilerOptions.LanguageMode.NO_TRANSPILE);
 
+    // Do not transpile module declarations
+    options.setWrapGoogModulesForWhitespaceOnly(false);
+
     // Compiler passes must be disabled to disable down-transpilation to ES5.
     options.skipAllCompilerPasses();
     // So that we can query types after compilation.

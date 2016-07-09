@@ -319,7 +319,7 @@ public final class ClassConversionPass implements CompilerPass {
       Node assignNode = exprNode.getFirstChild();
       // Report error if trying to assign to prototype directly
       Node lhs = assignNode.getFirstChild();
-      if ("prototype".equals(lhs.getLastChild().getString())) {
+      if (lhs.isGetProp() && "prototype".equals(lhs.getLastChild().getString())) {
         compiler.report(JSError.make(
             exprNode,
             GENTS_CLASS_PASS_ERROR,

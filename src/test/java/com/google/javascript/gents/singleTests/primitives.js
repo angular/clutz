@@ -21,3 +21,9 @@ var b = true;
 
 /** @type {string} */
 var s = "hello";
+
+/** @type {number} */
+let l = 6;
+
+/** @type {number} */
+const c = 8;

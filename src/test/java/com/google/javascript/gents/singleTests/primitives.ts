@@ -6,3 +6,5 @@ var nil: null = null;
 var n: number = 4;
 var b: boolean = true;
 var s: string = "hello";
+let l: number = 6;
+const c: number = 8;

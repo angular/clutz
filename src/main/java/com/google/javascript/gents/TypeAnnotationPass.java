@@ -79,7 +79,7 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
         if (parent == null) {
           break;
         }
-        if (parent.isVar() || parent.isLet()) { // Variable declaration
+        if (parent.isVar() || parent.isLet() || parent.isConst()) { // Variable declaration
           // TODO(renez): convert all vars into lets
           if (bestJSDocInfo != null) {
             setTypeExpression(n, bestJSDocInfo.getType(), false);

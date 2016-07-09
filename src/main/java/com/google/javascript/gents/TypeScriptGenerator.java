@@ -117,6 +117,9 @@ public class TypeScriptGenerator {
     Node externRoot = compiler.getRoot().getFirstChild();
     Node srcRoot = compiler.getRoot().getLastChild();
 
+    CompilerPass modulePass = new ModuleConversionPass(compiler);
+    modulePass.process(externRoot, srcRoot);
+
     CompilerPass classPass = new ClassConversionPass(compiler);
     classPass.process(externRoot, srcRoot);
 
