@@ -603,7 +603,7 @@ public class DeclarationGenerator {
     if (symbol == null) return true;
     JSType type = symbol.getType();
     // Emit var foo : PrivateType for private symbols.
-    if (isPrivate(type.getJSDocInfo())) return true;
+    if (isPrivate(type.getJSDocInfo()) && !isConstructor(type.getJSDocInfo())) return true;
     // Only var declarations have collisions, while class, interface, and functions can coexist with
     // namespaces.
     if (type != null && (type.isInterface() || type.isConstructor() || type.isFunctionType())) {
@@ -648,7 +648,7 @@ public class DeclarationGenerator {
     emitNamespaceBegin(namespace);
     TreeWalker treeWalker = new TreeWalker(compiler.getTypeRegistry(), provides, isExtern);
     if (isDefault) {
-      if (isPrivate(symbol.getJSDocInfo())) {
+      if (isPrivate(symbol.getJSDocInfo()) && !isConstructor(symbol.getJSDocInfo())) {
         treeWalker.emitPrivateValue(emitName);
       } else {
         treeWalker.walk(symbol, emitName);
@@ -818,7 +818,7 @@ public class DeclarationGenerator {
 
   private boolean isPrivateProperty(ObjectType obj, String propName) {
     JSDocInfo info = obj.getOwnPropertyJSDocInfo(propName);
-    return isPrivate(info);
+    return isPrivate(info) && !isConstructor(info);
   }
 
   private boolean isTypeCheckSuppressedProperty(ObjectType obj, String propName) {
@@ -843,6 +843,10 @@ public class DeclarationGenerator {
 
   private boolean isPrivate(@Nullable JSDocInfo docInfo) {
     return docInfo != null && docInfo.getVisibility() == Visibility.PRIVATE;
+  }
+
+  private boolean isConstructor(@Nullable JSDocInfo docInfo) {
+    return docInfo != null && docInfo.isConstructor();
   }
 
   private void declareModule(String name, boolean isDefault, String emitName) {
@@ -1159,15 +1163,10 @@ public class DeclarationGenerator {
       ObjectType superType = getSuperType(ftype);
       if (superType != null) {
         emit("extends");
-        if (isPrivate(superType.getJSDocInfo())) {
-          // TypeScript does not allow public APIs that expose non-exported/private types.
-          emit(Constants.INTERNAL_NAMESPACE + ".PrivateClass");
-        } else {
-          boolean emitInstanceForObject = emitInstance &&
-              (opts.emitPlatformExterns || !isDefinedInPlatformExterns(superType));
-          Visitor<Void> visitor = new ExtendsImplementsTypeVisitor(emitInstanceForObject);
-          superType.visit(visitor);
-        }
+        boolean emitInstanceForObject = emitInstance &&
+            (opts.emitPlatformExterns || !isDefinedInPlatformExterns(superType));
+        Visitor<Void> visitor = new ExtendsImplementsTypeVisitor(emitInstanceForObject);
+        superType.visit(visitor);
       }
 
       Iterator<ObjectType> it = ftype.getOwnImplementedInterfaces().iterator();
@@ -1182,7 +1181,7 @@ public class DeclarationGenerator {
     private void emitCommaSeparatedInterfaces(Iterator<ObjectType> it) {
       while (it.hasNext()) {
         ObjectType type = it.next();
-        if (isPrivate(type.getJSDocInfo())) {
+        if (isPrivate(type.getJSDocInfo()) && !isConstructor(type.getJSDocInfo())) {
           // TypeScript does not allow public APIs that expose non-exported/private types.
           emit(Constants.INTERNAL_NAMESPACE + ".PrivateInterface");
         } else {
@@ -1342,7 +1341,7 @@ public class DeclarationGenerator {
       // See also JsdocToEs6TypedConverter in the Closure code base. This code is implementing the
       // same algorithm starting from JSType nodes (as opposed to JSDocInfo), and directly
       // generating textual output. Otherwise both algorithms should produce the same output.
-      if (isPrivate(typeToVisit)) {
+      if (isPrivate(typeToVisit) && !isConstructor(typeToVisit.getJSDocInfo())) {
         // TypeScript does not allow public APIs that expose non-exported/private types. Just emit
         // an empty object literal type for those, i.e. something that cannot be used for anything,
         // except being passed around.
@@ -1653,8 +1652,9 @@ public class DeclarationGenerator {
         emitBreak();
       }
       // Constructors.
-      if (type.isConstructor() && (type).getParameters().iterator().hasNext()) {
+      if (type.isConstructor() && (type).getParameters().iterator().hasNext() && !isPrivate(type.getJSDocInfo())) {
         maybeEmitJsDoc(type.getJSDocInfo(), /* ignoreParams */ false);
+        // TODO mark constuctor as private when source is annoated with @private for ts v2.0 and greater
         emit("constructor");
         visitFunctionParameters(type, false, classTemplateTypeNames);
         emit(";");

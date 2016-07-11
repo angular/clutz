@@ -3,8 +3,9 @@ goog.provide('privateclass');
 /**
  * @constructor
  * @private
+ * @param {number} parameter
  */
-privateclass.P = function() {};
+privateclass.P = function(parameter) {};
 
 /**
  * @interface
