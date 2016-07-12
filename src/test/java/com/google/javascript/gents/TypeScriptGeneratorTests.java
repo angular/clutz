@@ -36,7 +36,7 @@ public class TypeScriptGeneratorTests {
   public static TestSuite suite() throws IOException {
     TestSuite suite = new TestSuite(TypeScriptGeneratorTests.class.getName());
 
-    List<File> testFiles = getSingleTestInputFiles(DeclarationGeneratorTests.JS);
+    List<File> testFiles = getTestInputFiles(DeclarationGeneratorTests.JS, singleTestPath);
     for (final File input : testFiles) {
       File goldenFile = DeclarationGeneratorTests.getGoldenFile(input, ".ts");
       suite.addTest(new GoldenFileTest(input.getName(), goldenFile, input));
@@ -44,13 +44,17 @@ public class TypeScriptGeneratorTests {
     return suite;
   }
 
-  static List<File> getSingleTestInputFiles(FilenameFilter filter) {
-    File[] testFiles = getTestDirPath(singleTestPath).toFile().listFiles(filter);
+  static List<File> getTestInputFiles(FilenameFilter filter, String... dir) {
+    File[] testFiles = getTestDirPath(dir).toFile().listFiles(filter);
     return Arrays.asList(testFiles);
   }
 
-  static Path getTestDirPath(String testDir) {
-    return getPackagePath().resolve(testDir);
+  static Path getTestDirPath(String... testDir) {
+    Path p = getPackagePath();
+    for (String dir : testDir) {
+      p = p.resolve(dir);
+    }
+    return p;
   }
 
   static Path getPackagePath() {

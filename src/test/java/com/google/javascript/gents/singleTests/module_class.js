@@ -4,18 +4,21 @@ goog.module("A.B.C");
  * @constructor
  * @param {number} n
  */
-exports = function(n) {
+function klass(n) {
+  /** @type {number} */
   this.n = n;
-};
+}
 
 /**
  * @type {number}
  */
-exports.x = 4;
+klass.x = 4;
 
 /**
  * @return {boolean}
  */
-exports.foo = function() {
+klass.prototype.foo = function() {
   return false;
 };
+
+exports = klass;

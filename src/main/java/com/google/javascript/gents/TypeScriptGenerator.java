@@ -162,7 +162,13 @@ public class TypeScriptGenerator {
    * '{@code .}'.
    */
   static String getFileNameWithoutExtension(String filepath) {
-    String filename = new File(filepath).getName();
+    return removeExtension(new File(filepath).getName());
+  }
+
+  /**
+   * Returns the file name without its file extension.
+   */
+  static String removeExtension(String filename) {
     int dotIndex = filename.lastIndexOf(".");
     return (dotIndex == -1) ? filename : filename.substring(0, dotIndex);
   }
