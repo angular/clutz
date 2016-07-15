@@ -5,14 +5,35 @@ plugins {
   // Generate coverage during tests.
   id 'jacoco'
 
-  // Generate an executable, combined .jar file.
+  // Generate executable scripts
   id 'application'
-  id 'com.github.johnrengelman.shadow' version '1.2.3'
 }
+
+def createScript(project, mainClass, name) {
+  project.tasks.create(name: name, type: CreateStartScripts) {
+    outputDir       = new File(project.buildDir, 'scripts')
+    mainClassName   = mainClass
+    applicationName = name
+    classpath       = project.tasks[JavaPlugin.JAR_TASK_NAME].outputs.files + project.configurations.runtime
+  }
+  project.tasks[name].dependsOn(project.jar)
+
+  project.applicationDistribution.with {
+    into("bin") {
+      from(project.tasks[name])
+      fileMode = 0755
+    }
+  }
+}
+
+startScripts.enabled = false
+run.enabled = false
 
 sourceCompatibility = 1.7
 version = '1.0'
-mainClassName = 'com.google.javascript.clutz.DeclarationGenerator'
+
+createScript(project, 'com.google.javascript.clutz.DeclarationGenerator', 'clutz')
+createScript(project, 'com.google.javascript.gents.TypeScriptGenerator', 'gents')
 
 repositories {
   mavenCentral()
