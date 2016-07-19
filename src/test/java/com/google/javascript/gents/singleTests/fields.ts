@@ -1,25 +1,21 @@
 var A = class {
   d: string;
-  c: number;
+  c: number = 4;
+  z: number;
   b: boolean;
   a: number;
   static h: any;
-  static g: boolean;
+  static g: boolean = true;
   f: any;
-  e: number;
+  e: number = 8;
   constructor(a: number) {
     this.a = a;
-    this.b;
+    let y = 1;
+    this.z = y + 1;
   }
   foo() {
-    this.c = 4;
-    this.d;
     this.u;
     this.n = 12;
     this.x = this.a;
   }
 };
-A.prototype.e = 8;
-A.prototype.f;
-A.g = true;
-A.h;

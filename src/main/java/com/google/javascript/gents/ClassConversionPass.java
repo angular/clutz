@@ -176,8 +176,6 @@ public final class ClassConversionPass implements CompilerPass {
       superClass = NodeUtil.newQName(compiler, superClassName);
     }
 
-    // TODO(renez): traverse function body to pull out field declaration info
-
     // Generate new class node with only a constructor method
     Node constructor = IR.memberFunctionDef(
         "constructor",
@@ -266,11 +264,19 @@ public final class ClassConversionPass implements CompilerPass {
     Node classMembers = declaration.classNode.getLastChild();
     String fieldName = declaration.memberName;
 
-    // TODO(renez): After the closure compiler CodeGenerator update, add field default values here
-    // to allow us to delete the original node
     Node fieldNode = Node.newString(Token.MEMBER_VARIABLE_DEF, fieldName);
     fieldNode.setJSDocInfo(declaration.jsDoc);
     fieldNode.setStaticMember(declaration.isStatic);
+
+    // Add default value for fields
+    if (declaration.rhs == null) {
+      declaration.exprRoot.detachFromParent();
+    } else if (NodeUtil.isLiteralValue(declaration.rhs, false)) {
+      declaration.exprRoot.detachFromParent();
+      declaration.rhs.detachFromParent();
+      fieldNode.addChildToBack(declaration.rhs);
+    }
+
     classMembers.addChildToFront(fieldNode);
     compiler.reportCodeChange();
   }

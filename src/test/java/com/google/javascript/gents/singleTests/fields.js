@@ -7,6 +7,10 @@ var A = function(a) {
   this.a = a;
   /** @type {boolean} */
   this.b;
+
+  let y = 1;
+  /** @type {number} */
+  this.z = y + 1;
 };
 
 A.prototype.foo = function() {

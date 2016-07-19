@@ -3,7 +3,11 @@ package com.google.javascript.gents;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.io.Files;
+import com.google.javascript.jscomp.CodeConsumer;
+import com.google.javascript.jscomp.CodeGenerator;
 import com.google.javascript.jscomp.CodePrinter;
+import com.google.javascript.jscomp.CodePrinter.Builder.CodeGeneratorFactory;
+import com.google.javascript.jscomp.CodePrinter.Format;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.CompilerPass;
@@ -110,7 +114,7 @@ public class TypeScriptGenerator {
     Map<String, String> sourceFileMap = new HashMap<>();
 
     // Add type annotation as a new compiler pass
-    CompilerOptions compilerOpts = opts.getCompilerOptions();
+    final CompilerOptions compilerOpts = opts.getCompilerOptions();
     // Compile javascript code
     compiler.compile(externs, sourceFiles, compilerOpts);
 
@@ -130,9 +134,17 @@ public class TypeScriptGenerator {
     // We only use the source root as the extern root is ignored for codegen
     for (Node file : srcRoot.children()) {
       String basename = getFileNameWithoutExtension(file.getSourceFileName());
+      CodeGeneratorFactory factory = new CodeGeneratorFactory() {
+        @Override
+        public CodeGenerator getCodeGenerator(Format outputFormat, CodeConsumer cc) {
+          return new GentsCodeGenerator(cc, compilerOpts);
+        }
+      };
+
       String tsCode = new CodePrinter.Builder(file)
           .setCompilerOptions(opts.getCompilerOptions())
           .setTypeRegistry(compiler.getTypeRegistry())
+          .setCodeGeneratorFactory(factory)
           .setPrettyPrint(true)
           .setLineBreak(true)
           .setOutputTypes(true)
