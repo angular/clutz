@@ -6,10 +6,10 @@ import static com.google.javascript.rhino.TypeDeclarationsIR.booleanType;
 import static com.google.javascript.rhino.TypeDeclarationsIR.functionType;
 import static com.google.javascript.rhino.TypeDeclarationsIR.namedType;
 import static com.google.javascript.rhino.TypeDeclarationsIR.numberType;
-import static com.google.javascript.rhino.TypeDeclarationsIR.optionalParameter;
 import static com.google.javascript.rhino.TypeDeclarationsIR.parameterizedType;
 import static com.google.javascript.rhino.TypeDeclarationsIR.recordType;
 import static com.google.javascript.rhino.TypeDeclarationsIR.stringType;
+import static com.google.javascript.rhino.TypeDeclarationsIR.undefinedType;
 import static com.google.javascript.rhino.TypeDeclarationsIR.unionType;
 import static com.google.javascript.rhino.TypeDeclarationsIR.voidType;
 
@@ -94,9 +94,15 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
             Node attachTypeExpr = n;
             // Modify the primary AST to represent a function parameter as a
             // REST node, if the type indicates it is a rest parameter.
-            // This should be the ONLY place Token.ELLIPSIS is found.
             if (parameterType.getRoot().getType() == Token.ELLIPSIS) {
               attachTypeExpr = IR.rest(n.getString());
+              n.getParent().replaceChild(n, attachTypeExpr);
+              compiler.reportCodeChange();
+            }
+            // Modify the AST to represent an optional parameter
+            if (parameterType.getRoot().getType() == Token.EQUALS) {
+              attachTypeExpr = IR.name(n.getString());
+              attachTypeExpr.putBooleanProp(Node.OPT_ES6_TYPED, true);
               n.getParent().replaceChild(n, attachTypeExpr);
               compiler.reportCodeChange();
             }
@@ -174,7 +180,7 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
         case STAR:
           return anyType();
         case VOID:
-          return isReturnType ? voidType() : namedType("undefined");
+          return isReturnType ? voidType() : undefinedType();
         // TypeScript types are non-nullable by default with --strictNullChecks
         case BANG:
           return convertTypeNodeAST(n.getFirstChild());
@@ -208,9 +214,7 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
             // a return statement, while "void" does not.
             case "undefined":
             case "void":
-              // TODO(renez): refactor this once CodeGenerator provides support for
-              // Token.UNDEFINED_TYPE
-              return isReturnType ? voidType() : namedType("undefined");
+              return isReturnType ? voidType() : undefinedType();
             default:
               TypeDeclarationNode root = namedType(typeName);
               if (n.getChildCount() > 0 && n.getFirstChild().isBlock()) {
@@ -269,17 +273,13 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
                 String paramName = "p" + paramIdx++;
                 if (param.getType() == Token.ELLIPSIS) {
                   if (param.getFirstChild() != null) {
-                    restType = arrayType(convertTypeNodeAST(param.getFirstChild()));
+                    restType = convertTypeNodeAST(param);
                   }
                   restName = paramName;
+                } else if (param.getType() == Token.EQUALS) {
+                  optionalParams.put(paramName, convertTypeNodeAST(param));
                 } else {
-                  TypeDeclarationNode paramNode = convertTypeNodeAST(param);
-                  if (paramNode.getType() == Token.OPTIONAL_PARAMETER) {
-                    optionalParams.put(paramName,
-                        (TypeDeclarationNode) paramNode.removeFirstChild());
-                  } else {
-                    requiredParams.put(paramName, convertTypeNodeAST(param));
-                  }
+                  requiredParams.put(paramName, convertTypeNodeAST(param));
                 }
               }
             } else if (child2.isNew()) {
@@ -290,17 +290,23 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
               // They could be added as properties on the result node.
             } else {
               returnType = convertTypeNodeAST(child2, true);
+              if (returnType == null) {
+                returnType = anyType();
+              }
             }
           }
           return functionType(returnType, requiredParams, optionalParams, restName, restType);
-        // TODO(renez): confirm this is unreachable code and remove in future.
+        // Variable function parameters are encoded as an array.
         case ELLIPSIS:
-          return arrayType(convertTypeNodeAST(n.getFirstChild()));
-        // TODO(renez): this is incorrect. optional parameters only modify the parameter name and
-        // ignore the type. This logic should be hoisted up into visit()
+          Node arrType = convertTypeNodeAST(n.getFirstChild());
+          if (arrType == null) {
+            arrType = anyType();
+          }
+          return arrayType(arrType);
+        // Optional parameters are entirely encoded within the parameter name while the type
+        // remains the same.
         case EQUALS:
-          TypeDeclarationNode optionalParam = convertTypeNodeAST(n.getFirstChild());
-          return optionalParam == null ? null : optionalParameter(optionalParam);
+          return convertTypeNodeAST(n.getFirstChild());
         default:
           throw new IllegalArgumentException(
               "Unsupported node type:\n" + n.toStringTree());

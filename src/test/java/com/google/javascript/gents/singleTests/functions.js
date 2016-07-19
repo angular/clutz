@@ -1,27 +1,33 @@
-var foo = function() {};
+var nop = function() {};
 
 // Function params
 /**
  * @param {number} n
  */
-var bar = function(n) {};
+var oneParam = function(n) {};
 
 /**
  * @param {boolean} b
  * @param {string} s
  */
-function baz(b, s) {}
+function twoParams(b, s) {}
 
 // Function returns
 /**
  * @return {*}
  */
-var crack = function() { return "hello"; };
+var anyReturn = function() { return "hello"; };
 
 /**
  * @return {number}
  */
-function snapple() { return 4; }
+function typedReturn() { return 4; }
+
+/**
+ * @param {number} n
+ * @param {boolean} b
+ */
+var partiallyTyped = function(n, u1, b, u2) {};
 
 // Both params and returns
 /**
@@ -30,7 +36,7 @@ function snapple() { return 4; }
  * @param {?} x
  * @return {string}
  */
-var pop = function(b, s, x) { if (b) { return s; }};
+var complex = function(b, s, x) { if (b) { return s; }};
 
 // Undefined params
 

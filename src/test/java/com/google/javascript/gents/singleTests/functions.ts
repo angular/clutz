@@ -1,16 +1,18 @@
-var foo = function() {
+var nop = function() {
 };
-var bar = function(n: number) {
+var oneParam = function(n: number) {
 };
-function baz(b: boolean, s: string) {
+function twoParams(b: boolean, s: string) {
 }
-var crack = function(): any {
+var anyReturn = function(): any {
   return "hello";
 };
-function snapple(): number {
+function typedReturn(): number {
   return 4;
 }
-var pop = function(b: boolean, s: string, x: any): string {
+var partiallyTyped = function(n: number, u1, b: boolean, u2) {
+};
+var complex = function(b: boolean, s: string, x: any): string {
   if (b) {
     return s;
   }
