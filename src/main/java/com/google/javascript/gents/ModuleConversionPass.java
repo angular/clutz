@@ -1,9 +1,9 @@
 package com.google.javascript.gents;
 
 import com.google.common.base.Preconditions;
+import com.google.javascript.gents.CollectModuleMetadata.FileModule;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
-import com.google.javascript.jscomp.DiagnosticType;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.jscomp.NodeTraversal.AbstractPostOrderCallback;
@@ -15,7 +15,6 @@ import com.google.javascript.rhino.Token;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -23,17 +22,15 @@ import java.util.Map;
  */
 public final class ModuleConversionPass implements CompilerPass {
 
-  static final DiagnosticType GENTS_MODULE_PASS_ERROR = DiagnosticType.error(
-      "GENTS_MODULE_PASS_ERROR", "{0}");
-
   private final AbstractCompiler compiler;
   private final Map<String, FileModule> fileToModule;
   private final Map<String, FileModule> namespaceToModule;
 
-  public ModuleConversionPass(AbstractCompiler compiler) {
+  public ModuleConversionPass(AbstractCompiler compiler,
+      Map<String, FileModule> fileToModule, Map<String, FileModule> namespaceToModule) {
     this.compiler = compiler;
-    this.fileToModule = new HashMap<>();
-    this.namespaceToModule = new HashMap<>();
+    this.fileToModule = fileToModule;
+    this.namespaceToModule = namespaceToModule;
   }
 
   @Override
@@ -65,13 +62,6 @@ public final class ModuleConversionPass implements CompilerPass {
           break;
         case CALL:
           if ("goog.module".equals(n.getFirstChild().getQualifiedName())) {
-            if (!parent.getParent().isScript() || // is top level
-                !parent.getParent().getFirstChild().equals(parent)) { // is first statement
-              compiler.report(JSError.make(n, GENTS_MODULE_PASS_ERROR,
-                  "goog.module must be the first top level statement."));
-              break;
-            }
-            registerModule(n.getSourceFileName(), n.getLastChild().getString());
             // Remove the goog.module call.
             n.getParent().detachFromParent();
             compiler.reportCodeChange();
@@ -81,11 +71,6 @@ public final class ModuleConversionPass implements CompilerPass {
           // Only convert inside goog.module files
           if ("exports".equals(firstStepOfPropertyPath(n.getFirstChild())) &&
               fileToModule.containsKey(n.getSourceFileName())) {
-            if (!parent.getParent().isScript()) { // is top level
-              compiler.report(JSError.make(n, GENTS_MODULE_PASS_ERROR,
-                  "goog.module exports must be top level."));
-              break;
-            }
             convertExportAssignment(n);
           }
           break;
@@ -128,13 +113,13 @@ public final class ModuleConversionPass implements CompilerPass {
 
     String requiredNamespace = callNode.getLastChild().getString();
     FileModule module = namespaceToModule.get(requiredNamespace);
-    String referencedFile = module.file;
-    if (referencedFile == null) {
-      compiler.report(JSError.make(topLevelImport, GENTS_MODULE_PASS_ERROR,
+    if (module == null) {
+      compiler.report(JSError.make(topLevelImport, GentsErrorManager.GENTS_MODULE_PASS_ERROR,
           String.format("Module %s does not exist.", requiredNamespace)));
       return;
     }
 
+    String referencedFile = module.file;
     // TODO(renez): handle absolute paths if referenced module is not 'nearby' source module.
     referencedFile = getRelativePath(topLevelImport.getSourceFileName(), referencedFile);
 
@@ -201,27 +186,13 @@ public final class ModuleConversionPass implements CompilerPass {
       // exports = ...
       FileModule module = fileToModule.get(assign.getSourceFileName());
       String moduleSuffix = lastStepOfPropertyPath(NodeUtil.newQName(compiler, module.namespace));
-      if (module.exportsNamespace) {
-        compiler.report(JSError.make(assign, GENTS_MODULE_PASS_ERROR,
-            String.format("Exporting both default and namespace values unsupported.")));
-        return;
-      }
 
       rhs.detachFromParent();
       exportNode = IR.constNode(IR.name(moduleSuffix), rhs);
-      module.exportsDefault = true;
     } else if (lhs.isGetProp() && lhs.getFirstChild().isName()) {
       // exports.foo = ...
-      FileModule module = fileToModule.get(assign.getSourceFileName());
-      if (module.exportsDefault) {
-        compiler.report(JSError.make(assign, GENTS_MODULE_PASS_ERROR,
-            String.format("Exporting both default and namespace values unsupported.")));
-        return;
-      }
-
       rhs.detachFromParent();
       exportNode = IR.constNode(IR.name(lhs.getLastChild().getString()), rhs);
-      module.exportsNamespace = true;
     } else {
       // exports.A.B.foo = ...
       // This implicitly assumes that the prefix has already been exported elsewhere.
@@ -236,9 +207,7 @@ public final class ModuleConversionPass implements CompilerPass {
     compiler.reportCodeChange();
   }
 
-  /**
-   * Returns if the node {@code n} is either a var, let or const declaration.
-   */
+  /** Returns if the node {@code n} is either a var, let or const declaration. */
   boolean isBinding(Node n) {
     if (n.isVar() || n.isLet() || n.isConst()) {
       return n.getFirstChild().isName();
@@ -246,9 +215,7 @@ public final class ModuleConversionPass implements CompilerPass {
     return false;
   }
 
-  /**
-   * Returns the relative path between the source file and the referenced module file for importing.
-   */
+  /** Returns the relative path between the source file and the referenced module file. */
   String getRelativePath(String sourceFile, String referencedFile) {
     Path from = Paths.get(sourceFile, "..").normalize();
     Path to = Paths.get(TypeScriptGenerator.removeExtension(referencedFile)).normalize();
@@ -258,25 +225,19 @@ public final class ModuleConversionPass implements CompilerPass {
         "./" + importPath.toString();
   }
 
-  /**
-   * Returns the first identifier of a name node.
-   */
+  /** Returns the first identifier of a name node. */
   String firstStepOfPropertyPath(Node name) {
     return name.isGetProp() ?
         firstStepOfPropertyPath(name.getFirstChild()) :
         name.getQualifiedName();
   }
 
-  /**
-   * Returns the last identifier of a name node.
-   */
+  /** Returns the last identifier of a name node. */
   String lastStepOfPropertyPath(Node name) {
     return name.isGetProp() ? name.getLastChild().getString() : name.getQualifiedName();
   }
 
-  /**
-   * In-place removes the first identifier from a name node.
-   */
+  /** In-place removes the first identifier from a name node. */
   void removeFirstStepOfPropertyPath(Node name) {
     Preconditions.checkState(name.isGetProp());
     if (name.getFirstChild().isName()) {
@@ -284,31 +245,6 @@ public final class ModuleConversionPass implements CompilerPass {
       name.getParent().replaceChild(name, IR.name(newPrefix));
     } else {
       removeFirstStepOfPropertyPath(name.getFirstChild());
-    }
-  }
-
-  /**
-   * Registers a new module for future lookup.
-   */
-  void registerModule(String file, String namespace) {
-    FileModule module = new FileModule(file, namespace);
-    fileToModule.put(file, module);
-    namespaceToModule.put(namespace, module);
-  }
-
-  /**
-   * Encapsulates the module provided by each file.
-   * TODO(renez): generalize this to handle goog.provides as well.
-   */
-  private static class FileModule {
-    final String file;
-    final String namespace;
-    boolean exportsDefault;
-    boolean exportsNamespace;
-
-    private FileModule(String file, String namespace) {
-      this.file = file;
-      this.namespace = namespace;
     }
   }
 }

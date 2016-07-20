@@ -3,7 +3,6 @@ package com.google.javascript.gents;
 import com.google.common.base.Preconditions;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
-import com.google.javascript.jscomp.DiagnosticType;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.jscomp.NodeTraversal.AbstractPostOrderCallback;
@@ -23,9 +22,6 @@ import javax.annotation.Nullable;
  * converted into the new class definitions of ES6.
  */
 public final class ClassConversionPass implements CompilerPass {
-
-  static final DiagnosticType GENTS_CLASS_PASS_ERROR = DiagnosticType.error(
-      "GENTS_CLASS_PASS_ERROR", "{0}");
 
   private final AbstractCompiler compiler;
   private Map<String, Node> classes;
@@ -303,7 +299,7 @@ public final class ClassConversionPass implements CompilerPass {
       if (!classes.containsKey(className)) {
         compiler.report(JSError.make(
             exprNode,
-            GENTS_CLASS_PASS_ERROR,
+            GentsErrorManager.GENTS_CLASS_PASS_ERROR,
             String.format("Class %s could not be found.", className)));
         return;
       }
@@ -314,7 +310,7 @@ public final class ClassConversionPass implements CompilerPass {
       if (classNode.getSecondChild().isEmpty() || !storedSuperClassName.equals(superClassName)) {
         compiler.report(JSError.make(
             exprNode,
-            GENTS_CLASS_PASS_ERROR,
+            GentsErrorManager.GENTS_CLASS_PASS_ERROR,
             String.format("Invalid superclass for %s", className)));
         return;
       }
@@ -328,7 +324,7 @@ public final class ClassConversionPass implements CompilerPass {
       if (lhs.isGetProp() && "prototype".equals(lhs.getLastChild().getString())) {
         compiler.report(JSError.make(
             exprNode,
-            GENTS_CLASS_PASS_ERROR,
+            GentsErrorManager.GENTS_CLASS_PASS_ERROR,
             String.format("Cannot directly assign to prototype for %s",
                 lhs.getFirstChild().getQualifiedName())));
       }
@@ -360,7 +356,7 @@ public final class ClassConversionPass implements CompilerPass {
     if (classNode.getSecondChild().isEmpty()) {
       compiler.report(JSError.make(
           callNode,
-          GENTS_CLASS_PASS_ERROR,
+          GentsErrorManager.GENTS_CLASS_PASS_ERROR,
           String.format("Cannot call superclass in root class %s", className)));
       return;
     }
@@ -430,7 +426,7 @@ public final class ClassConversionPass implements CompilerPass {
     if (classes.containsKey(className)) {
       compiler.report(JSError.make(
           n,
-          GENTS_CLASS_PASS_ERROR,
+          GentsErrorManager.GENTS_CLASS_PASS_ERROR,
           String.format("Class %s has been defined multiple times.", className)));
       return;
     }

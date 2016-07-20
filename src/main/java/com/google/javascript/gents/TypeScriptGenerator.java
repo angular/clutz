@@ -2,6 +2,7 @@ package com.google.javascript.gents;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.javascript.jscomp.CodeConsumer;
 import com.google.javascript.jscomp.CodeGenerator;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A tool that transpiles {@code .js} ES6 and ES5 Closure annotated JavaScript to {@code .ts}
@@ -74,15 +76,11 @@ public class TypeScriptGenerator {
   }
 
   void generateTypeScript() {
-    List<SourceFile> sourceFiles = new ArrayList<>();
-    for (String source : opts.arguments) {
-      sourceFiles.add(SourceFile.fromFile(source, UTF_8));
-    }
-    List<SourceFile> externFiles = new ArrayList<>();
-    for (String extern : opts.externs) {
-      externFiles.add(SourceFile.fromFile(extern, UTF_8));
-    }
-    Map<String, String> result = generateTypeScript(sourceFiles, externFiles);
+    List<SourceFile> srcFiles = getFiles(opts.srcFiles);
+    List<SourceFile> externFiles = getFiles(opts.externs);
+    Set<String> filesToConvert = Sets.newHashSet(opts.filesToConvert);
+
+    Map<String, String> result = generateTypeScript(filesToConvert, srcFiles, externFiles);
 
     // TODO(renez): consider refactoring file output for handling directory output better
     for (String basename : result.keySet()) {
@@ -94,7 +92,8 @@ public class TypeScriptGenerator {
         System.out.println(tsCode);
       } else {
         File output = new File(new File(opts.output), basename + ".ts");
-        if (!output.getParentFile().mkdirs()) {
+        if (!output.getParentFile().exists() &&
+            !output.getParentFile().mkdirs()) {
           throw new IllegalArgumentException("Unable to make directories " + output.getParent());
         }
         try {
@@ -109,19 +108,25 @@ public class TypeScriptGenerator {
   /**
    * Returns a map from the basename to the TypeScript code generated for the file.
    */
-  Map<String, String> generateTypeScript(List<SourceFile> sourceFiles, List<SourceFile> externs)
-      throws AssertionError {
+  Map<String, String> generateTypeScript(Set<String> filesToConvert,
+      List<SourceFile> srcFiles, List<SourceFile> externs) throws AssertionError {
     Map<String, String> sourceFileMap = new HashMap<>();
 
-    // Add type annotation as a new compiler pass
     final CompilerOptions compilerOpts = opts.getCompilerOptions();
     // Compile javascript code
-    compiler.compile(externs, sourceFiles, compilerOpts);
+    compiler.compile(externs, srcFiles, compilerOpts);
 
     Node externRoot = compiler.getRoot().getFirstChild();
     Node srcRoot = compiler.getRoot().getLastChild();
 
-    CompilerPass modulePass = new ModuleConversionPass(compiler);
+    CollectModuleMetadata modulePrePass = new CollectModuleMetadata(compiler);
+    modulePrePass.process(externRoot, srcRoot);
+
+    // Strips all file nodes that we are not compiling.
+    stripNonCompiledNodes(srcRoot, filesToConvert);
+
+    CompilerPass modulePass = new ModuleConversionPass(compiler,
+        modulePrePass.getFileMap(), modulePrePass.getNamespaceMap());
     modulePass.process(externRoot, srcRoot);
 
     CompilerPass classPass = new ClassConversionPass(compiler);
@@ -130,7 +135,6 @@ public class TypeScriptGenerator {
     CompilerPass typingPass = new TypeAnnotationPass(compiler);
     typingPass.process(externRoot, srcRoot);
 
-    // TODO(renez): implement ts code generation here
     // We only use the source root as the extern root is ignored for codegen
     for (Node file : srcRoot.children()) {
       String basename = getFileNameWithoutExtension(file.getSourceFileName());
@@ -155,6 +159,28 @@ public class TypeScriptGenerator {
 
     errorManager.doGenerateReport();
     return sourceFileMap;
+  }
+
+  /**
+   * Removes the root nodes for all the library files from the source node.
+   */
+  void stripNonCompiledNodes(Node n, Set<String> filesToCompile) {
+    for (Node child : n.children()) {
+      if (!filesToCompile.contains(child.getSourceFileName())) {
+        child.detachFromParent();
+      }
+    }
+  }
+
+  /**
+   * Returns a list of source files from a list of file names.
+   */
+  List<SourceFile> getFiles(Iterable<String> fileNames) {
+    List<SourceFile> files = new ArrayList<>();
+    for (String fileName : fileNames) {
+      files.add(SourceFile.fromFile(fileName, UTF_8));
+    }
+    return files;
   }
 
   /**

@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.javascript.clutz.DeclarationGeneratorTests;
 import com.google.javascript.jscomp.SourceFile;
@@ -25,8 +26,10 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RunWith(AllTests.class)
 public class TypeScriptGeneratorTests {
@@ -93,9 +96,9 @@ public class TypeScriptGeneratorTests {
 
         TypeScriptGenerator gents = new TypeScriptGenerator(new Options());
         Map<String, String> transpiledSource = gents.generateTypeScript(
-            Lists.newArrayList(SourceFile.fromCode(sourceFile.getName(), sourceText)),
-            new ArrayList<SourceFile>()
-        );
+            Collections.singleton(sourceFile.getName()),
+            Collections.singletonList(SourceFile.fromCode(sourceFile.getName(), sourceText)),
+            Collections.EMPTY_LIST);
 
         assertThat(transpiledSource).hasSize(1);
         assertThat(transpiledSource).containsEntry(basename, goldenText);
@@ -129,8 +132,16 @@ public class TypeScriptGeneratorTests {
     gents = new TypeScriptGenerator(new Options());
   }
 
-  private Map<String, String> runGents(SourceFile... srcFiles) {
-    return gents.generateTypeScript(Lists.newArrayList(srcFiles), new ArrayList<SourceFile>());
+  private Map<String, String> runGents(SourceFile... sourceFiles) {
+    Set<String> sourceNames = Sets.newHashSet();
+    for (SourceFile src : sourceFiles) {
+      sourceNames.add(src.getName());
+    }
+
+    return gents.generateTypeScript(
+        sourceNames,
+        Lists.newArrayList(sourceFiles),
+        Collections.EMPTY_LIST);
   }
 
   @Test
