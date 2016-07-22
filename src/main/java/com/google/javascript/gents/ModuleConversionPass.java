@@ -6,7 +6,6 @@ import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.NodeTraversal;
-import com.google.javascript.jscomp.NodeTraversal.AbstractPostOrderCallback;
 import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.rhino.IR;
 import com.google.javascript.rhino.JSDocInfo;
@@ -16,9 +15,13 @@ import com.google.javascript.rhino.Token;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Nullable;
 
 /**
  * Converts Closure-style modules into TypeScript (ES6) modules (not namespaces).
+ * All module metadata must be populated before running this CompilerPass.
  */
 public final class ModuleConversionPass implements CompilerPass {
 
@@ -43,35 +46,49 @@ public final class ModuleConversionPass implements CompilerPass {
    * Converts "exports" assignments into TypeScript export statements.
    * This also builds a map of all the declared modules.
    */
-  private class ModuleExportConverter extends AbstractPostOrderCallback {
+  private class ModuleExportConverter extends AbstractTopLevelCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
-      switch (n.getType()) {
-        case SCRIPT:
-          if (fileToModule.containsKey(n.getSourceFileName())) {
-            FileModule module = fileToModule.get(n.getSourceFileName());
-            // Module is declared purely for side effects
-            if (!module.exportsDefault && !module.exportsNamespace) {
-              // export {};
-              // TODO(renez): Add comment to explain that this statement is used to change file
-              // into a module.
-              Node exportNode = new Node(Token.EXPORT, new Node(Token.EXPORT_SPECS));
-              n.addChildToFront(exportNode);
-            }
+      String filename = n.getSourceFileName();
+      if (n.isScript()) {
+        if (fileToModule.containsKey(filename)) {
+          // Module is declared purely for side effects
+          if (!fileToModule.get(filename).hasExports()) {
+            // export {};
+            // TODO(renez): Add comment to explain that this statement is used to change file
+            // into a module.
+            Node exportNode = new Node(Token.EXPORT, new Node(Token.EXPORT_SPECS));
+            n.addChildToFront(exportNode);
           }
-          break;
+        }
+      }
+
+      if (!n.isExprResult()) {
+        return;
+      }
+
+      Node child = n.getFirstChild();
+      switch (child.getType()) {
         case CALL:
-          if ("goog.module".equals(n.getFirstChild().getQualifiedName())) {
-            // Remove the goog.module call.
-            n.getParent().detachFromParent();
+          String callName = child.getFirstChild().getQualifiedName();
+          if ("goog.module".equals(callName) || "goog.provide".equals(callName)) {
+            // Remove the goog.module and goog.provide calls.
+            n.detachFromParent();
             compiler.reportCodeChange();
           }
           break;
         case ASSIGN:
-          // Only convert inside goog.module files
-          if ("exports".equals(firstStepOfPropertyPath(n.getFirstChild())) &&
-              fileToModule.containsKey(n.getSourceFileName())) {
-            convertExportAssignment(n);
+          if (!fileToModule.containsKey(filename)) {
+            break;
+          }
+          FileModule module = fileToModule.get(filename);
+          Node lhs = child.getFirstChild();
+          Map<String, String> symbols = module.exportedSymbols;
+
+          // We export the longest valid prefix
+          String exportedNamespace = findLongestNamespacePrefix(lhs, symbols.keySet());
+          if (exportedNamespace != null) {
+            convertExportAssignment(child, exportedNamespace, symbols.get(exportedNamespace));
           }
           break;
         default:
@@ -83,7 +100,7 @@ public final class ModuleConversionPass implements CompilerPass {
   /**
    * Converts goog.require statements into TypeScript import statements.
    */
-  private class ModuleImportConverter extends AbstractPostOrderCallback {
+  private class ModuleImportConverter extends AbstractTopLevelCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
       if (isBinding(n)) {
@@ -112,21 +129,21 @@ public final class ModuleConversionPass implements CompilerPass {
     Node callNode = topLevelImport.getFirstFirstChild();
 
     String requiredNamespace = callNode.getLastChild().getString();
-    FileModule module = namespaceToModule.get(requiredNamespace);
-    if (module == null) {
+    if (!namespaceToModule.containsKey(requiredNamespace)) {
       compiler.report(JSError.make(topLevelImport, GentsErrorManager.GENTS_MODULE_PASS_ERROR,
           String.format("Module %s does not exist.", requiredNamespace)));
       return;
     }
 
+    FileModule module = namespaceToModule.get(requiredNamespace);
     String referencedFile = module.file;
     // TODO(renez): handle absolute paths if referenced module is not 'nearby' source module.
     referencedFile = getRelativePath(topLevelImport.getSourceFileName(), referencedFile);
 
     Node importNode;
-    if (module.exportsDefault) {
+    if (module.importedSymbols.containsKey(requiredNamespace)) {
       // import {module as var} from "./file"
-      String moduleSuffix = lastStepOfPropertyPath(NodeUtil.newQName(compiler, requiredNamespace));
+      String moduleSuffix = lastStepOfPropertyPath(requiredNamespace);
       Node importSpec = new Node(Token.IMPORT_SPEC, IR.name(moduleSuffix));
       // import {a as b} only when a =/= b
       if (!moduleSuffix.equals(localName)) {
@@ -137,7 +154,7 @@ public final class ModuleConversionPass implements CompilerPass {
           IR.empty(),
           new Node(Token.IMPORT_SPECS, importSpec),
           Node.newString(referencedFile));
-    } else if (module.exportsNamespace) {
+    } else if (module.importedSymbols.size() > 0) {
       // import * as var from "./file"
       importNode = new Node(Token.IMPORT,
           IR.empty(),
@@ -156,23 +173,18 @@ public final class ModuleConversionPass implements CompilerPass {
   }
 
   /**
-   * Converts a Closure "exports" assignment into a TypeScript export statement.
+   * Converts a Closure assignment on a goog.module or goog.provide namespace into
+   * a TypeScript export statement.
    * This method should only be called on a node within a module.
    *
-   * For example, converts:
-   *
-   * goog.module("A.B.C");
-   * exports = ...;
-   * exports.foo = ...;
-   * exports.foo.x = ...;
-   *
-   * to
-   *
-   * export const C = ...;
-   * export const foo = ...;
-   * foo.x = ...;
+   * @param assign Assignment node
+   * @param exportedNamespace The prefix of the assignment name that we are exporting
+   * @param exportedSymbol The symbol that we want to export from the file
+   * For example,
+   * convertExportAssignment(pre.fix = ..., "pre.fix", "name") <-> export const name = ...
+   * convertExportAssignment(pre.fix.foo = ..., "pre.fix", "name") <-> name.foo = ...
    */
-  void convertExportAssignment(Node assign) {
+  void convertExportAssignment(Node assign, String exportedNamespace, String exportedSymbol) {
     Preconditions.checkState(assign.isAssign());
     Preconditions.checkState(assign.getParent().isExprResult());
 
@@ -181,29 +193,17 @@ public final class ModuleConversionPass implements CompilerPass {
     Node rhs = assign.getLastChild();
     JSDocInfo jsDoc = NodeUtil.getBestJSDocInfo(assign);
 
-    Node exportNode;
-    if (lhs.isName()) {
-      // exports = ...
-      FileModule module = fileToModule.get(assign.getSourceFileName());
-      String moduleSuffix = lastStepOfPropertyPath(NodeUtil.newQName(compiler, module.namespace));
-
+    if (exportedNamespace.equals(lhs.getQualifiedName())) {
+      // Generate new export statement
       rhs.detachFromParent();
-      exportNode = IR.constNode(IR.name(moduleSuffix), rhs);
-    } else if (lhs.isGetProp() && lhs.getFirstChild().isName()) {
-      // exports.foo = ...
-      rhs.detachFromParent();
-      exportNode = IR.constNode(IR.name(lhs.getLastChild().getString()), rhs);
+      Node exportNode = IR.constNode(IR.name(exportedSymbol), rhs);
+      exportNode.setJSDocInfo(jsDoc);
+      exprNode.getParent().replaceChild(exprNode, new Node(Token.EXPORT, exportNode));
     } else {
-      // exports.A.B.foo = ...
-      // This implicitly assumes that the prefix has already been exported elsewhere.
-      // The prefix is trimmed and nothing is exported in order to avoid any possible collisions.
-      removeFirstStepOfPropertyPath(lhs);
-      compiler.reportCodeChange();
-      return;
+      // Assume prefix has already been exported and just trim the prefix
+      replacePrefixInPath(lhs, exportedNamespace, exportedSymbol);
     }
 
-    exportNode.setJSDocInfo(jsDoc);
-    exprNode.getParent().replaceChild(exprNode, new Node(Token.EXPORT, exportNode));
     compiler.reportCodeChange();
   }
 
@@ -225,26 +225,37 @@ public final class ModuleConversionPass implements CompilerPass {
         "./" + importPath.toString();
   }
 
-  /** Returns the first identifier of a name node. */
-  String firstStepOfPropertyPath(Node name) {
-    return name.isGetProp() ?
-        firstStepOfPropertyPath(name.getFirstChild()) :
-        name.getQualifiedName();
+  /**
+   * Gets the longest namespace that is a prefix of the name node.
+   * Returns null if no namespaces are valid prefixes.
+   */
+  @Nullable
+  String findLongestNamespacePrefix(Node name, Set<String> namespaces) {
+    if (namespaces.contains(name.getQualifiedName())) {
+      return name.getQualifiedName();
+    } else if (name.isGetProp()) {
+      return findLongestNamespacePrefix(name.getFirstChild(), namespaces);
+    }
+    return null;
   }
 
-  /** Returns the last identifier of a name node. */
-  String lastStepOfPropertyPath(Node name) {
-    return name.isGetProp() ? name.getLastChild().getString() : name.getQualifiedName();
+  /** Returns the last identifier of a qualified name string. */
+  String lastStepOfPropertyPath(String name) {
+    Node n = NodeUtil.newQName(compiler, name);
+    return n.isGetProp() ? n.getLastChild().getString() : n.getQualifiedName();
   }
 
-  /** In-place removes the first identifier from a name node. */
-  void removeFirstStepOfPropertyPath(Node name) {
-    Preconditions.checkState(name.isGetProp());
-    if (name.getFirstChild().isName()) {
-      String newPrefix = name.getLastChild().getString();
+  /**
+   * In-place removes a prefix from a name node.
+   * Does nothing if prefix does not exist.
+   */
+  void replacePrefixInPath(Node name, String prefix, String newPrefix) {
+    if (prefix.equals(name.getQualifiedName())) {
       name.getParent().replaceChild(name, IR.name(newPrefix));
     } else {
-      removeFirstStepOfPropertyPath(name.getFirstChild());
+      if (name.isGetProp()) {
+        replacePrefixInPath(name.getFirstChild(), prefix, newPrefix);
+      }
     }
   }
 }
