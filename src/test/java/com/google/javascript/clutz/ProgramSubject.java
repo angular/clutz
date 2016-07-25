@@ -128,7 +128,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       System.setErr(new PrintStream(out));
       DeclarationGenerator generator = new DeclarationGenerator(opts);
       String dts =
-          generator.generateDeclarations(sourceFiles, externFiles, new Depgraph(roots));
+          generator.generateDeclarations(sourceFiles, externFiles, Depgraph.forRoots(roots));
       String diagnostics = out.toString();
       return new String[] {dts, diagnostics};
     } finally {

@@ -37,7 +37,9 @@ public class OptionsTest {
     // Outputs are filtered by what appears in the depgraph.
     assertThat(opts.arguments).containsExactly("javascript/closure/string/string.js",
         "blaze-out/blah/my/blaze-out-file.js").inOrder();
-    assertThat(opts.externs).containsExactly("extern1.js", "extern2.js").inOrder();
+    assertThat(opts.externs)
+        .containsExactly("extern1.js", "extern2.js", "javascript/common/dom.js")
+        .inOrder();
     assertThat(opts.output).isEqualTo("output.d.ts");
   }
 

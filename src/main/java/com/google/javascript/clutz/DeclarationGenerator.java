@@ -75,7 +75,7 @@ import javax.annotation.Nullable;
 /**
  * A tool that generates {@code .d.ts} declarations from a Google Closure JavaScript program.
  */
-public class DeclarationGenerator {
+class DeclarationGenerator {
   static final String INSTANCE_CLASS_SUFFIX = "_Instance";
 
   /**
@@ -280,7 +280,6 @@ public class DeclarationGenerator {
 
   String generateDeclarations(List<SourceFile> sourceFiles, List<SourceFile> externs,
       Depgraph depgraph) throws AssertionError {
-
     compiler.compile(externs, sourceFiles, opts.getCompilerOptions());
     precomputeChildLists();
     collectTypedefs();
@@ -297,7 +296,7 @@ public class DeclarationGenerator {
     return input.substring(0, dotIdx);
   }
 
-  public String produceDts(Depgraph depgraph) {
+  String produceDts(Depgraph depgraph) {
     // Tree sets for consistent order.
     TreeSet<String> provides = new TreeSet<>();
     Set<String> rewrittenProvides = new TreeSet<>();
@@ -884,7 +883,7 @@ public class DeclarationGenerator {
     emitBreak();
   }
 
-  static public List<SourceFile> getDefaultExterns(Options opts) {
+  static List<SourceFile> getDefaultExterns(Options opts) {
     try {
       return AbstractCommandLineRunner.getBuiltinExterns(
           opts.getCompilerOptions().getEnvironment());

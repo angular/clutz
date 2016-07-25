@@ -5,11 +5,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -23,30 +21,44 @@ import java.util.regex.Pattern;
  * graph for a given rule. We use it to determine which inputs to the compiler are srcs and which
  * come from deps.
  */
-public class Depgraph {
+class Depgraph {
 
-  private final Set<String> roots;
+  private final Set<String> roots = new LinkedHashSet<>();
+  private final Set<String> nonroots = new LinkedHashSet<>();
+  private final Set<String> externs = new LinkedHashSet<>();
 
-  public Depgraph(Set<String> roots) {
-    this.roots = roots;
-  }
+  private Depgraph() {}
 
-  public boolean isRoot(String fileName) {
+  boolean isRoot(String fileName) {
     // roots can only be empty if no Depgraphs were passed in, in which case we accept all files.
     return roots.isEmpty() || roots.contains(fileName);
   }
 
-  public Set<String> getRoots() {
-    return roots;
+  Set<String> getRoots() {
+    return Collections.unmodifiableSet(roots);
+  }
+
+  Set<String> getNonroots() {
+    return Collections.unmodifiableSet(nonroots);
+  }
+
+  Set<String> getExterns() {
+    return Collections.unmodifiableSet(externs);
+  }
+
+  static Depgraph forRoots(Set<String> roots) {
+    Depgraph result = new Depgraph();
+    result.roots.addAll(roots);
+    return result;
   }
 
   // TODO(alexeagle): consider parsing into an object graph rather than nested loops over List<?>.
-  public static Depgraph parseFrom(boolean allFilesAreRoots, List<String> fileNames) {
+  static Depgraph parseFrom(List<String> fileNames) {
+    Depgraph result = new Depgraph();
     if (fileNames.isEmpty()) {
-      return new Depgraph(Collections.<String>emptySet());
+      return result;
     }
 
-    Set<String> roots = new LinkedHashSet<>();
     for (String depgraphName : fileNames) {
       try {
         String depgraph = Files.toString(new File(depgraphName), UTF_8);
@@ -56,10 +68,7 @@ public class Depgraph {
           String key = (String) outer.get(0);
           @SuppressWarnings("unchecked")
           List<List<?>> value = (List<List<?>>) outer.get(1);
-          List<String> files = getFiles(value);
-          if (allFilesAreRoots || "roots".equals(key)) {
-            roots.addAll(files);
-          }
+          result.collectFiles("roots".equals(key) , value);
         }
       } catch (FileNotFoundException e) {
         throw new IllegalArgumentException("depgraph file not found: " + depgraphName, e);
@@ -69,25 +78,41 @@ public class Depgraph {
         throw new RuntimeException("malformed depgraph: " + depgraphName, e);
       }
     }
-    if (roots.isEmpty()) {
+    if (result.roots.isEmpty()) {
       throw new IllegalStateException("No roots were found in the provided depgraphs files");
     }
-    return new Depgraph(roots);
+    return result;
   }
 
   // Strip brackets from bazel's "[blaze-out/.../]foo/bar" path prefixes.
   private static final Pattern GENERATED_FILE = Pattern.compile("^\\[([^]]+)\\]");
 
-  private static List<String> getFiles(List<List<?>> fileList) {
-    ArrayList<String> files = new ArrayList<>();
+  private void collectFiles(boolean isRoots, List<List<?>> fileList) {
     for (List<?> rootDescriptor : fileList) {
-      String fileName = (String) rootDescriptor.iterator().next();
+      String fileName = (String) rootDescriptor.get(0);
       // *-bootstrap.js are automatically added to every rule by Bazel
-      if (!fileName.endsWith("-bootstrap.js")) {
-        fileName = GENERATED_FILE.matcher(fileName).replaceAll("$1");
-        files.add(fileName);
+      if (fileName.endsWith("-bootstrap.js")) {
+        continue;
+      }
+      @SuppressWarnings("unchecked")
+      List<List<?>> fileProperties = (List<List<?>>) rootDescriptor.get(1);
+      boolean isExterns = false;
+      for (List<?> tuple: fileProperties) {
+        String key = (String) tuple.get(0);
+        if ("is_externs".equals(key)
+            && Boolean.TRUE.equals(tuple.get(1))) {
+          isExterns = true;
+          break;
+        }
+      }
+      fileName = GENERATED_FILE.matcher(fileName).replaceAll("$1");
+      if (isExterns) {
+        externs.add(fileName);
+      } else if (isRoots) {
+        roots.add(fileName);
+      } else {
+        nonroots.add(fileName);
       }
     }
-    return files;
   }
 }

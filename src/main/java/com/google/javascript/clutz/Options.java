@@ -1,17 +1,17 @@
 package com.google.javascript.clutz;
 
+import com.google.common.collect.Sets;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DiagnosticGroups;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.spi.StringArrayOptionHandler;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Options {
 
@@ -83,13 +83,15 @@ public class Options {
   Options(String[] args) throws CmdLineException {
     CmdLineParser parser = new CmdLineParser(this);
     parser.parseArgument(args);
-    this.depgraph = Depgraph.parseFrom(this.filterSourcesWithDepgraphs, depgraphFiles);
+    this.depgraph = Depgraph.parseFrom(depgraphFiles);
     if (filterSourcesWithDepgraphs) {
       // Clutz still takes the list of files to compile from the outside, because Closure depends
       // on source order in many places. The depgraph files are not sorted, build order is instead
       // established by the outside tool driving compilation (e.g. bazel).
-      arguments.retainAll(depgraph.getRoots());
+      Set<String> merged = Sets.union(depgraph.getRoots(), depgraph.getNonroots());
+      arguments.retainAll(merged);
     }
+    this.externs.addAll(depgraph.getExterns());
     if (arguments.isEmpty()) {
       throw new CmdLineException(parser, "No files were given");
     }
