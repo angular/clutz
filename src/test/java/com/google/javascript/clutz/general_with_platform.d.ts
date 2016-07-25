@@ -257,11 +257,11 @@ declare namespace ಠ_ಠ.clutz {
   }
   class MessageSender_Instance {
     private noStructuralTyping_: any;
-    frameId : number | undefined ;
-    id : string | undefined ;
-    tab : Tab | undefined ;
-    tlsChannelId : string | undefined ;
-    url : string | undefined ;
+    frameId ? : number ;
+    id ? : string ;
+    tab ? : Tab ;
+    tlsChannelId ? : string ;
+    url ? : string ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -286,7 +286,7 @@ declare namespace ಠ_ಠ.clutz {
     onDisconnect : ChromeEvent ;
     onMessage : ChromeEvent ;
     postMessage (obj : any ) : void ;
-    sender : MessageSender | undefined ;
+    sender ? : MessageSender ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -496,18 +496,18 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_: any;
     active : boolean ;
     favIconUrl : string ;
-    height : number | undefined ;
+    height ? : number ;
     highlighted : boolean ;
     id : number ;
     incognito : boolean ;
     index : number ;
     openerTabId : number ;
     pinned : boolean ;
-    sessionId : string | undefined ;
+    sessionId ? : string ;
     status : string ;
     title : string ;
     url : string ;
-    width : number | undefined ;
+    width ? : number ;
     windowId : number ;
   }
 }

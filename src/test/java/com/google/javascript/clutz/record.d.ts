@@ -14,6 +14,7 @@ declare module 'goog:namespace.I' {
 declare namespace ಠ_ಠ.clutz.namespace {
   interface R {
     foo : boolean ;
+    optionalFoo ? : boolean ;
   }
 }
 declare module 'goog:namespace.R' {
