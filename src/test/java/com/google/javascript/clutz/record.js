@@ -10,6 +10,9 @@ namespace.R = function() {};
 /** @type {boolean} */
 namespace.R.prototype.foo;
 
+/** @type {boolean|undefined} */
+namespace.R.prototype.optionalFoo;
+
 /** @record */
 namespace.I.InnerR = function() {};
 

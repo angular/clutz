@@ -1815,7 +1815,13 @@ class DeclarationGenerator {
       if (isStatic) emit("static");
       emit(propName);
       if (!propertyType.isFunctionType() || forcePropDeclaration) {
-        visitTypeDeclaration(propertyType, false, false);
+        UnionType unionType = propertyType.toMaybeUnionType();
+        boolean isOptionalProperty = false;
+        if (unionType != null && any(unionType.getAlternates(), isVoidType)) {
+          emit("?");
+          isOptionalProperty = true;
+        }
+        visitTypeDeclaration(propertyType, false, isOptionalProperty);
       } else {
         // Avoid re-emitting template variables defined on the class level if method is not static.
         Set<String> objTemplateTypes =
