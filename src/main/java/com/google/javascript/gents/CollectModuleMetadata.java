@@ -8,9 +8,7 @@ import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.rhino.Node;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Preprocesses all source and library files to build a mapping between Closure namespaces and
@@ -49,6 +47,12 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     String filename = n.getSourceFileName();
     switch (child.getType()) {
       case CALL:
+        // Ignore unusual call cases
+        // (function() {...})()
+        // nested().calls()
+        if (child.getFirstChild().getQualifiedName() == null) {
+          break;
+        }
         switch (child.getFirstChild().getQualifiedName()) {
           case "goog.module":
             if (!parent.getFirstChild().equals(n)) { // is first statement
@@ -85,7 +89,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
       return;
     }
     FileModule module = new FileModule(file, true);
-    module.validNamespaces.add(namespace);
+    module.providesObject.put(namespace, false);
     fileToModule.put(file, module);
     namespaceToModule.put(namespace, module);
   }
@@ -102,7 +106,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
       fileToModule.put(file, new FileModule(file, false));
     }
     FileModule module = fileToModule.get(file);
-    module.validNamespaces.add(namespace);
+    module.providesObject.put(namespace, false);
     namespaceToModule.put(namespace, module);
   }
 
@@ -122,8 +126,8 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
   class FileModule {
     final String file;
     private final boolean isGoogModule;
-    // Set of namespaces that this file provides
-    private final Set<String> validNamespaces = new HashSet<>();
+    // Whether or not the module provides the full objects for each namespace;
+    final Map<String, Boolean> providesObject = new HashMap<>();
     // Map from exported exported to the exported identifier
     final Map<String, String> exportedSymbols = new HashMap<>();
     // Map from the imported namespace to the imported identifier
@@ -152,7 +156,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     }
 
     private void maybeAddGoogExport(Node exportsName) {
-      String fullname = validNamespaces.iterator().next();
+      String fullname = providesObject.keySet().iterator().next();
       if ("exports".equals(exportsName.getQualifiedName())) {
         addExport(exportsName.getQualifiedName(), fullname, lastStepOfPropertyPath(fullname));
       } else if (exportsName.isGetProp() &&
@@ -164,8 +168,8 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
 
     private void maybeAddProvidesExport(Node exportsName) {
       String fullname = exportsName.getQualifiedName();
-      if (validNamespaces.contains(fullname) || (exportsName.isGetProp() &&
-          validNamespaces.contains(exportsName.getFirstChild().getQualifiedName()))) {
+      if (providesObject.containsKey(fullname) || (exportsName.isGetProp() &&
+          providesObject.containsKey(exportsName.getFirstChild().getQualifiedName()))) {
         addExport(fullname, fullname, lastStepOfPropertyPath(exportsName));
       }
     }
@@ -173,6 +177,14 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     private void addExport(String exportName, String importName, String identifier) {
       exportedSymbols.put(exportName, identifier);
       importedSymbols.put(importName, identifier);
+
+      Node namespace = NodeUtil.newQName(compiler, importName);
+      if (namespace.isGetProp()) {
+        String parentName = namespace.getFirstChild().getQualifiedName();
+        if (providesObject.containsKey(parentName)) {
+          providesObject.put(parentName, true);
+        }
+      }
     }
   }
 }

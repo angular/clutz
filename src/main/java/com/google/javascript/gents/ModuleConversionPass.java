@@ -104,33 +104,43 @@ public final class ModuleConversionPass implements CompilerPass {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
       if (isBinding(n)) {
+        // var x = goog.require(...);
         Node callNode = n.getFirstFirstChild();
         if (callNode == null || !callNode.isCall()) {
           return;
         }
 
         if ("goog.require".equals(callNode.getFirstChild().getQualifiedName())) {
-          convertRequireToImportStatement(n);
+          String requiredNamespace = callNode.getLastChild().getString();
+          String localName = n.getFirstChild().getQualifiedName();
+          convertRequireToImportStatements(n, localName, requiredNamespace);
+        }
+      } else if (n.isExprResult()) {
+        // goog.require(...);
+        Node callNode = n.getFirstChild();
+        if (callNode == null || !callNode.isCall()) {
+          return;
+        }
+        if ("goog.require".equals(callNode.getFirstChild().getQualifiedName())) {
+          String requiredNamespace = callNode.getLastChild().getString();
+          String localName = lastStepOfPropertyPath(requiredNamespace);
+          convertRequireToImportStatements(n, localName, requiredNamespace);
         }
       }
     }
   }
 
   /**
-   * Converts a Closure goog.require assignment into a TypeScript import statement.
+   * Converts a Closure goog.require call into a TypeScript import statement.
    *
    * The resulting node is dependent on the exports by the module being imported:
-   * import {A as defaultExport} from "./filenameA";
-   * import * as namespaceExport from "./filenameB";
+   * import {A as localName} from "./valueExports";
+   * import * as localName from "./objectExports";
    * import "./sideEffectsOnly"
    */
-  void convertRequireToImportStatement(Node topLevelImport) {
-    String localName = topLevelImport.getFirstChild().getQualifiedName();
-    Node callNode = topLevelImport.getFirstFirstChild();
-
-    String requiredNamespace = callNode.getLastChild().getString();
+  void convertRequireToImportStatements(Node n, String localName, String requiredNamespace) {
     if (!namespaceToModule.containsKey(requiredNamespace)) {
-      compiler.report(JSError.make(topLevelImport, GentsErrorManager.GENTS_MODULE_PASS_ERROR,
+      compiler.report(JSError.make(n, GentsErrorManager.GENTS_MODULE_PASS_ERROR,
           String.format("Module %s does not exist.", requiredNamespace)));
       return;
     }
@@ -138,37 +148,50 @@ public final class ModuleConversionPass implements CompilerPass {
     FileModule module = namespaceToModule.get(requiredNamespace);
     String referencedFile = module.file;
     // TODO(renez): handle absolute paths if referenced module is not 'nearby' source module.
-    referencedFile = getRelativePath(topLevelImport.getSourceFileName(), referencedFile);
+    referencedFile = getRelativePath(n.getSourceFileName(), referencedFile);
+    String moduleSuffix = lastStepOfPropertyPath(requiredNamespace);
+    // Avoid name collisions
+    String backupName = moduleSuffix.equals(localName) ? moduleSuffix + "Exports" : moduleSuffix;
 
-    Node importNode;
+    boolean imported = false;
     if (module.importedSymbols.containsKey(requiredNamespace)) {
-      // import {module as var} from "./file"
-      String moduleSuffix = lastStepOfPropertyPath(requiredNamespace);
+      // import {value as localName} from "./file"
       Node importSpec = new Node(Token.IMPORT_SPEC, IR.name(moduleSuffix));
       // import {a as b} only when a =/= b
       if (!moduleSuffix.equals(localName)) {
         importSpec.addChildToBack(IR.name(localName));
       }
 
-      importNode = new Node(Token.IMPORT,
+      Node importNode = new Node(Token.IMPORT,
           IR.empty(),
           new Node(Token.IMPORT_SPECS, importSpec),
           Node.newString(referencedFile));
-    } else if (module.importedSymbols.size() > 0) {
+      n.getParent().addChildBefore(importNode, n);
+      imported = true;
+      // Switch to back up name if necessary
+      localName = backupName;
+    }
+
+    if (module.providesObject.get(requiredNamespace)) {
       // import * as var from "./file"
-      importNode = new Node(Token.IMPORT,
+      Node importNode = new Node(Token.IMPORT,
           IR.empty(),
           Node.newString(Token.IMPORT_STAR, localName),
           Node.newString(referencedFile));
-    } else {
+      n.getParent().addChildBefore(importNode, n);
+      imported = true;
+    }
+
+    if (!imported) {
       // side effects only
-      importNode = new Node(Token.IMPORT,
+      Node importNode = new Node(Token.IMPORT,
           IR.empty(),
           IR.empty(),
           Node.newString(referencedFile));
+      n.getParent().addChildBefore(importNode, n);
     }
 
-    topLevelImport.getParent().replaceChild(topLevelImport, importNode);
+    n.getParent().removeChild(n);
     compiler.reportCodeChange();
   }
 

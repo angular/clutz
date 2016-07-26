@@ -1,4 +1,4 @@
-var A = goog.require("default.A");
-var X = goog.require("default.A");
-var B = goog.require("namespace.A.B");
-var C = goog.require("sideeffect.A.B.C");
+goog.require("default.A");
+goog.require("namespace.A.B");
+goog.require("sideeffect.A.B.C");
+goog.require("both.A.B.C.D");
