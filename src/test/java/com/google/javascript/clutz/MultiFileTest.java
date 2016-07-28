@@ -47,7 +47,6 @@ public class MultiFileTest {
         .generatesDeclarations(expected);
   }
 
-
   @Test
   public void googModule() throws Exception {
     String expected = DeclarationGeneratorTests.getTestFileText(input("goog_module.d.ts"));
@@ -56,6 +55,14 @@ public class MultiFileTest {
             input("required.js"), input("goog_module.js")),
         Collections.<File>emptyList())
         .generatesDeclarations(expected);
+  }
+
+  @Test
+  public void depgraph() throws Exception {
+    String expected = DeclarationGeneratorTests.getTestFileText(input("depgraph.d.ts"));
+    assertThatProgram(ImmutableList.of(input("root.js")),
+        ImmutableList.of(input("transitive.js"), input("transitive_unused.js")))
+            .generatesDeclarations(expected);
   }
 
   private File input(String filename) {

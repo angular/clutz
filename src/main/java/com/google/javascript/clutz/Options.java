@@ -33,8 +33,13 @@ public class Options {
       handler = StringArrayOptionHandler.class)
   List<String> depgraphFiles = new ArrayList<>();
 
+  @Option(name = "--strict_deps",
+      usage = "generates no modules for nonroots (but does generate types), so that nonroots "
+          + "cannot be imported by TypeScript code.")
+  boolean strictDeps = false;
+
   @Option(name = "--depgraphs_filter_sources",
-      usage = "include all sources in compilation that appear (anywhere) in the given depgraphs")
+      usage = "only include sources from the arguments list that appear in the given depgraphs")
   boolean filterSourcesWithDepgraphs = false;
 
   @Option(name = "--emitPlatformExterns",
@@ -83,7 +88,7 @@ public class Options {
   Options(String[] args) throws CmdLineException {
     CmdLineParser parser = new CmdLineParser(this);
     parser.parseArgument(args);
-    this.depgraph = Depgraph.parseFrom(depgraphFiles);
+    depgraph = Depgraph.parseFrom(depgraphFiles);
     if (filterSourcesWithDepgraphs) {
       // Clutz still takes the list of files to compile from the outside, because Closure depends
       // on source order in many places. The depgraph files are not sorted, build order is instead
@@ -91,7 +96,10 @@ public class Options {
       Set<String> merged = Sets.union(depgraph.getRoots(), depgraph.getNonroots());
       arguments.retainAll(merged);
     }
-    this.externs.addAll(depgraph.getExterns());
+    externs.addAll(depgraph.getExterns());
+    if (!strictDeps) {
+      depgraph = depgraph.withNonrootsAsRoots();
+    }
     if (arguments.isEmpty()) {
       throw new CmdLineException(parser, "No files were given");
     }

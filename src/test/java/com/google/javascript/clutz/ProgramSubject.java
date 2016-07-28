@@ -90,8 +90,10 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       sourceFiles.add(CLUTZ_GOOG_BASE);
     }
 
+    Set<String> nonroots = new LinkedHashSet<>();
     for (File nonroot : getSubject().nonroots) {
       sourceFiles.add(SourceFile.fromFile(nonroot, UTF_8));
+      nonroots.add(nonroot.getPath());
     }
 
     Set<String> roots = new LinkedHashSet<>();
@@ -127,8 +129,8 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       System.setErr(new PrintStream(out));
       DeclarationGenerator generator = new DeclarationGenerator(opts);
-      String dts =
-          generator.generateDeclarations(sourceFiles, externFiles, Depgraph.forRoots(roots));
+      String dts = generator.generateDeclarations(sourceFiles, externFiles,
+          Depgraph.forRoots(roots, nonroots));
       String diagnostics = out.toString();
       return new String[] {dts, diagnostics};
     } finally {

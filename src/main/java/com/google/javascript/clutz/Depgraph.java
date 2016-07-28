@@ -34,6 +34,14 @@ class Depgraph {
     return roots.isEmpty() || roots.contains(fileName);
   }
 
+  Depgraph withNonrootsAsRoots() {
+    Depgraph res = new Depgraph();
+    res.roots.addAll(roots);
+    res.roots.addAll(nonroots);
+    res.externs.addAll(externs);
+    return res;
+  }
+
   Set<String> getRoots() {
     return Collections.unmodifiableSet(roots);
   }
@@ -46,9 +54,10 @@ class Depgraph {
     return Collections.unmodifiableSet(externs);
   }
 
-  static Depgraph forRoots(Set<String> roots) {
+  static Depgraph forRoots(Set<String> roots, Set<String> nonroots) {
     Depgraph result = new Depgraph();
     result.roots.addAll(roots);
+    result.nonroots.addAll(nonroots);
     return result;
   }
 
