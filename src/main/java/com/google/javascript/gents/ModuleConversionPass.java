@@ -1,11 +1,14 @@
 package com.google.javascript.gents;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.google.javascript.gents.CollectModuleMetadata.FileModule;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.NodeTraversal;
+import com.google.javascript.jscomp.NodeTraversal.AbstractPreOrderCallback;
 import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.rhino.IR;
 import com.google.javascript.rhino.JSDocInfo;
@@ -29,6 +32,10 @@ public final class ModuleConversionPass implements CompilerPass {
   private final Map<String, FileModule> fileToModule;
   private final Map<String, FileModule> namespaceToModule;
 
+  // Used for rewriting usages of imported symbols
+  // filename, namespace -> local name
+  private final Table<String, String, String> localRewrite = HashBasedTable.create();
+
   public ModuleConversionPass(AbstractCompiler compiler,
       Map<String, FileModule> fileToModule, Map<String, FileModule> namespaceToModule) {
     this.compiler = compiler;
@@ -40,6 +47,7 @@ public final class ModuleConversionPass implements CompilerPass {
   public void process(Node externs, Node root) {
     NodeTraversal.traverseEs6(compiler, root, new ModuleExportConverter());
     NodeTraversal.traverseEs6(compiler, root, new ModuleImportConverter());
+    NodeTraversal.traverseEs6(compiler, root, new ModuleImportRewriter());
   }
 
   /**
@@ -103,7 +111,7 @@ public final class ModuleConversionPass implements CompilerPass {
   private class ModuleImportConverter extends AbstractTopLevelCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
-      if (isBinding(n)) {
+      if (NodeUtil.isNameDeclaration(n)) {
         // var x = goog.require(...);
         Node callNode = n.getFirstFirstChild();
         if (callNode == null || !callNode.isCall()) {
@@ -123,10 +131,32 @@ public final class ModuleConversionPass implements CompilerPass {
         }
         if ("goog.require".equals(callNode.getFirstChild().getQualifiedName())) {
           String requiredNamespace = callNode.getLastChild().getString();
-          String localName = lastStepOfPropertyPath(requiredNamespace);
-          convertRequireToImportStatements(n, localName, requiredNamespace);
+          convertRequireToImportStatements(n, requiredNamespace, requiredNamespace);
         }
       }
+    }
+  }
+
+  /**
+   * Rewrites variable names used in the file to correspond to the newly imported symbols.
+   */
+  private class ModuleImportRewriter extends AbstractPreOrderCallback {
+    @Override
+    public boolean shouldTraverse(NodeTraversal t, Node n, Node parent) {
+      // Rewrite all imported variable name usages
+      if (n.isName() || n.isGetProp()) {
+        if (!localRewrite.containsRow(n.getSourceFileName())) {
+          return true;
+        }
+
+        Map<String, String> rewriteMap = localRewrite.rowMap().get(n.getSourceFileName());
+        String importedNamespace = findLongestNamespacePrefix(n, rewriteMap.keySet());
+        if (importedNamespace != null) {
+          replacePrefixInPath(n, importedNamespace, rewriteMap.get(importedNamespace));
+          return false;
+        }
+      }
+      return true;
     }
   }
 
@@ -138,12 +168,15 @@ public final class ModuleConversionPass implements CompilerPass {
    * import * as localName from "./objectExports";
    * import "./sideEffectsOnly"
    */
-  void convertRequireToImportStatements(Node n, String localName, String requiredNamespace) {
+  void convertRequireToImportStatements(Node n, String fullLocalName, String requiredNamespace) {
     if (!namespaceToModule.containsKey(requiredNamespace)) {
       compiler.report(JSError.make(n, GentsErrorManager.GENTS_MODULE_PASS_ERROR,
           String.format("Module %s does not exist.", requiredNamespace)));
       return;
     }
+
+    // Local name is the shortened namespace symbol
+    String localName = lastStepOfPropertyPath(fullLocalName);
 
     FileModule module = namespaceToModule.get(requiredNamespace);
     String referencedFile = module.file;
@@ -168,11 +201,13 @@ public final class ModuleConversionPass implements CompilerPass {
           Node.newString(referencedFile));
       n.getParent().addChildBefore(importNode, n);
       imported = true;
+
+      localRewrite.put(n.getSourceFileName(), fullLocalName, localName);
       // Switch to back up name if necessary
       localName = backupName;
     }
 
-    if (module.providesObject.get(requiredNamespace)) {
+    if (module.providesObjectChildren.get(requiredNamespace).size() > 0) {
       // import * as var from "./file"
       Node importNode = new Node(Token.IMPORT,
           IR.empty(),
@@ -180,6 +215,13 @@ public final class ModuleConversionPass implements CompilerPass {
           Node.newString(referencedFile));
       n.getParent().addChildBefore(importNode, n);
       imported = true;
+
+      for (String child : module.providesObjectChildren.get(requiredNamespace)) {
+        if (!localRewrite.contains(n.getSourceFileName(), child)) {
+          localRewrite.put(n.getSourceFileName(),
+              fullLocalName + '.' + child, localName + '.' + child);
+        }
+      }
     }
 
     if (!imported) {
@@ -230,14 +272,6 @@ public final class ModuleConversionPass implements CompilerPass {
     compiler.reportCodeChange();
   }
 
-  /** Returns if the node {@code n} is either a var, let or const declaration. */
-  boolean isBinding(Node n) {
-    if (n.isVar() || n.isLet() || n.isConst()) {
-      return n.getFirstChild().isName();
-    }
-    return false;
-  }
-
   /** Returns the relative path between the source file and the referenced module file. */
   String getRelativePath(String sourceFile, String referencedFile) {
     Path from = Paths.get(sourceFile, "..").normalize();
@@ -274,7 +308,7 @@ public final class ModuleConversionPass implements CompilerPass {
    */
   void replacePrefixInPath(Node name, String prefix, String newPrefix) {
     if (prefix.equals(name.getQualifiedName())) {
-      name.getParent().replaceChild(name, IR.name(newPrefix));
+      name.getParent().replaceChild(name, NodeUtil.newQName(compiler, newPrefix));
     } else {
       if (name.isGetProp()) {
         replacePrefixInPath(name.getFirstChild(), prefix, newPrefix);

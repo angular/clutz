@@ -22,11 +22,22 @@ public class GentsCodeGenerator extends CodeGenerator {
     super.add(n, ctx);
 
     // Default field values
-    if (n.isMemberVariableDef()) {
-      if (n.hasChildren()) {
-        add(" = ");
-        add(n.getLastChild());
-      }
+    switch (n.getType()) {
+      case MEMBER_VARIABLE_DEF:
+        if (n.hasChildren()) {
+          add(" = ");
+          add(n.getLastChild());
+        }
+        break;
+      case NEW:
+        // The Closure Compiler code generator drops off the extra () for new statements.
+        // We add them back in to maintain a consistent style.
+        if (n.hasOneChild()) {
+          add("()");
+        }
+        break;
+      default:
+        break;
     }
   }
 
