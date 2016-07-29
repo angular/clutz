@@ -119,7 +119,7 @@ public class TypeScriptGenerator {
     Node externRoot = compiler.getRoot().getFirstChild();
     Node srcRoot = compiler.getRoot().getLastChild();
 
-    CollectModuleMetadata modulePrePass = new CollectModuleMetadata(compiler);
+    CollectModuleMetadata modulePrePass = new CollectModuleMetadata(compiler, filesToConvert);
     modulePrePass.process(externRoot, srcRoot);
 
     // Strips all file nodes that we are not compiling.

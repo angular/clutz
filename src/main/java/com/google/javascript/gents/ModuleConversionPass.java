@@ -164,6 +164,7 @@ public final class ModuleConversionPass implements CompilerPass {
    * Converts a Closure goog.require call into a TypeScript import statement.
    *
    * The resulting node is dependent on the exports by the module being imported:
+   * import localName from "goog:old.namespace.syntax";
    * import {A as localName} from "./valueExports";
    * import * as localName from "./objectExports";
    * import "./sideEffectsOnly"
@@ -185,6 +186,19 @@ public final class ModuleConversionPass implements CompilerPass {
     String moduleSuffix = lastStepOfPropertyPath(requiredNamespace);
     // Avoid name collisions
     String backupName = moduleSuffix.equals(localName) ? moduleSuffix + "Exports" : moduleSuffix;
+
+    // Uses default import syntax as this is a javascript namespace
+    if (module.shouldUseOldSyntax()) {
+      Node importNode = new Node(Token.IMPORT,
+          IR.empty(),
+          Node.newString(Token.NAME, localName),
+          Node.newString("goog:" + requiredNamespace));
+      n.getParent().replaceChild(n, importNode);
+      compiler.reportCodeChange();
+
+      localRewrite.put(n.getSourceFileName(), fullLocalName, localName);
+      return;
+    }
 
     boolean imported = false;
     if (module.importedSymbols.containsKey(requiredNamespace)) {

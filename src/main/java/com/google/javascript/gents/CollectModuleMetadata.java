@@ -19,6 +19,7 @@ import java.util.Set;
 public final class CollectModuleMetadata extends AbstractTopLevelCallback implements CompilerPass {
 
   private final AbstractCompiler compiler;
+  final Set<String> filesToConvert;
   final Map<String, FileModule> fileToModule = new HashMap<>();
   final Map<String, FileModule> namespaceToModule = new HashMap<>();
 
@@ -30,8 +31,9 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     return namespaceToModule;
   }
 
-  public CollectModuleMetadata(AbstractCompiler compiler) {
+  public CollectModuleMetadata(AbstractCompiler compiler, Set<String> filesToConvert) {
     this.compiler = compiler;
+    this.filesToConvert = filesToConvert;
   }
 
   @Override
@@ -128,6 +130,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
   class FileModule {
     final String file;
     private final boolean isGoogModule;
+    private final boolean isJsLibrary;
     // Map from provided namespace to the set of subproperties that are exported
     final Map<String, Set<String>> providesObjectChildren = new HashMap<>();
     // Map from exported exported to the exported identifier
@@ -138,6 +141,12 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     FileModule(String file, boolean isGoogModule) {
       this.file = file;
       this.isGoogModule = isGoogModule;
+      this.isJsLibrary = !filesToConvert.contains(file);
+    }
+
+    /** Returns if the import statement for this file should use the old 'goog:' namespace syntax */
+    boolean shouldUseOldSyntax() {
+      return isJsLibrary;
     }
 
     /** Returns if the file actually exports any symbols. */

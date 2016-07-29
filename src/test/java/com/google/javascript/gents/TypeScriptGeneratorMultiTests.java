@@ -68,13 +68,17 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
 
         for (final File sourceFile : testFiles) {
           String sourceText = getFileText(sourceFile);
-          sourceNames.add(sourceFile.getName());
+          String filename = sourceFile.getName();
           sourceFiles.add(SourceFile.fromCode(sourceFile.getName(), sourceText));
 
-          String basename = TypeScriptGenerator.getFileNameWithoutExtension(sourceFile.getName());
-          File goldenFile = DeclarationGeneratorTests.getGoldenFile(sourceFile, ".ts");
-          String goldenText = getFileText(goldenFile);
-          goldenFiles.put(basename, goldenText);
+          if (!filename.endsWith("_keep.js")) {
+            sourceNames.add(sourceFile.getName());
+
+            String basename = TypeScriptGenerator.getFileNameWithoutExtension(sourceFile.getName());
+            File goldenFile = DeclarationGeneratorTests.getGoldenFile(sourceFile, ".ts");
+            String goldenText = getFileText(goldenFile);
+            goldenFiles.put(basename, goldenText);
+          }
         }
 
         TypeScriptGenerator gents = new TypeScriptGenerator(new Options());
@@ -84,7 +88,7 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
             sourceFiles,
             Collections.EMPTY_LIST);
 
-        assertThat(transpiledSource).hasSize(sourceFiles.size());
+        assertThat(transpiledSource).hasSize(sourceNames.size());
         for (String basename : goldenFiles.keySet()) {
           String goldenText = goldenFiles.get(basename);
           assertThat(transpiledSource).containsEntry(basename, goldenText);
