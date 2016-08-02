@@ -80,18 +80,21 @@ public class TypeScriptGenerator {
     List<SourceFile> externFiles = getFiles(opts.externs);
     Set<String> filesToConvert = Sets.newHashSet(opts.filesToConvert);
 
+    PathUtil.setRoot(opts.root);
     Map<String, String> result = generateTypeScript(filesToConvert, srcFiles, externFiles);
 
-    // TODO(renez): consider refactoring file output for handling directory output better
-    for (String basename : result.keySet()) {
+    for (String filename : filesToConvert) {
+      String relativePath = PathUtil.getRelativePath(".", filename);
+      String basename = PathUtil.getFileNameWithoutExtension(relativePath);
       String tsCode = result.get(basename);
       if ("-".equals(opts.output)) {
         System.out.println("========================================");
-        System.out.println("File: " + basename + ".js");
+        System.out.println("File: " + relativePath);
         System.out.println("========================================");
         System.out.println(tsCode);
       } else {
-        File output = new File(new File(opts.output), basename + ".ts");
+        String tsFilename = PathUtil.removeExtension(relativePath) + ".ts";
+        File output = new File(new File(opts.output), tsFilename);
         if (!output.getParentFile().exists() &&
             !output.getParentFile().mkdirs()) {
           throw new IllegalArgumentException("Unable to make directories " + output.getParent());
@@ -137,7 +140,7 @@ public class TypeScriptGenerator {
 
     // We only use the source root as the extern root is ignored for codegen
     for (Node file : srcRoot.children()) {
-      String basename = getFileNameWithoutExtension(file.getSourceFileName());
+      String basename = PathUtil.getFileNameWithoutExtension(file.getSourceFileName());
       CodeGeneratorFactory factory = new CodeGeneratorFactory() {
         @Override
         public CodeGenerator getCodeGenerator(Format outputFormat, CodeConsumer cc) {
@@ -181,21 +184,5 @@ public class TypeScriptGenerator {
       files.add(SourceFile.fromFile(fileName, UTF_8));
     }
     return files;
-  }
-
-  /**
-   * Returns the file name without its file extension or path. The result does not include the
-   * '{@code .}'.
-   */
-  static String getFileNameWithoutExtension(String filepath) {
-    return removeExtension(new File(filepath).getName());
-  }
-
-  /**
-   * Returns the file name without its file extension.
-   */
-  static String removeExtension(String filename) {
-    int dotIndex = filename.lastIndexOf(".");
-    return (dotIndex == -1) ? filename : filename.substring(0, dotIndex);
   }
 }

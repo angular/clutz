@@ -24,6 +24,9 @@ public class Options {
   @Option(name = "-o", usage = "output to this directory", metaVar = "OUTPUT")
   String output = "-";
 
+  @Option(name = "--root", usage = "root directory of imports", metaVar = "ROOT")
+  String root = null;
+
   @Option(name = "--debug", usage = "run in debug mode (prints compiler warnings)")
   boolean debug = false;
 

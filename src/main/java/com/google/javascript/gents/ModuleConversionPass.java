@@ -152,7 +152,7 @@ public final class ModuleConversionPass implements CompilerPass {
         Map<String, String> rewriteMap = localRewrite.rowMap().get(n.getSourceFileName());
         String importedNamespace = findLongestNamespacePrefix(n, rewriteMap.keySet());
         if (importedNamespace != null) {
-          replacePrefixInPath(n, importedNamespace, rewriteMap.get(importedNamespace));
+          replacePrefixInPropertyPath(n, importedNamespace, rewriteMap.get(importedNamespace));
           return false;
         }
       }
@@ -180,9 +180,6 @@ public final class ModuleConversionPass implements CompilerPass {
     String localName = lastStepOfPropertyPath(fullLocalName);
 
     FileModule module = namespaceToModule.get(requiredNamespace);
-    String referencedFile = module.file;
-    // TODO(renez): handle absolute paths if referenced module is not 'nearby' source module.
-    referencedFile = getRelativePath(n.getSourceFileName(), referencedFile);
     String moduleSuffix = lastStepOfPropertyPath(requiredNamespace);
     // Avoid name collisions
     String backupName = moduleSuffix.equals(localName) ? moduleSuffix + "Exports" : moduleSuffix;
@@ -199,6 +196,8 @@ public final class ModuleConversionPass implements CompilerPass {
       localRewrite.put(n.getSourceFileName(), fullLocalName, localName);
       return;
     }
+
+    String referencedFile = PathUtil.getImportPath(n.getSourceFileName(), module.file);
 
     boolean imported = false;
     if (module.importedSymbols.containsKey(requiredNamespace)) {
@@ -280,20 +279,10 @@ public final class ModuleConversionPass implements CompilerPass {
       exprNode.getParent().replaceChild(exprNode, new Node(Token.EXPORT, exportNode));
     } else {
       // Assume prefix has already been exported and just trim the prefix
-      replacePrefixInPath(lhs, exportedNamespace, exportedSymbol);
+      replacePrefixInPropertyPath(lhs, exportedNamespace, exportedSymbol);
     }
 
     compiler.reportCodeChange();
-  }
-
-  /** Returns the relative path between the source file and the referenced module file. */
-  String getRelativePath(String sourceFile, String referencedFile) {
-    Path from = Paths.get(sourceFile, "..").normalize();
-    Path to = Paths.get(TypeScriptGenerator.removeExtension(referencedFile)).normalize();
-    Path importPath = from.relativize(to).normalize();
-    return importPath.toString().startsWith(".") ?
-        importPath.toString() :
-        "./" + importPath.toString();
   }
 
   /**
@@ -320,12 +309,12 @@ public final class ModuleConversionPass implements CompilerPass {
    * In-place removes a prefix from a name node.
    * Does nothing if prefix does not exist.
    */
-  void replacePrefixInPath(Node name, String prefix, String newPrefix) {
+  void replacePrefixInPropertyPath(Node name, String prefix, String newPrefix) {
     if (prefix.equals(name.getQualifiedName())) {
       name.getParent().replaceChild(name, NodeUtil.newQName(compiler, newPrefix));
     } else {
       if (name.isGetProp()) {
-        replacePrefixInPath(name.getFirstChild(), prefix, newPrefix);
+        replacePrefixInPropertyPath(name.getFirstChild(), prefix, newPrefix);
       }
     }
   }

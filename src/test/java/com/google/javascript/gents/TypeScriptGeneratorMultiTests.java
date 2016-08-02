@@ -74,7 +74,7 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
           if (!filename.endsWith("_keep.js")) {
             sourceNames.add(sourceFile.getName());
 
-            String basename = TypeScriptGenerator.getFileNameWithoutExtension(sourceFile.getName());
+            String basename = PathUtil.getFileNameWithoutExtension(sourceFile.getName());
             File goldenFile = DeclarationGeneratorTests.getGoldenFile(sourceFile, ".ts");
             String goldenText = getFileText(goldenFile);
             goldenFiles.put(basename, goldenText);

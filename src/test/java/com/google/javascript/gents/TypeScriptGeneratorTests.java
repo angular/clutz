@@ -90,7 +90,7 @@ public class TypeScriptGeneratorTests {
     public void run(TestResult result) {
       result.startTest(this);
       try {
-        String basename = TypeScriptGenerator.getFileNameWithoutExtension(sourceFile.getName());
+        String basename = PathUtil.getFileNameWithoutExtension(sourceFile.getName());
         String sourceText = getFileText(sourceFile);
         String goldenText = getFileText(goldenFile);
 
@@ -158,7 +158,7 @@ public class TypeScriptGeneratorTests {
   @Test
   public void testFileNameTrimming() {
     String filepath = "/this/is/a/path/to/../foo.bar";
-    String filename = TypeScriptGenerator.getFileNameWithoutExtension(filepath);
+    String filename = PathUtil.getFileNameWithoutExtension(filepath);
     assertThat(filename).isEqualTo("foo");
   }
 }
