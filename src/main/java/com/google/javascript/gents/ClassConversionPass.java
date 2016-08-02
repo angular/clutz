@@ -204,10 +204,10 @@ public final class ClassConversionPass implements CompilerPass {
       // Handle static methods
       if ("statics".equals(child.getString())) {
         for (Node child2 : child.getFirstChild().children()) {
-          classMembers.addChildToBack(objectLiteralMethodToMethodDef(child2, true));
+          convertOjbectLiteral(classMembers, child2, true);
         }
       } else { // prototype methods
-        classMembers.addChildToBack(objectLiteralMethodToMethodDef(child, false));
+        convertOjbectLiteral(classMembers, child, false);
       }
     }
     Node classNode = new Node(Token.CLASS, IR.empty(), superClass, classMembers);
@@ -217,18 +217,30 @@ public final class ClassConversionPass implements CompilerPass {
   }
 
   /**
-   * Converts functions declared in object literals into a member function definition.
+   * Converts functions and variables declared in object literals into member method and
+   * field definitions
    */
-  Node objectLiteralMethodToMethodDef(Node objectLiteralMethod, boolean isStatic) {
-    Preconditions.checkState(objectLiteralMethod.isStringKey());
-    Preconditions.checkState(objectLiteralMethod.getFirstChild().isFunction());
+  void convertOjbectLiteral(Node classMembers, Node objectLiteralMember, boolean isStatic) {
+    Preconditions.checkState(objectLiteralMember.isStringKey());
 
-    Node fn = objectLiteralMethod.getFirstChild();
-    fn.detachFromParent();
-    Node methodDef = IR.memberFunctionDef(objectLiteralMethod.getString(), fn);
-    methodDef.setJSDocInfo(objectLiteralMethod.getJSDocInfo());
-    methodDef.setStaticMember(isStatic);
-    return methodDef;
+    Node value = objectLiteralMember.getFirstChild();
+    value.detachFromParent();
+
+    Node n;
+    if (value.isFunction()) {
+      n = IR.memberFunctionDef(objectLiteralMember.getString(), value);
+      n.setJSDocInfo(objectLiteralMember.getJSDocInfo());
+      n.setStaticMember(isStatic);
+      // Methods added to back
+      classMembers.addChildToBack(n);
+    } else {
+      n = Node.newString(Token.MEMBER_VARIABLE_DEF, objectLiteralMember.getString());
+      n.addChildToBack(value);
+      n.setJSDocInfo(objectLiteralMember.getJSDocInfo());
+      n.setStaticMember(isStatic);
+      // Fields added to front
+      classMembers.addChildToFront(n);
+    }
   }
 
   /**
@@ -347,21 +359,41 @@ public final class ClassConversionPass implements CompilerPass {
 
     // First validate that we are inside a constructor call that extends another class
     Node classNode = NodeUtil.getEnclosingClass(callNode);
-    if (classNode == null) {
+    if (callName == null || classNode == null) {
       return;
     }
 
     String className = NodeUtil.getName(classNode);
-    // Super calls for root classes are not converted
-    if (classNode.getSecondChild().isEmpty()) {
-      compiler.report(JSError.make(
-          callNode,
-          GentsErrorManager.GENTS_CLASS_PASS_ERROR,
-          String.format("Cannot call superclass in root class %s", className)));
+
+    // Translate super constructor or super method calls as follows:
+    // A.base(this, 'constructor', args) -> super(args);
+    // A.base(this, 'foo', args) -> super.foo(args);
+    if (callName.equals(className + ".base") &&
+        callNode.getSecondChild().isThis()) {
+      // Super calls for root classes are not converted
+      if (classNode.getSecondChild().isEmpty()) {
+        compiler.report(JSError.make(
+            callNode,
+            GentsErrorManager.GENTS_CLASS_PASS_ERROR,
+            String.format("Cannot call superclass in root class %s", className)));
+        return;
+      }
+      String methodName = callNode.getChildAtIndex(2).getString();
+
+      if ("constructor".equals(methodName)) {
+        callNode.replaceChild(callNode.getFirstChild(), IR.superNode());
+      } else {
+        callNode.replaceChild(callNode.getFirstChild(),
+            NodeUtil.newQName(compiler, "super." + methodName));
+      }
+
+      callNode.removeChild(callNode.getSecondChild());
+      callNode.removeChild(callNode.getSecondChild());
+      compiler.reportCodeChange();
       return;
     }
-    String superClassName = classNode.getSecondChild().getQualifiedName();
 
+    String superClassName = classNode.getSecondChild().getQualifiedName();
     // B.call(this, args) -> super(args);
     if (callName.equals(superClassName + ".call") &&
         callNode.getSecondChild().isThis()) {
@@ -389,25 +421,6 @@ public final class ClassConversionPass implements CompilerPass {
         compiler.reportCodeChange();
         return;
       }
-    }
-
-    // A.base(this, 'constructor', args) -> super(args);
-    // A.base(this, 'foo', args) -> super.foo(args);
-    if (callName.equals(className + ".base") &&
-        callNode.getSecondChild().isThis()) {
-      String methodName = callNode.getChildAtIndex(2).getString();
-
-      if ("constructor".equals(methodName)) {
-        callNode.replaceChild(callNode.getFirstChild(), IR.superNode());
-      } else {
-        callNode.replaceChild(callNode.getFirstChild(),
-            NodeUtil.newQName(compiler, "super." + methodName));
-      }
-
-      callNode.removeChild(callNode.getSecondChild());
-      callNode.removeChild(callNode.getSecondChild());
-      compiler.reportCodeChange();
-      return;
     }
   }
 

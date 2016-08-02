@@ -14,6 +14,7 @@ goog.A.B = {};
 goog.A.B.baz = function(n: number): void {
 };
 goog.B = class extends goog.A {
+  static num: number = 4;
   constructor(a) {
     super(a);
   }
@@ -24,3 +25,12 @@ goog.B = class extends goog.A {
     return true;
   }
 };
+class A {
+  constructor() {
+    goog.A.foo(4);
+  }
+  static anon() {
+    (function() {
+    })();
+  }
+}

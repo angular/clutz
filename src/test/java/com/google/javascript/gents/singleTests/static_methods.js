@@ -47,6 +47,22 @@ goog.B = goog.defineClass(goog.A, {
     /**
      * @returns {boolean}
      */
-    bar: function() { return true; }
+    bar: function() { return true; },
+    /**
+     * @type {number}
+     */
+    num: 4,
   }
 });
+
+/**
+ * @constructor
+ */
+function A() {
+  goog.A.foo(4);
+}
+
+A.anon = function() {
+  // Anonymous function call
+  (function() {})();
+}
