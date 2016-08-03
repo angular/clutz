@@ -1,7 +1,9 @@
 var num = 4;
-export const B = function(): number {
+var B = function(): number {
   return num;
 };
+export{B};
+export{num};
 export const foo = class {
   static z: number;
   constructor() {

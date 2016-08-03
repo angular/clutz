@@ -2,7 +2,10 @@ goog.module("both.A.B");
 
 var num = 4;
 /** @return {number} */
-exports = function() { return num; };
+var B = function() { return num; };
+
+exports = B;
+exports.num = num;
 /** @constructor */
 exports.foo = function() { };
 /** @type {number} */

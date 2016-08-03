@@ -274,7 +274,12 @@ public final class ModuleConversionPass implements CompilerPass {
     if (exportedNamespace.equals(lhs.getQualifiedName())) {
       // Generate new export statement
       rhs.detachFromParent();
-      Node exportNode = IR.constNode(IR.name(exportedSymbol), rhs);
+      Node exportNode;
+      if (rhs.isName() && exportedSymbol.equals(rhs.getString())) {
+        exportNode = new Node(Token.EXPORT_SPECS, new Node(Token.EXPORT_SPEC, rhs));
+      } else {
+        exportNode = IR.constNode(IR.name(exportedSymbol), rhs);
+      }
       exportNode.setJSDocInfo(jsDoc);
       exprNode.getParent().replaceChild(exprNode, new Node(Token.EXPORT, exportNode));
     } else {
