@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DiagnosticGroups;
+import com.google.javascript.jscomp.DependencyOptions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -61,6 +62,10 @@ public class Options {
   public CompilerOptions getCompilerOptions() {
     final CompilerOptions options = new CompilerOptions();
     options.setClosurePass(true);
+
+    DependencyOptions deps = new DependencyOptions();
+    deps.setDependencySorting(true);
+    options.setDependencyOptions(deps);
 
     if (!this.entryPoints.isEmpty()) {
       options.setManageClosureDependencies(this.entryPoints);
