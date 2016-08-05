@@ -26,6 +26,7 @@ import com.google.javascript.jscomp.NodeTraversal.AbstractPostOrderCallback;
 import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.rhino.IR;
 import com.google.javascript.rhino.JSDocInfo;
+import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.JSTypeExpression;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Node.TypeDeclarationNode;
@@ -42,7 +43,7 @@ import javax.annotation.Nullable;
  *
  * This compiler pass is based off of the {@code JsdocToEs6TypedConverter} compiler pass.
  */
-public final class TypeAnnotationPass extends AbstractPostOrderCallback implements CompilerPass {
+public final class TypeAnnotationPass implements CompilerPass {
 
   private final AbstractCompiler compiler;
 
@@ -52,66 +53,88 @@ public final class TypeAnnotationPass extends AbstractPostOrderCallback implemen
 
   @Override
   public void process(Node externs, Node root) {
-    NodeTraversal.traverseEs6(compiler, root, this);
+    NodeTraversal.traverseEs6(compiler, root, new TypeAnnotationConverter());
+    NodeTraversal.traverseEs6(compiler, root, new AccessModifierConverter());
   }
 
-  @Override
-  public void visit(NodeTraversal t, Node n, Node parent) {
-    JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
-    switch (n.getType()) {
-      // Fields default to any type
-      case MEMBER_VARIABLE_DEF:
-        if (bestJSDocInfo != null && bestJSDocInfo.getType() != null) {
-          setTypeExpression(n, bestJSDocInfo.getType(), false);
-        } else {
-          n.setDeclaredTypeExpression(anyType());
-        }
-        break;
-      // Functions are annotated with their return type
-      case FUNCTION:
-        if (bestJSDocInfo != null) {
-          setTypeExpression(n, bestJSDocInfo.getReturnType(), true);
-        }
-        break;
-      // Names and properties are annotated with their types
-      case NAME:
-      case GETPROP:
-        if (parent == null) {
-          break;
-        }
-        if (parent.isVar() || parent.isLet() || parent.isConst()) { // Variable declaration
-          // TODO(renez): convert all vars into lets
-          if (bestJSDocInfo != null) {
+  /** Annotates variables and functions with their corresponding TypeScript type. */
+  private class TypeAnnotationConverter extends AbstractPostOrderCallback {
+    @Override
+    public void visit(NodeTraversal t, Node n, Node parent) {
+      JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
+      switch (n.getType()) {
+        // Fields default to any type
+        case MEMBER_VARIABLE_DEF:
+          if (bestJSDocInfo != null && bestJSDocInfo.getType() != null) {
             setTypeExpression(n, bestJSDocInfo.getType(), false);
+          } else {
+            n.setDeclaredTypeExpression(anyType());
           }
-        } else if (parent.isParamList()) { // Function parameters
-          JSDocInfo parentDocInfo = NodeUtil.getBestJSDocInfo(parent.getParent());
-          if (parentDocInfo == null) {
+          break;
+        // Functions are annotated with their return type
+        case FUNCTION:
+          if (bestJSDocInfo != null) {
+            setTypeExpression(n, bestJSDocInfo.getReturnType(), true);
+          }
+          break;
+        // Names and properties are annotated with their types
+        case NAME:
+        case GETPROP:
+          if (parent == null) {
             break;
           }
-          JSTypeExpression parameterType = parentDocInfo.getParameterType(n.getString());
-          if (parameterType != null) {
-            Node attachTypeExpr = n;
-            // Modify the primary AST to represent a function parameter as a
-            // REST node, if the type indicates it is a rest parameter.
-            if (parameterType.getRoot().getType() == Token.ELLIPSIS) {
-              attachTypeExpr = IR.rest(n.getString());
-              n.getParent().replaceChild(n, attachTypeExpr);
-              compiler.reportCodeChange();
+          if (parent.isVar() || parent.isLet() || parent.isConst()) { // Variable declaration
+            // TODO(renez): convert all vars into lets
+            if (bestJSDocInfo != null) {
+              setTypeExpression(n, bestJSDocInfo.getType(), false);
             }
-            // Modify the AST to represent an optional parameter
-            if (parameterType.getRoot().getType() == Token.EQUALS) {
-              attachTypeExpr = IR.name(n.getString());
-              attachTypeExpr.putBooleanProp(Node.OPT_ES6_TYPED, true);
-              n.getParent().replaceChild(n, attachTypeExpr);
-              compiler.reportCodeChange();
+          } else if (parent.isParamList()) { // Function parameters
+            JSDocInfo parentDocInfo = NodeUtil.getBestJSDocInfo(parent.getParent());
+            if (parentDocInfo == null) {
+              break;
             }
-            setTypeExpression(attachTypeExpr, parameterType, false);
+            JSTypeExpression parameterType = parentDocInfo.getParameterType(n.getString());
+            if (parameterType != null) {
+              Node attachTypeExpr = n;
+              // Modify the primary AST to represent a function parameter as a
+              // REST node, if the type indicates it is a rest parameter.
+              if (parameterType.getRoot().getType() == Token.ELLIPSIS) {
+                attachTypeExpr = IR.rest(n.getString());
+                n.getParent().replaceChild(n, attachTypeExpr);
+                compiler.reportCodeChange();
+              }
+              // Modify the AST to represent an optional parameter
+              if (parameterType.getRoot().getType() == Token.EQUALS) {
+                attachTypeExpr = IR.name(n.getString());
+                attachTypeExpr.putBooleanProp(Node.OPT_ES6_TYPED, true);
+                n.getParent().replaceChild(n, attachTypeExpr);
+                compiler.reportCodeChange();
+              }
+              setTypeExpression(attachTypeExpr, parameterType, false);
+            }
           }
-        }
-        break;
-      default:
-        break;
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  /** Annotates variables with their corresponding modifiers. (ie. private, protected) */
+  private class AccessModifierConverter extends AbstractPostOrderCallback {
+    @Override
+    public void visit(NodeTraversal t, Node n, Node parent) {
+      JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
+      if (bestJSDocInfo == null) {
+        return;
+      }
+
+      // Add visibility for private and protected.
+      if (Visibility.PRIVATE.equals(bestJSDocInfo.getVisibility())) {
+        n.putProp(Node.ACCESS_MODIFIER, Visibility.PRIVATE);
+      } else if (Visibility.PROTECTED.equals(bestJSDocInfo.getVisibility())) {
+        n.putProp(Node.ACCESS_MODIFIER, Visibility.PROTECTED);
+      }
     }
   }
 
