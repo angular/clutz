@@ -135,6 +135,11 @@ public final class TypeAnnotationPass implements CompilerPass {
       } else if (Visibility.PROTECTED.equals(bestJSDocInfo.getVisibility())) {
         n.putProp(Node.ACCESS_MODIFIER, Visibility.PROTECTED);
       }
+
+      // Change variable declarations to constants
+      if (bestJSDocInfo.isConstant() && (n.isVar() || n.isLet())) {
+        n.setType(Token.CONST);
+      }
     }
   }
 
