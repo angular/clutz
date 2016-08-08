@@ -161,4 +161,14 @@ public class TypeScriptGeneratorTests {
     String filename = PathUtil.getFileNameWithoutExtension(filepath);
     assertThat(filename).isEqualTo("foo");
   }
+
+  @Test
+  public void testNoExterns() throws Exception {
+    Map<String, String> result = runGents(
+        SourceFile.fromCode("foo", "/** @type {number} */ var x = 4;"),
+        SourceFile.fromCode("bar", "/** @externs */ /** @const {string} */ var y = \"hello\";")
+    );
+    assertThat(result).hasSize(1);
+    assertThat(result).containsEntry("foo", "var x: number = 4;\n");
+  }
 }

@@ -83,7 +83,7 @@ public class TypeScriptGenerator {
     PathUtil.setRoot(opts.root);
     Map<String, String> result = generateTypeScript(filesToConvert, srcFiles, externFiles);
 
-    for (String filename : filesToConvert) {
+    for (String filename : result.keySet()) {
       String relativePath = PathUtil.getRelativePath(".", filename);
       String basename = PathUtil.getFileNameWithoutExtension(relativePath);
       String tsCode = result.get(basename);
