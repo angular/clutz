@@ -89,12 +89,14 @@ public class TypeScriptGeneratorTests {
     @Override
     public void run(TestResult result) {
       result.startTest(this);
+
+      TypeScriptGenerator gents = new TypeScriptGenerator(new Options());
+
       try {
-        String basename = PathUtil.getFileNameWithoutExtension(sourceFile.getName());
+        String basename = gents.pathUtil.getFileNameWithoutExtension(sourceFile.getName());
         String sourceText = getFileText(sourceFile);
         String goldenText = getFileText(goldenFile);
 
-        TypeScriptGenerator gents = new TypeScriptGenerator(new Options());
         Map<String, String> transpiledSource = gents.generateTypeScript(
             Collections.singleton(sourceFile.getName()),
             Collections.singletonList(SourceFile.fromCode(sourceFile.getName(), sourceText)),
@@ -158,7 +160,7 @@ public class TypeScriptGeneratorTests {
   @Test
   public void testFileNameTrimming() {
     String filepath = "/this/is/a/path/to/../foo.bar";
-    String filename = PathUtil.getFileNameWithoutExtension(filepath);
+    String filename = gents.pathUtil.getFileNameWithoutExtension(filepath);
     assertThat(filename).isEqualTo("foo");
   }
 

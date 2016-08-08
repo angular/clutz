@@ -58,6 +58,9 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
     @Override
     public void run(TestResult result) {
       result.startTest(this);
+
+      TypeScriptGenerator gents = new TypeScriptGenerator(new Options());
+
       try {
         List<File> testFiles = getTestInputFiles(DeclarationGeneratorTests.JS,
             multiTestPath, dirName);
@@ -74,14 +77,12 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
           if (!filename.endsWith("_keep.js")) {
             sourceNames.add(sourceFile.getName());
 
-            String basename = PathUtil.getFileNameWithoutExtension(sourceFile.getName());
+            String basename = gents.pathUtil.getFileNameWithoutExtension(sourceFile.getName());
             File goldenFile = DeclarationGeneratorTests.getGoldenFile(sourceFile, ".ts");
             String goldenText = getFileText(goldenFile);
             goldenFiles.put(basename, goldenText);
           }
         }
-
-        TypeScriptGenerator gents = new TypeScriptGenerator(new Options());
 
         Map<String, String> transpiledSource = gents.generateTypeScript(
             sourceNames,

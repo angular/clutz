@@ -19,6 +19,8 @@ import java.util.Set;
 public final class CollectModuleMetadata extends AbstractTopLevelCallback implements CompilerPass {
 
   private final AbstractCompiler compiler;
+  private final NameUtil nameUtil;
+
   final Set<String> filesToConvert;
   final Map<String, FileModule> fileToModule = new HashMap<>();
   final Map<String, FileModule> namespaceToModule = new HashMap<>();
@@ -31,8 +33,21 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     return namespaceToModule;
   }
 
-  public CollectModuleMetadata(AbstractCompiler compiler, Set<String> filesToConvert) {
+  /** Returns a map from all symbols in the compilation unit to their respective modules */
+  Map<String, FileModule> getSymbolMap() {
+    Map<String, FileModule> out = new HashMap<>();
+    for (FileModule module : fileToModule.values()) {
+      for (String symbol : module.importedNamespacesToSymbols.keySet()) {
+        out.put(symbol, module);
+      }
+    }
+    return out;
+  }
+
+  public CollectModuleMetadata(AbstractCompiler compiler, NameUtil nameUtil,
+      Set<String> filesToConvert) {
     this.compiler = compiler;
+    this.nameUtil = nameUtil;
     this.filesToConvert = filesToConvert;
   }
 
@@ -93,50 +108,70 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
       return;
     }
     FileModule module = new FileModule(file, true);
-    module.providesObjectChildren.put(namespace, new HashSet<String>());
-    fileToModule.put(file, module);
-    namespaceToModule.put(namespace, module);
+    module.registerNamespaceToGlobalScope(namespace);
   }
 
   /** Registers a goog.provide namespace for future lookup. */
   void registerProvidesModule(Node n, String file, String namespace) {
+    FileModule module;
     if (fileToModule.containsKey(file)) {
       if (fileToModule.get(file).isGoogModule) {
         compiler.report(JSError.make(n, GentsErrorManager.GENTS_MODULE_PASS_ERROR,
             String.format("goog.provide cannot be used in the same file as goog.module.")));
         return;
       }
+      module = fileToModule.get(file);
     } else {
-      fileToModule.put(file, new FileModule(file, false));
+      module = new FileModule(file, false);
     }
-    FileModule module = fileToModule.get(file);
-    module.providesObjectChildren.put(namespace, new HashSet<String>());
-    namespaceToModule.put(namespace, module);
+    module.registerNamespaceToGlobalScope(namespace);
   }
 
-  /** Returns the last identifier of a qualified name string. */
-  String lastStepOfPropertyPath(String name) {
-    return lastStepOfPropertyPath(NodeUtil.newQName(compiler, name));
-  }
-
-  /** Returns the last identifier of a name node. */
-  String lastStepOfPropertyPath(Node n) {
-    return n.isGetProp() ? n.getLastChild().getString() : n.getQualifiedName();
-  }
-
-  /**
-   * Encapsulates the module provided by each file.
-   */
+  /** Encapsulates the module provided by each file. */
   class FileModule {
     final String file;
-    private final boolean isGoogModule;
+
+    /** Module is not part of the conversion process and only exists for its exported symbols */
     private final boolean isJsLibrary;
-    // Map from provided namespace to the set of subproperties that are exported
+    /** Declared with goog.module rather than goog.provide */
+    private final boolean isGoogModule;
+
+    /**
+     * Map from each provided namespace to all exported subproperties. Note that only namespaces
+     * declared with 'goog.module' or 'goog.provide' are considered provided. Their subproperties
+     * are considered exported from the file, but not directly provided. This is to determine what
+     * namespaces other files are allowed to reference with 'goog.require'.
+     *
+     * For example,
+     * goog.module('A.B');
+     * exports = ...;
+     * exports.C = ...;
+     * exports.C.D = ...;
+     * Would result in providesObjectChildren['A.B'] = {'C'}
+     */
     final Map<String, Set<String>> providesObjectChildren = new HashMap<>();
-    // Map from exported exported to the exported identifier
-    final Map<String, String> exportedSymbols = new HashMap<>();
-    // Map from the imported namespace to the imported identifier
-    final Map<String, String> importedSymbols = new HashMap<>();
+    /**
+     * Map from the fully qualified name being exported to the exported symbol. For example,
+     * goog.module('A.B');
+     * exports = ...;
+     * exports.C = ...;
+     * exports.C.D = ...;
+     * Would result in:
+     * exportedNamespacesToSymbols['exports'] = 'B'
+     * exportedNamespacesToSymbols['exports.C'] = 'C'
+     */
+    final Map<String, String> exportedNamespacesToSymbols = new HashMap<>();
+    /**
+     * Map from the fully qualified name that would be imported to the exported symbol. For example,
+     * goog.module('A.B');
+     * exports = ...;
+     * exports.C = ...;
+     * exports.C.D = ...;
+     * Would result in:
+     * importedNamespacesToSymbols['A.B'] = 'B'
+     * importedNamespacesToSymbols['A.B.C'] = 'C'
+     */
+    final Map<String, String> importedNamespacesToSymbols = new HashMap<>();
 
     FileModule(String file, boolean isGoogModule) {
       this.file = file;
@@ -151,7 +186,20 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
 
     /** Returns if the file actually exports any symbols. */
     boolean hasExports() {
-      return !exportedSymbols.isEmpty();
+      return !exportedNamespacesToSymbols.isEmpty();
+    }
+
+    /**
+     * Register namespace name to global scope so that other files can call 'goog.require'
+     * on the qualified name.
+     */
+    void registerNamespaceToGlobalScope(String namespace) {
+      providesObjectChildren.put(namespace, new HashSet<String>());
+      if (isJsLibrary) {
+        maybeAddExport(NodeUtil.newQName(compiler, namespace));
+      }
+      fileToModule.put(file, this);
+      namespaceToModule.put(namespace, this);
     }
 
     /**
@@ -169,7 +217,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     private void maybeAddGoogExport(Node exportsName) {
       String fullname = providesObjectChildren.keySet().iterator().next();
       if ("exports".equals(exportsName.getQualifiedName())) {
-        addExport(exportsName.getQualifiedName(), fullname, lastStepOfPropertyPath(fullname));
+        addExport(exportsName.getQualifiedName(), fullname, nameUtil.lastStepOfName(fullname));
       } else if (exportsName.isGetProp() &&
           "exports".equals(exportsName.getFirstChild().getQualifiedName())) {
         String identifier = exportsName.getLastChild().getString();
@@ -181,13 +229,13 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
       String fullname = exportsName.getQualifiedName();
       if (providesObjectChildren.containsKey(fullname) || (exportsName.isGetProp() &&
           providesObjectChildren.containsKey(exportsName.getFirstChild().getQualifiedName()))) {
-        addExport(fullname, fullname, lastStepOfPropertyPath(exportsName));
+        addExport(fullname, fullname, nameUtil.lastStepOfName(exportsName));
       }
     }
 
     private void addExport(String exportName, String importName, String identifier) {
-      exportedSymbols.put(exportName, identifier);
-      importedSymbols.put(importName, identifier);
+      exportedNamespacesToSymbols.put(exportName, identifier);
+      importedNamespacesToSymbols.put(importName, identifier);
 
       Node namespace = NodeUtil.newQName(compiler, importName);
       if (namespace.isGetProp()) {

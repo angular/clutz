@@ -62,6 +62,9 @@ public class TypeScriptGenerator {
   private final Compiler compiler;
   private final GentsErrorManager errorManager;
 
+  final PathUtil pathUtil;
+  final NameUtil nameUtil;
+
   TypeScriptGenerator(Options opts) {
     this.opts = opts;
     this.compiler = new Compiler();
@@ -69,6 +72,9 @@ public class TypeScriptGenerator {
     this.errorManager = new GentsErrorManager(System.err,
         ErrorFormat.MULTILINE.toFormatter(compiler, true), opts.debug);
     compiler.setErrorManager(errorManager);
+
+    this.pathUtil = new PathUtil(opts.root);
+    this.nameUtil = new NameUtil(compiler);
   }
 
   boolean hasErrors() {
@@ -80,12 +86,11 @@ public class TypeScriptGenerator {
     List<SourceFile> externFiles = getFiles(opts.externs);
     Set<String> filesToConvert = Sets.newHashSet(opts.filesToConvert);
 
-    PathUtil.setRoot(opts.root);
     Map<String, String> result = generateTypeScript(filesToConvert, srcFiles, externFiles);
 
-    for (String filename : result.keySet()) {
-      String relativePath = PathUtil.getRelativePath(".", filename);
-      String basename = PathUtil.getFileNameWithoutExtension(relativePath);
+    for (String filename : filesToConvert) {
+      String relativePath = pathUtil.getRelativePath(".", filename);
+      String basename = pathUtil.getFileNameWithoutExtension(relativePath);
       String tsCode = result.get(basename);
       if ("-".equals(opts.output)) {
         System.out.println("========================================");
@@ -93,7 +98,7 @@ public class TypeScriptGenerator {
         System.out.println("========================================");
         System.out.println(tsCode);
       } else {
-        String tsFilename = PathUtil.removeExtension(relativePath) + ".ts";
+        String tsFilename = pathUtil.removeExtension(relativePath) + ".ts";
         File output = new File(new File(opts.output), tsFilename);
         if (!output.getParentFile().exists() &&
             !output.getParentFile().mkdirs()) {
@@ -122,25 +127,27 @@ public class TypeScriptGenerator {
     Node externRoot = compiler.getRoot().getFirstChild();
     Node srcRoot = compiler.getRoot().getLastChild();
 
-    CollectModuleMetadata modulePrePass = new CollectModuleMetadata(compiler, filesToConvert);
+    CollectModuleMetadata modulePrePass = new CollectModuleMetadata(compiler, nameUtil,
+        filesToConvert);
     modulePrePass.process(externRoot, srcRoot);
 
     // Strips all file nodes that we are not compiling.
     stripNonCompiledNodes(srcRoot, filesToConvert);
 
-    CompilerPass modulePass = new ModuleConversionPass(compiler,
+    ModuleConversionPass modulePass = new ModuleConversionPass(compiler, pathUtil, nameUtil,
         modulePrePass.getFileMap(), modulePrePass.getNamespaceMap());
     modulePass.process(externRoot, srcRoot);
 
     CompilerPass classPass = new ClassConversionPass(compiler);
     classPass.process(externRoot, srcRoot);
 
-    CompilerPass typingPass = new TypeAnnotationPass(compiler);
+    CompilerPass typingPass = new TypeAnnotationPass(compiler, pathUtil, nameUtil,
+        modulePrePass.getSymbolMap(), modulePass.getTypeRewrite());
     typingPass.process(externRoot, srcRoot);
 
     // We only use the source root as the extern root is ignored for codegen
     for (Node file : srcRoot.children()) {
-      String basename = PathUtil.getFileNameWithoutExtension(file.getSourceFileName());
+      String basename = pathUtil.getFileNameWithoutExtension(file.getSourceFileName());
       CodeGeneratorFactory factory = new CodeGeneratorFactory() {
         @Override
         public CodeGenerator getCodeGenerator(Format outputFormat, CodeConsumer cc) {

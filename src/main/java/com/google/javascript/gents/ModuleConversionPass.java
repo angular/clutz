@@ -15,12 +15,7 @@ import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Nullable;
 
 /**
  * Converts Closure-style modules into TypeScript (ES6) modules (not namespaces).
@@ -29,16 +24,27 @@ import javax.annotation.Nullable;
 public final class ModuleConversionPass implements CompilerPass {
 
   private final AbstractCompiler compiler;
+  private final PathUtil pathUtil;
+  private final NameUtil nameUtil;
+
   private final Map<String, FileModule> fileToModule;
   private final Map<String, FileModule> namespaceToModule;
 
   // Used for rewriting usages of imported symbols
   // filename, namespace -> local name
-  private final Table<String, String, String> localRewrite = HashBasedTable.create();
+  private final Table<String, String, String> valueRewrite = HashBasedTable.create();
+  private final Table<String, String, String> typeRewrite = HashBasedTable.create();
 
-  public ModuleConversionPass(AbstractCompiler compiler,
+  public Table<String, String, String> getTypeRewrite() {
+    return typeRewrite;
+  }
+
+  public ModuleConversionPass(AbstractCompiler compiler, PathUtil pathUtil, NameUtil nameUtil,
       Map<String, FileModule> fileToModule, Map<String, FileModule> namespaceToModule) {
     this.compiler = compiler;
+    this.pathUtil = pathUtil;
+    this.nameUtil = nameUtil;
+
     this.fileToModule = fileToModule;
     this.namespaceToModule = namespaceToModule;
   }
@@ -66,7 +72,12 @@ public final class ModuleConversionPass implements CompilerPass {
             // TODO(renez): Add comment to explain that this statement is used to change file
             // into a module.
             Node exportNode = new Node(Token.EXPORT, new Node(Token.EXPORT_SPECS));
-            n.addChildToFront(exportNode);
+
+            if (n.hasChildren() && n.getFirstChild().isModuleBody()) {
+              n.getFirstChild().addChildToFront(exportNode);
+            } else {
+              n.addChildToFront(exportNode);
+            }
           }
         }
       }
@@ -91,10 +102,10 @@ public final class ModuleConversionPass implements CompilerPass {
           }
           FileModule module = fileToModule.get(filename);
           Node lhs = child.getFirstChild();
-          Map<String, String> symbols = module.exportedSymbols;
+          Map<String, String> symbols = module.exportedNamespacesToSymbols;
 
           // We export the longest valid prefix
-          String exportedNamespace = findLongestNamespacePrefix(lhs, symbols.keySet());
+          String exportedNamespace = nameUtil.findLongestNamePrefix(lhs, symbols.keySet());
           if (exportedNamespace != null) {
             convertExportAssignment(child, exportedNamespace, symbols.get(exportedNamespace));
           }
@@ -145,14 +156,14 @@ public final class ModuleConversionPass implements CompilerPass {
     public boolean shouldTraverse(NodeTraversal t, Node n, Node parent) {
       // Rewrite all imported variable name usages
       if (n.isName() || n.isGetProp()) {
-        if (!localRewrite.containsRow(n.getSourceFileName())) {
+        if (!valueRewrite.containsRow(n.getSourceFileName())) {
           return true;
         }
 
-        Map<String, String> rewriteMap = localRewrite.rowMap().get(n.getSourceFileName());
-        String importedNamespace = findLongestNamespacePrefix(n, rewriteMap.keySet());
+        Map<String, String> rewriteMap = valueRewrite.rowMap().get(n.getSourceFileName());
+        String importedNamespace = nameUtil.findLongestNamePrefix(n, rewriteMap.keySet());
         if (importedNamespace != null) {
-          replacePrefixInPropertyPath(n, importedNamespace, rewriteMap.get(importedNamespace));
+          nameUtil.replacePrefixInName(n, importedNamespace, rewriteMap.get(importedNamespace));
           return false;
         }
       }
@@ -177,10 +188,10 @@ public final class ModuleConversionPass implements CompilerPass {
     }
 
     // Local name is the shortened namespace symbol
-    String localName = lastStepOfPropertyPath(fullLocalName);
+    String localName = nameUtil.lastStepOfName(fullLocalName);
 
     FileModule module = namespaceToModule.get(requiredNamespace);
-    String moduleSuffix = lastStepOfPropertyPath(requiredNamespace);
+    String moduleSuffix = nameUtil.lastStepOfName(requiredNamespace);
     // Avoid name collisions
     String backupName = moduleSuffix.equals(localName) ? moduleSuffix + "Exports" : moduleSuffix;
 
@@ -193,14 +204,14 @@ public final class ModuleConversionPass implements CompilerPass {
       n.getParent().replaceChild(n, importNode);
       compiler.reportCodeChange();
 
-      localRewrite.put(n.getSourceFileName(), fullLocalName, localName);
+      registerLocalSymbol(n.getSourceFileName(), fullLocalName, requiredNamespace, localName);
       return;
     }
 
-    String referencedFile = PathUtil.getImportPath(n.getSourceFileName(), module.file);
+    String referencedFile = pathUtil.getImportPath(n.getSourceFileName(), module.file);
 
     boolean imported = false;
-    if (module.importedSymbols.containsKey(requiredNamespace)) {
+    if (module.importedNamespacesToSymbols.containsKey(requiredNamespace)) {
       // import {value as localName} from "./file"
       Node importSpec = new Node(Token.IMPORT_SPEC, IR.name(moduleSuffix));
       // import {a as b} only when a =/= b
@@ -215,7 +226,7 @@ public final class ModuleConversionPass implements CompilerPass {
       n.getParent().addChildBefore(importNode, n);
       imported = true;
 
-      localRewrite.put(n.getSourceFileName(), fullLocalName, localName);
+      registerLocalSymbol(n.getSourceFileName(), fullLocalName, requiredNamespace, localName);
       // Switch to back up name if necessary
       localName = backupName;
     }
@@ -230,9 +241,10 @@ public final class ModuleConversionPass implements CompilerPass {
       imported = true;
 
       for (String child : module.providesObjectChildren.get(requiredNamespace)) {
-        if (!localRewrite.contains(n.getSourceFileName(), child)) {
-          localRewrite.put(n.getSourceFileName(),
-              fullLocalName + '.' + child, localName + '.' + child);
+        if (!valueRewrite.contains(n.getSourceFileName(), child)) {
+          String filename = n.getSourceFileName();
+          registerLocalSymbol(filename, fullLocalName + '.' + child,
+              requiredNamespace + '.' + child, localName + '.'+ child);
         }
       }
     }
@@ -284,43 +296,19 @@ public final class ModuleConversionPass implements CompilerPass {
       exprNode.getParent().replaceChild(exprNode, new Node(Token.EXPORT, exportNode));
     } else {
       // Assume prefix has already been exported and just trim the prefix
-      replacePrefixInPropertyPath(lhs, exportedNamespace, exportedSymbol);
+      nameUtil.replacePrefixInName(lhs, exportedNamespace, exportedSymbol);
     }
 
     compiler.reportCodeChange();
   }
 
   /**
-   * Gets the longest namespace that is a prefix of the name node.
-   * Returns null if no namespaces are valid prefixes.
+   * Saves the local name for imported symbols to be used for code rewriting later.
    */
-  @Nullable
-  String findLongestNamespacePrefix(Node name, Set<String> namespaces) {
-    if (namespaces.contains(name.getQualifiedName())) {
-      return name.getQualifiedName();
-    } else if (name.isGetProp()) {
-      return findLongestNamespacePrefix(name.getFirstChild(), namespaces);
-    }
-    return null;
-  }
-
-  /** Returns the last identifier of a qualified name string. */
-  String lastStepOfPropertyPath(String name) {
-    Node n = NodeUtil.newQName(compiler, name);
-    return n.isGetProp() ? n.getLastChild().getString() : n.getQualifiedName();
-  }
-
-  /**
-   * In-place removes a prefix from a name node.
-   * Does nothing if prefix does not exist.
-   */
-  void replacePrefixInPropertyPath(Node name, String prefix, String newPrefix) {
-    if (prefix.equals(name.getQualifiedName())) {
-      name.getParent().replaceChild(name, NodeUtil.newQName(compiler, newPrefix));
-    } else {
-      if (name.isGetProp()) {
-        replacePrefixInPropertyPath(name.getFirstChild(), prefix, newPrefix);
-      }
-    }
+  void registerLocalSymbol(String sourceFile, String fullLocalName, String requiredNamespace,
+      String localName) {
+    valueRewrite.put(sourceFile, fullLocalName, localName);
+    typeRewrite.put(sourceFile, fullLocalName, localName);
+    typeRewrite.put(sourceFile, requiredNamespace, localName);
   }
 }
