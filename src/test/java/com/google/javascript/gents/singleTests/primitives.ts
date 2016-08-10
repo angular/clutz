@@ -1,10 +1,10 @@
-var x: any;
-var y: any;
-var v: undefined;
-var u: undefined = undefined;
-var nil: null = null;
-var n: number = 4;
-var b: boolean = true;
-var s: string = "hello";
+let x: any;
+let y: any;
+let v: undefined;
+let u: undefined = undefined;
+let nil: null = null;
+let n: number = 4;
+let b: boolean = true;
+let s: string = "hello";
 let l: number = 6;
 const c: number = 8;

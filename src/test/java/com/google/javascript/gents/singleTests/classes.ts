@@ -1,4 +1,4 @@
-var A = class {
+let A = class {
   constructor(a: number) {
     this.a = a;
   }
@@ -15,13 +15,13 @@ class C extends A {
     this.b = b;
   }
 }
-var D = class extends B {
+let D = class extends B {
   constructor(a, b, c) {
     super(a, b);
     this.c = c;
   }
 };
-var E = class extends C {
+let E = class extends C {
   constructor(a, b) {
     super(a, b);
   }

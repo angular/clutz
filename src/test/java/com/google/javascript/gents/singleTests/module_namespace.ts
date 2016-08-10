@@ -1,4 +1,4 @@
-var bar = function(): boolean {
+let bar = function(): boolean {
   return true;
 };
 export const x: number = 4;

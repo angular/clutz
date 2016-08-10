@@ -1,5 +1,5 @@
-var num = 4;
-var B = function(): number {
+let num = 4;
+let B = function(): number {
   return num;
 };
 export{B};

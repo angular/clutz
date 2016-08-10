@@ -1,4 +1,4 @@
-var A = class {
+let A = class {
   d: string;
   c: number = 4;
   z: number;

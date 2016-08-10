@@ -1,4 +1,4 @@
-var goog: any = {};
+let goog: any = {};
 goog.A = class {
   constructor(a: number) {
     this.a = a;

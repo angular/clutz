@@ -6,6 +6,6 @@ import X from "goog:lib.C";
 A();
 AExports.foo();
 B();
-var n = B.num + B.num;
+let n = B.num + B.num;
 X();
 n += X.num;
