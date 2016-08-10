@@ -10,6 +10,6 @@ import com.google.javascript.rhino.Node;
 public abstract class AbstractTopLevelCallback implements Callback {
   @Override
   public final boolean shouldTraverse(NodeTraversal nodeTraversal, Node n, Node parent) {
-    return parent == null || n.isScript() || parent.isScript();
+    return parent == null || n.isScript() || parent.isScript() || parent.isModuleBody();
   }
 }
