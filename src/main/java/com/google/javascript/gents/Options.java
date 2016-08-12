@@ -61,6 +61,8 @@ public class Options {
 
     // Do not transpile module declarations
     options.setWrapGoogModulesForWhitespaceOnly(false);
+    // Stop escaping the characters "=&<>"
+    options.setTrustedStrings(true);
 
     // Compiler passes must be disabled to disable down-transpilation to ES5.
     options.skipAllCompilerPasses();

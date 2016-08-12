@@ -8,3 +8,4 @@ let b: boolean = true;
 let s: string = "hello";
 let l: number = 6;
 const c: number = 8;
+let escaped: string = "'\"=&<>";

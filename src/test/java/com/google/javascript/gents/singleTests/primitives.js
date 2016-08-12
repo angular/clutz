@@ -27,3 +27,10 @@ let l = 6;
 
 /** @type {number} */
 const c = 8;
+
+/**
+ * Escape characters
+ * @type {string}
+ */
+var escaped = "'\"=&<>";
+  
