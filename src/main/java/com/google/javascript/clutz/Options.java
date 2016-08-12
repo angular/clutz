@@ -105,8 +105,8 @@ public class Options {
     if (!strictDeps) {
       depgraph = depgraph.withNonrootsAsRoots();
     }
-    if (arguments.isEmpty()) {
-      throw new CmdLineException(parser, "No files were given");
+    if (arguments.isEmpty() && externs.isEmpty()) {
+      throw new CmdLineException(parser, "No files or externs were given");
     }
   }
 
