@@ -156,6 +156,9 @@ public class TypeScriptGenerator {
         modulePrePass.getSymbolMap(), modulePass.getTypeRewrite());
     typingPass.process(externRoot, srcRoot);
 
+    CompilerPass stylePass = new StyleFixPass(compiler);
+    stylePass.process(externRoot, srcRoot);
+
     // We only use the source root as the extern root is ignored for codegen
     for (Node file : srcRoot.children()) {
       String basename = pathUtil.getFileNameWithoutExtension(file.getSourceFileName());

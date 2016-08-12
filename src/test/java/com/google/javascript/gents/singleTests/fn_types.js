@@ -46,4 +46,4 @@ var restParamsTyped = function(n, br) {};
 /**
  * @type {function(number, boolean=, ...): number}
  */
-var complex = function(n, o, r) { return n; };
+const complex = function(n, o, r) { return n; };

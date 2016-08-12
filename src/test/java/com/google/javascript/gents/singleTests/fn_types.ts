@@ -11,6 +11,6 @@ let optParams: (p1: number, p2?: string, p3?: boolean) =>
     any = function(n, s, b) {};
 let restParams: (p1: number, ...p2) => any = function(n, r) {};
 let restParamsTyped: (p1: number, ...p2: boolean[]) => any = function(n, br) {};
-let complex: (p1: number, p2?: boolean, ...p3) => number = function(n, o, r) {
+function complex(n: number, o?: boolean, ...r: any[]): number {
   return n;
-};
+}

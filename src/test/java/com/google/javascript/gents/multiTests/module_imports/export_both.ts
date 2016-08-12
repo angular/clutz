@@ -1,3 +1,3 @@
-export const D = function() {};
+export function D() {}
 export const x = 4;
-export const foo = function() {};
+export function foo() {}

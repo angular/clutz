@@ -104,12 +104,6 @@ public final class TypeAnnotationPass implements CompilerPass {
             setTypeExpression(n, bestJSDocInfo.getReturnType(), true);
           }
           break;
-        // Var is converted to let
-        // This is to output more idiomatic TypeScript even if it slightly changes the semantics
-        // of the original code.
-        case VAR:
-          n.setToken(Token.LET);
-          break;
         // Names and properties are annotated with their types
         case NAME:
         case GETPROP:

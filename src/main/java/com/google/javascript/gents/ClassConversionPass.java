@@ -183,7 +183,7 @@ public final class ClassConversionPass implements CompilerPass {
     Node classMembers = new Node(Token.CLASS_MEMBERS, constructor);
     Node classNode = new Node(Token.CLASS, name, superClass, classMembers);
 
-    maybeLiftClassDeclaration(n, classNode);
+    n.getParent().replaceChild(n, classNode);
     compiler.reportCodeChange();
   }
 
@@ -213,32 +213,8 @@ public final class ClassConversionPass implements CompilerPass {
 
     Node classNode = new Node(Token.CLASS, IR.empty(), superClass, classMembers);
 
-    maybeLiftClassDeclaration(n, classNode);
+    n.getParent().replaceChild(n, classNode);
     compiler.reportCodeChange();
-  }
-
-  /**
-   * Attempts to lift class declarations of the form
-   * 'var/let/const c = class {...}'
-   * into
-   * 'class c {...}'
-   */
-  void maybeLiftClassDeclaration(Node n, Node classNode) {
-    Node name = classNode.getFirstChild();
-
-    if (!NodeUtil.isNameDeclaration(n.getParent().getParent())) {
-      n.getParent().replaceChild(n, classNode);
-      return;
-    }
-    Node declaration = n.getParent().getParent();
-
-    // Replace name node with declared name
-    Node classDeclarationName = n.getParent();
-    classDeclarationName.detachChildren();
-    classDeclarationName.detachFromParent();
-    classNode.replaceChild(name, classDeclarationName);
-
-    declaration.getParent().replaceChild(declaration, classNode);
   }
 
   /**
