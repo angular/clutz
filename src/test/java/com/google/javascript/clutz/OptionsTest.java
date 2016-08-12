@@ -62,7 +62,13 @@ public class OptionsTest {
       new Options(new String[0]);
       fail("Should throw");
     } catch (CmdLineException expected) {
-      assertThat(expected.getMessage()).isEqualTo("No files were given");
+      assertThat(expected.getMessage()).isEqualTo("No files or externs were given");
     }
+  }
+
+  @Test
+  public void testShouldSupportExternsOnly() throws Exception {
+    Options opts = new Options(new String[] { "--externs", "extern1.js"});
+    assertThat(opts.externs).containsExactly("extern1.js");
   }
 }
