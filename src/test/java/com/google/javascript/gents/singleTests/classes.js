@@ -46,3 +46,7 @@ var E = goog.defineClass(C, {
     C.call(this, a, b);
   }
 });
+
+var nested = {};
+/** @constructor */
+nested.klass = function() {};

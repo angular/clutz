@@ -10,9 +10,9 @@ export const E = function() {
 };
 export const bar = function() {
 };
-export const G = class {
+export class G {
   constructor() {
   }
   static baz() {
   }
-};
+}

@@ -1,4 +1,4 @@
-let A = class {
+class A {
   d: string;
   c: number = 4;
   z: number;
@@ -18,4 +18,4 @@ let A = class {
     this.n = 12;
     this.x = this.a;
   }
-};
+}

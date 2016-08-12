@@ -12,12 +12,12 @@ export const bar = function() {
 };
 export const F = function() {
 };
-export const G = class {
+export class G {
   constructor() {
   }
   static baz() {
   }
-};
+}
 export const Z = function() {
 };
 export const fun = function() {

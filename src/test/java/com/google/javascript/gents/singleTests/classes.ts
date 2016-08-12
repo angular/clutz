@@ -1,8 +1,8 @@
-let A = class {
+class A {
   constructor(a: number) {
     this.a = a;
   }
-};
+}
 class B {
   constructor(a, b) {
     this.a = a;
@@ -15,14 +15,19 @@ class C extends A {
     this.b = b;
   }
 }
-let D = class extends B {
+class D extends B {
   constructor(a, b, c) {
     super(a, b);
     this.c = c;
   }
-};
-let E = class extends C {
+}
+class E extends C {
   constructor(a, b) {
     super(a, b);
+  }
+}
+let nested = {};
+nested.klass = class {
+  constructor() {
   }
 };

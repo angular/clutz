@@ -4,9 +4,9 @@ let B = function(): number {
 };
 export{B};
 export{num};
-export const foo = class {
+export class foo {
   static z: number;
   constructor() {
   }
-};
+}
 foo.z = num * 2;
