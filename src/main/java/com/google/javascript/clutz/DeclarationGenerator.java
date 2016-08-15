@@ -1823,12 +1823,24 @@ class DeclarationGenerator {
         }
         visitTypeDeclaration(propertyType, false, isOptionalProperty);
       } else {
+        FunctionType ftype = (FunctionType) propertyType;
         // Avoid re-emitting template variables defined on the class level if method is not static.
-        Set<String> objTemplateTypes =
+        Set<String> skipTemplateParams =
             isStatic
               ? Collections.<String>emptySet()
               : classTemplateTypeNames;
-        visitFunctionDeclaration((FunctionType) propertyType, objTemplateTypes);
+        JSType typeOfThis = ftype.getTypeOfThis();
+        // If a method returns the 'this' object, it needs to be typed to match the type of the
+        // instance it is invoked on. That way when called on the subclass it should return the
+        // subclass type.
+        // Unfortunately, TypeScript and closure disagree how to type this pattern.
+        // In closure it is a templatized method, together with the @this {T} annotation.
+        // In TypeScript one can use the reserved 'this' type, without templatization.
+        // Detect the pattern here and remove the templatized type from the emit.
+        if (typeOfThis != null && typeOfThis.isTemplateType()) {
+          skipTemplateParams.add(typeOfThis.getDisplayName());
+        }
+        visitFunctionDeclaration(ftype, skipTemplateParams);
       }
       emit(";");
       emitBreak();
@@ -1850,9 +1862,11 @@ class DeclarationGenerator {
     }
 
 
-    private void visitFunctionDeclaration(FunctionType ftype, Set<String> objTemplateTypes) {
-      visitFunctionParameters(ftype, true, objTemplateTypes);
+    private void visitFunctionDeclaration(FunctionType ftype, Set<String> skipTemplateParams) {
+      visitFunctionParameters(ftype, true, skipTemplateParams);
       JSType type = ftype.getReturnType();
+      JSType typeOfThis = ftype.getTypeOfThis();
+
       if (type == null) return;
       emit(":");
       // Closure conflates 'undefined' and 'void', and in general visitType always emits `undefined`
@@ -1861,6 +1875,9 @@ class DeclarationGenerator {
       // are not strictly the same.
       if (type.isVoidType()) {
         emit("void");
+      } else if (typeOfThis != null && typeOfThis.isTemplateType() && typeOfThis.equals(type)) {
+        // This type is reserved in TypeScript, but a template param in closure.
+        emit("this");
       } else {
         visitType(type);
       }
