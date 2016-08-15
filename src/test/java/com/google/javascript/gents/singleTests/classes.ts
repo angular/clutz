@@ -1,7 +1,5 @@
 class A {
-  constructor(a: number) {
-    this.a = a;
-  }
+  constructor(a: number) { this.a = a; }
 }
 class B {
   constructor(a, b) {
@@ -22,12 +20,9 @@ class D extends B {
   }
 }
 class E extends C {
-  constructor(a, b) {
-    super(a, b);
-  }
+  constructor(a, b) { super(a, b); }
 }
 let nested = {};
 nested.klass = class {
-  constructor() {
-  }
+  constructor() {}
 };

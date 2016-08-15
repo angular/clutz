@@ -6,18 +6,11 @@ class A {
   a: number;
   private static sb: number;
   protected static sa: number;
-  constructor() {
-  }
-  foo() {
-  }
-  protected bar() {
-  }
-  private baz() {
-  }
-  static fizzbuzz() {
-  }
-  protected static fizz() {
-  }
-  private static buzz() {
-  }
+  constructor() {}
+  foo() {}
+  protected bar() {}
+  private baz() {}
+  static fizzbuzz() {}
+  protected static fizz() {}
+  private static buzz() {}
 }

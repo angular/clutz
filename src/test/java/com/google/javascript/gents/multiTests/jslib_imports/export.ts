@@ -1,4 +1,2 @@
-export const A = function() {
-};
-export const foo = function() {
-};
+export const A = function() {};
+export const foo = function() {};

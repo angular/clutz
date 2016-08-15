@@ -1,6 +1,5 @@
 class foo {
-  constructor() {
-  }
+  constructor() {}
 }
 export const C = foo;
 export const typC = foo;

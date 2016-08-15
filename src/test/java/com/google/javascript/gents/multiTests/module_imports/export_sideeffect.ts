@@ -1,2 +1,2 @@
-export{};
-console.log("hello");
+export {};
+console.log('hello');

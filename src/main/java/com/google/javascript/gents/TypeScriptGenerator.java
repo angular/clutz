@@ -3,6 +3,7 @@ package com.google.javascript.gents;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.collect.Sets;
+import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
 import com.google.javascript.jscomp.CodeConsumer;
 import com.google.javascript.jscomp.CodeGenerator;
@@ -16,6 +17,11 @@ import com.google.javascript.jscomp.ErrorFormat;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.rhino.Node;
 
+import java.io.BufferedWriter;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.concurrent.TimeUnit;
 import org.kohsuke.args4j.CmdLineException;
 
 import java.io.File;
@@ -31,6 +37,11 @@ import java.util.Set;
  * TypeScript.
  */
 public class TypeScriptGenerator {
+  /**
+   * Command line clang-format string to format stdin.
+   * The filename 'a.ts' is only used to inform clang-format of the file type (TS).
+   */
+  private static final String[] CLANG_FORMAT = {"clang-format", "-assume-filename=a.ts"};
 
   public static void main(String[] args) {
     Options options = null;
@@ -163,12 +174,59 @@ public class TypeScriptGenerator {
           .setLineBreak(true)
           .setOutputTypes(true)
           .build();
-      // TODO(renez): pipe generated TypeScript code through clang-format
-      sourceFileMap.put(basename, tsCode);
+
+      sourceFileMap.put(basename, tryClangFormat(tsCode));
     }
 
     errorManager.doGenerateReport();
     return sourceFileMap;
+  }
+
+  /**
+   * Attempts to format the generated TypeScript using clang-format.
+   * On failure to format (ie. clang-format does not exist), return the inputted string.
+   */
+  String tryClangFormat(String code) {
+    Process process = null;
+    try {
+      process = Runtime.getRuntime().exec(CLANG_FORMAT);
+      final OutputStream stdin = process.getOutputStream();
+      // stdout must be final for the nested object byteSource to return it.
+      final InputStream stdout = process.getInputStream();
+
+      // Write TypeScript code to stdin of the process
+      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdin));
+      writer.write(code);
+      writer.flush();
+      writer.close();
+
+      // Reads stdout of the process
+      ByteSource byteSource = new ByteSource() {
+        @Override
+        public InputStream openStream() throws IOException {
+          return stdout;
+        }
+      };
+      return byteSource.asCharSource(UTF_8).read();
+    } catch (IOException e) {
+      System.err.println("clang-format has failed to execute: " + e.getMessage());
+      return code;
+    } finally {
+      if (process != null) {
+        // Wait for process to finish
+        try {
+          if (!process.waitFor(5, TimeUnit.SECONDS)) {
+            process.destroyForcibly();
+            throw new RuntimeException("timed out waiting for clang-format to finish");
+          }
+          if (process.exitValue() != 0) {
+            throw new RuntimeException("clang-format failed with exit code " + process.exitValue());
+          }
+        } catch (InterruptedException e) {
+          throw new RuntimeException("unexpected interruption", e);
+        }
+      }
+    }
   }
 
   /**
