@@ -103,7 +103,8 @@ public class TypeScriptGeneratorTests {
             Collections.EMPTY_LIST);
 
         assertThat(transpiledSource).hasSize(1);
-        assertThat(transpiledSource).containsEntry(basename, goldenText);
+        assertThat(transpiledSource).containsKey(basename);
+        assertThat(transpiledSource.get(basename)).isEqualTo(goldenText);
       } catch (Throwable t) {
         result.addError(this, t);
       } finally {

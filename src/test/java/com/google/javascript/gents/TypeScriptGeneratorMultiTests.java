@@ -92,7 +92,8 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
         assertThat(transpiledSource).hasSize(sourceNames.size());
         for (String basename : goldenFiles.keySet()) {
           String goldenText = goldenFiles.get(basename);
-          assertThat(transpiledSource).containsEntry(basename, goldenText);
+          assertThat(transpiledSource).containsKey(basename);
+          assertThat(transpiledSource.get(basename)).isEqualTo(goldenText);
         }
       } catch (Throwable t) {
         result.addError(this, t);

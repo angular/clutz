@@ -21,7 +21,6 @@ import java.io.BufferedWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.concurrent.TimeUnit;
 import org.kohsuke.args4j.CmdLineException;
 
 import java.io.File;
@@ -41,7 +40,8 @@ public class TypeScriptGenerator {
    * Command line clang-format string to format stdin.
    * The filename 'a.ts' is only used to inform clang-format of the file type (TS).
    */
-  private static final String[] CLANG_FORMAT = {"clang-format", "-assume-filename=a.ts"};
+  private static final String[] CLANG_FORMAT = {"clang-format",
+      "-assume-filename=a.ts", "-style=Google"};
 
   public static void main(String[] args) {
     Options options = null;
@@ -213,18 +213,9 @@ public class TypeScriptGenerator {
       return code;
     } finally {
       if (process != null) {
-        // Wait for process to finish
-        try {
-          if (!process.waitFor(5, TimeUnit.SECONDS)) {
-            process.destroyForcibly();
-            throw new RuntimeException("timed out waiting for clang-format to finish");
-          }
-          if (process.exitValue() != 0) {
-            throw new RuntimeException("clang-format failed with exit code " + process.exitValue());
-          }
-        } catch (InterruptedException e) {
-          throw new RuntimeException("unexpected interruption", e);
-        }
+        // TODO(renez): Use .waitFor(n, TimeUnit.SECONDS) and .destroyForcibly() once we moved to
+        // Java 8.
+        process.destroy();
       }
     }
   }

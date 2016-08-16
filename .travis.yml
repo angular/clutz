@@ -1,3 +1,5 @@
+before_install:
+  - npm install clang-format
 language: java
 sudo: false
 cache:
