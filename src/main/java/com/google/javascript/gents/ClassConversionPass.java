@@ -24,10 +24,12 @@ import javax.annotation.Nullable;
 public final class ClassConversionPass implements CompilerPass {
 
   private final AbstractCompiler compiler;
+  private final NodeComments nodeComments;
   private Map<String, Node> classes;
 
-  public ClassConversionPass(AbstractCompiler compiler) {
+  public ClassConversionPass(AbstractCompiler compiler, NodeComments nodeComments) {
     this.compiler = compiler;
+    this.nodeComments = nodeComments;
     this.classes = new LinkedHashMap<>();
   }
 
@@ -183,7 +185,7 @@ public final class ClassConversionPass implements CompilerPass {
     Node classMembers = new Node(Token.CLASS_MEMBERS, constructor);
     Node classNode = new Node(Token.CLASS, name, superClass, classMembers);
 
-    n.getParent().replaceChild(n, classNode);
+    nodeComments.replaceWithComment(n, classNode);
     compiler.reportCodeChange();
   }
 
@@ -210,10 +212,9 @@ public final class ClassConversionPass implements CompilerPass {
         convertOjbectLiteral(classMembers, child, false);
       }
     }
-
     Node classNode = new Node(Token.CLASS, IR.empty(), superClass, classMembers);
 
-    n.getParent().replaceChild(n, classNode);
+    nodeComments.replaceWithComment(n, classNode);
     compiler.reportCodeChange();
   }
 
@@ -227,20 +228,21 @@ public final class ClassConversionPass implements CompilerPass {
     Node value = objectLiteralMember.getFirstChild();
     value.detachFromParent();
 
-    Node n;
     if (value.isFunction()) {
-      n = IR.memberFunctionDef(objectLiteralMember.getString(), value);
+      Node n = IR.memberFunctionDef(objectLiteralMember.getString(), value);
       n.setJSDocInfo(objectLiteralMember.getJSDocInfo());
       n.setStaticMember(isStatic);
       // Methods added to back
       classMembers.addChildToBack(n);
+      nodeComments.moveComment(objectLiteralMember, n);
     } else {
-      n = Node.newString(Token.MEMBER_VARIABLE_DEF, objectLiteralMember.getString());
+      Node n = Node.newString(Token.MEMBER_VARIABLE_DEF, objectLiteralMember.getString());
       n.addChildToBack(value);
       n.setJSDocInfo(objectLiteralMember.getJSDocInfo());
       n.setStaticMember(isStatic);
       // Fields added to front
-      classMembers.addChildToFront(n);
+      addFieldToClassMembers(classMembers, n);
+      nodeComments.moveComment(objectLiteralMember, n);
     }
   }
 
@@ -262,6 +264,7 @@ public final class ClassConversionPass implements CompilerPass {
 
     // Append the new method to the class
     classMembers.addChildToBack(memberFunc);
+    nodeComments.moveComment(declaration.exprRoot, memberFunc);
     compiler.reportCodeChange();
   }
 
@@ -276,6 +279,7 @@ public final class ClassConversionPass implements CompilerPass {
     Node fieldNode = Node.newString(Token.MEMBER_VARIABLE_DEF, fieldName);
     fieldNode.setJSDocInfo(declaration.jsDoc);
     fieldNode.setStaticMember(declaration.isStatic);
+    nodeComments.moveComment(declaration.exprRoot, fieldNode);
 
     // Add default value for fields
     if (declaration.rhs == null) {
@@ -284,9 +288,11 @@ public final class ClassConversionPass implements CompilerPass {
       declaration.exprRoot.detachFromParent();
       declaration.rhs.detachFromParent();
       fieldNode.addChildToBack(declaration.rhs);
+    } else {
+      nodeComments.clearComment(declaration.exprRoot);
     }
 
-    classMembers.addChildToFront(fieldNode);
+    addFieldToClassMembers(classMembers, fieldNode);
     compiler.reportCodeChange();
   }
 
@@ -382,12 +388,13 @@ public final class ClassConversionPass implements CompilerPass {
       String methodName = callNode.getChildAtIndex(2).getString();
 
       if ("constructor".equals(methodName)) {
-        callNode.replaceChild(callNode.getFirstChild(), IR.superNode());
+        nodeComments.replaceWithComment(callNode.getFirstChild(), IR.superNode());
       } else {
-        callNode.replaceChild(callNode.getFirstChild(),
+        nodeComments.replaceWithComment(callNode.getFirstChild(),
             NodeUtil.newQName(compiler, "super." + methodName));
       }
 
+      // Remove twice to get rid of "this" and the method name
       callNode.removeChild(callNode.getSecondChild());
       callNode.removeChild(callNode.getSecondChild());
       compiler.reportCodeChange();
@@ -398,7 +405,8 @@ public final class ClassConversionPass implements CompilerPass {
     // B.call(this, args) -> super(args);
     if (callName.equals(superClassName + ".call") &&
         callNode.getSecondChild().isThis()) {
-      callNode.replaceChild(callNode.getFirstChild(), IR.superNode());
+      nodeComments.replaceWithComment(callNode.getFirstChild(), IR.superNode());
+
       callNode.removeChild(callNode.getSecondChild());
       compiler.reportCodeChange();
       return;
@@ -414,15 +422,26 @@ public final class ClassConversionPass implements CompilerPass {
         while (!n.getLastChild().getString().equals("prototype")) {
           n = n.getFirstChild();
         }
-        n.getParent().replaceChild(n, IR.superNode());
         nameNode.detachFromParent();
 
-        callNode.replaceChild(callNode.getFirstChild(), nameNode);
+        nodeComments.replaceWithComment(n, IR.superNode());
+        nodeComments.replaceWithComment(callNode.getFirstChild(), nameNode);
         callNode.removeChild(callNode.getSecondChild());
         compiler.reportCodeChange();
         return;
       }
     }
+  }
+
+  /** Adds a field node before the first method node in classMembers */
+  void addFieldToClassMembers(Node classMembers, Node field) {
+    for (Node n : classMembers.children()) {
+      if (n.isMemberFunctionDef()) {
+        classMembers.addChildBefore(field, n);
+        return;
+      }
+    }
+    classMembers.addChildToBack(field);
   }
 
   /**

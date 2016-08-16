@@ -10,12 +10,23 @@ import com.google.javascript.rhino.Token;
  * Code generator for gents to add TypeScript specific code generation.
  */
 public class GentsCodeGenerator extends CodeGenerator {
-  protected GentsCodeGenerator(CodeConsumer consumer, CompilerOptions options) {
+  private final NodeComments nodeComments;
+
+  protected GentsCodeGenerator(CodeConsumer consumer, CompilerOptions options,
+      NodeComments nodeComments) {
     super(consumer, options);
+    this.nodeComments = nodeComments;
   }
 
   @Override
   protected void add(Node n, Context ctx) {
+    String comment = nodeComments.getComment(n);
+    if (comment != null) {
+      add(comment);
+      // temporary new line
+      add("\n");
+    }
+
     if (maybeOverrideCodeGen(n, ctx)) {
       return;
     }

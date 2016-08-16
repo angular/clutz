@@ -145,18 +145,22 @@ public class TypeScriptGenerator {
     // Strips all file nodes that we are not compiling.
     stripNonCompiledNodes(srcRoot, filesToConvert);
 
+    CommentLinkingPass commentsPass = new CommentLinkingPass(compiler);
+    commentsPass.process(externRoot, srcRoot);
+    final NodeComments comments = commentsPass.getComments();
+
     ModuleConversionPass modulePass = new ModuleConversionPass(compiler, pathUtil, nameUtil,
-        modulePrePass.getFileMap(), modulePrePass.getNamespaceMap());
+        modulePrePass.getFileMap(), modulePrePass.getNamespaceMap(), comments);
     modulePass.process(externRoot, srcRoot);
 
-    CompilerPass classPass = new ClassConversionPass(compiler);
+    CompilerPass classPass = new ClassConversionPass(compiler, comments);
     classPass.process(externRoot, srcRoot);
 
     CompilerPass typingPass = new TypeAnnotationPass(compiler, pathUtil, nameUtil,
-        modulePrePass.getSymbolMap(), modulePass.getTypeRewrite());
+        modulePrePass.getSymbolMap(), modulePass.getTypeRewrite(), comments);
     typingPass.process(externRoot, srcRoot);
 
-    CompilerPass stylePass = new StyleFixPass(compiler);
+    CompilerPass stylePass = new StyleFixPass(compiler, comments);
     stylePass.process(externRoot, srcRoot);
 
     // We only use the source root as the extern root is ignored for codegen
@@ -165,7 +169,7 @@ public class TypeScriptGenerator {
       CodeGeneratorFactory factory = new CodeGeneratorFactory() {
         @Override
         public CodeGenerator getCodeGenerator(Format outputFormat, CodeConsumer cc) {
-          return new GentsCodeGenerator(cc, compilerOpts);
+          return new GentsCodeGenerator(cc, compilerOpts, comments);
         }
       };
 

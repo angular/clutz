@@ -57,6 +57,7 @@ public final class TypeAnnotationPass implements CompilerPass {
   private final AbstractCompiler compiler;
   private final PathUtil pathUtil;
   private final NameUtil nameUtil;
+  private final NodeComments nodeComments;
 
   // symbolName -> fileModule
   private final Map<String, FileModule> symbolToModule;
@@ -66,10 +67,12 @@ public final class TypeAnnotationPass implements CompilerPass {
   private final Multimap<String, Node> importsNeeded = LinkedHashMultimap.create();
 
   public TypeAnnotationPass(AbstractCompiler compiler, PathUtil pathUtil, NameUtil nameUtil,
-      Map<String, FileModule> symbolMap, Table<String, String, String> typeRewrite) {
+      Map<String, FileModule> symbolMap, Table<String, String, String> typeRewrite,
+      NodeComments nodeComments) {
     this.compiler = compiler;
     this.pathUtil = pathUtil;
     this.nameUtil = nameUtil;
+    this.nodeComments = nodeComments;
 
     this.symbolToModule = new HashMap<>(symbolMap);
     this.typeRewrite = HashBasedTable.create(typeRewrite);
@@ -126,14 +129,14 @@ public final class TypeAnnotationPass implements CompilerPass {
               // REST node, if the type indicates it is a rest parameter.
               if (parameterType.getRoot().getType() == Token.ELLIPSIS) {
                 attachTypeExpr = IR.rest(n.getString());
-                n.getParent().replaceChild(n, attachTypeExpr);
+                nodeComments.replaceWithComment(n, attachTypeExpr);
                 compiler.reportCodeChange();
               }
               // Modify the AST to represent an optional parameter
               if (parameterType.getRoot().getType() == Token.EQUALS) {
                 attachTypeExpr = IR.name(n.getString());
                 attachTypeExpr.putBooleanProp(Node.OPT_ES6_TYPED, true);
-                n.getParent().replaceChild(n, attachTypeExpr);
+                nodeComments.replaceWithComment(n, attachTypeExpr);
                 compiler.reportCodeChange();
               }
               setTypeExpression(attachTypeExpr, parameterType, false);

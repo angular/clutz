@@ -26,6 +26,7 @@ public final class ModuleConversionPass implements CompilerPass {
   private final AbstractCompiler compiler;
   private final PathUtil pathUtil;
   private final NameUtil nameUtil;
+  private final NodeComments nodeComments;
 
   private final Map<String, FileModule> fileToModule;
   private final Map<String, FileModule> namespaceToModule;
@@ -40,10 +41,12 @@ public final class ModuleConversionPass implements CompilerPass {
   }
 
   public ModuleConversionPass(AbstractCompiler compiler, PathUtil pathUtil, NameUtil nameUtil,
-      Map<String, FileModule> fileToModule, Map<String, FileModule> namespaceToModule) {
+      Map<String, FileModule> fileToModule, Map<String, FileModule> namespaceToModule,
+      NodeComments nodeComments) {
     this.compiler = compiler;
     this.pathUtil = pathUtil;
     this.nameUtil = nameUtil;
+    this.nodeComments = nodeComments;
 
     this.fileToModule = fileToModule;
     this.namespaceToModule = namespaceToModule;
@@ -201,7 +204,7 @@ public final class ModuleConversionPass implements CompilerPass {
           IR.empty(),
           Node.newString(Token.NAME, localName),
           Node.newString("goog:" + requiredNamespace));
-      n.getParent().replaceChild(n, importNode);
+      nodeComments.replaceWithComment(n, importNode);
       compiler.reportCodeChange();
 
       registerLocalSymbol(n.getSourceFileName(), fullLocalName, requiredNamespace, localName);
@@ -224,6 +227,7 @@ public final class ModuleConversionPass implements CompilerPass {
           new Node(Token.IMPORT_SPECS, importSpec),
           Node.newString(referencedFile));
       n.getParent().addChildBefore(importNode, n);
+      nodeComments.moveComment(n, importNode);
       imported = true;
 
       registerLocalSymbol(n.getSourceFileName(), fullLocalName, requiredNamespace, localName);
@@ -238,6 +242,7 @@ public final class ModuleConversionPass implements CompilerPass {
           Node.newString(Token.IMPORT_STAR, localName),
           Node.newString(referencedFile));
       n.getParent().addChildBefore(importNode, n);
+      nodeComments.moveComment(n, importNode);
       imported = true;
 
       for (String child : module.providesObjectChildren.get(requiredNamespace)) {
@@ -256,6 +261,7 @@ public final class ModuleConversionPass implements CompilerPass {
           IR.empty(),
           Node.newString(referencedFile));
       n.getParent().addChildBefore(importNode, n);
+      nodeComments.moveComment(n, importNode);
     }
 
     n.getParent().removeChild(n);
@@ -293,7 +299,7 @@ public final class ModuleConversionPass implements CompilerPass {
         exportNode = IR.constNode(IR.name(exportedSymbol), rhs);
       }
       exportNode.setJSDocInfo(jsDoc);
-      exprNode.getParent().replaceChild(exprNode, new Node(Token.EXPORT, exportNode));
+      nodeComments.replaceWithComment(exprNode, new Node(Token.EXPORT, exportNode));
     } else {
       // Assume prefix has already been exported and just trim the prefix
       nameUtil.replacePrefixInName(lhs, exportedNamespace, exportedSymbol);

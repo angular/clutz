@@ -8,8 +8,6 @@ import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.jscomp.NodeTraversal.AbstractPostOrderCallback;
-import com.google.javascript.jscomp.NodeUtil;
-import com.google.javascript.rhino.IR;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Node.TypeDeclarationNode;
 import com.google.javascript.rhino.Token;
@@ -20,9 +18,11 @@ import com.google.javascript.rhino.Token;
 public final class StyleFixPass extends AbstractPostOrderCallback implements CompilerPass {
 
   private final AbstractCompiler compiler;
+  private final NodeComments nodeComments;
 
-  public StyleFixPass(AbstractCompiler compiler) {
+  public StyleFixPass(AbstractCompiler compiler, NodeComments nodeComments) {
     this.compiler = compiler;
+    this.nodeComments = nodeComments;
   }
 
   @Override
@@ -88,7 +88,7 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
               } else {
                 newNode.setString(param.getString());
               }
-              param.getParent().replaceChild(param, newNode);
+              nodeComments.replaceWithComment(param, newNode);
             }
             n.getFirstChild().setDeclaredTypeExpression(null);
 
@@ -120,9 +120,8 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
     // Replace name node with declared name
     rhs.detachFromParent();
     newName.detachFromParent();
-    rhs.replaceChild(oldName, newName);
-
-    n.getParent().replaceChild(n, rhs);
+    nodeComments.replaceWithComment(oldName, newName);
+    nodeComments.replaceWithComment(n, rhs);
   }
 
 }
