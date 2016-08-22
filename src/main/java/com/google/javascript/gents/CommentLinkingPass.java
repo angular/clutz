@@ -24,15 +24,15 @@ public final class CommentLinkingPass implements CompilerPass {
    * Some regexes contain an empty capture group for uniform handling.
    */
   private static final Pattern[] COMMENT_REPLACEMENTS = {
-      Pattern.compile("@constructor\\h*(?<keep>)"),
-      Pattern.compile("@(extends|type)\\h*(\\{.*\\})\\h*(?<keep>)"),
-      Pattern.compile("@(private|protected|public|package|const)\\h*(\\{.*\\})?\\h*(?<keep>)"),
+      Pattern.compile("@constructor[ \t]*(?<keep>)"),
+      Pattern.compile("@(extends|type)[ \t]*(\\{.*\\})[ \t]*(?<keep>)"),
+      Pattern.compile("@(private|protected|public|package|const)[ \t]*(\\{.*\\})?[ \t]*(?<keep>)"),
       // Removes @param and @return if there is no description
-      Pattern.compile("@param\\h*(\\{.*\\})\\h*\\w+\\h*(?<keep>\\*\\/|\\n)"),
-      Pattern.compile("@returns?\\h*(\\{.*\\})\\h*(?<keep>\\*\\/|\\n)"),
-      Pattern.compile("(?<keep>@(param|returns?))\\h*(\\{.*\\})"),
+      Pattern.compile("@param[ \t]*(\\{.*\\})[ \t]*\\w+[ \t]*(?<keep>\\*\\/|\n)"),
+      Pattern.compile("@returns?[ \t]*(\\{.*\\})[ \t]*(?<keep>\\*\\/|\n)"),
+      Pattern.compile("(?<keep>@(param|returns?))[ \t]*(\\{.*\\})"),
       // Remove empty lines with only *
-      Pattern.compile("(?m)^\\h*\\*\\s*\\n(?<keep>)")};
+      Pattern.compile("(?m)^[ \t]*\\*\\s*\n(?<keep>)")};
 
   private final Compiler compiler;
   private final NodeComments nodeComments;
