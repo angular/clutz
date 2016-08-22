@@ -4,7 +4,6 @@ import com.google.javascript.jscomp.CodeConsumer;
 import com.google.javascript.jscomp.CodeGenerator;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.rhino.Node;
-import com.google.javascript.rhino.Token;
 
 /**
  * Code generator for gents to add TypeScript specific code generation.
@@ -57,10 +56,19 @@ public class GentsCodeGenerator extends CodeGenerator {
    * @return true if no further code generation on this node is needed.
    */
   boolean maybeOverrideCodeGen(Node n, Context ctx) {
-    if (n.getType().equals(Token.UNDEFINED_TYPE)) {
-      add("undefined");
-      return true;
+    switch(n.getType()) {
+      case UNDEFINED_TYPE:
+        add("undefined");
+        return true;
+      case CAST:
+        add("(");
+        add(n.getFirstChild());
+        add(" as ");
+        add(n.getDeclaredTypeExpression());
+        add(")");
+        return true;
+      default:
+        return false;
     }
-    return false;
   }
 }
