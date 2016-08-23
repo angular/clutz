@@ -111,6 +111,9 @@ public final class ModuleConversionPass implements CompilerPass {
           String exportedNamespace = nameUtil.findLongestNamePrefix(lhs, symbols.keySet());
           if (exportedNamespace != null) {
             convertExportAssignment(child, exportedNamespace, symbols.get(exportedNamespace));
+            // Registers symbol for rewriting local uses
+            registerLocalSymbol(child.getSourceFileName(), exportedNamespace, exportedNamespace,
+                symbols.get(exportedNamespace));
           }
           break;
         default:
