@@ -36,12 +36,10 @@ import com.google.javascript.rhino.JSTypeExpression;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Node.TypeDeclarationNode;
 import com.google.javascript.rhino.Token;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -141,6 +139,8 @@ public final class TypeAnnotationPass implements CompilerPass {
               }
               setTypeExpression(attachTypeExpr, parameterType, false);
             }
+          } else if (parent.isCast()) {
+            setTypeExpression(parent, parent.getJSDocInfo().getType(), false);
           }
           break;
         default:
