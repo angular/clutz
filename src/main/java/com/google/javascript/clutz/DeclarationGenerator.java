@@ -249,10 +249,10 @@ class DeclarationGenerator {
    * If we emit the name, we would emit `var a: B;`, which is undesirable (consider A being string).
    *
    * For now, only emit by name typedefs that are unlikely to have more than one name referring to
-   * them - record types and templatized types.
+   * them - record types, templatized types and function types.
    */
   private boolean shouldEmitTypedefByName(JSType realType) {
-    return realType.isRecordType() || realType.isTemplatizedType();
+    return realType.isRecordType() || realType.isTemplatizedType() || realType.isFunctionType();
   }
 
   void generateDeclarations() {
@@ -830,6 +830,16 @@ class DeclarationGenerator {
   }
 
   private boolean isPrivate(JSType type) {
+    // Due to https://github.com/google/closure-compiler/issues/1975 we cannot obtain the JSDoc
+    // for a typedef. Assume non-private as it is more common.
+    // Closure creates a NamedType when the typedef is used in an union, eg: T | null.
+    // Dereference the named type before checking if it is a typedef.
+    NamedType nType = type.toMaybeNamedType();
+    if (typedefs.containsKey(type) ||
+        nType != null && typedefs.containsKey(nType.getReferencedType())) {
+      return false;
+    }
+
     // For unknown reasons, enum types do not keep their defining jsdoc info.
     if (type.isEnumType() || type.isEnumElementType()) {
       return isPrivate(type.getDisplayName());
