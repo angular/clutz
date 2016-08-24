@@ -139,9 +139,10 @@ public final class TypeAnnotationPass implements CompilerPass {
               }
               setTypeExpression(attachTypeExpr, parameterType, false);
             }
-          } else if (parent.isCast()) {
-            setTypeExpression(parent, parent.getJSDocInfo().getType(), false);
           }
+          break;
+        case CAST:
+          setTypeExpression(n, n.getJSDocInfo().getType(), false);
           break;
         default:
           break;
