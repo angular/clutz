@@ -54,6 +54,7 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
           if (rhs.isClass()) {
             liftClassOrFunctionDefinition(n);
           } else if (rhs.isFunction()) {
+            rhs.setIsArrowFunction(false);
             // Convert const functions only
             TypeDeclarationNode type = n.getFirstChild().getDeclaredTypeExpression();
             // Untyped declarations are lifted

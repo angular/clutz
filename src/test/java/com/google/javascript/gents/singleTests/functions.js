@@ -57,3 +57,9 @@ var retVoid = function() {};
  * @return {undefined}
  */
 var retUndef = function() {};
+
+/**
+ * @param {number} a
+ * @return {number}
+ */
+const arrow = a => { return a; };

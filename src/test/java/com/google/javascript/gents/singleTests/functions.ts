@@ -21,3 +21,6 @@ let paramUndef = function(u: undefined, v: undefined) {};
 // Void returns
 let retVoid = function(): void {};
 let retUndef = function(): void {};
+function arrow(a: number): number {
+  return a;
+}
