@@ -8,7 +8,6 @@ class A {
   c: number;
   protected d: number;
   private e: number;
-  constructor() {}
   // Method access
   foo() {}
   protected bar() {}

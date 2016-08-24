@@ -96,6 +96,19 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
           }
         }
         break;
+      case MEMBER_FUNCTION_DEF:
+        // Remove empty constructors
+        if ("constructor".equals(n.getString())) {
+          Node params = n.getFirstChild().getSecondChild();
+          Node block = n.getFirstChild().getLastChild();
+          String comment = nodeComments.getComment(n);
+
+          if (!params.hasChildren() && !block.hasChildren() && comment == null) {
+            n.detachFromParent();
+            compiler.reportCodeChange();
+          }
+        }
+        break;
       default:
         break;
     }

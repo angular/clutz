@@ -6,6 +6,5 @@ export function foo() {}
 export function E() {}
 export function bar() {}
 export class G {
-  constructor() {}
   static baz() {}
 }

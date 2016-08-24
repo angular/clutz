@@ -7,7 +7,6 @@ export function E() {}
 export function bar() {}
 export function F() {}
 export class G {
-  constructor() {}
   static baz() {}
 }
 export function Z() {}

@@ -38,6 +38,4 @@ class E extends C {
   constructor(a, b) { super(a, b); }
 }
 let nested = {};
-nested.klass = class {
-  constructor() {}
-};
+nested.klass = class {};

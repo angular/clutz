@@ -2,7 +2,6 @@
  * This comment describes a class
  */
 class A {
-  constructor() {}
   // This comment is moved with the method
   /* This one too (same comment block) */
   foo() {}
