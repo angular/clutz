@@ -1,6 +1,5 @@
 export class B {
-  n: number;
-  constructor(n: number) { this.n = n; }
+  constructor(public n: number) {}
 }
 // Aggressively export rather than create static methods/fields
 export function foo(): number {

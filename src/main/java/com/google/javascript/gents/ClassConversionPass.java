@@ -9,6 +9,8 @@ import com.google.javascript.jscomp.NodeTraversal.AbstractPostOrderCallback;
 import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.rhino.IR;
 import com.google.javascript.rhino.JSDocInfo;
+import com.google.javascript.rhino.JSDocInfo.Visibility;
+import com.google.javascript.rhino.JSTypeExpression;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
 
@@ -113,8 +115,39 @@ public final class ClassConversionPass implements CompilerPass {
         if (declaration != null &&
             declaration.jsDoc != null &&
             declaration.jsDoc.getType() != null) {
+          Node fnNode = NodeUtil.getEnclosingFunction(n);
+          String fnName = fnNode.getParent().getString();
+          JSTypeExpression type = declaration.jsDoc.getType();
+          // All declarations of the form this.name = name;
+          if ("constructor".equals(fnName) && declaration.rhsEqualToField()) {
+            Node params = fnNode.getSecondChild();
+            JSDocInfo constructorJsDoc = NodeUtil.getBestJSDocInfo(fnNode);
+
+            for (Node param : params.children()) {
+              JSTypeExpression paramType = constructorJsDoc.getParameterType(param.getString());
+              // Names and types must be equal
+              if (declaration.memberName.equals(param.getString()) && type.equals(paramType)) {
+                // Add visibility directly to param if possible
+                moveAccessModifier(declaration, param);
+                n.detachFromParent();
+                compiler.reportCodeChange();
+                return;
+              }
+            }
+          }
           moveFieldsIntoClasses(declaration);
         }
+      }
+    }
+
+    /** Moves the access modifier from the original declaration to the constructor parameter */
+    void moveAccessModifier(ClassMemberDeclaration declaration, Node param) {
+      if (Visibility.PRIVATE.equals(declaration.jsDoc.getVisibility())) {
+        param.putProp(Node.ACCESS_MODIFIER, Visibility.PRIVATE);
+      } else if (Visibility.PROTECTED.equals(declaration.jsDoc.getVisibility())) {
+        param.putProp(Node.ACCESS_MODIFIER, Visibility.PROTECTED);
+      } else {
+        param.putProp(Node.ACCESS_MODIFIER, Visibility.PUBLIC);
       }
     }
   }
@@ -485,6 +518,14 @@ public final class ClassConversionPass implements CompilerPass {
       this.isStatic = isStatic;
       this.classNode = classNode;
       this.memberName = memberName;
+    }
+
+    /**
+     * Returns whether the rhs is the same as the method name being declared
+     * eg. this.a = a;
+     */
+    boolean rhsEqualToField() {
+      return rhs != null && memberName.equals(rhs.getQualifiedName());
     }
 
     /**

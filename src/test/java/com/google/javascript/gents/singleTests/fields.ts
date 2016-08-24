@@ -3,13 +3,11 @@ class A {
   f: any;
   static g: boolean = true;
   static h: any;
-  a: number;
   b: boolean;
   z: number;
   c: number = 4;
   d: string;
-  constructor(a: number) {
-    this.a = a;
+  constructor(public a: number) {
     let y = 1;
     this.z = y + 1;
   }

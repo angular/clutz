@@ -3,6 +3,7 @@ package com.google.javascript.gents;
 import com.google.javascript.jscomp.CodeConsumer;
 import com.google.javascript.jscomp.CodeGenerator;
 import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
 
 /**
@@ -67,6 +68,27 @@ public class GentsCodeGenerator extends CodeGenerator {
         add(n.getDeclaredTypeExpression());
         add(")");
         return true;
+      case NAME:
+        // Prepend access modifiers on constructor params
+        if (n.getParent().isParamList()) {
+          Visibility visibility = (Visibility) n.getProp(Node.ACCESS_MODIFIER);
+          if (visibility != null) {
+            switch (visibility) {
+              case PRIVATE:
+                add("private ");
+                break;
+              case PROTECTED:
+                add("protected ");
+                break;
+              case PUBLIC:
+                add("public ");
+                break;
+              default:
+                break;
+            }
+          }
+        }
+        return false;
       default:
         return false;
     }
