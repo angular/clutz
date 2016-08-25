@@ -4,6 +4,7 @@ declare namespace ಠ_ಠ.clutz.generics {
   class ExtendsGenericClass < TYPE > extends ExtendsGenericClass_Instance < TYPE > {
   }
   class ExtendsGenericClass_Instance < TYPE > extends ಠ_ಠ.clutz.generics.Foo_Instance < TYPE , number > {
+    constructor ( ) ;
   }
   class Foo < T , U > extends Foo_Instance < T , U > {
   }

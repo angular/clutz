@@ -2,6 +2,7 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
   class Error extends Error_Instance {
   }
   class Error_Instance extends GlobalError {
+    constructor ( ) ;
   }
   interface ExtendsIThenable extends PromiseLike < any > {
   }
@@ -44,6 +45,7 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
   class B extends B_Instance {
   }
   class B_Instance extends ಠ_ಠ.clutz.typesWithExterns.A_Instance {
+    constructor ( ) ;
   }
 }
 declare namespace ಠ_ಠ.clutz.goog {
@@ -57,6 +59,7 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
   class C extends C_Instance {
   }
   class C_Instance extends ಠ_ಠ.clutz.typesWithExterns.A_Instance {
+    constructor ( ) ;
   }
 }
 declare namespace ಠ_ಠ.clutz.goog {

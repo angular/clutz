@@ -1668,7 +1668,7 @@ class DeclarationGenerator {
         emitBreak();
       }
       // Constructors.
-      if (type.isConstructor() && (type).getParameters().iterator().hasNext() && !isPrivate(
+      if (type.isConstructor() && mustEmitConstructor(type) && !isPrivate(
           type.getJSDocInfo())) {
         maybeEmitJsDoc(type.getJSDocInfo(), /* ignoreParams */ false);
         // TODO(radokirov): mark constuctor as private when source is annotated with
@@ -1720,6 +1720,22 @@ class DeclarationGenerator {
       unindent();
       emit("}");
       emitBreak();
+    }
+
+    /**
+     * If a constructor statement is not emitted TS will assume a constructor with no arguments
+     * and no body (default ctor) for base classes, or the constructor of the superclass.
+     *
+     * Omitting the constructor is correct only if the closure class and *all* its superclasses
+     * have zero argument constructors.
+     */
+    private boolean mustEmitConstructor(FunctionType type) {
+      while (type != null) {
+        if (type.getParameters().iterator().hasNext()) return true;
+        ObjectType oType = getSuperType(type);
+        type = oType != null ? oType.getConstructor() : null;
+      }
+      return false;
     }
 
     /**

@@ -10,4 +10,4 @@ class Test implements ExtendGenericInterface<string> {}
 
 var i: GenericInterface<string> = new ImplementsGenericInterface<string>();
 
-var i2: GenericInterface<string> = new ExtendsGenericClass<string>(0);
+var i2: GenericInterface<string> = new ExtendsGenericClass<string>();

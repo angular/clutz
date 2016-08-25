@@ -2,6 +2,7 @@ declare namespace ಠ_ಠ.clutz.foo {
   class A extends A_Instance {
   }
   class A_Instance extends Function {
+    constructor ( ) ;
   }
 }
 declare namespace ಠ_ಠ.clutz.goog {
