@@ -1825,6 +1825,8 @@ class DeclarationGenerator {
 
     private void emitProperty(String propName, JSType propertyType, boolean isStatic,
         boolean forcePropDeclaration, Set<String> classTemplateTypeNames) {
+      if(handleSpecialTTEFunctions(propertyType, propName, isStatic, classTemplateTypeNames)) return;
+
       if (isStatic) emit("static");
       emit(propName);
       if (!propertyType.isFunctionType() || forcePropDeclaration) {
@@ -1857,6 +1859,82 @@ class DeclarationGenerator {
       }
       emit(";");
       emitBreak();
+    }
+
+    /**
+     * Closure has an experimental feature - Type Transformation Expression (TTE) -
+     * used to type functions like Promise.then and Promise.all. The feature is rarely used and
+     * impossible to translate to TS, so we just hard code some type signature. Yuk!
+     *
+     * This is a hack and won't scale, but I hope TTE will have very limited usage.
+     *
+     * Returns whether this was a TTE function and handled specially.
+     */
+    private boolean handleSpecialTTEFunctions(JSType type, String propName,
+        boolean isStatic, Set<String> classTemplateTypeNames) {
+      FunctionType ftype = type.toMaybeFunctionType();
+      if (ftype == null) return false;
+
+      boolean hasTTE = false;
+      for (TemplateType templateKey : ftype.getTemplateTypeMap().getTemplateKeys()) {
+        if (templateKey.getTypeTransformation() != null) {
+          hasTTE = true;
+          break;
+        }
+      }
+      if (!hasTTE) return false;
+
+      // The same signature can be found in a number of classes - es6 Promise, angular.$q.Promise,
+      // custom Thenable classes, etc. While the class names differ the implementations are close
+      // enough that we use the same signature for all of them.
+      // Only customization needed is plugging in the correct class name.
+      String templateTypeSig = isStatic ?
+          getSignatureForStaticTTEFn(propName, ftype) :
+          getSignatureForInstanceTTEFn(propName, classTemplateTypeNames, ftype);
+      if (templateTypeSig == null) {
+        emit("/* function had TTE, but not a known translation. Emitted type is likely wrong. */");
+        emitBreak();
+        return false;
+      }
+      emit(templateTypeSig);
+      emitBreak();
+      return true;
+    }
+
+    private String getSignatureForInstanceTTEFn(String propName, Set<String> classTemplateTypeNames,
+        FunctionType ftype) {
+      // If ftype is foo.bar.Promise.prototype.then, extract className as Promise.
+      String className = getUnqualifiedName(getNamespace(getNamespace(ftype.getDisplayName())));
+      Iterator<String> templateTypeNames = classTemplateTypeNames.iterator();
+      if (!templateTypeNames.hasNext()) return null;
+
+      String templateVarName = templateTypeNames.next();
+
+      String classTemplatizedType = className + " < RESULT >";
+      if (propName.equals("then")) {
+        return "then < RESULT > (opt_onFulfilled ? : ( (a : " + templateVarName + " ) => " +
+            classTemplatizedType + " | RESULT ) | null , " +
+            "opt_onRejected ? : ( (a : any ) => any ) | null) : " +
+            classTemplatizedType + " ;";
+      }
+      return null;
+    }
+
+    private String getSignatureForStaticTTEFn(String propName, FunctionType ftype) {
+      // If ftype is foo.bar.Promise.all, extract className as Promise.
+      String className = getUnqualifiedName(getNamespace(ftype.getDisplayName()));
+      switch (propName) {
+        case "resolve":
+          return "static resolve < T >(value: " + className +" < T > | T): " +
+              className + " < T >;";
+        case "race":
+          return  "static race < T > (values : T [] ) : " + className + " < T > ;";
+        case "all":
+          return "static all(promises : " + className + " < any > [] ) : " +
+              className + " < any [] > ;";
+        default:
+      }
+      return null;
     }
 
     private Set<String> getTemplateTypeNames(ObjectType objType) {

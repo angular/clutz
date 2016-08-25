@@ -294,13 +294,13 @@ declare namespace ಠ_ಠ.clutz {
     static all < T > (iterable : ( T | Promise < T > ) [] | Iterable < T | Promise < T > > ) : Promise < T [] > ;
     static race < T > (iterable : T [] | Iterable < T > ) : Promise < T > ;
     static reject (opt_error ? : any ) : Promise < any > ;
-    static resolve < VALUE , RESULT > (opt_value ? : VALUE ) : RESULT ;
+    static resolve < T >(value: Promise < T > | T): Promise < T >;
   }
   class Promise_Instance < TYPE > implements PromiseLike < TYPE > {
     private noStructuralTyping_: any;
     constructor (resolver : (a : (a ? : TYPE | PromiseLike < TYPE > | null | { then : any } ) => any , b : (a ? : any ) => any ) => any ) ;
     catch < RESULT > (onRejected : (a : any ) => RESULT ) : Promise < RESULT > ;
-    then < VALUE , RESULT > (opt_onFulfilled ? : ( (a : TYPE ) => VALUE ) | null , opt_onRejected ? : ( (a : any ) => any ) | null ) : RESULT ;
+    then < RESULT > (opt_onFulfilled ? : ( (a : TYPE ) => Promise < RESULT > | RESULT ) | null , opt_onRejected ? : ( (a : any ) => any ) | null) : Promise < RESULT > ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
