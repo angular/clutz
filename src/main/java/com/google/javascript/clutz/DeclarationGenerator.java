@@ -344,6 +344,10 @@ class DeclarationGenerator {
         declareModule(provide, true, emitName);
         continue;
       }
+      if (symbol.getType() == null) {
+        emitComment("Skipping symbol " + symbol.getName() + " due to missing type information.");
+        continue;
+      }
       // ArrayLike is defined in lib.d.ts, so we skip any type alias that
       // would shadow it.
       // Note that clutz expands type aliases used in closure code,
@@ -354,7 +358,6 @@ class DeclarationGenerator {
         emitBreak();
         continue;
       }
-      // checkArgument(symbol.getType() != null, "all symbols should have a type: %s", provide);
       String namespace = symbol.getName();
       boolean isDefault = isDefaultExport(symbol);
       // These goog.provide's have only one symbol, so users expect to use default import
