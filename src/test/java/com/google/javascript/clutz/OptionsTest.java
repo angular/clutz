@@ -71,4 +71,11 @@ public class OptionsTest {
     Options opts = new Options(new String[] { "--externs", "extern1.js"});
     assertThat(opts.externs).containsExactly("extern1.js");
   }
+
+  @Test
+  public void testShouldPruneRepeatedExterns() throws Exception {
+    Options opts = new Options(new String[] {"a.js", "extern1.js", "--externs", "extern1.js", "extern2.js"});
+    assertThat(opts.externs).containsExactly("extern1.js", "extern2.js");
+    assertThat(opts.arguments).containsExactly("a.js");
+  }
 }

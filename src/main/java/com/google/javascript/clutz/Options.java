@@ -102,6 +102,8 @@ public class Options {
       arguments.retainAll(merged);
     }
     externs.addAll(depgraph.getExterns());
+    // Exclude externs that are already in the sources to avoid duplicated symbols.
+    arguments.removeAll(externs);
     if (!strictDeps) {
       depgraph = depgraph.withNonrootsAsRoots();
     }
