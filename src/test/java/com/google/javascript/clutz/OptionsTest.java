@@ -38,7 +38,7 @@ public class OptionsTest {
     assertThat(opts.arguments).containsExactly("javascript/closure/string/string.js",
         "blaze-out/blah/my/blaze-out-file.js").inOrder();
     assertThat(opts.externs)
-        .containsExactly("extern1.js", "extern2.js", "javascript/common/dom.js")
+        .containsExactly("javascript/common/dom.js", "extern1.js", "extern2.js")
         .inOrder();
     assertThat(opts.output).isEqualTo("output.d.ts");
   }
@@ -77,5 +77,13 @@ public class OptionsTest {
     Options opts = new Options(new String[] {"a.js", "extern1.js", "--externs", "extern1.js", "extern2.js"});
     assertThat(opts.externs).containsExactly("extern1.js", "extern2.js");
     assertThat(opts.arguments).containsExactly("a.js");
+  }
+
+  @Test
+  public void testExternsShouldBeUnique() throws Exception {
+    Options opts = new Options(new String[]{"--externs", "javascript/common/dom.js", "--depgraphs",
+        DepgraphTest.DEPGRAPH_PATH.toFile().toString(),
+    });
+    assertThat(opts.externs).containsExactly("javascript/common/dom.js");
   }
 }

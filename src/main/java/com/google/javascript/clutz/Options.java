@@ -6,8 +6,11 @@ import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.DependencyOptions;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
+
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -101,7 +104,11 @@ public class Options {
       Set<String> merged = Sets.union(depgraph.getRoots(), depgraph.getNonroots());
       arguments.retainAll(merged);
     }
-    externs.addAll(depgraph.getExterns());
+    // set union command line externs and depgraph.externs.
+    Set<String> allExterns = new LinkedHashSet<>(depgraph.getExterns());
+    allExterns.addAll(externs);
+    externs = new ArrayList<>(allExterns);
+
     // Exclude externs that are already in the sources to avoid duplicated symbols.
     arguments.removeAll(externs);
     if (!strictDeps) {
