@@ -39,3 +39,11 @@ class E extends C {
 }
 let nested = {};
 nested.klass = class {};
+class F {
+  // inline comment
+
+  /**
+   * block comment
+   */
+  constructor() {}
+}

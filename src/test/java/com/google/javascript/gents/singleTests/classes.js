@@ -50,3 +50,14 @@ var E = goog.defineClass(C, {
 var nested = {};
 /** @constructor */
 nested.klass = function() {};
+
+
+const F = goog.defineClass(null, {
+  // inline comment
+
+  /**
+   * block comment
+   */
+  constructor: function() {
+  },
+});

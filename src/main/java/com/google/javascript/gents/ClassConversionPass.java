@@ -13,10 +13,8 @@ import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.JSTypeExpression;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import javax.annotation.Nullable;
 
 /**
@@ -236,13 +234,19 @@ public final class ClassConversionPass implements CompilerPass {
 
     Node classMembers = new Node(Token.CLASS_MEMBERS);
     for (Node child : n.getLastChild().children()) {
-      // Handle static methods
-      if ("statics".equals(child.getString())) {
-        for (Node child2 : child.getFirstChild().children()) {
-          convertOjbectLiteral(classMembers, child2, true);
+      if (child.isStringKey()) {
+        // Handle static methods
+        if ("statics".equals(child.getString())) {
+          for (Node child2 : child.getFirstChild().children()) {
+            convertOjbectLiteral(classMembers, child2, true);
+          }
+        } else { // prototype methods
+          convertOjbectLiteral(classMembers, child, false);
         }
-      } else { // prototype methods
-        convertOjbectLiteral(classMembers, child, false);
+      } else {
+        // Add all other members, such as EMPTY comment nodes, as is.
+        child.detachFromParent();
+        classMembers.addChildrenToBack(child);
       }
     }
     Node classNode = new Node(Token.CLASS, IR.empty(), superClass, classMembers);
