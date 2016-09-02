@@ -90,7 +90,7 @@ public final class TypeAnnotationPass implements CompilerPass {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
       JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
-      switch (n.getType()) {
+      switch (n.getToken()) {
         // Fields default to any type
         case MEMBER_VARIABLE_DEF:
           if (bestJSDocInfo != null && bestJSDocInfo.getType() != null) {
@@ -125,13 +125,13 @@ public final class TypeAnnotationPass implements CompilerPass {
               Node attachTypeExpr = n;
               // Modify the primary AST to represent a function parameter as a
               // REST node, if the type indicates it is a rest parameter.
-              if (parameterType.getRoot().getType() == Token.ELLIPSIS) {
+              if (parameterType.getRoot().getToken() == Token.ELLIPSIS) {
                 attachTypeExpr = IR.rest(n.getString());
                 nodeComments.replaceWithComment(n, attachTypeExpr);
                 compiler.reportCodeChange();
               }
               // Modify the AST to represent an optional parameter
-              if (parameterType.getRoot().getType() == Token.EQUALS) {
+              if (parameterType.getRoot().getToken() == Token.EQUALS) {
                 attachTypeExpr = IR.name(n.getString());
                 attachTypeExpr.putBooleanProp(Node.OPT_ES6_TYPED, true);
                 nodeComments.replaceWithComment(n, attachTypeExpr);
@@ -142,7 +142,7 @@ public final class TypeAnnotationPass implements CompilerPass {
           }
           break;
         case CAST:
-          setTypeExpression(n, n.getJSDocInfo().getType(), false);
+          setTypeExpression(n, n.getJSDocInfo().getToken(), false);
           break;
         default:
           break;
@@ -248,7 +248,7 @@ public final class TypeAnnotationPass implements CompilerPass {
 
   @Nullable
   public TypeDeclarationNode convertTypeNodeAST(Node n, boolean isReturnType) {
-    switch (n.getType()) {
+    switch (n.getToken()) {
       // for function types that don't declare a return type
       // ex. /** @return */ var f = function() {};
       case EMPTY:
@@ -313,7 +313,7 @@ public final class TypeAnnotationPass implements CompilerPass {
       case LC:
         LinkedHashMap<String, TypeDeclarationNode> properties = new LinkedHashMap<>();
         for (Node field : n.getFirstChild().children()) {
-          boolean isFieldTypeDeclared = field.getType() == Token.COLON;
+          boolean isFieldTypeDeclared = field.getToken() == Token.COLON;
           Node fieldNameNode = isFieldTypeDeclared ? field.getFirstChild() : field;
           String fieldName = fieldNameNode.getString();
           if (fieldName.startsWith("'") || fieldName.startsWith("\"")) {
@@ -349,12 +349,12 @@ public final class TypeAnnotationPass implements CompilerPass {
             int paramIdx = 1;
             for (Node param : child2.children()) {
               String paramName = "p" + paramIdx++;
-              if (param.getType() == Token.ELLIPSIS) {
+              if (param.getToken() == Token.ELLIPSIS) {
                 if (param.getFirstChild() != null) {
                   restType = convertTypeNodeAST(param);
                 }
                 restName = paramName;
-              } else if (param.getType() == Token.EQUALS) {
+              } else if (param.getToken() == Token.EQUALS) {
                 optionalParams.put(paramName, convertTypeNodeAST(param));
               } else {
                 requiredParams.put(paramName, convertTypeNodeAST(param));
@@ -443,7 +443,7 @@ public final class TypeAnnotationPass implements CompilerPass {
   void flatten(Iterable<TypeDeclarationNode> types,
       List<TypeDeclarationNode> result, boolean hasNull) {
     for (TypeDeclarationNode t : types) {
-      switch (t.getType()) {
+      switch (t.getToken()) {
         case NULL:
           if (!hasNull) {
             result.add(new TypeDeclarationNode(Token.NULL));

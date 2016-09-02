@@ -90,7 +90,7 @@ public final class ModuleConversionPass implements CompilerPass {
       }
 
       Node child = n.getFirstChild();
-      switch (child.getType()) {
+      switch (child.getToken()) {
         case CALL:
           String callName = child.getFirstChild().getQualifiedName();
           if ("goog.module".equals(callName) || "goog.provide".equals(callName)) {

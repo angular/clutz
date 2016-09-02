@@ -64,7 +64,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
 
     Node child = n.getFirstChild();
     String filename = n.getSourceFileName();
-    switch (child.getType()) {
+    switch (child.getToken()) {
       case CALL:
         // Ignore unusual call cases
         // (function() {...})()

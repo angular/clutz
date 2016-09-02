@@ -53,7 +53,7 @@ public final class ClassConversionPass implements CompilerPass {
   private class ClassDefinitionConverter extends AbstractPostOrderCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
-      switch (n.getType()) {
+      switch (n.getToken()) {
         case FUNCTION:
           JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
           if (bestJSDocInfo != null && bestJSDocInfo.isConstructor()) {
@@ -77,7 +77,7 @@ public final class ClassConversionPass implements CompilerPass {
   private class ClassMemberConverter extends AbstractPostOrderCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
-      switch (n.getType()) {
+      switch (n.getToken()) {
         case CLASS:
           addClassToScope(n);
           break;
@@ -156,7 +156,7 @@ public final class ClassConversionPass implements CompilerPass {
   private class InheritanceConverter extends AbstractPostOrderCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
-      switch (n.getType()) {
+      switch (n.getToken()) {
         case EXPR_RESULT:
           maybeRemoveInherits(n);
           break;

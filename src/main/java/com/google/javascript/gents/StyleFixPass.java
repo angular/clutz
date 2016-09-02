@@ -32,7 +32,7 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
 
   @Override
   public void visit(NodeTraversal t, Node n, Node parent) {
-    switch (n.getType()) {
+    switch (n.getToken()) {
       // Var is converted to let
       // This is to output more idiomatic TypeScript even if it slightly changes the semantics
       // of the original code.
