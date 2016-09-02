@@ -33,7 +33,7 @@ public class GentsCodeGenerator extends CodeGenerator {
     super.add(n, ctx);
 
     // Default field values
-    switch (n.getType()) {
+    switch (n.getToken()) {
       case MEMBER_VARIABLE_DEF:
         if (n.hasChildren()) {
           add(" = ");
@@ -57,7 +57,7 @@ public class GentsCodeGenerator extends CodeGenerator {
    * @return true if no further code generation on this node is needed.
    */
   boolean maybeOverrideCodeGen(Node n, Context ctx) {
-    switch(n.getType()) {
+    switch(n.getToken()) {
       case UNDEFINED_TYPE:
         add("undefined");
         return true;
