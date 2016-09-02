@@ -9,6 +9,7 @@ goog.A = class {
  */
   foo(n) { return n; }
 };
+
 /**
  * Named class extension
  */
@@ -26,10 +27,12 @@ class B extends goog.A {
  */
   baz(n: number): boolean { return super.foo(n) > 0; }
 }
+
 /**
  * Unconverted method
  */
 C.prototype.baz = function(n: number): void {};
+
 /**
  * goog.defineClass based classes
  */

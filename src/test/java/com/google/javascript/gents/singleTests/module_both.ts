@@ -4,5 +4,7 @@ let B = function(): number {
 };
 export {B};
 export {num};
+
 export class foo { static z: number; }
+
 foo.z = num * 2;

@@ -4,6 +4,7 @@
 class A {
   constructor(a: number) { this.a = a; }
 }
+
 /**
  * Named class
  */
@@ -13,6 +14,7 @@ class B {
     this.b = b;
   }
 }
+
 /**
  * Named class extension
  */
@@ -22,6 +24,7 @@ class C extends A {
     this.b = b;
   }
 }
+
 /**
  * Anonymous class extension
  */
@@ -31,14 +34,17 @@ class D extends B {
     this.c = c;
   }
 }
+
 /**
  * goog.defineClass based classes
  */
 class E extends C {
   constructor(a, b) { super(a, b); }
 }
+
 let nested = {};
 nested.klass = class {};
+
 class F {
   // inline comment
 

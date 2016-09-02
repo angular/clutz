@@ -10,11 +10,14 @@ goog.A = class {
  */
   static bar(n: number): boolean { return n > 0; }
 };
+
 goog.A.B = {};
+
 /**
  * Unconverted method
  */
 goog.A.B.baz = function(n: number): void {};
+
 /**
  * goog.defineClass based classes
  */
@@ -24,6 +27,7 @@ goog.B = class extends goog.A {
   static foo(): boolean { return false; }
   static bar(): boolean { return true; }
 };
+
 class A {
   constructor() { goog.A.foo(4); }
   static anon() {

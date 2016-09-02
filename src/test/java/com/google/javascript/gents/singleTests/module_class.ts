@@ -3,4 +3,5 @@ class klass {
   constructor(public n: number) {}
   foo(): boolean { return false; }
 }
+
 export const C = klass;

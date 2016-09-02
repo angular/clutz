@@ -50,6 +50,15 @@ public class GentsCodeGenerator extends CodeGenerator {
       default:
         break;
     }
+
+    // Add an empty line if the next node is further away than the next line.
+    Node nextNode = n.getNext();
+    if (nextNode != null) {
+      int lineSpacing = nextNode.getLineno() - n.getLineno();
+      if (lineSpacing > 1) {
+        add("\n");
+      }
+    }
   }
 
   /**

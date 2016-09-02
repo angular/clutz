@@ -13,6 +13,7 @@ class A {
 /* Still the same block */
 // Yup
 // Here too
+
 /**
  * @param notdeleted because this has a description
  * @return this also has a description
