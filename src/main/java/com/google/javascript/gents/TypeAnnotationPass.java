@@ -142,7 +142,7 @@ public final class TypeAnnotationPass implements CompilerPass {
           }
           break;
         case CAST:
-          setTypeExpression(n, n.getJSDocInfo().getToken(), false);
+          setTypeExpression(n, n.getJSDocInfo().getType(), false);
           break;
         default:
           break;
