@@ -2,9 +2,7 @@
  * Anonymous class
  */
 class A {
-  constructor(a: number) {
-    this.a = a;
-  }
+  constructor(a: number) { this.a = a; }
 }
 
 /**
@@ -41,9 +39,7 @@ class D extends B {
  * goog.defineClass based classes
  */
 class E extends C {
-  constructor(a, b) {
-    super(a, b);
-  }
+  constructor(a, b) { super(a, b); }
 }
 
 let nested = {};
