@@ -168,7 +168,7 @@ public final class TypeAnnotationPass implements CompilerPass {
 
       // Change variable declarations to constants
       if (bestJSDocInfo.isConstant() && (n.isVar() || n.isLet())) {
-        n.setType(Token.CONST);
+        n.setToken(Token.CONST);
       }
     }
   }
