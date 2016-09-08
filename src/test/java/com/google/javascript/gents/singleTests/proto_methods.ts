@@ -3,11 +3,15 @@ let goog: any = {};
  * Nested anonymous class in ES6 syntax
  */
 goog.A = class {
-  constructor(a: number) { this.a = a; }
+  constructor(a: number) {
+    this.a = a;
+  }
   /**
  * Untyped method
  */
-  foo(n) { return n; }
+  foo(n) {
+    return n;
+  }
 };
 
 /**
@@ -21,11 +25,15 @@ class B extends goog.A {
   /**
  * Typed method
  */
-  bar(n: number): boolean { return super.foo(n) > 0; }
+  bar(n: number): boolean {
+    return super.foo(n) > 0;
+  }
   /**
  * Another typed method
  */
-  baz(n: number): boolean { return super.foo(n) > 0; }
+  baz(n: number): boolean {
+    return super.foo(n) > 0;
+  }
 }
 
 /**
@@ -37,6 +45,10 @@ C.prototype.baz = function(n: number): void {};
  * goog.defineClass based classes
  */
 goog.B = class extends goog.A {
-  constructor(a) { super(a); }
-  foo(): number { return 0; }
+  constructor(a) {
+    super(a);
+  }
+  foo(): number {
+    return 0;
+  }
 };
