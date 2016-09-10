@@ -26,7 +26,7 @@ import org.kohsuke.args4j.CmdLineException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,6 +42,15 @@ public class TypeScriptGenerator {
    */
   private static final String[] CLANG_FORMAT = {"clang-format",
       "-assume-filename=a.ts", "-style=Google"};
+
+  static {
+    // In some environments (Mac OS X programs started from Finder, like your IDE) PATH does
+    // not contain "clang-format". This property allows explicitly configuring its location.
+    String cfLocation = System.getProperty("gents.clangFormat");
+    if (cfLocation != null) {
+      CLANG_FORMAT[0] = cfLocation;
+    }
+  }
 
   public static void main(String[] args) {
     Options options = null;
@@ -95,7 +104,7 @@ public class TypeScriptGenerator {
   void generateTypeScript() {
     List<SourceFile> srcFiles = getFiles(opts.srcFiles);
     List<SourceFile> externFiles = getFiles(opts.externs);
-    Set<String> filesToConvert = Sets.newHashSet(opts.filesToConvert);
+    Set<String> filesToConvert = Sets.newLinkedHashSet(opts.filesToConvert);
 
     Map<String, String> result = generateTypeScript(filesToConvert, srcFiles, externFiles);
 
@@ -129,7 +138,7 @@ public class TypeScriptGenerator {
    */
   Map<String, String> generateTypeScript(Set<String> filesToConvert,
       List<SourceFile> srcFiles, List<SourceFile> externs) throws AssertionError {
-    Map<String, String> sourceFileMap = new HashMap<>();
+    Map<String, String> sourceFileMap = new LinkedHashMap<>();
 
     final CompilerOptions compilerOpts = opts.getCompilerOptions();
     // Compile javascript code

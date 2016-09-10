@@ -4,7 +4,7 @@ import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DiagnosticGroups;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import org.kohsuke.args4j.Argument;
@@ -44,7 +44,7 @@ public class Options {
   @Argument
   List<String> arguments = new ArrayList<>();
 
-  Set<String> srcFiles = new HashSet<>();
+  Set<String> srcFiles = new LinkedHashSet<>();
 
   public CompilerOptions getCompilerOptions() {
     final CompilerOptions options = new CompilerOptions();

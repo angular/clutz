@@ -6,9 +6,8 @@ import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.rhino.Node;
-
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,8 +21,8 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
   private final NameUtil nameUtil;
 
   final Set<String> filesToConvert;
-  final Map<String, FileModule> fileToModule = new HashMap<>();
-  final Map<String, FileModule> namespaceToModule = new HashMap<>();
+  final Map<String, FileModule> fileToModule = new LinkedHashMap<>();
+  final Map<String, FileModule> namespaceToModule = new LinkedHashMap<>();
 
   Map<String, FileModule> getFileMap() {
     return fileToModule;
@@ -35,7 +34,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
 
   /** Returns a map from all symbols in the compilation unit to their respective modules */
   Map<String, FileModule> getSymbolMap() {
-    Map<String, FileModule> out = new HashMap<>();
+    Map<String, FileModule> out = new LinkedHashMap<>();
     for (FileModule module : fileToModule.values()) {
       for (String symbol : module.importedNamespacesToSymbols.keySet()) {
         out.put(symbol, module);
@@ -149,7 +148,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
      * exports.C.D = ...;
      * Would result in providesObjectChildren['A.B'] = {'C'}
      */
-    final Map<String, Set<String>> providesObjectChildren = new HashMap<>();
+    final Map<String, Set<String>> providesObjectChildren = new LinkedHashMap<>();
     /**
      * Map from the fully qualified name being exported to the exported symbol. For example,
      * goog.module('A.B');
@@ -160,7 +159,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
      * exportedNamespacesToSymbols['exports'] = 'B'
      * exportedNamespacesToSymbols['exports.C'] = 'C'
      */
-    final Map<String, String> exportedNamespacesToSymbols = new HashMap<>();
+    final Map<String, String> exportedNamespacesToSymbols = new LinkedHashMap<>();
     /**
      * Map from the fully qualified name that would be imported to the exported symbol. For example,
      * goog.module('A.B');
@@ -171,7 +170,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
      * importedNamespacesToSymbols['A.B'] = 'B'
      * importedNamespacesToSymbols['A.B.C'] = 'C'
      */
-    final Map<String, String> importedNamespacesToSymbols = new HashMap<>();
+    final Map<String, String> importedNamespacesToSymbols = new LinkedHashMap<>();
 
     FileModule(String file, boolean isGoogModule) {
       this.file = file;
@@ -194,7 +193,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
      * on the qualified name.
      */
     void registerNamespaceToGlobalScope(String namespace) {
-      providesObjectChildren.put(namespace, new HashSet<String>());
+      providesObjectChildren.put(namespace, new LinkedHashSet<String>());
       if (isJsLibrary) {
         maybeAddExport(NodeUtil.newQName(compiler, namespace));
       }
