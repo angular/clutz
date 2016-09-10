@@ -27,3 +27,7 @@ goog.inherits = function(childCtor, parentCtor) {};
  * @return {boolean} Whether variable is defined.
  */
 goog.isDef = function(val) {};
+
+goog.provide('goog.Uri');
+/** @constructor */
+goog.Uri =  function() {}

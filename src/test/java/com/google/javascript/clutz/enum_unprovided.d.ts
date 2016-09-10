@@ -6,7 +6,7 @@ declare namespace ಠ_ಠ.clutz.somenamespace {
     bar : ಠ_ಠ.clutz.somenamespace.MyEnum ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'somenamespace.Foo'): typeof ಠ_ಠ.clutz.somenamespace.Foo;
 }
 declare module 'goog:somenamespace.Foo' {

@@ -5,7 +5,7 @@ declare namespace ಠ_ಠ.clutz.foo {
     constructor ( ) ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'foo.A'): typeof ಠ_ಠ.clutz.foo.A;
 }
 declare module 'goog:foo.A' {

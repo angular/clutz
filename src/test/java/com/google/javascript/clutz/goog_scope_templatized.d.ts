@@ -16,7 +16,7 @@ declare namespace ಠ_ಠ.clutz.aliasT {
   //!! TODO(rado): investigate why this is not I<string>.
   var iboom : ಠ_ಠ.clutz.$jscomp.scope.I < any > | null ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'aliasT.iboom'): typeof ಠ_ಠ.clutz.aliasT.iboom;
 }
 declare module 'goog:aliasT.iboom' {

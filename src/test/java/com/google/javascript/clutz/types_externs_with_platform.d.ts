@@ -17,7 +17,7 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
   var myScope : ಠ_ಠ.clutz.namespace.Foo ;
   function topLevelFunction ( ...a : any [] ) : any ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'typesWithExterns'): typeof ಠ_ಠ.clutz.typesWithExterns;
 }
 declare module 'goog:typesWithExterns' {
@@ -33,7 +33,7 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
     apply : number ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'typesWithExterns.A'): typeof ಠ_ಠ.clutz.typesWithExterns.A;
 }
 declare module 'goog:typesWithExterns.A' {
@@ -48,7 +48,7 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
     constructor ( ) ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'typesWithExterns.B'): typeof ಠ_ಠ.clutz.typesWithExterns.B;
 }
 declare module 'goog:typesWithExterns.B' {
@@ -62,7 +62,7 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
     constructor ( ) ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'typesWithExterns.C'): typeof ಠ_ಠ.clutz.typesWithExterns.C;
 }
 declare module 'goog:typesWithExterns.C' {

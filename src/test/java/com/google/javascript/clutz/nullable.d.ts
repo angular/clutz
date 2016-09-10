@@ -13,7 +13,7 @@ declare namespace ಠ_ಠ.clutz.nullable {
    */
   var z : Object | null ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'nullable'): typeof ಠ_ಠ.clutz.nullable;
 }
 declare module 'goog:nullable' {

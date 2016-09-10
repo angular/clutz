@@ -8,7 +8,7 @@ declare namespace ಠ_ಠ.clutz.undefinedns {
   function h ( ) : void ;
   function i ( ) : undefined | string ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'undefinedns'): typeof ಠ_ಠ.clutz.undefinedns;
 }
 declare module 'goog:undefinedns' {

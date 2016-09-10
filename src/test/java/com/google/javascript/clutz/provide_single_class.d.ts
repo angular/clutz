@@ -23,7 +23,7 @@ declare namespace ಠ_ಠ.clutz.foo.bar.Baz {
     B : NestedEnum ,
   };
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'foo.bar.Baz'): typeof ಠ_ಠ.clutz.foo.bar.Baz;
 }
 declare module 'goog:foo.bar.Baz' {

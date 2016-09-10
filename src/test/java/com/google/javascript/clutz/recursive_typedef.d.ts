@@ -6,7 +6,7 @@ declare namespace ಠ_ಠ.clutz.rec {
     foo : ಠ_ಠ.clutz.rec.ns.Arr ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'rec.Aclass'): typeof ಠ_ಠ.clutz.rec.Aclass;
 }
 declare module 'goog:rec.Aclass' {
@@ -21,7 +21,7 @@ declare namespace ಠ_ಠ.clutz.rec.ns {
   var foo2 : ಠ_ಠ.clutz.rec.ns.El ;
   var tvar : ಠ_ಠ.clutz.rec.ns.T ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'rec.ns'): typeof ಠ_ಠ.clutz.rec.ns;
 }
 declare module 'goog:rec.ns' {

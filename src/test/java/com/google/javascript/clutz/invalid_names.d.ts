@@ -1,7 +1,7 @@
 declare namespace ಠ_ಠ.clutz.invalid.names {
   var valid : null ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'invalid.names'): typeof ಠ_ಠ.clutz.invalid.names;
 }
 declare module 'goog:invalid.names' {

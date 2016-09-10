@@ -64,10 +64,15 @@ public class Options {
 
     // Compiler passes must be disabled to disable down-transpilation to ES5.
     options.skipAllCompilerPasses();
-    // So that we can query types after compilation.
-    options.setIdeMode(true);
+    setIdeMode(options);
 
     return options;
+  }
+
+  @SuppressWarnings("deprecation")
+  private void setIdeMode(final CompilerOptions options) {
+    // So that we can query types after compilation.
+    options.setIdeMode(true);
   }
 
   Options(String[] args) throws CmdLineException {

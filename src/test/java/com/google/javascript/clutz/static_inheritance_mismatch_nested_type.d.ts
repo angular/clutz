@@ -10,7 +10,7 @@ declare namespace ಠ_ಠ.clutz.sim_nested.Child {
     B : Nested ,
   };
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'sim_nested.Child'): typeof ಠ_ಠ.clutz.sim_nested.Child;
 }
 declare module 'goog:sim_nested.Child' {
@@ -23,7 +23,7 @@ declare namespace ಠ_ಠ.clutz.sim_nested.Child {
     B : NestedAndProvided ,
   };
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'sim_nested.Child.NestedAndProvided'): typeof ಠ_ಠ.clutz.sim_nested.Child.NestedAndProvided;
 }
 declare module 'goog:sim_nested.Child.NestedAndProvided' {
@@ -43,7 +43,7 @@ declare namespace ಠ_ಠ.clutz.sim_nested.Parent {
     A : Nested ,
   };
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'sim_nested.Parent'): typeof ಠ_ಠ.clutz.sim_nested.Parent;
 }
 declare module 'goog:sim_nested.Parent' {
@@ -56,7 +56,7 @@ declare namespace ಠ_ಠ.clutz.sim_nested.Parent {
     A : NestedAndProvided ,
   };
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'sim_nested.Parent.NestedAndProvided'): typeof ಠ_ಠ.clutz.sim_nested.Parent.NestedAndProvided;
 }
 declare module 'goog:sim_nested.Parent.NestedAndProvided' {

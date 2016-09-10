@@ -8,7 +8,7 @@ declare namespace ಠ_ಠ.clutz.static_inherit {
   class Child_Instance extends ಠ_ಠ.clutz.static_inherit.Parent_Instance {
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'static_inherit.Child'): typeof ಠ_ಠ.clutz.static_inherit.Child;
 }
 declare module 'goog:static_inherit.Child' {
@@ -23,7 +23,7 @@ declare namespace ಠ_ಠ.clutz.static_inherit {
   class GrandChild_Instance extends ಠ_ಠ.clutz.static_inherit.Child_Instance {
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'static_inherit.GrandChild'): typeof ಠ_ಠ.clutz.static_inherit.GrandChild;
 }
 declare module 'goog:static_inherit.GrandChild' {
@@ -41,7 +41,7 @@ declare namespace ಠ_ಠ.clutz.static_inherit {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'static_inherit.Parent'): typeof ಠ_ಠ.clutz.static_inherit.Parent;
 }
 declare module 'goog:static_inherit.Parent' {

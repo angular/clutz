@@ -29,7 +29,7 @@ declare namespace ಠ_ಠ.clutz.generics {
   function identity < T > (a : T ) : T ;
   function objectWithGenericKeyType < K , V > (obj : { [ /* warning: coerced from K */ key: string ]: V } ) : void ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'generics'): typeof ಠ_ಠ.clutz.generics;
 }
 declare module 'goog:generics' {

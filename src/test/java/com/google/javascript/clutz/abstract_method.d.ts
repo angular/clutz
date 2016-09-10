@@ -5,7 +5,7 @@ declare namespace ಠ_ಠ.clutz.abstract_method {
     bar (a : number ) : string ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'abstract_method.Child'): typeof ಠ_ಠ.clutz.abstract_method.Child;
 }
 declare module 'goog:abstract_method.Child' {
@@ -21,7 +21,7 @@ declare namespace ಠ_ಠ.clutz.abstract_method {
     foo ( ) : string ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'abstract_method.Clazz'): typeof ಠ_ಠ.clutz.abstract_method.Clazz;
 }
 declare module 'goog:abstract_method.Clazz' {

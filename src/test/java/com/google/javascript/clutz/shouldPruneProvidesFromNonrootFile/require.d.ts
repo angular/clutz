@@ -6,7 +6,7 @@ declare namespace ಠ_ಠ.clutz.a.b {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'a.b'): typeof ಠ_ಠ.clutz.a.b;
 }
 declare module 'goog:a.b' {

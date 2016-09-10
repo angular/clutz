@@ -10,7 +10,7 @@ declare namespace ಠ_ಠ.clutz.suppress {
   class B_Instance extends ಠ_ಠ.clutz.suppress.A_Instance {
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'suppress'): typeof ಠ_ಠ.clutz.suppress;
 }
 declare module 'goog:suppress' {

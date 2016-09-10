@@ -16,7 +16,7 @@ declare namespace ಠ_ಠ.clutz.privatetype {
 declare namespace ಠ_ಠ.clutz.privatetype.Foo {
   type typedef = { a : ಠ_ಠ.clutz.PrivateType } ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'privatetype.Foo'): typeof ಠ_ಠ.clutz.privatetype.Foo;
 }
 declare module 'goog:privatetype.Foo' {
@@ -32,7 +32,7 @@ declare namespace ಠ_ಠ.clutz.privatetype {
     method ( ) : void ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'privatetype.X_'): typeof ಠ_ಠ.clutz.privatetype.X_;
 }
 declare module 'goog:privatetype.X_' {
@@ -42,7 +42,7 @@ declare module 'goog:privatetype.X_' {
 declare namespace ಠ_ಠ.clutz.privatetype {
   var enumUser : ಠ_ಠ.clutz.PrivateType ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'privatetype.enumUser'): typeof ಠ_ಠ.clutz.privatetype.enumUser;
 }
 declare module 'goog:privatetype.enumUser' {
@@ -52,7 +52,7 @@ declare module 'goog:privatetype.enumUser' {
 declare namespace ಠ_ಠ.clutz.privatetype {
   var user : ಠ_ಠ.clutz.privatetype.X_ ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'privatetype.user'): typeof ಠ_ಠ.clutz.privatetype.user;
 }
 declare module 'goog:privatetype.user' {

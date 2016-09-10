@@ -3,14 +3,12 @@ package com.google.javascript.clutz;
 import com.google.common.collect.Sets;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.DependencyOptions;
+import com.google.javascript.jscomp.DiagnosticGroups;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
-
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -89,8 +87,13 @@ public class Options {
     options.setLanguageOut(CompilerOptions.LanguageMode.ECMASCRIPT5);
     options.setCheckTypes(true);
     options.setInferTypes(true);
-    options.setIdeMode(true); // So that we can query types after compilation.
+    setIdeMode(options);
     return options;
+  }
+
+  @SuppressWarnings("deprecation")
+  private void setIdeMode(final CompilerOptions options) {
+    options.setIdeMode(true); // So that we can query types after compilation.
   }
 
   Options(String[] args) throws CmdLineException {

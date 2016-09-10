@@ -9,7 +9,7 @@ declare namespace ಠ_ಠ.clutz.forward {
     fn (a : any ) : any ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'forward.A'): typeof ಠ_ಠ.clutz.forward.A;
 }
 declare module 'goog:forward.A' {

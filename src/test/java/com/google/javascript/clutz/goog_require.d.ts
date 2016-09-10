@@ -5,7 +5,7 @@ declare namespace ಠ_ಠ.clutz.foo {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'foo.SimpleClass'): typeof ಠ_ಠ.clutz.foo.SimpleClass;
 }
 declare module 'goog:foo.SimpleClass' {
@@ -15,7 +15,7 @@ declare module 'goog:foo.SimpleClass' {
 declare namespace ಠ_ಠ.clutz.foo.simpleNamespace {
   var a : number ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'foo.simpleNamespace'): typeof ಠ_ಠ.clutz.foo.simpleNamespace;
 }
 declare module 'goog:foo.simpleNamespace' {

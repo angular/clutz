@@ -44,7 +44,7 @@ declare namespace ಠ_ಠ.clutz.index_signature {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'index_signature'): typeof ಠ_ಠ.clutz.index_signature;
 }
 declare module 'goog:index_signature' {

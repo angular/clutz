@@ -4,7 +4,7 @@ declare namespace ಠ_ಠ.clutz.nested.bar {
     A : HahaEnum ,
   };
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'nested.bar.HahaEnum'): typeof ಠ_ಠ.clutz.nested.bar.HahaEnum;
 }
 declare module 'goog:nested.bar.HahaEnum' {
@@ -17,7 +17,7 @@ declare namespace ಠ_ಠ.clutz.nested.baz {
     A : Enum ,
   };
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'nested.baz.Enum'): typeof ಠ_ಠ.clutz.nested.baz.Enum;
 }
 declare module 'goog:nested.baz.Enum' {

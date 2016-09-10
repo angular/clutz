@@ -79,7 +79,7 @@ class DeclarationGenerator {
   static final String INSTANCE_CLASS_SUFFIX = "_Instance";
 
   /**
-   * Contains symbols that are part of platform externs, but not yet in lib.d.ts This list is
+   * Contains symbols that are part of platform externs, but not yet in lib.d.ts. This list is
    * incomplete and will grow as needed.
    */
   private static final Set<String> platformSymbolsMissingInTypeScript = ImmutableSet.of(
@@ -116,6 +116,8 @@ class DeclarationGenerator {
       "null", "package", "private", "protected", "public", "return", "static",
       "super", "switch", "this", "throw", "true", "try", "typeof", "var",
       "void", "while", "with", "yield");
+
+  private static final String GOOG_BASE_NAMESPACE = "goog";
 
   /**
    * List of global platform symbols that are redirected through an alias in closure.lib.d.ts
@@ -649,7 +651,12 @@ class DeclarationGenerator {
       emitComment("skipping property " + symbol.getName() + " because it is not a valid symbol.");
       return 0;
     }
-    emitNamespaceBegin(namespace);
+    if (GOOG_BASE_NAMESPACE.equals(namespace) && GOOG_BASE_NAMESPACE.equals(symbol.getName())) {
+      // Emitting the 'goog' namespace itself (but not e.g. 'goog.Uri').
+      emitTopLevelNamespaceBegin(namespace);
+    } else {
+      emitNamespaceBegin(namespace);
+    }
     TreeWalker treeWalker = new TreeWalker(compiler.getTypeRegistry(), provides, isExtern);
     if (isDefault) {
       if (isPrivate(symbol.getJSDocInfo()) && !isConstructor(symbol.getJSDocInfo())) {
@@ -783,8 +790,8 @@ class DeclarationGenerator {
 
   private void emitGoogRequireSupport(String namespace, String nameToBeRequired, String emitName) {
     // goog namespace doesn't need to be goog.required.
-    if (namespace.equals("goog")) return;
-    emitNamespaceBegin("goog");
+    if (namespace.equals(GOOG_BASE_NAMESPACE)) return;
+    emitTopLevelNamespaceBegin(GOOG_BASE_NAMESPACE);
     // TS supports overloading the require declaration with a fixed string argument.
     emit("function require(name: '" + nameToBeRequired + "'): typeof " +
         Constants.INTERNAL_NAMESPACE + "." + emitName + ";");
@@ -794,11 +801,17 @@ class DeclarationGenerator {
 
 
   private void emitNamespaceBegin(String namespace) {
-    emitNoSpace("declare namespace ");
-    emitNoSpace(Constants.INTERNAL_NAMESPACE);
+    String internalNamespace = Constants.INTERNAL_NAMESPACE;
     if (!namespace.isEmpty()) {
-      emitNoSpace("." + namespace);
+      internalNamespace += ".";
+      internalNamespace += namespace;
     }
+    emitTopLevelNamespaceBegin(internalNamespace);
+  }
+
+  private void emitTopLevelNamespaceBegin(String namespace) {
+    emitNoSpace("declare namespace ");
+    emitNoSpace(namespace);
     emitNoSpace(" {");
     indent();
     emitBreak();
@@ -871,6 +884,10 @@ class DeclarationGenerator {
 
   private void declareModule(String name, boolean isDefault, String emitName,
                              boolean inParentNamespace) {
+    if (GOOG_BASE_NAMESPACE.equals(name)) {
+      // goog:goog cannot be imported.
+      return;
+    }
     emitNoSpace("declare module '");
     emitNoSpace("goog:" + name);
     emitNoSpace("' {");

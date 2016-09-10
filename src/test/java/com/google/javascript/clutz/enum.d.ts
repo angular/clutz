@@ -5,7 +5,7 @@ declare namespace ಠ_ಠ.clutz.some {
     B : SomeEnum ,
   };
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'some.SomeEnum'): typeof ಠ_ಠ.clutz.some.SomeEnum;
 }
 declare module 'goog:some.SomeEnum' {

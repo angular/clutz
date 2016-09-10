@@ -6,7 +6,7 @@ declare namespace ಠ_ಠ.clutz.namedType {
     fn (a : ಠ_ಠ.clutz.namedType.D < any > ) : any ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'namedType.A'): typeof ಠ_ಠ.clutz.namedType.A;
 }
 declare module 'goog:namedType.A' {
@@ -20,7 +20,7 @@ declare namespace ಠ_ಠ.clutz.namedType {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'namedType.D'): typeof ಠ_ಠ.clutz.namedType.D;
 }
 declare module 'goog:namedType.D' {

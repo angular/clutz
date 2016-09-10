@@ -3,7 +3,7 @@ declare namespace ಠ_ಠ.clutz.union {
   var nullableUnion : Object | number ;
   var x : boolean | string ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'union'): typeof ಠ_ಠ.clutz.union;
 }
 declare module 'goog:union' {

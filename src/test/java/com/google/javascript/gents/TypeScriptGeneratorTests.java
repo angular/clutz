@@ -8,28 +8,24 @@ import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.javascript.clutz.DeclarationGeneratorTests;
 import com.google.javascript.jscomp.SourceFile;
-
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.Describable;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
-
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @RunWith(AllTests.class)
 public class TypeScriptGeneratorTests {
@@ -100,7 +96,7 @@ public class TypeScriptGeneratorTests {
         Map<String, String> transpiledSource = gents.generateTypeScript(
             Collections.singleton(sourceFile.getName()),
             Collections.singletonList(SourceFile.fromCode(sourceFile.getName(), sourceText)),
-            Collections.EMPTY_LIST);
+            Collections.<SourceFile>emptyList());
 
         assertThat(transpiledSource).hasSize(1);
         assertThat(transpiledSource).containsKey(basename);
@@ -144,7 +140,7 @@ public class TypeScriptGeneratorTests {
     return gents.generateTypeScript(
         sourceNames,
         Lists.newArrayList(sourceFiles),
-        Collections.EMPTY_LIST);
+        Collections.<SourceFile>emptyList());
   }
 
   @Test

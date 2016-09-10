@@ -23,7 +23,7 @@ declare namespace ಠ_ಠ.clutz.interface_exp {
     B : SomeEnum ,
   };
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'interface_exp.SomeEnum'): typeof ಠ_ಠ.clutz.interface_exp.SomeEnum;
 }
 declare module 'goog:interface_exp.SomeEnum' {

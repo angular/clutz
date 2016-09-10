@@ -16,7 +16,7 @@ declare namespace ಠ_ಠ.clutz.typedefs {
   type strOrFunc = string | ( ( ) => string ) ;
   type strToStr = (a : string ) => string ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'typedefs'): typeof ಠ_ಠ.clutz.typedefs;
 }
 declare module 'goog:typedefs' {

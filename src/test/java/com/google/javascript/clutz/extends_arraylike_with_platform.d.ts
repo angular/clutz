@@ -7,7 +7,7 @@ declare namespace ಠ_ಠ.clutz.extend.arraylike {
     length : number ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'extend.arraylike.A'): typeof ಠ_ಠ.clutz.extend.arraylike.A;
 }
 declare module 'goog:extend.arraylike.A' {
@@ -23,7 +23,7 @@ declare namespace ಠ_ಠ.clutz.extend.arraylike {
     length : number ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'extend.arraylike.B'): typeof ಠ_ಠ.clutz.extend.arraylike.B;
 }
 declare module 'goog:extend.arraylike.B' {

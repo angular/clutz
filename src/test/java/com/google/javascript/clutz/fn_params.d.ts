@@ -8,7 +8,7 @@ declare namespace ಠ_ಠ.clutz.fn_params {
   function varargs (x : string ,  ...y : ( number | undefined ) [] ) : void ;
   function varargs_fns ( ...var_args : ( Function | null | undefined ) [] ) : void ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'fn_params'): typeof ಠ_ಠ.clutz.fn_params;
 }
 declare module 'goog:fn_params' {

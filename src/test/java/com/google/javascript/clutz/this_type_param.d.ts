@@ -7,7 +7,7 @@ declare namespace ಠ_ಠ.clutz.nsThis {
     foo ( ) : this ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'nsThis.C'): typeof ಠ_ಠ.clutz.nsThis.C;
 }
 declare module 'goog:nsThis.C' {
@@ -20,7 +20,7 @@ declare namespace ಠ_ಠ.clutz.nsThis {
   class D_Instance extends ಠ_ಠ.clutz.nsThis.C_Instance {
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'nsThis.D'): typeof ಠ_ಠ.clutz.nsThis.D;
 }
 declare module 'goog:nsThis.D' {

@@ -5,7 +5,7 @@ declare namespace ಠ_ಠ.clutz.a.b {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'a.b.StaticHolder'): typeof ಠ_ಠ.clutz.a.b.StaticHolder;
 }
 declare module 'goog:a.b.StaticHolder' {
@@ -19,7 +19,7 @@ declare namespace ಠ_ಠ.clutz.a.b.StaticHolder {
     Y : AnEnum ,
   };
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'a.b.StaticHolder.AnEnum'): typeof ಠ_ಠ.clutz.a.b.StaticHolder.AnEnum;
 }
 declare module 'goog:a.b.StaticHolder.AnEnum' {
@@ -29,7 +29,7 @@ declare module 'goog:a.b.StaticHolder.AnEnum' {
 declare namespace ಠ_ಠ.clutz.a.b.StaticHolder {
   function aFunction ( ) : boolean ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'a.b.StaticHolder.aFunction'): typeof ಠ_ಠ.clutz.a.b.StaticHolder.aFunction;
 }
 declare module 'goog:a.b.StaticHolder.aFunction' {

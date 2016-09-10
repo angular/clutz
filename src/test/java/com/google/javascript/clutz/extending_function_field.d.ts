@@ -1,7 +1,7 @@
 declare namespace ಠ_ಠ.clutz.a {
   function messesWithB (b : ಠ_ಠ.clutz.ns.B ) : void ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'a.messesWithB'): typeof ಠ_ಠ.clutz.a.messesWithB;
 }
 declare module 'goog:a.messesWithB' {
@@ -16,7 +16,7 @@ declare namespace ಠ_ಠ.clutz.ns {
     fn ( ) : void ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'ns.A'): typeof ಠ_ಠ.clutz.ns.A;
 }
 declare module 'goog:ns.A' {
@@ -33,7 +33,7 @@ declare namespace ಠ_ಠ.clutz.ns {
     fn ( ) : void ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'ns.B'): typeof ಠ_ಠ.clutz.ns.B;
 }
 declare module 'goog:ns.B' {

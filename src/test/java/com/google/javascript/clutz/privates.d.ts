@@ -11,7 +11,7 @@ declare namespace ಠ_ಠ.clutz.priv {
     publicField : number ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'priv'): typeof ಠ_ಠ.clutz.priv;
 }
 declare module 'goog:priv' {
@@ -32,7 +32,7 @@ declare namespace ಠ_ಠ.clutz.priv2.PublicClass {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'priv2.PublicClass'): typeof ಠ_ಠ.clutz.priv2.PublicClass;
 }
 declare module 'goog:priv2.PublicClass' {

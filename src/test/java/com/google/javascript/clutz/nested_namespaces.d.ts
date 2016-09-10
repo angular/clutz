@@ -3,7 +3,7 @@ declare namespace ಠ_ಠ.clutz.nested {
   var NotNested : {
   };
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'nested.NotNested'): typeof ಠ_ಠ.clutz.nested.NotNested;
 }
 declare module 'goog:nested.NotNested' {
@@ -15,7 +15,7 @@ declare namespace ಠ_ಠ.clutz.nested {
   var NotNestedEither : {
   };
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'nested.NotNestedEither'): typeof ಠ_ಠ.clutz.nested.NotNestedEither;
 }
 declare module 'goog:nested.NotNestedEither' {
@@ -29,7 +29,7 @@ declare namespace ಠ_ಠ.clutz.nested {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'nested.PrivateC'): typeof ಠ_ಠ.clutz.nested.PrivateC;
 }
 declare module 'goog:nested.PrivateC' {
@@ -41,7 +41,7 @@ declare namespace ಠ_ಠ.clutz.nested.PrivateC {
   var Enum : {
   };
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'nested.PrivateC.Enum'): typeof ಠ_ಠ.clutz.nested.PrivateC.Enum;
 }
 declare module 'goog:nested.PrivateC.Enum' {
@@ -51,7 +51,7 @@ declare module 'goog:nested.PrivateC.Enum' {
 declare namespace ಠ_ಠ.clutz.nested {
   var foo__clutz_alias : ಠ_ಠ.clutz.nested.PrivateC ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'nested.foo'): typeof ಠ_ಠ.clutz.nested.foo__clutz_alias;
 }
 declare module 'goog:nested.foo' {
@@ -65,7 +65,7 @@ declare namespace ಠ_ಠ.clutz.nested.foo {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'nested.foo.Klass'): typeof ಠ_ಠ.clutz.nested.foo.Klass;
 }
 declare module 'goog:nested.foo.Klass' {

@@ -5,7 +5,7 @@ declare namespace ಠ_ಠ.clutz.dep {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'dep.D'): typeof ಠ_ಠ.clutz.dep.D;
 }
 declare module 'goog:dep.D' {
@@ -20,7 +20,7 @@ declare namespace ಠ_ಠ.clutz.main {
     fn (a : ಠ_ಠ.clutz.dep.D ) : void ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'main.A'): typeof ಠ_ಠ.clutz.main.A;
 }
 declare module 'goog:main.A' {

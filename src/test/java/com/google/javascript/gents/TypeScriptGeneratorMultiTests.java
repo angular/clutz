@@ -7,23 +7,19 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.javascript.clutz.DeclarationGeneratorTests;
 import com.google.javascript.jscomp.SourceFile;
-
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
-
-import org.junit.runner.Describable;
-import org.junit.runner.Description;
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import junit.framework.TestResult;
+import junit.framework.TestSuite;
+import org.junit.runner.Describable;
+import org.junit.runner.Description;
+import org.junit.runner.RunWith;
+import org.junit.runners.AllTests;
 
 @RunWith(AllTests.class)
 public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
@@ -87,7 +83,7 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
         Map<String, String> transpiledSource = gents.generateTypeScript(
             sourceNames,
             sourceFiles,
-            Collections.EMPTY_LIST);
+            Collections.<SourceFile>emptyList());
 
         assertThat(transpiledSource).hasSize(sourceNames.size());
         for (String basename : goldenFiles.keySet()) {

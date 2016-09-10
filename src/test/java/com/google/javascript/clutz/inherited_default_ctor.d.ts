@@ -11,7 +11,7 @@ declare namespace ಠ_ಠ.clutz.def.ctor {
     constructor ( ) ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'def.ctor'): typeof ಠ_ಠ.clutz.def.ctor;
 }
 declare module 'goog:def.ctor' {

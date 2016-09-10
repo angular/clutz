@@ -1,13 +1,12 @@
 package com.google.javascript.gents;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-import org.kohsuke.args4j.CmdLineException;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import org.junit.Test;
+import org.kohsuke.args4j.CmdLineException;
 
 public class OptionsTest {
 

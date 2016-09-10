@@ -27,7 +27,7 @@ public class GentsCodeGenerator extends CodeGenerator {
       add("\n");
     }
 
-    if (maybeOverrideCodeGen(n, ctx)) {
+    if (maybeOverrideCodeGen(n)) {
       return;
     }
     super.add(n, ctx);
@@ -65,7 +65,7 @@ public class GentsCodeGenerator extends CodeGenerator {
    * Attempts to seize control of code generation if necessary.
    * @return true if no further code generation on this node is needed.
    */
-  boolean maybeOverrideCodeGen(Node n, Context ctx) {
+  boolean maybeOverrideCodeGen(Node n) {
     switch(n.getToken()) {
       case UNDEFINED_TYPE:
         add("undefined");

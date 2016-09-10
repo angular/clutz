@@ -13,7 +13,7 @@ declare namespace ಠ_ಠ.clutz.empty_type_args {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'empty_type_args.NoMoreTemplateArgs'): typeof ಠ_ಠ.clutz.empty_type_args.NoMoreTemplateArgs;
 }
 declare module 'goog:empty_type_args.NoMoreTemplateArgs' {
@@ -28,7 +28,7 @@ declare namespace ಠ_ಠ.clutz.empty_type_args {
     constructor (a : ಠ_ಠ.clutz.empty_type_args.NoMoreTemplateArgs ) ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'empty_type_args.X'): typeof ಠ_ಠ.clutz.empty_type_args.X;
 }
 declare module 'goog:empty_type_args.X' {

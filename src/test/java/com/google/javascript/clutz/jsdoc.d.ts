@@ -26,7 +26,7 @@ declare namespace ಠ_ಠ.clutz.x {
     method (foo : string ) : void ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'x.Y'): typeof ಠ_ಠ.clutz.x.Y;
 }
 declare module 'goog:x.Y' {

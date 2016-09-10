@@ -5,7 +5,7 @@ declare namespace ಠ_ಠ.clutz.provides {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'provides.C'): typeof ಠ_ಠ.clutz.provides.C;
 }
 declare module 'goog:provides.C' {
@@ -15,7 +15,7 @@ declare module 'goog:provides.C' {
 declare namespace ಠ_ಠ.clutz.provides {
   var instance : ಠ_ಠ.clutz.provides.C ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'provides.instance'): typeof ಠ_ಠ.clutz.provides.instance;
 }
 declare module 'goog:provides.instance' {

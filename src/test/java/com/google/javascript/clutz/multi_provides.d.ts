@@ -1,7 +1,7 @@
 declare namespace ಠ_ಠ.clutz.multi_provides.a {
   var val : number ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'multi_provides.a'): typeof ಠ_ಠ.clutz.multi_provides.a;
 }
 declare module 'goog:multi_provides.a' {
@@ -11,7 +11,7 @@ declare module 'goog:multi_provides.a' {
 declare namespace ಠ_ಠ.clutz.multi_provides.a.b.c {
   var three : string ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'multi_provides.a.b.c'): typeof ಠ_ಠ.clutz.multi_provides.a.b.c;
 }
 declare module 'goog:multi_provides.a.b.c' {
@@ -25,7 +25,7 @@ declare namespace ಠ_ಠ.clutz.multi_provides.a.b.c {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'multi_provides.a.b.c.Two'): typeof ಠ_ಠ.clutz.multi_provides.a.b.c.Two;
 }
 declare module 'goog:multi_provides.a.b.c.Two' {

@@ -29,9 +29,6 @@ declare namespace ಠ_ಠ.clutz.goog {
   var __namespace_needs_to_be_non_value_empty__: void;
 }
 
-// Closure's goog namespace is accessible as a global symbol without the need for
-// an explicit goog.require, during the closure compiler pass.
-declare var goog: typeof ಠ_ಠ.clutz.goog;
 /**
  * Global variable indicating whether the JavaScript code has been compiled.
  * This variable is defined in Closure's base.js, but not on the `goog` namespace, which

@@ -1,7 +1,7 @@
 declare namespace ಠ_ಠ.clutz {
   function fn ( ) : ಠ_ಠ.clutz.fn.String ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'fn'): typeof ಠ_ಠ.clutz.fn;
 }
 declare module 'goog:fn' {
@@ -15,7 +15,7 @@ declare namespace ಠ_ಠ.clutz.fn {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'fn.String'): typeof ಠ_ಠ.clutz.fn.String;
 }
 declare module 'goog:fn.String' {

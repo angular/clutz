@@ -2,7 +2,7 @@ declare namespace ಠ_ಠ.clutz {
   type module$exports$module$Foo = ಠ_ಠ.clutz.module$contents$module$Foo_A ;
   var module$exports$module$Foo : typeof ಠ_ಠ.clutz.module$contents$module$Foo_A ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'module$exports$module$Foo'): typeof ಠ_ಠ.clutz.module$exports$module$Foo;
 }
 declare module 'goog:module.Foo' {

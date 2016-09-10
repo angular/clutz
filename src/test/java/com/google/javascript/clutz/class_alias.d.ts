@@ -2,7 +2,7 @@ declare namespace ಠ_ಠ.clutz.alias {
   type A = ಠ_ಠ.clutz.original.A ;
   var A : typeof ಠ_ಠ.clutz.original.A ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'alias.A'): typeof ಠ_ಠ.clutz.alias.A;
 }
 declare module 'goog:alias.A' {
@@ -23,7 +23,7 @@ declare namespace ಠ_ಠ.clutz.original.A {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'original.A'): typeof ಠ_ಠ.clutz.original.A;
 }
 declare module 'goog:original.A' {

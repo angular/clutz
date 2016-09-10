@@ -16,20 +16,18 @@ import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.ErrorFormat;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.rhino.Node;
-
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import org.kohsuke.args4j.CmdLineException;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.kohsuke.args4j.CmdLineException;
 
 /**
  * A tool that transpiles {@code .js} ES6 and ES5 Closure annotated JavaScript to {@code .ts}

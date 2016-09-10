@@ -9,7 +9,7 @@ declare namespace ಠ_ಠ.clutz.tte {
     then < RESULT > (opt_onFulfilled ? : ( (a : T ) => Promise < RESULT > | RESULT ) | null , opt_onRejected ? : ( (a : any ) => any ) | null) : Promise < RESULT > ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'tte.Promise'): typeof ಠ_ಠ.clutz.tte.Promise;
 }
 declare module 'goog:tte.Promise' {

@@ -5,7 +5,6 @@ import com.google.javascript.jscomp.DiagnosticType;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.MessageFormatter;
 import com.google.javascript.jscomp.PrintStreamErrorManager;
-
 import java.io.PrintStream;
 
 /**

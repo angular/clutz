@@ -14,7 +14,7 @@ declare namespace ಠ_ಠ.clutz.lends {
     c : boolean ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'lends.A'): typeof ಠ_ಠ.clutz.lends.A;
 }
 declare module 'goog:lends.A' {

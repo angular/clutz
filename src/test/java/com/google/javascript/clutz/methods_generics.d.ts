@@ -25,7 +25,7 @@ declare namespace ಠ_ಠ.clutz.method_generics {
     push (value : T ) : void ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'method_generics'): typeof ಠ_ಠ.clutz.method_generics;
 }
 declare module 'goog:method_generics' {

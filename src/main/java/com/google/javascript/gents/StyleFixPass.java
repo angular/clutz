@@ -38,7 +38,7 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
       // of the original code.
       case VAR:
         n.setToken(Token.LET);
-        // fall through
+        //$FALL-THROUGH$
       case LET:
         if (hasGrandchildren(n)) {
           Node rhs = n.getFirstFirstChild();

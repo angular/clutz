@@ -6,7 +6,7 @@ declare namespace ಠ_ಠ.clutz.root {
     useTransitive ( ) : ಠ_ಠ.clutz.transitive.Y | null ;
   }
 }
-declare namespace ಠ_ಠ.clutz.goog {
+declare namespace goog {
   function require(name: 'root.Z'): typeof ಠ_ಠ.clutz.root.Z;
 }
 declare module 'goog:root.Z' {
