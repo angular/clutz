@@ -61,3 +61,11 @@ const F = goog.defineClass(null, {
   constructor: function() {
   },
 });
+
+const G = goog.defineClass(null, {
+  /**
+   * ES6 method short hand.
+   */
+  method() {
+  },
+});

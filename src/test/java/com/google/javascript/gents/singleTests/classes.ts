@@ -53,3 +53,11 @@ class F {
    */
   constructor() {}
 }
+
+class G {
+  /**
+   * ES6 method short hand.
+   */
+  method() {}
+}
+
