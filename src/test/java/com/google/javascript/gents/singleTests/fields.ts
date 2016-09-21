@@ -7,14 +7,13 @@ class A {
   z: number;
   c: number = 4;
   d: string;
+  // These are undeclared fields
+  u: any;
+  n: any = 12;
+  x: any;
   constructor(public a: number) {
     let y = 1;
     this.z = y + 1;
   }
-  foo() {
-    // These are undeclared fields
-    this.u;
-    this.n = 12;
-    this.x = this.a;
-  }
+  foo() { this.x = this.a; }
 }

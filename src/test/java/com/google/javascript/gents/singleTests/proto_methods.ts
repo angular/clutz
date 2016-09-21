@@ -3,6 +3,7 @@ let goog: any = {};
  * Nested anonymous class in ES6 syntax
  */
 goog.A = class {
+  a: any;
   constructor(a: number) {
     this.a = a;
   }
@@ -18,6 +19,7 @@ goog.A = class {
  * Named class extension
  */
 class B extends goog.A {
+  b: any;
   constructor(a: number, b: boolean) {
     super(a);
     this.b = b;

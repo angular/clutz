@@ -1,5 +1,6 @@
 let goog: any = {};
 goog.A = class {
+  a: any;
   constructor(a: number) {
     this.a = a;
   }

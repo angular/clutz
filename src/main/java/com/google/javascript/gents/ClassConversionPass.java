@@ -109,27 +109,29 @@ public final class ClassConversionPass implements CompilerPass {
     public void visit(NodeTraversal t, Node n, Node parent) {
       if (n.isExprResult()) {
         ClassMemberDeclaration declaration = ClassMemberDeclaration.newDeclarationOnThis(n);
-        // Ignore field declarations without a type annotation
-        if (declaration != null &&
-            declaration.jsDoc != null &&
-            declaration.jsDoc.getType() != null) {
-          Node fnNode = NodeUtil.getEnclosingFunction(n);
-          String fnName = fnNode.getParent().getString();
-          JSTypeExpression type = declaration.jsDoc.getType();
-          // All declarations of the form this.name = name;
-          if ("constructor".equals(fnName) && declaration.rhsEqualToField()) {
-            Node params = fnNode.getSecondChild();
-            JSDocInfo constructorJsDoc = NodeUtil.getBestJSDocInfo(fnNode);
 
-            for (Node param : params.children()) {
-              JSTypeExpression paramType = constructorJsDoc.getParameterType(param.getString());
-              // Names and types must be equal
-              if (declaration.memberName.equals(param.getString()) && type.equals(paramType)) {
-                // Add visibility directly to param if possible
-                moveAccessModifier(declaration, param);
-                n.detachFromParent();
-                compiler.reportCodeChange();
-                return;
+        if (declaration != null) {
+          // TODO(gmoothart): in many cases we should be able to infer the type from the rhs
+          if (declaration.jsDoc != null &&
+              declaration.jsDoc.getType() != null) {
+            Node fnNode = NodeUtil.getEnclosingFunction(n);
+            String fnName = fnNode.getParent().getString();
+            JSTypeExpression type = declaration.jsDoc.getType();
+            // All declarations of the form this.name = name;
+            if ("constructor".equals(fnName) && declaration.rhsEqualToField()) {
+              Node params = fnNode.getSecondChild();
+              JSDocInfo constructorJsDoc = NodeUtil.getBestJSDocInfo(fnNode);
+
+              for (Node param : params.children()) {
+                JSTypeExpression paramType = constructorJsDoc.getParameterType(param.getString());
+                // Names and types must be equal
+                if (declaration.memberName.equals(param.getString()) && type.equals(paramType)) {
+                  // Add visibility directly to param if possible
+                  moveAccessModifier(declaration, param);
+                  n.detachFromParent();
+                  compiler.reportCodeChange();
+                  return;
+                }
               }
             }
           }
