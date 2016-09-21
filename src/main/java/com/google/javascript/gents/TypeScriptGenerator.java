@@ -2,9 +2,13 @@ package com.google.javascript.gents;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 import com.google.javascript.jscomp.CodeConsumer;
 import com.google.javascript.jscomp.CodeGenerator;
 import com.google.javascript.jscomp.CodePrinter;
@@ -18,10 +22,13 @@ import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.rhino.Node;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -80,11 +87,12 @@ public class TypeScriptGenerator {
   private final Options opts;
   private final Compiler compiler;
   private final GentsErrorManager errorManager;
+  private final Map<String, String> externsMap;
 
   final PathUtil pathUtil;
   final NameUtil nameUtil;
 
-  TypeScriptGenerator(Options opts) {
+  TypeScriptGenerator(Options opts) throws FileNotFoundException {
     this.opts = opts;
     this.compiler = new Compiler();
     compiler.disableThreads();
@@ -94,6 +102,14 @@ public class TypeScriptGenerator {
 
     this.pathUtil = new PathUtil(opts.root);
     this.nameUtil = new NameUtil(compiler);
+    if (opts.externsMapFile != null) {
+      Type mapType = new TypeToken<Map<String, String>>(){}.getType();
+      JsonReader reader = new JsonReader(new FileReader(opts.externsMapFile));
+      externsMap = new Gson().fromJson(reader, mapType);
+    }
+    else {
+      externsMap = ImmutableMap.of();
+    }
   }
 
   boolean hasErrors() {
@@ -165,7 +181,7 @@ public class TypeScriptGenerator {
     classPass.process(externRoot, srcRoot);
 
     CompilerPass typingPass = new TypeAnnotationPass(compiler, pathUtil, nameUtil,
-        modulePrePass.getSymbolMap(), modulePass.getTypeRewrite(), comments);
+        modulePrePass.getSymbolMap(), modulePass.getTypeRewrite(), comments, externsMap);
     typingPass.process(externRoot, srcRoot);
 
     CompilerPass stylePass = new StyleFixPass(compiler, comments);

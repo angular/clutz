@@ -41,6 +41,11 @@ public class Options {
       handler = StringArrayOptionHandler.class)
   List<String> externs = new ArrayList<>();
 
+  @Option(name = "--externsMap",
+      usage = "File mapping externs to their TypeScript typings equivalent. Formatted as json",
+      metaVar = "EXTERNSMAP")
+  String externsMapFile = null;
+
   @Argument
   List<String> arguments = new ArrayList<>();
 
@@ -87,5 +92,10 @@ public class Options {
   }
 
   Options() {
+    this.externsMapFile = externsMapFile;
+  }
+
+  Options(String externsMapFile) {
+    this.externsMapFile = externsMapFile;
   }
 }

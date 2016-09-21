@@ -13,11 +13,13 @@ public class OptionsTest {
   @Test
   public void testFullUsage() throws Exception {
     Options opts = new Options(new String[]{
-        "foo.js", "--externs", "extern1.js", "extern2.js", "-o", "output"
+        "foo.js", "--externs", "extern1.js", "extern2.js", "-o", "output", "--externsMap",
+        "externs_map.json",
     });
     assertThat(opts.arguments).containsExactly("foo.js");
     assertThat(opts.externs).containsExactly("extern1.js", "extern2.js").inOrder();
     assertThat(opts.output).isEqualTo("output");
+    assertThat(opts.externsMapFile).isEqualTo("externs_map.json");
   }
 
   @Test
