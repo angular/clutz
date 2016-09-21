@@ -234,14 +234,14 @@ public final class ClassConversionPass implements CompilerPass {
 
     Node classMembers = new Node(Token.CLASS_MEMBERS);
     for (Node child : n.getLastChild().children()) {
-      if (child.isStringKey()) {
+      if (child.isStringKey() || child.isMemberFunctionDef()) {
         // Handle static methods
         if ("statics".equals(child.getString())) {
           for (Node child2 : child.getFirstChild().children()) {
-            convertOjbectLiteral(classMembers, child2, true);
+            convertObjectLiteral(classMembers, child2, true);
           }
         } else { // prototype methods
-          convertOjbectLiteral(classMembers, child, false);
+          convertObjectLiteral(classMembers, child, false);
         }
       } else {
         // Add all other members, such as EMPTY comment nodes, as is.
@@ -259,8 +259,9 @@ public final class ClassConversionPass implements CompilerPass {
    * Converts functions and variables declared in object literals into member method and
    * field definitions
    */
-  void convertOjbectLiteral(Node classMembers, Node objectLiteralMember, boolean isStatic) {
-    Preconditions.checkState(objectLiteralMember.isStringKey());
+  void convertObjectLiteral(Node classMembers, Node objectLiteralMember, boolean isStatic) {
+    Preconditions.checkState(
+        objectLiteralMember.isStringKey() || objectLiteralMember.isMemberFunctionDef());
 
     Node value = objectLiteralMember.getFirstChild();
     value.detachFromParent();
