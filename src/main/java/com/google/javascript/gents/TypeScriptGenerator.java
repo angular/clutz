@@ -35,11 +35,12 @@ import org.kohsuke.args4j.CmdLineException;
  */
 public class TypeScriptGenerator {
   /**
-   * Command line clang-format string to format stdin.
-   * The filename 'a.ts' is only used to inform clang-format of the file type (TS).
+   * Command line clang-format string to format stdin. The filename 'a.ts' is only used to inform
+   * clang-format of the file type (TS).
    */
-  private static final String[] CLANG_FORMAT = {"node_modules/.bin/clang-format",
-      "-assume-filename=a.ts", "-style=Google"};
+  private static final String[] CLANG_FORMAT = {
+    "clang-format", "-assume-filename=a.ts", "-style=Google"
+  };
 
   static {
     // In some environments (Mac OS X programs started from Finder, like your IDE) PATH does
