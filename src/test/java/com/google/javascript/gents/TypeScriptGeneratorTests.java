@@ -3,6 +3,7 @@ package com.google.javascript.gents;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
@@ -32,13 +33,22 @@ public class TypeScriptGeneratorTests {
 
   static final String singleTestPath = "singleTests";
 
+  static final String TEST_EXTERNS_MAP = TypeScriptGeneratorTests
+      .getTestDirPath("test_externs_map.json").toString();
+
   public static TestSuite suite() throws IOException {
+    // Map of test filename -> Options for tests which need a specific set of options
+    final Map<String, Options> testOptionsMap = ImmutableMap.<String, Options>builder()
+        .put("externs_map.js", new Options(TypeScriptGeneratorTests.TEST_EXTERNS_MAP))
+        .build();
+
     TestSuite suite = new TestSuite(TypeScriptGeneratorTests.class.getName());
 
     List<File> testFiles = getTestInputFiles(DeclarationGeneratorTests.JS, singleTestPath);
     for (final File input : testFiles) {
       File goldenFile = DeclarationGeneratorTests.getGoldenFile(input, ".ts");
-      suite.addTest(new GoldenFileTest(input.getName(), goldenFile, input));
+      Options options = testOptionsMap.get(input.getName());
+      suite.addTest(new GoldenFileTest(input.getName(), goldenFile, input, options));
     }
     return suite;
   }
@@ -71,17 +81,22 @@ public class TypeScriptGeneratorTests {
   }
 
   private static final class GoldenFileTest implements junit.framework.Test, Describable {
-    private final String TEST_EXTERNS_MAP = TypeScriptGeneratorTests
-        .getTestDirPath("test_externs_map.json").toString();
 
     private final String testName;
     private final File sourceFile;
     private final File goldenFile;
+    private final Options testOptions;
 
-    private GoldenFileTest(String testName, File goldenFile, File sourceFile) {
+    private GoldenFileTest(String testName, File goldenFile, File sourceFile, Options testOptions) {
       this.testName = testName;
       this.goldenFile = goldenFile;
       this.sourceFile = sourceFile;
+
+      if (testOptions == null) {
+        this.testOptions = new Options();
+      } else {
+        this.testOptions = testOptions;
+      }
     }
 
     @Override
@@ -90,8 +105,7 @@ public class TypeScriptGeneratorTests {
 
       TypeScriptGenerator gents;
       try {
-        Options options = new Options(TEST_EXTERNS_MAP);
-        gents = new TypeScriptGenerator(options);
+        gents = new TypeScriptGenerator(this.testOptions);
 
         String basename = gents.pathUtil.getFileNameWithoutExtension(sourceFile.getName());
         String sourceText = getFileText(sourceFile);

@@ -5,17 +5,20 @@ import com.google.javascript.jscomp.CodeGenerator;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
+import java.util.Map;
 
 /**
  * Code generator for gents to add TypeScript specific code generation.
  */
 public class GentsCodeGenerator extends CodeGenerator {
   private final NodeComments nodeComments;
+  private final Map<String, String> externsMap;
 
   protected GentsCodeGenerator(CodeConsumer consumer, CompilerOptions options,
-      NodeComments nodeComments) {
+      NodeComments nodeComments, Map<String, String> externsMap) {
     super(consumer, options);
     this.nodeComments = nodeComments;
+    this.externsMap = externsMap;
   }
 
   @Override
@@ -97,6 +100,15 @@ public class GentsCodeGenerator extends CodeGenerator {
             }
           }
         }
+        return false;
+      case ANY_TYPE:
+        // Check the externsMap for an alias to use in place of "any"
+        String anyTypeName = externsMap.get("any");
+        if (anyTypeName != null) {
+          add(anyTypeName);
+          return true;
+        }
+
         return false;
       default:
         return false;
