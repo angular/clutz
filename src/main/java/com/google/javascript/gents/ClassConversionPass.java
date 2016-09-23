@@ -109,9 +109,13 @@ public final class ClassConversionPass implements CompilerPass {
     public void visit(NodeTraversal t, Node n, Node parent) {
       if (n.isExprResult()) {
         ClassMemberDeclaration declaration = ClassMemberDeclaration.newDeclarationOnThis(n);
-        // Ignore field declarations without a type annotation
-        if (declaration != null &&
-            declaration.jsDoc != null &&
+
+        if (declaration == null) {
+          return;
+        }
+
+        // TODO(gmoothart): in many cases we should be able to infer the type from the rhs
+        if (declaration.jsDoc != null &&
             declaration.jsDoc.getType() != null) {
           Node fnNode = NodeUtil.getEnclosingFunction(n);
           String fnName = fnNode.getParent().getString();
@@ -133,8 +137,9 @@ public final class ClassConversionPass implements CompilerPass {
               }
             }
           }
-          moveFieldsIntoClasses(declaration);
         }
+
+        moveFieldsIntoClasses(declaration);
       }
     }
 
