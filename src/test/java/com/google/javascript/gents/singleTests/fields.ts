@@ -15,5 +15,7 @@ class A {
     let y = 1;
     this.z = y + 1;
   }
-  foo() { this.x = this.a; }
+  foo() {
+    this.x = this.a;
+  }
 }
