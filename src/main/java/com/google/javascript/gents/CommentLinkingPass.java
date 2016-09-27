@@ -32,7 +32,9 @@ public final class CommentLinkingPass implements CompilerPass {
       Pattern.compile("@returns?[ \t]*(\\{.*\\})[ \t]*(?<keep>\\*\\/|\n)"),
       Pattern.compile("(?<keep>@(param|returns?))[ \t]*(\\{.*\\})"),
       // Remove empty lines with only *
-      Pattern.compile("(?m)^[ \t]*\\*\\s*\n(?<keep>)")};
+      Pattern.compile("(?m)^[ \t]*\\*\\s*\n(?<keep>)"),
+      // Remove type annotation from @export
+      Pattern.compile("(?<keep>@export)[ \t]*(\\{.*\\})")};
 
   private final Compiler compiler;
   private final NodeComments nodeComments;
