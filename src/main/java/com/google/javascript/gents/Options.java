@@ -1,11 +1,19 @@
 package com.google.javascript.gents;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DiagnosticGroups;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -50,6 +58,7 @@ public class Options {
   List<String> arguments = new ArrayList<>();
 
   Set<String> srcFiles = new LinkedHashSet<>();
+  Map<String, String> externsMap = null;
 
   public CompilerOptions getCompilerOptions() {
     final CompilerOptions options = new CompilerOptions();
@@ -80,7 +89,17 @@ public class Options {
     options.setIdeMode(true);
   }
 
-  Options(String[] args) throws CmdLineException {
+  private Map<String, String> getExternsMap() throws FileNotFoundException {
+    if (this.externsMapFile != null) {
+      Type mapType = new TypeToken<Map<String, String>>(){}.getType();
+      JsonReader reader = new JsonReader(new FileReader(externsMapFile));
+      return new Gson().fromJson(reader, mapType);
+    } else {
+      return ImmutableMap.of();
+    }
+  }
+
+  Options(String[] args) throws CmdLineException, FileNotFoundException {
     CmdLineParser parser = new CmdLineParser(this);
     parser.parseArgument(args);
     srcFiles.addAll(arguments);
@@ -89,13 +108,16 @@ public class Options {
     if (srcFiles.isEmpty()) {
       throw new CmdLineException(parser, "No files were given");
     }
+
+    externsMap = getExternsMap();
   }
 
   Options() {
-    this.externsMapFile = externsMapFile;
+    externsMap = ImmutableMap.of();
   }
 
-  Options(String externsMapFile) {
+  Options(String externsMapFile) throws FileNotFoundException {
     this.externsMapFile = externsMapFile;
+    externsMap = getExternsMap();
   }
 }
