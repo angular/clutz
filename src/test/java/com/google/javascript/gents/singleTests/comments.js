@@ -36,3 +36,6 @@ var foo = function(deleted, notdeleted) { return deleted + notdeleted; };
  * @const {number}
  */
 var x;
+
+/** @export {number} */
+let m = 4;

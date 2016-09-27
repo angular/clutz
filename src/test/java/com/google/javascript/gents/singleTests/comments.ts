@@ -24,3 +24,5 @@ let foo = function(deleted: number, notdeleted: number): number {
 };
 // The following comment should be entirely deleted
 const x;
+/** @export */
+let m: number = 4;
