@@ -63,10 +63,12 @@ public final class TypeAnnotationPass implements CompilerPass {
   private final Table<String, String, String> typeRewrite;
   // filename -> extra imports needed to be added
   private final Multimap<String, Node> importsNeeded = LinkedHashMultimap.create();
+  // extern -> typing map for when extern and TS typing names differ
+  private Map<String, String> externsMap;
 
   public TypeAnnotationPass(AbstractCompiler compiler, PathUtil pathUtil, NameUtil nameUtil,
       Map<String, FileModule> symbolMap, Table<String, String, String> typeRewrite,
-      NodeComments nodeComments) {
+      NodeComments nodeComments, Map<String, String> externsMap) {
     this.compiler = compiler;
     this.pathUtil = pathUtil;
     this.nameUtil = nameUtil;
@@ -74,6 +76,7 @@ public final class TypeAnnotationPass implements CompilerPass {
 
     this.symbolToModule = new HashMap<>(symbolMap);
     this.typeRewrite = HashBasedTable.create(typeRewrite);
+    this.externsMap = externsMap;
   }
 
   @Override
@@ -294,6 +297,7 @@ public final class TypeAnnotationPass implements CompilerPass {
             return isReturnType ? voidType() : undefinedType();
           default:
             String newTypeName = convertTypeName(n.getSourceFileName(), typeName);
+            newTypeName = convertExternNameToTypingName(newTypeName);
             TypeDeclarationNode root = namedType(newTypeName);
             if (n.getChildCount() > 0 && n.getFirstChild().isBlock()) {
               Node block = n.getFirstChild();
@@ -434,6 +438,19 @@ public final class TypeAnnotationPass implements CompilerPass {
 
       typeRewrite.put(sourceFile, importedNamespace, symbol);
       return nameUtil.replacePrefixInName(typeName, importedNamespace, symbol);
+    }
+  }
+
+  /**
+   * If an extern-to-typing map is provided, try to look up the extern type name and replace it with
+   * the TypeScript version.
+   */
+  String convertExternNameToTypingName(String externTypeName) {
+    String typingName = this.externsMap.get(externTypeName);
+    if (typingName != null) {
+      return typingName;
+    } else {
+      return externTypeName;
     }
   }
 

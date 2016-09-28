@@ -165,7 +165,7 @@ public class TypeScriptGenerator {
     classPass.process(externRoot, srcRoot);
 
     CompilerPass typingPass = new TypeAnnotationPass(compiler, pathUtil, nameUtil,
-        modulePrePass.getSymbolMap(), modulePass.getTypeRewrite(), comments);
+        modulePrePass.getSymbolMap(), modulePass.getTypeRewrite(), comments, opts.externsMap);
     typingPass.process(externRoot, srcRoot);
 
     CompilerPass stylePass = new StyleFixPass(compiler, comments);

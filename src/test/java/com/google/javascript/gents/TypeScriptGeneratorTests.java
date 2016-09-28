@@ -71,6 +71,8 @@ public class TypeScriptGeneratorTests {
   }
 
   private static final class GoldenFileTest implements junit.framework.Test, Describable {
+    private final String TEST_EXTERNS_MAP = TypeScriptGeneratorTests
+        .getTestDirPath("test_externs_map.json").toString();
 
     private final String testName;
     private final File sourceFile;
@@ -86,9 +88,11 @@ public class TypeScriptGeneratorTests {
     public void run(TestResult result) {
       result.startTest(this);
 
-      TypeScriptGenerator gents = new TypeScriptGenerator(new Options());
-
+      TypeScriptGenerator gents;
       try {
+        Options options = new Options(TEST_EXTERNS_MAP);
+        gents = new TypeScriptGenerator(options);
+
         String basename = gents.pathUtil.getFileNameWithoutExtension(sourceFile.getName());
         String sourceText = getFileText(sourceFile);
         String goldenText = getFileText(goldenFile);

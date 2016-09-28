@@ -55,9 +55,9 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
     public void run(TestResult result) {
       result.startTest(this);
 
-      TypeScriptGenerator gents = new TypeScriptGenerator(new Options());
-
       try {
+        TypeScriptGenerator gents = new TypeScriptGenerator(new Options());
+
         List<File> testFiles = getTestInputFiles(DeclarationGeneratorTests.JS,
             multiTestPath, dirName);
 
