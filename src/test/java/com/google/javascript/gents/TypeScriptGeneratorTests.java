@@ -9,7 +9,6 @@ import com.google.common.io.Files;
 import com.google.javascript.clutz.DeclarationGeneratorTests;
 import com.google.javascript.jscomp.SourceFile;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -132,7 +131,7 @@ public class TypeScriptGeneratorTests {
   private TypeScriptGenerator gents;
 
   @Before
-  public void setUp() throws FileNotFoundException {
+  public void setUp() {
     gents = new TypeScriptGenerator(new Options());
   }
 

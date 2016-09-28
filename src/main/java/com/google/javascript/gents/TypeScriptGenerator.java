@@ -18,7 +18,6 @@ import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.rhino.Node;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -60,10 +59,6 @@ public class TypeScriptGenerator {
       System.err.println(e.getMessage());
       System.err.println("Usage: gents [options...] arguments...");
       e.getParser().printUsage(System.err);
-      System.err.println();
-      System.exit(1);
-    } catch(FileNotFoundException e) {
-      System.err.println("externs file " + options.externsMapFile + " not found.");
       System.err.println();
       System.exit(1);
     }

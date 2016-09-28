@@ -99,7 +99,7 @@ public class Options {
     }
   }
 
-  Options(String[] args) throws CmdLineException, FileNotFoundException {
+  Options(String[] args) throws CmdLineException {
     CmdLineParser parser = new CmdLineParser(this);
     parser.parseArgument(args);
     srcFiles.addAll(arguments);
@@ -109,7 +109,12 @@ public class Options {
       throw new CmdLineException(parser, "No files were given");
     }
 
-    externsMap = getExternsMap();
+    try {
+      externsMap = getExternsMap();
+    } catch (FileNotFoundException e) {
+      throw new CmdLineException(parser,
+          "externs file " + externsMapFile + " not found.", e);
+    }
   }
 
   Options() {
