@@ -60,6 +60,19 @@ const F = goog.defineClass(null, {
    */
   constructor: function() {
   },
+
+  /** Do foo! */
+  foo: function() {
+
+  },
+
+  /**
+   * Returns phone number.
+   * @return {string} 
+   */
+  bar: function() {
+    return '';
+  }
 });
 
 const G = goog.defineClass(null, {

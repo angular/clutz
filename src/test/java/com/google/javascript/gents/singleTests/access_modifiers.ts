@@ -10,10 +10,15 @@ class A {
   private e: number;
   // Method access
   foo() {}
+
   protected bar() {}
+
   private baz() {}
+
   // Static method access
   static fizzbuzz() {}
+
   protected static fizz() {}
+
   private static buzz() {}
 }
