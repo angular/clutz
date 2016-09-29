@@ -91,7 +91,7 @@ public class Options {
 
   private Map<String, String> getExternsMap() throws FileNotFoundException {
     if (this.externsMapFile != null) {
-      Type mapType = new TypeToken<Map<String, String>>(){}.getType();
+      Type mapType = new TypeToken<Map<String, String>>() { /* empty */ }.getType();
       JsonReader reader = new JsonReader(new FileReader(externsMapFile));
       return new Gson().fromJson(reader, mapType);
     } else {

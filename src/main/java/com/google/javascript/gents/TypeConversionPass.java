@@ -14,23 +14,24 @@ import com.google.javascript.rhino.JSTypeExpression;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 
 /**
- * Converts ES5 JavaScript classes into ES6 JavaScript classes. Prototype declarations are
- * converted into the new class definitions of ES6.
+ * Converts ES5 JavaScript classes and interfaces into ES6 JavaScript classes and TypeScript interfaces. Prototype
+ * declarations are converted into the new class definitions of ES6.
  */
-public final class ClassConversionPass implements CompilerPass {
+public final class TypeConversionPass implements CompilerPass {
 
   private final AbstractCompiler compiler;
   private final NodeComments nodeComments;
-  private Map<String, Node> classes;
+  private Map<String, Node> types;
 
-  public ClassConversionPass(AbstractCompiler compiler, NodeComments nodeComments) {
+  public TypeConversionPass(AbstractCompiler compiler, NodeComments nodeComments) {
     this.compiler = compiler;
     this.nodeComments = nodeComments;
-    this.classes = new LinkedHashMap<>();
+    this.types = new LinkedHashMap<>();
   }
 
   @Override
@@ -38,9 +39,9 @@ public final class ClassConversionPass implements CompilerPass {
     for (Node child : root.children()) {
       // We convert each file independently to avoid merging class methods from different files.
       if (child.isScript()) {
-        this.classes = new LinkedHashMap<>();
-        NodeTraversal.traverseEs6(compiler, child, new ClassDefinitionConverter());
-        NodeTraversal.traverseEs6(compiler, child, new ClassMemberConverter());
+        this.types = new LinkedHashMap<>();
+        NodeTraversal.traverseEs6(compiler, child, new TypeDefinitionConverter());
+        NodeTraversal.traverseEs6(compiler, child, new TypeMemberConverter());
         NodeTraversal.traverseEs6(compiler, child, new FieldOnThisConverter());
         NodeTraversal.traverseEs6(compiler, child, new InheritanceConverter());
       }
@@ -50,13 +51,13 @@ public final class ClassConversionPass implements CompilerPass {
   /**
    * Converts @constructor annotated functions into classes.
    */
-  private class ClassDefinitionConverter extends AbstractPostOrderCallback {
+  private class TypeDefinitionConverter extends AbstractPostOrderCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
       switch (n.getToken()) {
         case FUNCTION:
           JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
-          if (bestJSDocInfo != null && bestJSDocInfo.isConstructor()) {
+          if (bestJSDocInfo != null && (bestJSDocInfo.isConstructor() || bestJSDocInfo.isInterface())) {
             convertConstructorToClass(n, bestJSDocInfo);
           }
           break;
@@ -74,7 +75,7 @@ public final class ClassConversionPass implements CompilerPass {
   /**
    * Converts class prototype methods and static methods.
    */
-  private class ClassMemberConverter extends AbstractPostOrderCallback {
+  private class TypeMemberConverter extends AbstractPostOrderCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
       switch (n.getToken()) {
@@ -82,7 +83,7 @@ public final class ClassConversionPass implements CompilerPass {
           addClassToScope(n);
           break;
         case EXPR_RESULT:
-          ClassMemberDeclaration declaration = ClassMemberDeclaration.newDeclaration(n, classes);
+          ClassMemberDeclaration declaration = ClassMemberDeclaration.newDeclaration(n, types);
           if (declaration == null) {
             break;
           }
@@ -182,6 +183,7 @@ public final class ClassConversionPass implements CompilerPass {
     Preconditions.checkState(n.getFirstChild().isName());
     Preconditions.checkState(n.getSecondChild().isParamList());
     Preconditions.checkState(n.getLastChild().isBlock());
+    String typeName = NodeUtil.getName(n);
     // Break up function
     Node name = n.getFirstChild();
     Node params = n.getSecondChild();
@@ -210,18 +212,33 @@ public final class ClassConversionPass implements CompilerPass {
       superClass = NodeUtil.newQName(compiler, superClassName);
     }
 
-    // Generate new class node with only a constructor method
-    Node constructor = IR.memberFunctionDef(
-        "constructor",
-        IR.function(IR.name(""), params, body)
-    );
-    // Sets jsdoc info to preserve type declarations on method
-    constructor.setJSDocInfo(jsDoc);
+    Node typeNode;
+    if (jsDoc.isInterface()) {
+      List<JSTypeExpression> interfaces = jsDoc.getImplementedInterfaces();
+      if (!interfaces.isEmpty()) {
+        Node superInterfaces = new Node(Token.INTERFACE_EXTENDS);
+        for (JSTypeExpression type : interfaces) {
+          superInterfaces.addChildToBack(type.getRoot());
+        }
+        superClass = superInterfaces;
+      }
+      typeNode = new Node(Token.INTERFACE, name, superClass, new Node(Token.INTERFACE_MEMBERS));
+      // Must be registered here, as JSCompiler cannot extract names from INTERFACE nodes.
+      addTypeToScope(typeNode, typeName);
+    } else {
+      // Generate new class node with only a constructor method
+      Node constructor = IR.memberFunctionDef(
+          "constructor",
+          IR.function(IR.name(""), params, body)
+      );
+      // Sets jsdoc info to preserve type declarations on method
+      constructor.setJSDocInfo(jsDoc);
+      Node classMembers = new Node(Token.CLASS_MEMBERS, constructor);
+      typeNode = new Node(Token.CLASS, name, superClass, classMembers);
+    }
 
-    Node classMembers = new Node(Token.CLASS_MEMBERS, constructor);
-    Node classNode = new Node(Token.CLASS, name, superClass, classMembers);
-
-    nodeComments.replaceWithComment(n, classNode);
+    typeNode.setJSDocInfo(n.getJSDocInfo());
+    nodeComments.replaceWithComment(n, typeNode);
     compiler.reportCodeChange();
   }
 
@@ -304,6 +321,17 @@ public final class ClassConversionPass implements CompilerPass {
     Node memberFunc = IR.memberFunctionDef(fieldName, declaration.rhs);
     memberFunc.setStaticMember(declaration.isStatic);
     memberFunc.setJSDocInfo(declaration.jsDoc);
+    if (declaration.classNode.getType() == Token.INTERFACE) {
+      Node body = declaration.rhs.getLastChild();
+      Preconditions.checkState(body.isBlock());
+      if (body.getChildCount() != 0) {
+        compiler.report(JSError.make(
+            declaration.rhs,
+            GentsErrorManager.GENTS_CLASS_PASS_ERROR,
+            String.format("Interface method %s should be empty.", declaration.memberName)));
+      }
+      declaration.rhs.replaceChild(body, new Node(Token.EMPTY));
+    }
 
     // Append the new method to the class
     classMembers.addChildToBack(memberFunc);
@@ -358,7 +386,7 @@ public final class ClassConversionPass implements CompilerPass {
       String superClassName = callNode.getLastChild().getQualifiedName();
 
       // Check that class exists
-      if (!classes.containsKey(className)) {
+      if (!types.containsKey(className)) {
         compiler.report(JSError.make(
             exprNode,
             GentsErrorManager.GENTS_CLASS_PASS_ERROR,
@@ -367,7 +395,7 @@ public final class ClassConversionPass implements CompilerPass {
       }
 
       // Check that superclass is consistent
-      Node classNode = classes.get(className);
+      Node classNode = types.get(className);
       String storedSuperClassName = classNode.getSecondChild().getQualifiedName();
       if (classNode.getSecondChild().isEmpty() || !storedSuperClassName.equals(superClassName)) {
         compiler.report(JSError.make(
@@ -499,14 +527,18 @@ public final class ClassConversionPass implements CompilerPass {
       // We do not emit an error here as there can be anonymous classes without names.
       return;
     }
-    if (classes.containsKey(className)) {
+    addTypeToScope(n, className);
+  }
+
+  private void addTypeToScope(Node n, String typeName) {
+    if (types.containsKey(typeName)) {
       compiler.report(JSError.make(
           n,
           GentsErrorManager.GENTS_CLASS_PASS_ERROR,
-          String.format("Class %s has been defined multiple times.", className)));
+          String.format("Type %s has been defined multiple times.", typeName)));
       return;
     }
-    classes.put(className, n);
+    types.put(typeName, n);
   }
 
   /**

@@ -24,8 +24,8 @@ public final class CommentLinkingPass implements CompilerPass {
    * Some regexes contain an empty capture group for uniform handling.
    */
   private static final Pattern[] COMMENT_REPLACEMENTS = {
-      Pattern.compile("@constructor[ \t]*(?<keep>)"),
-      Pattern.compile("@(extends|type)[ \t]*(\\{.*\\})[ \t]*(?<keep>)"),
+      Pattern.compile("@(constructor|interface|record)[ \t]*(?<keep>)"),
+      Pattern.compile("@(extends|implements|type)[ \t]*(\\{.*\\})[ \t]*(?<keep>)"),
       Pattern.compile("@(private|protected|public|package|const)[ \t]*(\\{.*\\})?[ \t]*(?<keep>)"),
       // Removes @param and @return if there is no description
       Pattern.compile("@param[ \t]*(\\{.*\\})[ \t]*\\w+[ \t]*(?<keep>\\*\\/|\n)"),

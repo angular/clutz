@@ -161,7 +161,7 @@ public class TypeScriptGenerator {
         modulePrePass.getFileMap(), modulePrePass.getNamespaceMap(), comments);
     modulePass.process(externRoot, srcRoot);
 
-    CompilerPass classPass = new ClassConversionPass(compiler, comments);
+    CompilerPass classPass = new TypeConversionPass(compiler, comments);
     classPass.process(externRoot, srcRoot);
 
     CompilerPass typingPass = new TypeAnnotationPass(compiler, pathUtil, nameUtil,
@@ -210,29 +210,36 @@ public class TypeScriptGenerator {
       final InputStream stdout = process.getInputStream();
 
       // Write TypeScript code to stdin of the process
-      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdin));
-      writer.write(code);
-      writer.flush();
-      writer.close();
-
-      // Reads stdout of the process
-      ByteSource byteSource = new ByteSource() {
-        @Override
-        public InputStream openStream() throws IOException {
-          return stdout;
-        }
-      };
-      return byteSource.asCharSource(UTF_8).read();
+      try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdin)); ) {
+        writer.write(code);
+        writer.close();
+      }
+      return readStream(stdout);
     } catch (IOException e) {
       System.err.println("clang-format has failed to execute: " + e.getMessage());
       return code;
     } finally {
       if (process != null) {
+        try {
+          System.err.println(readStream(process.getErrorStream()));
+        } catch (@SuppressWarnings("unused") IOException ignored) {
+          // Ignored.
+        }
         // TODO(renez): Use .waitFor(n, TimeUnit.SECONDS) and .destroyForcibly() once we moved to
         // Java 8.
         process.destroy();
       }
     }
+  }
+
+  private String readStream(final InputStream stream) throws IOException {
+    ByteSource byteSource = new ByteSource() {
+      @Override
+      public InputStream openStream() throws IOException {
+        return stream;
+      }
+    };
+    return byteSource.asCharSource(UTF_8).read();
   }
 
   /**

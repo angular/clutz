@@ -43,7 +43,7 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
         if (hasGrandchildren(n)) {
           Node rhs = n.getFirstFirstChild();
           // ONLY convert classes (not functions) for var and let
-          if (rhs.isClass()) {
+          if (isTypeDefinition(rhs)) {
             liftClassOrFunctionDefinition(n);
           }
         }
@@ -51,7 +51,7 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
       case CONST:
         if (hasGrandchildren(n)) {
           Node rhs = n.getFirstFirstChild();
-          if (rhs.isClass()) {
+          if (isTypeDefinition(rhs)) {
             liftClassOrFunctionDefinition(n);
           } else if (rhs.isFunction()) {
             rhs.setIsArrowFunction(false);
@@ -113,6 +113,10 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
       default:
         break;
     }
+  }
+
+  private boolean isTypeDefinition(Node rhs) {
+    return rhs.isClass() || rhs.getType() == Token.INTERFACE;
   }
 
   /** Returns if a node has grandchildren */
