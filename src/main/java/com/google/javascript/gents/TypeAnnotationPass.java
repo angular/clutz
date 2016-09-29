@@ -108,6 +108,27 @@ public final class TypeAnnotationPass implements CompilerPass {
             setTypeExpression(n, bestJSDocInfo.getReturnType(), true);
           }
           break;
+        case CLASS:
+          if (bestJSDocInfo != null) {
+            List<JSTypeExpression> interfaces = bestJSDocInfo.getImplementedInterfaces();
+            if (!interfaces.isEmpty()) {
+              // Convert the @implements {...} JSDoc comments to TypeNodeASTs, and add them into the
+              // implements part of the class definition.
+              Node impls = new Node(Token.IMPLEMENTS);
+              for (JSTypeExpression type : interfaces) {
+                impls.addChildToBack(convertTypeNodeAST(type.getRoot()));
+              }
+              n.putProp(Node.IMPLEMENTS, impls);
+            }
+          }
+          break;
+        case INTERFACE_EXTENDS:
+          Node newExtends = n.cloneNode();
+          for (Node c : n.children()) {
+            newExtends.addChildToBack(convertTypeNodeAST(c));
+          }
+          parent.replaceChild(n, newExtends);
+          break;
         // Names and properties are annotated with their types
         case NAME:
         case GETPROP:
