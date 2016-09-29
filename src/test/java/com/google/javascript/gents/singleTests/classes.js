@@ -68,7 +68,7 @@ const F = goog.defineClass(null, {
 
   /**
    * Returns phone number.
-   * @return {string} 
+   * @return {string}
    */
   bar: function() {
     return '';
