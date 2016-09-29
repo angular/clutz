@@ -647,8 +647,9 @@ public final class TypeConversionPass implements CompilerPass {
     @Nullable
     static ClassMemberDeclaration newDeclarationOnThis(Node n) {
       Node fullName = getFullName(n);
-      // Node MUST start with "this."
-      if (!fullName.isGetProp() || !containsThis(fullName)) {
+      // Node MUST start with "this." and be shallow, i.e. "this.foo".
+      // "this.foo.bar" and other nestings are not declarations and are ignored.
+      if (!fullName.isGetProp() || !fullName.getFirstChild().isThis()) {
         return null;
       }
 

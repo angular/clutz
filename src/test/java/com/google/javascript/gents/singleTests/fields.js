@@ -11,6 +11,9 @@ var A = function(a) {
   let y = 1;
   /** @type {number} */
   this.z = y + 1;
+
+  this.w;
+  this.w.bar = 'bar';
 };
 
 A.prototype.foo = function() {
