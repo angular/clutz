@@ -40,7 +40,7 @@ public final class TypeConversionPass implements CompilerPass {
       // We convert each file independently to avoid merging class methods from different files.
       if (child.isScript()) {
         this.types = new LinkedHashMap<>();
-        NodeTraversal.traverseEs6(compiler, child, new TypeDefinitionConverter());
+        NodeTraversal.traverseEs6(compiler, child, new TypeConverter());
         NodeTraversal.traverseEs6(compiler, child, new TypeMemberConverter());
         NodeTraversal.traverseEs6(compiler, child, new FieldOnThisConverter());
         NodeTraversal.traverseEs6(compiler, child, new InheritanceConverter());
@@ -51,7 +51,7 @@ public final class TypeConversionPass implements CompilerPass {
   /**
    * Converts @constructor annotated functions into classes.
    */
-  private class TypeDefinitionConverter extends AbstractPostOrderCallback {
+  private class TypeConverter extends AbstractPostOrderCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
       switch (n.getToken()) {
@@ -64,6 +64,33 @@ public final class TypeConversionPass implements CompilerPass {
         case CALL:
           if ("goog.defineClass".equals(n.getFirstChild().getQualifiedName())) {
             convertDefineClassToClass(n);
+          }
+          break;
+        case GETPROP:
+        case NAME:
+        case VAR:
+        case LET:
+        case CONST:
+          // Converts a typedef into an interface, which then later has its members converted in
+          // TypeAnnotationPass.
+          JSDocInfo jsdoc = NodeUtil.getBestJSDocInfo(n);
+          if (jsdoc != null && jsdoc.hasTypedefType()) {
+            String name;
+            if (n.getType() == Token.NAME) {
+              name = n.getString();
+            } else if (n.getType() == Token.GETPROP) {
+              name = n.getSecondChild().getString();
+            } else {
+              name = n.getFirstChild().getString();
+            }
+            Node typeDef = Node.newString(Token.TYPE_ALIAS, name);
+            types.put(name, typeDef);
+            typeDef.setJSDocInfo(jsdoc);
+            if (parent.getType() == Token.EXPR_RESULT) {
+              parent.getParent().replaceChild(parent, typeDef);
+            } else {
+              parent.replaceChild(n, typeDef);
+            }
           }
           break;
         default:

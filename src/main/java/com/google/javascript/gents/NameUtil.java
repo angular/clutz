@@ -2,6 +2,7 @@ package com.google.javascript.gents;
 
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.NodeUtil;
+import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
 import java.util.Set;
@@ -68,7 +69,10 @@ public class NameUtil {
    */
   void replacePrefixInName(Node name, String prefix, String newPrefix) {
     if (prefix.equals(name.getQualifiedName())) {
-      name.getParent().replaceChild(name, NodeUtil.newQName(compiler, newPrefix));
+      Node newName = NodeUtil.newQName(compiler, newPrefix);
+      JSDocInfo jsdoc = NodeUtil.getBestJSDocInfo(name);
+      newName.setJSDocInfo(jsdoc);
+      name.getParent().replaceChild(name, newName);
     } else {
       if (name.isGetProp()) {
         replacePrefixInName(name.getFirstChild(), prefix, newPrefix);
