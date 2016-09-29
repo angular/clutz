@@ -108,7 +108,6 @@ public class GentsCodeGenerator extends CodeGenerator {
           add(anyTypeName);
           return true;
         }
-
         return false;
       default:
         return false;
