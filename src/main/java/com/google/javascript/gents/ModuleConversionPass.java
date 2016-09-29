@@ -98,6 +98,29 @@ public final class ModuleConversionPass implements CompilerPass {
             compiler.reportCodeChange();
           }
           break;
+        case GETPROP: {
+          JSDocInfo jsdoc = NodeUtil.getBestJSDocInfo(child);
+          if (jsdoc == null || !jsdoc.containsTypeDefinition()) {
+            // GETPROPs on the root level are only exports for @typedefs
+            break;
+          }
+          if (!fileToModule.containsKey(filename)) {
+            break;
+          }
+          FileModule module = fileToModule.get(filename);
+          Map<String, String> symbols = module.exportedNamespacesToSymbols;
+          String exportedNamespace = nameUtil.findLongestNamePrefix(child, symbols.keySet());
+          if (exportedNamespace != null) {
+            String localName = symbols.get(exportedNamespace);
+            Node export = new Node(Token.EXPORT, new Node(Token.EXPORT_SPECS,
+                new Node(Token.EXPORT_SPEC, Node.newString(Token.NAME, localName))));
+            parent.addChildAfter(export, n);
+            // Registers symbol for rewriting local uses.
+            registerLocalSymbol(child.getSourceFileName(), exportedNamespace, exportedNamespace,
+                localName);
+          }
+          break;
+        }
         case ASSIGN:
           if (!fileToModule.containsKey(filename)) {
             break;

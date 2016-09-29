@@ -129,6 +129,12 @@ public final class TypeAnnotationPass implements CompilerPass {
           }
           parent.replaceChild(n, newExtends);
           break;
+        case TYPE_ALIAS:
+          if (bestJSDocInfo != null && bestJSDocInfo.hasTypedefType()) {
+            JSTypeExpression typeDef = bestJSDocInfo.getTypedefType();
+            n.addChildToBack(convertTypeNodeAST(typeDef.getRoot()));
+          }
+          break;
         // Names and properties are annotated with their types
         case NAME:
         case GETPROP:

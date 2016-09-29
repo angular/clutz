@@ -5,6 +5,7 @@ import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.jscomp.NodeUtil;
+import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.Node;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -85,6 +86,14 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
             break;
           default:
             break;
+        }
+        break;
+      case GETPROP:
+        // Typedefs are often just on property gets, not on assignments.
+        JSDocInfo jsdoc = NodeUtil.getBestJSDocInfo(n);
+        if (jsdoc != null && jsdoc.containsTypeDefinition()) {
+          FileModule module = fileToModule.get(filename);
+          module.maybeAddExport(child);
         }
         break;
       case ASSIGN:
