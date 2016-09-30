@@ -48,22 +48,37 @@ public final class TypeConversionPass implements CompilerPass {
     }
   }
 
-  /**
-   * Converts @constructor annotated functions into classes.
-   */
+  /** Converts @constructor annotated functions into classes. */
   private class TypeConverter extends AbstractPostOrderCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
       switch (n.getToken()) {
         case FUNCTION:
           JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
-          if (bestJSDocInfo != null && (bestJSDocInfo.isConstructor() || bestJSDocInfo.isInterface())) {
+          if (bestJSDocInfo != null
+              && (bestJSDocInfo.isConstructor() || bestJSDocInfo.isInterface())) {
             convertConstructorToClass(n, bestJSDocInfo);
           }
           break;
         case CALL:
           if ("goog.defineClass".equals(n.getFirstChild().getQualifiedName())) {
             convertDefineClassToClass(n);
+          }
+          break;
+        case EXPORT:
+          // TODO(dpurpura): This seems like it should belong in {@link ModuleExportConverter};
+          //     however, adding it there seems to be too late in the process and doesn't have any
+          //     effect.
+          // TODO(dpurpura): Can we find a better indicator of default-ness?
+
+          if ( // Only match goog.module for now, since goog.provide can have multiple exports.
+          n.getParent().getToken() == Token.MODULE_BODY
+              // Don't match `exports.foo = function() { return 4; };`
+              && n.getNext() == null
+              // Match `exports = Klass` or `exports = function() {}`
+              && (n.getFirstFirstChild().getToken() == Token.EXPORT_SPEC
+                  || n.getFirstFirstChild().getFirstChild().getToken() == Token.FUNCTION)) {
+            n.putBooleanProp(Node.EXPORT_DEFAULT, true);
           }
           break;
         case GETPROP:
@@ -601,12 +616,12 @@ public final class TypeConversionPass implements CompilerPass {
      * Factory method for creating a new ClassMemberDeclaration on a declaration external to
      * a class.
      * <ul>
-     * <li>{@code A.prototype.foo = function() {...}}</li>
-     * <li>{@code A.prototype.w = 4}</li>
-     * <li>{@code A.prototype.x}</li>
-     * <li>{@code A.bar = function() {...}}</li>
-     * <li>{@code A.y = 6}</li>
-     * <li>{@code A.z}</li>
+     * <li><code>A.prototype.foo = function() {...}</code></li>
+     * <li><code>A.prototype.w = 4</code></li>
+     * <li><code>A.prototype.x</code></li>
+     * <li><code>A.bar = function() {...}</code></li>
+     * <li><code>A.y = 6</code></li>
+     * <li><code>A.z</code></li>
      * </ul>
      *
      * Returns null if the expression node is an invalid member declaration.
