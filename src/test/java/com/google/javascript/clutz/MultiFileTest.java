@@ -60,9 +60,13 @@ public class MultiFileTest {
   @Test
   public void depgraph() throws Exception {
     String expected = DeclarationGeneratorTests.getTestFileText(input("depgraph.d.ts"));
-    assertThatProgram(ImmutableList.of(input("root.js")),
-        ImmutableList.of(input("transitive.js"), input("transitive_unused.js")))
-            .generatesDeclarations(expected);
+    assertThatProgram(
+            ImmutableList.of(input("root.js")),
+            ImmutableList.of(
+                input("transitive.js"),
+                input("transitive_unused.js"),
+                input("transitive_namespace.js")))
+        .generatesDeclarations(expected);
   }
 
   private File input(String filename) {
