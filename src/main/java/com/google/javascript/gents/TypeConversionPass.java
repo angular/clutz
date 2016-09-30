@@ -1,6 +1,8 @@
 package com.google.javascript.gents;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.JSError;
@@ -13,6 +15,7 @@ import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.JSTypeExpression;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,42 +136,59 @@ public final class TypeConversionPass implements CompilerPass {
    * Converts fields declared internally inside a class using the "this" keyword.
    */
   private class FieldOnThisConverter extends AbstractPostOrderCallback {
+    // Map from class node to its field names
+    private Multimap<Node, String> classFieldMap = HashMultimap.create();
+
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
       if (n.isExprResult()) {
         ClassMemberDeclaration declaration = ClassMemberDeclaration.newDeclarationOnThis(n);
 
-        if (declaration == null) {
+        if (declaration == null || declarationHasBeenAdded(declaration)) {
           return;
         }
 
-        // TODO(gmoothart): in many cases we should be able to infer the type from the rhs
-        if (declaration.jsDoc != null &&
-            declaration.jsDoc.getType() != null) {
-          Node fnNode = NodeUtil.getEnclosingFunction(n);
-          String fnName = fnNode.getParent().getString();
-          JSTypeExpression type = declaration.jsDoc.getType();
-          // All declarations of the form this.name = name;
-          if ("constructor".equals(fnName) && declaration.rhsEqualToField()) {
-            Node params = fnNode.getSecondChild();
-            JSDocInfo constructorJsDoc = NodeUtil.getBestJSDocInfo(fnNode);
+        Node fnNode = NodeUtil.getEnclosingFunction(n);
+        String fnName = fnNode.getParent().getString();
 
-            for (Node param : params.children()) {
-              JSTypeExpression paramType = constructorJsDoc.getParameterType(param.getString());
-              // Names and types must be equal
-              if (declaration.memberName.equals(param.getString()) && type.equals(paramType)) {
-                // Add visibility directly to param if possible
-                moveAccessModifier(declaration, param);
-                n.detachFromParent();
-                compiler.reportCodeChange();
-                return;
-              }
+        // TODO(gmoothart): in many cases we should be able to infer the type from the rhs if there
+        // is no jsDoc
+
+        // Handle parameter properties when we are in the constructor and have a
+        // declaration of the form this.name = name;
+        if ("constructor".equals(fnName) &&
+            declaration.jsDoc != null &&
+            declaration.jsDoc.getType() != null &&
+            declaration.rhsEqualToField()) {
+          JSTypeExpression type = declaration.jsDoc.getType();
+          Node params = fnNode.getSecondChild();
+          JSDocInfo constructorJsDoc = NodeUtil.getBestJSDocInfo(fnNode);
+
+          for (Node param : params.children()) {
+            JSTypeExpression paramType = constructorJsDoc.getParameterType(param.getString());
+            // Names and types must be equal
+            if (declaration.memberName.equals(param.getString()) && type.equals(paramType)) {
+              // Add visibility directly to param if possible
+              moveAccessModifier(declaration, param);
+              n.detachFromParent();
+              compiler.reportCodeChange();
+              return;
             }
           }
         }
 
         moveFieldsIntoClasses(declaration);
+        registerDeclaration(declaration);
       }
+    }
+
+    private void registerDeclaration(ClassMemberDeclaration declaration) {
+      classFieldMap.put(declaration.classNode, declaration.memberName);
+    }
+
+    private boolean declarationHasBeenAdded(ClassMemberDeclaration declaration) {
+      Collection<String> classMembers = classFieldMap.get(declaration.classNode);
+      return classMembers != null && classMembers.contains(declaration.memberName);
     }
 
     /** Moves the access modifier from the original declaration to the constructor parameter */
@@ -379,10 +399,9 @@ public final class TypeConversionPass implements CompilerPass {
     fieldNode.setStaticMember(declaration.isStatic);
     nodeComments.moveComment(declaration.exprRoot, fieldNode);
 
-    // Add default value for fields
     if (declaration.rhs == null) {
       declaration.exprRoot.detachFromParent();
-    } else if (NodeUtil.isLiteralValue(declaration.rhs, false)) {
+    } else if (canPromoteFieldInitializer(declaration)) {
       declaration.exprRoot.detachFromParent();
       declaration.rhs.detachFromParent();
       fieldNode.addChildToBack(declaration.rhs);
@@ -392,6 +411,26 @@ public final class TypeConversionPass implements CompilerPass {
 
     addFieldToClassMembers(classMembers, fieldNode);
     compiler.reportCodeChange();
+  }
+
+  /**
+   * Check if we can safely generate a field initializer. We don't do this if the assignment rhs is
+   * not a literal or the enclosing function is not a constructor.
+   */
+  private boolean canPromoteFieldInitializer(ClassMemberDeclaration declaration) {
+    if (!NodeUtil.isLiteralValue(declaration.rhs, false)) {
+      return false;
+    }
+
+    Node fnNode = NodeUtil.getEnclosingFunction(declaration.exprRoot);
+    if (fnNode != null) {
+      String fnName = fnNode.getParent().getString();
+      if (!"constructor".equals(fnName)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**

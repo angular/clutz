@@ -16,6 +16,8 @@ var A = function(a) {
   this.w.bar = 'bar';
 
   baz.v = 1;
+  this.n = 12;
+  this.n = 13;
 };
 
 A.prototype.foo = function() {
@@ -24,9 +26,9 @@ A.prototype.foo = function() {
   /** @type {string} */
   this.d;
 
+  this.n = 14;
   // These are undeclared fields
   this.u;
-  this.n = 12;
   this.x = this.a;
 };
 
