@@ -649,6 +649,9 @@ public final class TypeConversionPass implements CompilerPass {
       Node fullName = getFullName(n);
       // Node MUST start with "this." and be shallow, i.e. "this.foo".
       // "this.foo.bar" and other nestings are not declarations and are ignored.
+      // fullName is a binary tree and multiple parts are represented by GETPROP
+      // nodes recursively on the left (first) child, so a first child of THIS is
+      // sufficient to ensure the name is of the form "this.foo".
       if (!fullName.isGetProp() || !fullName.getFirstChild().isThis()) {
         return null;
       }

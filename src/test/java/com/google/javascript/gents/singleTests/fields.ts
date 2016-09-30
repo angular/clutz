@@ -17,6 +17,8 @@ class A {
     this.z = y + 1;
 
     this.w.bar = 'bar';
+
+    baz.v = 1;
   }
   foo() {
     this.x = this.a;

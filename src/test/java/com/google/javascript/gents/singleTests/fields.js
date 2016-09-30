@@ -14,6 +14,8 @@ var A = function(a) {
 
   this.w;
   this.w.bar = 'bar';
+
+  baz.v = 1;
 };
 
 A.prototype.foo = function() {
