@@ -5,6 +5,7 @@ class A {
   static h: any;
   b: boolean;
   z: number;
+  w: any;
   c: number = 4;
   d: string;
   // These are undeclared fields
@@ -14,6 +15,10 @@ class A {
   constructor(public a: number) {
     let y = 1;
     this.z = y + 1;
+
+    this.w.bar = 'bar';
+
+    baz.v = 1;
   }
   foo() {
     this.x = this.a;
