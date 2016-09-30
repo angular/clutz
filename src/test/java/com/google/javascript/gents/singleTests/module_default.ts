@@ -1,3 +1,3 @@
-export function B(): number {
+export default function B(): number {
   return 4;
 }
