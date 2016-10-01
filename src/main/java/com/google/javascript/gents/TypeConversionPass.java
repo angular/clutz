@@ -65,22 +65,6 @@ public final class TypeConversionPass implements CompilerPass {
             convertDefineClassToClass(n);
           }
           break;
-        case EXPORT:
-          // TODO(dpurpura): This seems like it should belong in {@link ModuleExportConverter};
-          //     however, adding it there seems to be too late in the process and doesn't have any
-          //     effect.
-          // TODO(dpurpura): Can we find a better indicator of default-ness?
-
-          if ( // Only match goog.module for now, since goog.provide can have multiple exports.
-          n.getParent().getToken() == Token.MODULE_BODY
-              // Don't match `exports.foo = function() { return 4; };`
-              && n.getNext() == null
-              // Match `exports = Klass` or `exports = function() {}`
-              && (n.getFirstFirstChild().getToken() == Token.EXPORT_SPEC
-                  || n.getFirstFirstChild().getFirstChild().getToken() == Token.FUNCTION)) {
-            n.putBooleanProp(Node.EXPORT_DEFAULT, true);
-          }
-          break;
         case GETPROP:
         case NAME:
         case VAR:
