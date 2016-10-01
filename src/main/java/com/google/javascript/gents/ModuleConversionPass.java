@@ -21,6 +21,8 @@ import java.util.Map;
  * All module metadata must be populated before running this CompilerPass.
  */
 public final class ModuleConversionPass implements CompilerPass {
+  
+  private static final String EXPORTS = "exports";
 
   private final AbstractCompiler compiler;
   private final PathUtil pathUtil;
@@ -319,7 +321,7 @@ public final class ModuleConversionPass implements CompilerPass {
       rhs.detachFromParent();
       Node exportSpecNode;
       if (rhs.isName() && exportedSymbol.equals(rhs.getString())) {
-        exportSpecNode = exportedNamespace.equals("exports")
+        exportSpecNode = exportedNamespace.equals(EXPORTS)
             ? new Node(Token.EXPORT_SPEC, rhs)
             : new Node(Token.EXPORT_SPECS, new Node(Token.EXPORT_SPEC, rhs));
       } else {
@@ -329,7 +331,7 @@ public final class ModuleConversionPass implements CompilerPass {
       Node exportNode = new Node(Token.EXPORT, exportSpecNode);
       nodeComments.replaceWithComment(exprNode, exportNode);
       
-      if (exportedNamespace.equals("exports")) {
+      if (exportedNamespace.equals(EXPORTS)) {
         exportNode.putBooleanProp(Node.EXPORT_DEFAULT, true);
       }
     } else {
