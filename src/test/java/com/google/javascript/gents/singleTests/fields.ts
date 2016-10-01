@@ -20,6 +20,7 @@ class A {
 
     baz.v = 1;
   }
+
   foo() {
     this.x = this.a;
   }

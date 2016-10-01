@@ -5,6 +5,8 @@ import com.google.javascript.jscomp.CodeGenerator;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
+import com.google.javascript.rhino.Token;
+
 import java.util.Map;
 
 /**
@@ -54,11 +56,20 @@ public class GentsCodeGenerator extends CodeGenerator {
         break;
     }
 
-    // Add an empty line if the next node is further away than the next line.
+    addNewlines(n);
+  }
+
+  /** Add newlines to the generated source */
+  private void addNewlines(Node n) {
     Node nextNode = n.getNext();
     if (nextNode != null) {
       int lineSpacing = nextNode.getLineno() - n.getLineno();
-      if (lineSpacing > 1) {
+
+      // Add an empty line if:
+      //   - the next node is further away than the next line
+      //   - the next node is a class function (but the current node is not a comment)
+      if (lineSpacing > 1 ||
+          (nextNode.getToken() == Token.MEMBER_FUNCTION_DEF && n.getToken() != Token.EMPTY)) {
         add("\n");
       }
     }

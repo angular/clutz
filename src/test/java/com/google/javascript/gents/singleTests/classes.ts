@@ -61,6 +61,16 @@ class F {
    * block comment
    */
   constructor() {}
+
+  /** Do foo! */
+  foo() {}
+
+  /**
+   * Returns phone number.
+   */
+  bar(): string {
+    return '';
+  }
 }
 
 class G {

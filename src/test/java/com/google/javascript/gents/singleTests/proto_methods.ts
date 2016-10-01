@@ -7,6 +7,7 @@ goog.A = class {
   constructor(a: number) {
     this.a = a;
   }
+
   /**
  * Untyped method
  */
@@ -24,12 +25,14 @@ class B extends goog.A {
     super(a);
     this.b = b;
   }
+
   /**
  * Typed method
  */
   bar(n: number): boolean {
     return super.foo(n) > 0;
   }
+
   /**
  * Another typed method
  */
@@ -50,6 +53,7 @@ goog.B = class extends goog.A {
   constructor(a) {
     super(a);
   }
+
   foo(): number {
     return 0;
   }

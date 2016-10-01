@@ -4,12 +4,14 @@ goog.A = class {
   constructor(a: number) {
     this.a = a;
   }
+
   /**
  * Untyped method
  */
   static foo(n) {
     return n;
   }
+
   /**
  * Typed method
  */
@@ -33,9 +35,11 @@ goog.B = class extends goog.A {
   constructor(a) {
     super(a);
   }
+
   static foo(): boolean {
     return false;
   }
+
   static bar(): boolean {
     return true;
   }
@@ -45,6 +49,7 @@ class A {
   constructor() {
     goog.A.foo(4);
   }
+
   static anon() {
     // Anonymous function call
     (function() {})();
