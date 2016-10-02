@@ -48,16 +48,15 @@ public final class TypeConversionPass implements CompilerPass {
     }
   }
 
-  /**
-   * Converts @constructor annotated functions into classes.
-   */
+  /** Converts @constructor annotated functions into classes. */
   private class TypeConverter extends AbstractPostOrderCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
       switch (n.getToken()) {
         case FUNCTION:
           JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
-          if (bestJSDocInfo != null && (bestJSDocInfo.isConstructor() || bestJSDocInfo.isInterface())) {
+          if (bestJSDocInfo != null
+              && (bestJSDocInfo.isConstructor() || bestJSDocInfo.isInterface())) {
             convertConstructorToClass(n, bestJSDocInfo);
           }
           break;
@@ -601,12 +600,12 @@ public final class TypeConversionPass implements CompilerPass {
      * Factory method for creating a new ClassMemberDeclaration on a declaration external to
      * a class.
      * <ul>
-     * <li>{@code A.prototype.foo = function() {...}}</li>
-     * <li>{@code A.prototype.w = 4}</li>
-     * <li>{@code A.prototype.x}</li>
-     * <li>{@code A.bar = function() {...}}</li>
-     * <li>{@code A.y = 6}</li>
-     * <li>{@code A.z}</li>
+     * <li><code>A.prototype.foo = function() {...}</code></li>
+     * <li><code>A.prototype.w = 4</code></li>
+     * <li><code>A.prototype.x</code></li>
+     * <li><code>A.bar = function() {...}</code></li>
+     * <li><code>A.y = 6</code></li>
+     * <li><code>A.z</code></li>
      * </ul>
      *
      * Returns null if the expression node is an invalid member declaration.

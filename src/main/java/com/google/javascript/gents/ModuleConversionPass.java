@@ -21,6 +21,8 @@ import java.util.Map;
  * All module metadata must be populated before running this CompilerPass.
  */
 public final class ModuleConversionPass implements CompilerPass {
+  
+  private static final String EXPORTS = "exports";
 
   private final AbstractCompiler compiler;
   private final PathUtil pathUtil;
@@ -317,14 +319,21 @@ public final class ModuleConversionPass implements CompilerPass {
     if (exportedNamespace.equals(lhs.getQualifiedName())) {
       // Generate new export statement
       rhs.detachFromParent();
-      Node exportNode;
+      Node exportSpecNode;
       if (rhs.isName() && exportedSymbol.equals(rhs.getString())) {
-        exportNode = new Node(Token.EXPORT_SPECS, new Node(Token.EXPORT_SPEC, rhs));
+        exportSpecNode = exportedNamespace.equals(EXPORTS)
+            ? new Node(Token.EXPORT_SPEC, rhs)
+            : new Node(Token.EXPORT_SPECS, new Node(Token.EXPORT_SPEC, rhs));
       } else {
-        exportNode = IR.constNode(IR.name(exportedSymbol), rhs);
+        exportSpecNode = IR.constNode(IR.name(exportedSymbol), rhs);
       }
-      exportNode.setJSDocInfo(jsDoc);
-      nodeComments.replaceWithComment(exprNode, new Node(Token.EXPORT, exportNode));
+      exportSpecNode.setJSDocInfo(jsDoc);
+      Node exportNode = new Node(Token.EXPORT, exportSpecNode);
+      nodeComments.replaceWithComment(exprNode, exportNode);
+      
+      if (exportedNamespace.equals(EXPORTS)) {
+        exportNode.putBooleanProp(Node.EXPORT_DEFAULT, true);
+      }
     } else {
       // Assume prefix has already been exported and just trim the prefix
       nameUtil.replacePrefixInName(lhs, exportedNamespace, exportedSymbol);
