@@ -69,7 +69,7 @@ public class GentsCodeGenerator extends CodeGenerator {
       //   - the next node is further away than the next line
       //   - the next node is a class function (but the current node is not a comment)
       if (lineSpacing > 1 ||
-          (nextNode.getToken() == Token.MEMBER_FUNCTION_DEF ^ n.getToken() == Token.EMPTY)) {
+          (nextNode.getToken() == Token.MEMBER_FUNCTION_DEF && n.getToken() != Token.EMPTY)) {
         add("\n");
       }
     }
