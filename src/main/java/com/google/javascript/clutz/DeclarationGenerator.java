@@ -52,9 +52,6 @@ import com.google.javascript.rhino.jstype.TemplateType;
 import com.google.javascript.rhino.jstype.TemplatizedType;
 import com.google.javascript.rhino.jstype.UnionType;
 import com.google.javascript.rhino.jstype.Visitor;
-
-import org.kohsuke.args4j.CmdLineException;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -70,8 +67,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
-
 import javax.annotation.Nullable;
+import org.kohsuke.args4j.CmdLineException;
 
 /**
  * A tool that generates {@code .d.ts} declarations from a Google Closure JavaScript program.
@@ -388,7 +385,7 @@ class DeclarationGenerator {
     // For the purposes of determining which provides have been emitted
     // combine original provides and rewritten ones.
     provides.addAll(rewrittenProvides);
-    processUnprovidedTypes(provides);
+    processUnprovidedTypes(provides, transitiveProvides);
 
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
@@ -477,7 +474,7 @@ class DeclarationGenerator {
    * positions. However, our emit phases only emits goog.provided symbols and namespaces, so this
    * extra pass is required, in order to have valid output.
    */
-  private void processUnprovidedTypes(Set<String> provides) {
+  private void processUnprovidedTypes(Set<String> provides, Set<String> transitiveProvides) {
     /**
      * A new set of types can be discovered while visiting unprovided types.
      * To prevent an infinite loop in a pathological case, limit to a number of passes.
@@ -491,18 +488,24 @@ class DeclarationGenerator {
       // AFAICT, there is no api for going from type to symbol, so iterate all symbols first.
       for (TypedVar symbol : compiler.getTopScope().getAllSymbols()) {
         String name = symbol.getName();
-        // skip unused symbols, symbols already emitted or symbols whose namespace is emitted.
+        String namespace = getNamespace(name);
+        // skip unused symbols, symbols already emitted or symbols whose namespace is emitted
+        // (unless the symbols have their own provide).
         if (!typesUsed.contains(name) || typesEmitted.contains(name) ||
-            typesEmitted.contains(getNamespace(name))) {
+            (!transitiveProvides.contains(name) && typesEmitted.contains(namespace))) {
           continue;
         }
+
         // skip provided symbols (as default or in an namespace).
-        if (provides.contains(name) || provides.contains(getNamespace(name))) continue;
+        if (provides.contains(name)
+            || (!transitiveProvides.contains(name) && provides.contains(namespace))) {
+          continue;
+        }
 
         // skip extern symbols (they have a separate pass).
         CompilerInput symbolInput = this.compiler.getInput(new InputId(symbol.getInputName()));
         if (symbolInput != null && symbolInput.isExtern()) continue;
-        declareNamespace(getNamespace(name), symbol, name, /* isDefault */ true,
+        declareNamespace(namespace, symbol, name, /* isDefault */ true,
             Collections.<String>emptySet(), /* isExtern */ false);
         typesEmitted.add(name);
       }
