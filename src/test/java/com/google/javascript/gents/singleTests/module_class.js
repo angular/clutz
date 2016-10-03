@@ -1,10 +1,10 @@
-goog.module("A.B.C");
+goog.module("A.B.Klass");
 
 /**
  * @constructor
  * @param {number} n
  */
-function klass(n) {
+function Klass(n) {
   /** @type {number} */
   this.n = n;
 }
@@ -12,13 +12,13 @@ function klass(n) {
 /**
  * @type {number}
  */
-klass.x = 4;
+Klass.x = 4;
 
 /**
  * @return {boolean}
  */
-klass.prototype.foo = function() {
+Klass.prototype.foo = function() {
   return false;
 };
 
-exports = klass;
+exports = Klass;

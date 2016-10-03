@@ -1,4 +1,4 @@
-class klass {
+class Klass {
   static x: number = 4;
   constructor(public n: number) {}
 
@@ -7,4 +7,4 @@ class klass {
   }
 }
 
-export const C = klass;
+export default Klass;
