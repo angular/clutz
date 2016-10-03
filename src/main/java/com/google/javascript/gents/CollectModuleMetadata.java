@@ -91,7 +91,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
       case GETPROP:
         // Typedefs are often just on property gets, not on assignments.
         JSDocInfo jsdoc = NodeUtil.getBestJSDocInfo(n);
-        if (jsdoc != null && jsdoc.containsTypeDefinition()) {
+        if (jsdoc != null && jsdoc.containsTypeDefinition() && fileToModule.containsKey(filename)) {
           FileModule module = fileToModule.get(filename);
           module.maybeAddExport(child);
         }
