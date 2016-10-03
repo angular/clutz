@@ -116,7 +116,7 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
   }
 
   private boolean isTypeDefinition(Node rhs) {
-    return rhs.isClass() || rhs.getType() == Token.INTERFACE;
+    return rhs.isClass() || rhs.getToken() == Token.INTERFACE;
   }
 
   /** Returns if a node has grandchildren */
