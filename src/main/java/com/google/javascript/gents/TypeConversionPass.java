@@ -295,7 +295,7 @@ public final class TypeConversionPass implements CompilerPass {
       } else {
         // Add all other members, such as EMPTY comment nodes, as is.
         child.detachFromParent();
-        classMembers.addChildrenToBack(child);
+        classMembers.addChildToBack(child);
       }
     }
     Node classNode = new Node(Token.CLASS, IR.empty(), superClass, classMembers);
