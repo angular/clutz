@@ -18,6 +18,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
@@ -128,6 +129,8 @@ class DeclarationGenerator {
    * by replacing the second Error with GlobalError.
    */
   private static final Set<String> globalSymbolAliases = ImmutableSet.of("Error", "Event");
+  private final JSType UNKNOWN_TYPE;
+  private final JSType NUMBER_TYPE;
 
   public static void main(String[] args) {
     Options options = null;
@@ -198,6 +201,8 @@ class DeclarationGenerator {
     this.errorManager = new ClutzErrorManager(System.err,
         ErrorFormat.MULTILINE.toFormatter(compiler, true), opts.debug);
     compiler.setErrorManager(errorManager);
+    UNKNOWN_TYPE = compiler.getTypeRegistry().getNativeType(JSTypeNative.UNKNOWN_TYPE);
+    NUMBER_TYPE = compiler.getTypeRegistry().getNativeType(JSTypeNative.NUMBER_TYPE);
   }
 
   boolean hasErrors() {
@@ -1716,17 +1721,29 @@ class DeclarationGenerator {
       // ... and type that extends IObject or IArrayLike interfaces.
       // IArrayLike<T> extends IObject<number, T>. Normally only looking for IObject interface
       // should be enough. But the closure compiler seems to process these two interfaces as if they
-      // were independent. A type can even implements both.
-      for (ObjectType implementedInterface : getAllDirectlyImplementedInterfaces(type)) {
+      // were independent. A type can even implement both.
+      Set<ObjectType> implementedInterfaces = getAllDirectlyImplementedInterfaces(type);
+      boolean implementsIArrayLike = false;
+      for (ObjectType implementedInterface : implementedInterfaces) {
+        if (implementedInterface.getDisplayName().equals("IArrayLike")) implementsIArrayLike = true;
+      }
+      for (ObjectType implementedInterface : implementedInterfaces) {
         String displayName = implementedInterface.getDisplayName();
-        if ("IObject".equals(displayName)) {
-          List<JSType> iObjectTemplateTypes = implementedInterface.getTemplateTypes();
-          emitIndexSignature(iObjectTemplateTypes.get(0), iObjectTemplateTypes.get(1), true);
+        ImmutableList<JSType> templateTypes = implementedInterface.getTemplateTypes();
+        // IArrayLike extends IObject, but we can emit only one index signature.
+        if ("IObject".equals(displayName) && !implementsIArrayLike) {
+          List<JSType> iObjectTemplateTypes = templateTypes;
+          if (templateTypes != null && templateTypes.size() > 1) {
+            emitIndexSignature(iObjectTemplateTypes.get(0), iObjectTemplateTypes.get(1), true);
+          } else {
+            emitIndexSignature(UNKNOWN_TYPE, UNKNOWN_TYPE, true);
+          }
         } else if ("IArrayLike".equals(displayName)) {
-          emitIndexSignature(
-              compiler.getTypeRegistry().getNativeType(NUMBER_TYPE),
-              implementedInterface.getTemplateTypes().get(0),
-              true);
+          if (templateTypes != null && templateTypes.size() > 0) {
+            emitIndexSignature(NUMBER_TYPE, templateTypes.get(0), true);
+          } else {
+            emitIndexSignature(NUMBER_TYPE, UNKNOWN_TYPE, true);
+          }
         }
       }
 
@@ -1759,7 +1776,7 @@ class DeclarationGenerator {
      * Returns all interfaces implemented by a class and any
      * superinterface for any of those interfaces.
      */
-    public Iterable<ObjectType> getAllDirectlyImplementedInterfaces(FunctionType type) {
+    public Set<ObjectType> getAllDirectlyImplementedInterfaces(FunctionType type) {
       Set<ObjectType> interfaces = new HashSet<>();
 
       for (ObjectType implementedInterface : type.getOwnImplementedInterfaces()) {

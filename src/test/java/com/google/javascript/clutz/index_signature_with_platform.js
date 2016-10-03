@@ -57,3 +57,18 @@ index_signature.ShouldContainIndexSignature = function() {}
 
 /** @type {number} */
 index_signature.ShouldContainIndexSignature.prototype.length;
+
+/**
+ * @constructor
+ * @implements {IArrayLike}
+ */
+index_signature.ImplementsIArrayLikeBare = function() {};
+
+/** @type {number} */
+index_signature.ImplementsIArrayLikeBare.prototype.length;
+
+/**
+ * @constructor
+ * @implements {IObject}
+ */
+index_signature.ImplementsIObjectLikeBare = function() {};
