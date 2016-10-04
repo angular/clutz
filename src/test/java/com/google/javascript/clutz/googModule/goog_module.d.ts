@@ -16,7 +16,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$googmodule$TheModule {
   var a : number ;
   var b : number ;
   var required : ಠ_ಠ.clutz.googmodule.Required ;
-  var requiredDefault : module$contents$googmodule$requiredModuleDefault_A ;
+  var requiredDefault : module$exports$googmodule$requiredModuleDefault ;
 }
 declare namespace goog {
   function require(name: 'module$exports$googmodule$TheModule'): typeof ಠ_ಠ.clutz.module$exports$googmodule$TheModule;
@@ -36,8 +36,11 @@ declare module 'goog:googmodule.requiredModule' {
   export = alias;
 }
 declare namespace ಠ_ಠ.clutz {
-  type module$exports$googmodule$requiredModuleDefault = ಠ_ಠ.clutz.module$contents$googmodule$requiredModuleDefault_A ;
-  var module$exports$googmodule$requiredModuleDefault : typeof ಠ_ಠ.clutz.module$contents$googmodule$requiredModuleDefault_A ;
+  class module$exports$googmodule$requiredModuleDefault extends module$exports$googmodule$requiredModuleDefault_Instance {
+  }
+  class module$exports$googmodule$requiredModuleDefault_Instance {
+    private noStructuralTyping_: any;
+  }
 }
 declare namespace goog {
   function require(name: 'module$exports$googmodule$requiredModuleDefault'): typeof ಠ_ಠ.clutz.module$exports$googmodule$requiredModuleDefault;
@@ -45,11 +48,4 @@ declare namespace goog {
 declare module 'goog:googmodule.requiredModuleDefault' {
   import alias = ಠ_ಠ.clutz.module$exports$googmodule$requiredModuleDefault;
   export default alias;
-}
-declare namespace ಠ_ಠ.clutz {
-  class module$contents$googmodule$requiredModuleDefault_A extends module$contents$googmodule$requiredModuleDefault_A_Instance {
-  }
-  class module$contents$googmodule$requiredModuleDefault_A_Instance {
-    private noStructuralTyping_: any;
-  }
 }

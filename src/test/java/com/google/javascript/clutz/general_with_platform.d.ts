@@ -1,4 +1,14 @@
 declare namespace ಠ_ಠ.clutz {
+  interface Body {
+    arrayBuffer ( ) : Promise < ArrayBuffer > ;
+    blob ( ) : Promise < Blob > ;
+    bodyUsed : boolean ;
+    formData ( ) : Promise < FormData > ;
+    json ( ) : Promise < any > ;
+    text ( ) : Promise < string > ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   class ByteLengthQueuingStrategy extends ByteLengthQueuingStrategy_Instance {
   }
   class ByteLengthQueuingStrategy_Instance {
@@ -15,10 +25,10 @@ declare namespace ಠ_ಠ.clutz {
   }
   class ChromeBooleanEvent_Instance {
     private noStructuralTyping_: any;
-    addListener (callback : (a : boolean ) => undefined ) : any ;
+    addListener (callback : (a : boolean ) => undefined ) : void ;
     hasListener (callback : (a : boolean ) => undefined ) : boolean ;
     hasListeners ( ) : boolean ;
-    removeListener (callback : (a : boolean ) => undefined ) : any ;
+    removeListener (callback : (a : boolean ) => undefined ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -40,10 +50,10 @@ declare namespace ಠ_ಠ.clutz {
   }
   class ChromeObjectEvent_Instance {
     private noStructuralTyping_: any;
-    addListener (callback : (a : Object ) => undefined ) : any ;
+    addListener (callback : (a : Object ) => undefined ) : void ;
     hasListener (callback : (a : Object ) => undefined ) : boolean ;
     hasListeners ( ) : boolean ;
-    removeListener (callback : (a : Object ) => undefined ) : any ;
+    removeListener (callback : (a : Object ) => undefined ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -54,10 +64,10 @@ declare namespace ಠ_ಠ.clutz {
   }
   class ChromeStringArrayEvent_Instance {
     private noStructuralTyping_: any;
-    addListener (callback : (a : string [] ) => undefined ) : any ;
+    addListener (callback : (a : string [] ) => undefined ) : void ;
     hasListener (callback : (a : string [] ) => undefined ) : boolean ;
     hasListeners ( ) : boolean ;
-    removeListener (callback : (a : string [] ) => undefined ) : any ;
+    removeListener (callback : (a : string [] ) => undefined ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -68,10 +78,10 @@ declare namespace ಠ_ಠ.clutz {
   }
   class ChromeStringEvent_Instance {
     private noStructuralTyping_: any;
-    addListener (callback : (a : string ) => undefined ) : any ;
+    addListener (callback : (a : string ) => undefined ) : void ;
     hasListener (callback : (a : string ) => undefined ) : boolean ;
     hasListeners ( ) : boolean ;
-    removeListener (callback : (a : string ) => undefined ) : any ;
+    removeListener (callback : (a : string ) => undefined ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -82,10 +92,10 @@ declare namespace ಠ_ಠ.clutz {
   }
   class ChromeStringStringEvent_Instance {
     private noStructuralTyping_: any;
-    addListener (callback : (a : string , b : string ) => undefined ) : any ;
+    addListener (callback : (a : string , b : string ) => undefined ) : void ;
     hasListener (callback : (a : string , b : string ) => undefined ) : boolean ;
     hasListeners ( ) : boolean ;
-    removeListener (callback : (a : string , b : string ) => undefined ) : any ;
+    removeListener (callback : (a : string , b : string ) => undefined ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -102,9 +112,9 @@ declare namespace ಠ_ಠ.clutz {
   }
   class DirectoryEntry_Instance extends Entry_Instance {
     createReader ( ) : DirectoryReader ;
-    getDirectory (path : string , options ? : Object | null , successCallback ? : (a : DirectoryEntry ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
-    getFile (path : string , options ? : Object | null , successCallback ? : (a : FileEntry ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
-    removeRecursively (successCallback : ( ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+    getDirectory (path : string , options ? : Object | null , successCallback ? : (a : DirectoryEntry ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
+    getFile (path : string , options ? : Object | null , successCallback ? : (a : FileEntry ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
+    removeRecursively (successCallback : ( ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -112,7 +122,7 @@ declare namespace ಠ_ಠ.clutz {
   }
   class DirectoryReader_Instance {
     private noStructuralTyping_: any;
-    readEntries (successCallback : (a : Entry [] ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+    readEntries (successCallback : (a : Entry [] ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -120,25 +130,38 @@ declare namespace ಠ_ಠ.clutz {
   }
   class Entry_Instance {
     private noStructuralTyping_: any;
-    copyTo (parent : DirectoryEntry , newName ? : string , successCallback ? : (a : Entry ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+    copyTo (parent : DirectoryEntry , newName ? : string , successCallback ? : (a : Entry ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
     filesystem : FileSystem ;
     fullPath : string ;
-    getMetadata (successCallback : (a : Metadata ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
-    getParent (successCallback : (a : Entry ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+    getMetadata (successCallback : (a : Metadata ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
+    getParent (successCallback : (a : Entry ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
     isDirectory : boolean ;
     isFile : boolean ;
-    moveTo (parent : DirectoryEntry , newName ? : string , successCallback ? : (a : Entry ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+    moveTo (parent : DirectoryEntry , newName ? : string , successCallback ? : (a : Entry ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
     name : string ;
-    remove (successCallback : ( ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+    remove (successCallback : ( ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
     toURL (mimeType ? : string ) : string ;
   }
+}
+declare namespace ಠ_ಠ.clutz {
+  type FetchRequestType = string ;
+  var FetchRequestType : {
+    AUDIO : FetchRequestType ,
+    FONT : FetchRequestType ,
+    IMAGE : FetchRequestType ,
+    NONE : FetchRequestType ,
+    SCRIPT : FetchRequestType ,
+    STYLE : FetchRequestType ,
+    TRACK : FetchRequestType ,
+    VIDEO : FetchRequestType ,
+  };
 }
 declare namespace ಠ_ಠ.clutz {
   class FileEntry extends FileEntry_Instance {
   }
   class FileEntry_Instance extends Entry_Instance {
-    createWriter (successCallback : (a : FileWriter ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
-    file (successCallback : (a : File ) => any , errorCallback ? : (a : FileError ) => any ) : any ;
+    createWriter (successCallback : (a : FileWriter ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
+    file (successCallback : (a : File ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -180,7 +203,7 @@ declare namespace ಠ_ಠ.clutz {
     DONE : number ;
     INIT : number ;
     WRITING : number ;
-    abort ( ) : any ;
+    abort ( ) : void ;
     error : FileError | null ;
     onabort : ( (a : ProgressEvent ) => any ) | null ;
     onerror : ( (a : ProgressEvent ) => any ) | null ;
@@ -206,23 +229,26 @@ declare namespace ಠ_ಠ.clutz {
   class FileWriter_Instance extends FileSaver_Instance {
     length : number ;
     position : number ;
-    seek (offset : number ) : any ;
-    truncate (size : number ) : any ;
-    write (blob : Blob ) : any ;
+    seek (offset : number ) : void ;
+    truncate (size : number ) : void ;
+    write (blob : Blob ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
   class Headers extends Headers_Instance {
   }
-  class Headers_Instance {
+  class Headers_Instance implements Iterable < string [] > {
     private noStructuralTyping_: any;
-    constructor (opt_headersInit ? : Headers | string [] [] ) ;
-    append (name : string , value : string ) : any ;
-    delete (name : string ) : any ;
+    constructor (opt_headersInit ? : Headers | string [] [] | IObject < string , string > ) ;
+    append (name : string , value : string ) : void ;
+    delete (name : string ) : void ;
+    entries ( ) : Iterator < string [] > ;
     get (name : string ) : string | null ;
     getAll (name : string ) : string [] ;
     has (name : string ) : boolean ;
-    set (name : string , value : string ) : any ;
+    keys ( ) : Iterator < string > ;
+    set (name : string , value : string ) : void ;
+    values ( ) : Iterator < string > ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -250,6 +276,10 @@ declare namespace ಠ_ಠ.clutz {
   }
   class Image_Instance extends HTMLImageElement {
     constructor (opt_width ? : number , opt_height ? : number ) ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface Iterable < VALUE > {
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -291,8 +321,8 @@ declare namespace ಠ_ಠ.clutz {
 }
 declare namespace ಠ_ಠ.clutz {
   class Promise < TYPE > extends Promise_Instance < TYPE > {
-    static all < T > (iterable : ( T | Promise < T > ) [] | Iterable < T | Promise < T > > ) : Promise < T [] > ;
-    static race < T > (iterable : T [] | Iterable < T > ) : Promise < T > ;
+    static all(promises : Promise < any > [] ) : Promise < any [] > ;
+    static race < T > (values : T [] ) : Promise < T > ;
     static reject (opt_error ? : any ) : Promise < any > ;
     static resolve < T >(value: Promise < T > | T): Promise < T >;
   }
@@ -351,8 +381,8 @@ declare namespace ಠ_ಠ.clutz {
     constructor (stream : ReadableStream ) ;
     close ( ) : void ;
     desiredSize : number ;
-    enqueue (chunk : any ) : any ;
-    error (e : any ) : any ;
+    enqueue (chunk : any ) : void ;
+    error (e : any ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -361,32 +391,49 @@ declare namespace ಠ_ಠ.clutz {
   class ReadableStreamReader_Instance {
     private noStructuralTyping_: any;
     constructor (stream : ReadableStream ) ;
-    cancel (reason : any ) : any ;
+    cancel (reason : any ) : void ;
     closed : boolean ;
     read ( ) : Promise < { done : boolean , value ? : any } > ;
     releaseLock ( ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  type ReferrerPolicy = string ;
+  var ReferrerPolicy : {
+    NONE : ReferrerPolicy ,
+    NO_REFERRER : ReferrerPolicy ,
+    NO_REFERRER_WHEN_DOWNGRADE : ReferrerPolicy ,
+    ORIGIN : ReferrerPolicy ,
+    ORIGIN_WHEN_CROSS_ORIGIN : ReferrerPolicy ,
+    SAMEO_RIGIN : ReferrerPolicy ,
+    STRICT_ORIGIN : ReferrerPolicy ,
+    STRICT_ORIGIN_WHEN_CROSS_ORIGIN : ReferrerPolicy ,
+    UNSAFE_URL : ReferrerPolicy ,
+  };
+}
+declare namespace ಠ_ಠ.clutz {
   class Request extends Request_Instance {
   }
-  class Request_Instance {
+  class Request_Instance implements Body {
     private noStructuralTyping_: any;
-    constructor (input : Request | string , opt_init ? : { body ? : Blob | FormData | string , cache ? : RequestCache , credentials ? : RequestCredentials , headers ? : Headers | string [] [] , method ? : string , mode ? : RequestMode } ) ;
+    constructor (input : Request | string , opt_init ? : RequestInit ) ;
     arrayBuffer ( ) : Promise < ArrayBuffer > ;
     blob ( ) : Promise < Blob > ;
-    bodyUsed : boolean ;
+    bodyUsed : any ;
     cache : RequestCache ;
     clone ( ) : Request ;
-    context : RequestContext ;
     credentials : RequestCredentials ;
+    destination : RequestDestination ;
     formData ( ) : Promise < FormData > ;
     headers : Headers ;
-    json ( ) : Promise < Object > ;
+    integrity : string ;
+    json ( ) : Promise < any > ;
     method : string ;
     mode : RequestMode ;
+    redirect : RequestRedirect ;
     referrer : string ;
     text ( ) : Promise < string > ;
+    type : FetchRequestType ;
     url : string ;
   }
 }
@@ -402,44 +449,6 @@ declare namespace ಠ_ಠ.clutz {
   };
 }
 declare namespace ಠ_ಠ.clutz {
-  type RequestContext = string ;
-  var RequestContext : {
-    AUDIO : RequestContext ,
-    BEACON : RequestContext ,
-    CSPREPORT : RequestContext ,
-    DOWNLOAD : RequestContext ,
-    EMBED : RequestContext ,
-    EVENTSOURCE : RequestContext ,
-    FAVICON : RequestContext ,
-    FETCH : RequestContext ,
-    FONT : RequestContext ,
-    FORM : RequestContext ,
-    FRAME : RequestContext ,
-    HYPERLINK : RequestContext ,
-    IFRAME : RequestContext ,
-    IMAGE : RequestContext ,
-    IMAGESET : RequestContext ,
-    IMPORT : RequestContext ,
-    INTERNAL : RequestContext ,
-    LOCATION : RequestContext ,
-    MANIFEST : RequestContext ,
-    OBJECT : RequestContext ,
-    PING : RequestContext ,
-    PLUGIN : RequestContext ,
-    PREFETCH : RequestContext ,
-    SCRIPT : RequestContext ,
-    SERVICEWORKER : RequestContext ,
-    SHAREDWORKER : RequestContext ,
-    STYLE : RequestContext ,
-    SUBRESOURCE : RequestContext ,
-    TRACK : RequestContext ,
-    VIDEO : RequestContext ,
-    WORKER : RequestContext ,
-    XMLHTTPREQUEST : RequestContext ,
-    XSLT : RequestContext ,
-  };
-}
-declare namespace ಠ_ಠ.clutz {
   type RequestCredentials = string ;
   var RequestCredentials : {
     INCLUDE : RequestCredentials ,
@@ -448,35 +457,88 @@ declare namespace ಠ_ಠ.clutz {
   };
 }
 declare namespace ಠ_ಠ.clutz {
+  type RequestDestination = string ;
+  var RequestDestination : {
+    DOCUMENT : RequestDestination ,
+    EMBED : RequestDestination ,
+    FONT : RequestDestination ,
+    IMAGE : RequestDestination ,
+    MANIFEST : RequestDestination ,
+    MEDIA : RequestDestination ,
+    NONE : RequestDestination ,
+    OBJECT : RequestDestination ,
+    REPORT : RequestDestination ,
+    SCRIPT : RequestDestination ,
+    SERVICEWORKER : RequestDestination ,
+    SHAREDWORKER : RequestDestination ,
+    STYLE : RequestDestination ,
+    WORKER : RequestDestination ,
+    XSLT : RequestDestination ,
+  };
+}
+declare namespace ಠ_ಠ.clutz {
+  interface RequestInit {
+    body ? : Blob | ArrayBuffer | ArrayBufferView | FormData | string | null ;
+    cache ? : RequestCache ;
+    credentials ? : RequestCredentials ;
+    headers ? : Headers | string [] [] | IObject < string , string > ;
+    intergrity ? : string ;
+    method ? : string ;
+    mode ? : RequestMode ;
+    redirect ? : RequestRedirect ;
+    referrer ? : string ;
+    referrerPolicy ? : ReferrerPolicy ;
+    window ? : null ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   type RequestMode = string ;
   var RequestMode : {
     CORS : RequestMode ,
+    NAVIGATE : RequestMode ,
     NO_CORS : RequestMode ,
     SAME_ORIGIN : RequestMode ,
   };
 }
 declare namespace ಠ_ಠ.clutz {
+  type RequestRedirect = string ;
+  var RequestRedirect : {
+    ERROR : RequestRedirect ,
+    FOLLOW : RequestRedirect ,
+    MANUAL : RequestRedirect ,
+  };
+}
+declare namespace ಠ_ಠ.clutz {
   class Response extends Response_Instance {
-    static error ( ) : Response | null ;
-    static redirect (url : string , opt_status ? : number ) : Response | null ;
+    static error ( ) : Response ;
+    static redirect (url : string , opt_status ? : number ) : Response ;
   }
-  class Response_Instance {
+  class Response_Instance implements Body {
     private noStructuralTyping_: any;
-    constructor (opt_body ? : Blob | FormData | string , opt_init ? : { headers : Headers | string [] [] , status : number , statusText : string } ) ;
+    constructor (opt_body ? : Blob | ArrayBuffer | ArrayBufferView | FormData | string | ReadableStream | null , opt_init ? : ResponseInit ) ;
     arrayBuffer ( ) : Promise < ArrayBuffer > ;
     blob ( ) : Promise < Blob > ;
-    body : ReadableByteStream ;
-    bodyUsed : boolean ;
+    body : ReadableStream | null ;
+    bodyUsed : any ;
     clone ( ) : Response ;
     formData ( ) : Promise < FormData > ;
     headers : Headers ;
-    json ( ) : Promise < Object > ;
+    json ( ) : Promise < any > ;
     ok : boolean ;
+    redirected : boolean ;
     status : number ;
     statusText : string ;
     text ( ) : Promise < string > ;
+    trailer : Promise < Headers > ;
     type : ResponseType ;
     url : string ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface ResponseInit {
+    headers ? : Headers | string [] [] | IObject < string , string > ;
+    status ? : number ;
+    statusText ? : string ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -487,6 +549,7 @@ declare namespace ಠ_ಠ.clutz {
     DEFAULT : ResponseType ,
     ERROR : ResponseType ,
     OPAQUE : ResponseType ,
+    OPAQUEREDIRECT : ResponseType ,
   };
 }
 declare namespace ಠ_ಠ.clutz {

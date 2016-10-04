@@ -42,4 +42,4 @@ abstract_method.Child = function() {};
 /**
  * @override
  */
-abstract_method.Child.prototype.bar = function(a) { return a.toString() };
+abstract_method.Child.prototype.bar = function(a) { return a + '' };
