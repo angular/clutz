@@ -136,7 +136,9 @@ public final class TypeConversionPass implements CompilerPass {
    * Converts fields declared internally inside a class using the "this" keyword.
    */
   private class FieldOnThisConverter extends AbstractPostOrderCallback {
-    // Map from class node to its field names
+    /**
+     * Map from class node to its field names.
+     */
     private Multimap<Node, String> classFieldMap = HashMultimap.create();
 
     @Override
@@ -154,7 +156,7 @@ public final class TypeConversionPass implements CompilerPass {
         // TODO(gmoothart): in many cases we should be able to infer the type from the rhs if there
         // is no jsDoc
 
-        // Handle parameter properties when we are in the constructor and have a
+        // Convert fields to parameter properties when we are in the constructor and have a
         // declaration of the form this.name = name;
         if ("constructor".equals(fnName) &&
             declaration.jsDoc != null &&
