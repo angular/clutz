@@ -89,7 +89,8 @@ class DeclarationGenerator {
       "Entry", "DirectoryEntry", "FileSystem", "Metadata", "FileError", "DirectoryReader",
       "FileEntry", "FileWriter", "FileSaver", "ChromeEvent", "Tab", "ChromeStringArrayEvent",
       "ChromeStringStringEvent", "ChromeObjectEvent", "ChromeStringEvent", "ChromeBooleanEvent",
-      "MessageSender", "Port");
+      "MessageSender", "Port", "Body", "RequestInit", "RequestDestination", "FetchRequestType",
+      "RequestRedirect", "RefererrerPolicy", "ResponseInit", "ReferrerPolicy", "Iterable");
 
   /**
    * List of files that are part of closures platform externs.
