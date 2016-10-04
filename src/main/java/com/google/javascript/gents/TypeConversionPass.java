@@ -79,9 +79,9 @@ public final class TypeConversionPass implements CompilerPass {
           JSDocInfo jsdoc = NodeUtil.getBestJSDocInfo(n);
           if (jsdoc != null && jsdoc.hasTypedefType()) {
             String name;
-            if (n.getType() == Token.NAME) {
+            if (n.getToken() == Token.NAME) {
               name = n.getString();
-            } else if (n.getType() == Token.GETPROP) {
+            } else if (n.getToken() == Token.GETPROP) {
               name = n.getSecondChild().getString();
             } else {
               name = n.getFirstChild().getString();
@@ -89,7 +89,7 @@ public final class TypeConversionPass implements CompilerPass {
             Node typeDef = Node.newString(Token.TYPE_ALIAS, name);
             types.put(name, typeDef);
             typeDef.setJSDocInfo(jsdoc);
-            if (parent.getType() == Token.EXPR_RESULT) {
+            if (parent.getToken() == Token.EXPR_RESULT) {
               parent.getParent().replaceChild(parent, typeDef);
             } else {
               parent.replaceChild(n, typeDef);
@@ -370,7 +370,7 @@ public final class TypeConversionPass implements CompilerPass {
     Node memberFunc = IR.memberFunctionDef(fieldName, declaration.rhs);
     memberFunc.setStaticMember(declaration.isStatic);
     memberFunc.setJSDocInfo(declaration.jsDoc);
-    if (declaration.classNode.getType() == Token.INTERFACE) {
+    if (declaration.classNode.getToken() == Token.INTERFACE) {
       Node body = declaration.rhs.getLastChild();
       Preconditions.checkState(body.isBlock());
       if (body.getChildCount() != 0) {
