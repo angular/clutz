@@ -109,8 +109,8 @@ public class TypeScriptGenerator {
 
     for (String filename : filesToConvert) {
       String relativePath = pathUtil.getRelativePath(".", filename);
-      String basename = pathUtil.getFileNameWithoutExtension(relativePath);
-      String tsCode = result.get(basename);
+      String filepath = pathUtil.getFilePathWithoutExtension(relativePath);
+      String tsCode = result.get(filepath);
       if ("-".equals(opts.output)) {
         System.out.println("========================================");
         System.out.println("File: " + relativePath);
@@ -173,7 +173,7 @@ public class TypeScriptGenerator {
 
     // We only use the source root as the extern root is ignored for codegen
     for (Node file : srcRoot.children()) {
-      String basename = pathUtil.getFileNameWithoutExtension(file.getSourceFileName());
+      String filepath = pathUtil.getFilePathWithoutExtension(file.getSourceFileName());
       CodeGeneratorFactory factory = new CodeGeneratorFactory() {
         @Override
         public CodeGenerator getCodeGenerator(Format outputFormat, CodeConsumer cc) {
@@ -190,7 +190,7 @@ public class TypeScriptGenerator {
           .setOutputTypes(true)
           .build();
 
-      sourceFileMap.put(basename, tryClangFormat(tsCode));
+      sourceFileMap.put(filepath, tryClangFormat(tsCode));
     }
 
     errorManager.doGenerateReport();
