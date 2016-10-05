@@ -1,5 +1,6 @@
 package com.google.javascript.gents;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -15,6 +16,7 @@ import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 /**
  * Converts Closure-style modules into TypeScript (ES6) modules (not namespaces).
@@ -203,12 +205,16 @@ public final class ModuleConversionPass implements CompilerPass {
 
   /**
    * Converts a Closure goog.require call into a TypeScript import statement.
-   *
+   * <p>
    * The resulting node is dependent on the exports by the module being imported:
-   * import localName from "goog:old.namespace.syntax";
-   * import {A as localName} from "./valueExports";
-   * import * as localName from "./objectExports";
-   * import "./sideEffectsOnly"
+   * <code><pre>
+   *   import localName from "goog:old.namespace.syntax";
+   *   import defaultExport from "./defaultExport";
+   *   import {namedExport} from "./namedExports";
+   *   import {namedExport as localName} from "./namedExports";
+   *   import * as localName from "./objectExports";
+   *   import "./sideEffectsOnly"
+   * </pre></code>
    */
   void convertRequireToImportStatements(Node n, String fullLocalName, String requiredNamespace) {
     if (!namespaceToModule.containsKey(requiredNamespace)) {
@@ -227,10 +233,12 @@ public final class ModuleConversionPass implements CompilerPass {
 
     // Uses default import syntax as this is a javascript namespace
     if (module.shouldUseOldSyntax()) {
-      Node importNode = new Node(Token.IMPORT,
-          IR.empty(),
-          Node.newString(Token.NAME, localName),
-          Node.newString("goog:" + requiredNamespace));
+      Node importNode =
+          new Node(
+              Token.IMPORT,
+              IR.empty(),
+              Node.newString(Token.NAME, localName),
+              Node.newString("goog:" + requiredNamespace));
       nodeComments.replaceWithComment(n, importNode);
       compiler.reportCodeChange();
 
@@ -242,17 +250,39 @@ public final class ModuleConversionPass implements CompilerPass {
 
     boolean imported = false;
     if (module.importedNamespacesToSymbols.containsKey(requiredNamespace)) {
-      // import {value as localName} from "./file"
-      Node importSpec = new Node(Token.IMPORT_SPEC, IR.name(moduleSuffix));
-      // import {a as b} only when a =/= b
-      if (!moduleSuffix.equals(localName)) {
-        importSpec.addChildToBack(IR.name(localName));
+      @Nullable String defaultExportSymbol = module.exportedNamespacesToSymbols.get(EXPORTS);
+      String importedSymbol = module.importedNamespacesToSymbols.get(requiredNamespace);
+      boolean isDefaultExport = importedSymbol.equals(defaultExportSymbol);
+
+      Optional<Node> defaultExport;
+      Optional<Node> namedExports;
+      if (isDefaultExport) {
+        // import defaultExport from './file'
+        defaultExport = Optional.of(new Node(Token.IMPORT_SPEC, IR.name(localName)));
+        namedExports = Optional.absent();
+      } else {
+        // import {namedExport} from './file'
+        defaultExport = Optional.absent();
+        Node importSpec = new Node(Token.IMPORT_SPEC, IR.name(moduleSuffix));
+        namedExports = Optional.of(new Node(Token.IMPORT_SPECS, importSpec));
+
+        // import {namedExport as b} from './file'
+        // -- when 'exportedValueName' =/= 'b'
+        if (!moduleSuffix.equals(localName)) {
+          importSpec.addChildToBack(IR.name(localName));
+        }
       }
 
-      Node importNode = new Node(Token.IMPORT,
-          IR.empty(),
-          new Node(Token.IMPORT_SPECS, importSpec),
-          Node.newString(referencedFile));
+      // Note: Technically an import statement can import both default AND named exports, but
+      // right now we only handle one xor the other.
+      // import defaultExport, {namedExports} from './file';
+      Node importNode =
+          new Node(
+              Token.IMPORT,
+              defaultExport.or(IR.empty()),
+              namedExports.or(IR.empty()),
+              Node.newString(referencedFile));
+
       n.getParent().addChildBefore(importNode, n);
       nodeComments.moveComment(n, importNode);
       imported = true;
@@ -264,10 +294,12 @@ public final class ModuleConversionPass implements CompilerPass {
 
     if (module.providesObjectChildren.get(requiredNamespace).size() > 0) {
       // import * as var from "./file"
-      Node importNode = new Node(Token.IMPORT,
-          IR.empty(),
-          Node.newString(Token.IMPORT_STAR, localName),
-          Node.newString(referencedFile));
+      Node importNode =
+          new Node(
+              Token.IMPORT,
+              IR.empty(),
+              Node.newString(Token.IMPORT_STAR, localName),
+              Node.newString(referencedFile));
       n.getParent().addChildBefore(importNode, n);
       nodeComments.moveComment(n, importNode);
       imported = true;
@@ -275,18 +307,19 @@ public final class ModuleConversionPass implements CompilerPass {
       for (String child : module.providesObjectChildren.get(requiredNamespace)) {
         if (!valueRewrite.contains(n.getSourceFileName(), child)) {
           String filename = n.getSourceFileName();
-          registerLocalSymbol(filename, fullLocalName + '.' + child,
-              requiredNamespace + '.' + child, localName + '.'+ child);
+          registerLocalSymbol(
+              filename,
+              fullLocalName + '.' + child,
+              requiredNamespace + '.' + child,
+              localName + '.' + child);
         }
       }
     }
 
     if (!imported) {
       // side effects only
-      Node importNode = new Node(Token.IMPORT,
-          IR.empty(),
-          IR.empty(),
-          Node.newString(referencedFile));
+      Node importNode =
+          new Node(Token.IMPORT, IR.empty(), IR.empty(), Node.newString(referencedFile));
       n.getParent().addChildBefore(importNode, n);
       nodeComments.moveComment(n, importNode);
     }
@@ -321,9 +354,10 @@ public final class ModuleConversionPass implements CompilerPass {
       rhs.detachFromParent();
       Node exportSpecNode;
       if (rhs.isName() && exportedSymbol.equals(rhs.getString())) {
-        exportSpecNode = exportedNamespace.equals(EXPORTS)
-            ? new Node(Token.EXPORT_SPEC, rhs)
-            : new Node(Token.EXPORT_SPECS, new Node(Token.EXPORT_SPEC, rhs));
+        exportSpecNode =
+            exportedNamespace.equals(EXPORTS)
+                ? new Node(Token.EXPORT_SPEC, rhs)
+                : new Node(Token.EXPORT_SPECS, new Node(Token.EXPORT_SPEC, rhs));
       } else {
         exportSpecNode = IR.constNode(IR.name(exportedSymbol), rhs);
       }
