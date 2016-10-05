@@ -1,3 +1,3 @@
-export default function D() {}
+export default function() {}
 export const x = 4;
 export function foo() {}

@@ -1,2 +1,2 @@
-export default function Z() {}
+export default function() {}
 export function foo() {}
