@@ -48,7 +48,7 @@ import javax.annotation.Nullable;
  * Converts JavaScript code into JavaScript code annotated with TypeScript {@code
  * TypeDeclarationNode} information provided by the corresponding jsdoc.
  *
- * This compiler pass is based off of the {@code JsdocToEs6TypedConverter} compiler pass.
+ * <p>This compiler pass is based off of the {@code JsdocToEs6TypedConverter} compiler pass.
  */
 public final class TypeAnnotationPass implements CompilerPass {
 
@@ -426,9 +426,10 @@ public final class TypeAnnotationPass implements CompilerPass {
    * Converts the global type name to the local type name.
    */
   String convertTypeName(String sourceFile, String typeName) {
-    Map<String, String> rewriteMap = typeRewrite.containsRow(sourceFile) ?
-        typeRewrite.rowMap().get(sourceFile) :
-        new HashMap<String, String>();
+    Map<String, String> rewriteMap =
+        typeRewrite.containsRow(sourceFile)
+            ? typeRewrite.rowMap().get(sourceFile)
+            : new HashMap<String, String>();
 
     // All type symbols declared anywhere in the compilation unit
     Set<String> allTypes = new HashSet<>();
@@ -449,6 +450,8 @@ public final class TypeAnnotationPass implements CompilerPass {
       FileModule module = symbolToModule.get(importedNamespace);
       String symbol = module.importedNamespacesToSymbols.get(importedNamespace);
 
+      // TODO(dpurpura): Consider refactoring this to use the same import-rewriting rules
+      //  as in ModuleConversionPass.
       // Create new import statement
       Node importSpec;
       Node importFile;
@@ -456,7 +459,11 @@ public final class TypeAnnotationPass implements CompilerPass {
         importSpec = Node.newString(Token.NAME, symbol);
         importFile = Node.newString("goog:" + importedNamespace);
       } else {
-        importSpec = new Node(Token.IMPORT_SPECS, new Node(Token.IMPORT_SPEC, IR.name(symbol)));
+        @Nullable String defaultExportSymbol = module.exportedNamespacesToSymbols.get("exports");
+        importSpec =
+            symbol.equals(defaultExportSymbol) // isDefaultExport
+                ? new Node(Token.IMPORT_SPEC, IR.name(symbol))
+                : new Node(Token.IMPORT_SPECS, new Node(Token.IMPORT_SPEC, IR.name(symbol)));
         String referencedFile = pathUtil.getImportPath(sourceFile, module.file);
         importFile = Node.newString(referencedFile);
       }
