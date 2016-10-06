@@ -1,5 +1,6 @@
 goog.provide('ns.Interface2');
 goog.provide('ns.Interface3');
+goog.provide('ns.StructuralInterface');
 
 /** @interface */
 function Interface() {}
@@ -34,3 +35,20 @@ class X {}
  * @implements {ns.Interface3}
  */
 function Y() {}
+
+/** @record */
+ns.StructuralInterface = function() {}
+
+/**
+ * @param {string} a
+ * @return {number}
+ */
+ns.StructuralInterface.prototype.bar = function(a) {};
+
+const /** !ns.StructuralInterface */ structInterfaceImpl = {
+  /**
+   * @param {string} a
+   * @return {number}
+   */
+  bar: function(a) { return 1;}
+} 
