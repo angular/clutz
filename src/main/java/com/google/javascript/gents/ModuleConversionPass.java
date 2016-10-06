@@ -326,7 +326,7 @@ public final class ModuleConversionPass implements CompilerPass {
             : new Node(Token.EXPORT_SPECS, new Node(Token.EXPORT_SPEC, rhs));
       } else {
         exportSpecNode =
-            exportedNamespace.equals(EXPORTS)
+            (exportedNamespace.equals(EXPORTS) && rhs.getQualifiedName() != null)
                 ? rhs
                 : IR.constNode(IR.name(exportedSymbol), rhs);
       }
