@@ -1,5 +1,5 @@
 class foo {}
 
-export default const A = foo;
+export default foo;
 export const typA = foo;
 export const valA = new foo();
