@@ -7,4 +7,4 @@ class Klass {
   }
 }
 
-export default Klass;
+export {Klass};

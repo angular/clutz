@@ -321,22 +321,14 @@ public final class ModuleConversionPass implements CompilerPass {
       rhs.detachFromParent();
       Node exportSpecNode;
       if (rhs.isName() && exportedSymbol.equals(rhs.getString())) {
-        exportSpecNode = exportedNamespace.equals(EXPORTS)
-            ? new Node(Token.EXPORT_SPEC, rhs)
-            : new Node(Token.EXPORT_SPECS, new Node(Token.EXPORT_SPEC, rhs));
+        exportSpecNode = new Node(Token.EXPORT_SPECS, new Node(Token.EXPORT_SPEC, rhs));
       } else {
-        exportSpecNode =
-            (exportedNamespace.equals(EXPORTS) && rhs.getQualifiedName() != null)
-                ? rhs
-                : IR.constNode(IR.name(exportedSymbol), rhs);
+        exportSpecNode = IR.constNode(IR.name(exportedSymbol), rhs);
       }
       exportSpecNode.setJSDocInfo(jsDoc);
       Node exportNode = new Node(Token.EXPORT, exportSpecNode);
       nodeComments.replaceWithComment(exprNode, exportNode);
 
-      if (exportedNamespace.equals(EXPORTS)) {
-        exportNode.putBooleanProp(Node.EXPORT_DEFAULT, true);
-      }
     } else {
       // Assume prefix has already been exported and just trim the prefix
       nameUtil.replacePrefixInName(lhs, exportedNamespace, exportedSymbol);

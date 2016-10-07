@@ -1,3 +1,3 @@
-export default class A {
+export class A {
   constructor(public n: number) {}
 }
