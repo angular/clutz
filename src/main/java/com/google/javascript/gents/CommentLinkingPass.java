@@ -23,7 +23,7 @@ public final class CommentLinkingPass implements CompilerPass {
    * These jsdocs delete everything except for the `keep` capture group
    * Some regexes contain an empty capture group for uniform handling.
    */
-  private static final Pattern[] COMMENT_REPLACEMENTS = {
+  private static final Pattern[] JSDOC_REPLACEMENTS = {
       Pattern.compile("@(constructor|interface|record)[ \t]*(?<keep>)"),
       Pattern.compile("@(extends|implements|type)[ \t]*(\\{.*\\})[ \t]*(?<keep>)"),
       Pattern.compile("@(private|protected|public|package|const)[ \t]*(\\{.*\\})?[ \t]*(?<keep>)"),
@@ -35,6 +35,9 @@ public final class CommentLinkingPass implements CompilerPass {
       Pattern.compile("(?m)^[ \t]*\\*\\s*\n(?<keep>)"),
       // Remove type annotation from @export
       Pattern.compile("(?<keep>@export)[ \t]*(\\{.*\\})")};
+
+  private static final Pattern[] COMMENT_REPLACEMENTS = {
+      Pattern.compile("//\\s*goog.scope\\s*(?<keep>)")};
 
   private final Compiler compiler;
   private final NodeComments nodeComments;
@@ -125,7 +128,7 @@ public final class CommentLinkingPass implements CompilerPass {
       StringBuilder sb = new StringBuilder();
       String sep = "";
       for (Comment c : group) {
-        String comment = Type.JSDOC == c.type ? filterTags(c.value) : c.value;
+        String comment = filterTags(c.type, c.value);
         if (!comment.isEmpty()) {
           sb.append(sep).append(comment);
           sep = "\n";
@@ -140,8 +143,9 @@ public final class CommentLinkingPass implements CompilerPass {
     }
 
     /** Removes unneeded tags from the comment */
-    private String filterTags(String comment) {
-      for (Pattern p : COMMENT_REPLACEMENTS) {
+    private String filterTags(Type type, String comment) {
+      Pattern[] replacements = (type == Type.JSDOC) ? JSDOC_REPLACEMENTS : COMMENT_REPLACEMENTS;
+      for (Pattern p : replacements) {
         comment = p.matcher(comment).replaceAll("${keep}");
       }
       return isWhitespaceOnly(comment) ? "" : comment;
