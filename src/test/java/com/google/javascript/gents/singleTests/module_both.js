@@ -27,3 +27,5 @@ exports.num = num;
 exports.foo = function() { };
 /** @type {number} */
 exports.foo.z = num * 2;
+
+class ClassThatShouldNotBeExported {}
