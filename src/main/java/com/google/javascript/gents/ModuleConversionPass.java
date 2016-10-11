@@ -1,6 +1,9 @@
 package com.google.javascript.gents;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.javascript.gents.CollectModuleMetadata.FileModule;
@@ -14,7 +17,9 @@ import com.google.javascript.rhino.IR;
 import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Converts Closure-style modules into TypeScript (ES6) modules (not namespaces).
@@ -32,9 +37,21 @@ public final class ModuleConversionPass implements CompilerPass {
   private final Map<String, FileModule> fileToModule;
   private final Map<String, FileModule> namespaceToModule;
 
+  /**
+   * Map of metadata about a potential export to the node that should be exported.
+   *
+   * <p>For example, in the case below, the {@code Node} would point to {@code class Foo}.
+   * <code><pre>
+   * class Foo {}
+   * exports {Foo}
+   * </pre><code>
+   */
+  private final Map<ExportedSymbol, Node> exportsToNodes = new HashMap<>();
+
   // Used for rewriting usages of imported symbols
-  // filename, namespace -> local name
+  /** fileName, namespace -> local name */
   private final Table<String, String, String> valueRewrite = HashBasedTable.create();
+  /** fileName, namespace -> local name */
   private final Table<String, String, String> typeRewrite = HashBasedTable.create();
 
   public Table<String, String, String> getTypeRewrite() {
@@ -67,11 +84,11 @@ public final class ModuleConversionPass implements CompilerPass {
   private class ModuleExportConverter extends AbstractTopLevelCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
-      String filename = n.getSourceFileName();
+      String fileName = n.getSourceFileName();
       if (n.isScript()) {
-        if (fileToModule.containsKey(filename)) {
+        if (fileToModule.containsKey(fileName)) {
           // Module is declared purely for side effects
-          if (!fileToModule.get(filename).hasExports()) {
+          if (!fileToModule.get(fileName).hasExports()) {
             // export {};
             // TODO(renez): Add comment to explain that this statement is used to change file
             // into a module.
@@ -87,6 +104,11 @@ public final class ModuleConversionPass implements CompilerPass {
       }
 
       if (!n.isExprResult()) {
+        if (n.getToken() == Token.CONST
+            || n.getToken() == Token.CLASS
+            || n.getToken() == Token.FUNCTION) {
+          collectMetdataForExports(n, parent, fileName);
+        }
         return;
       }
 
@@ -106,10 +128,10 @@ public final class ModuleConversionPass implements CompilerPass {
             // GETPROPs on the root level are only exports for @typedefs
             break;
           }
-          if (!fileToModule.containsKey(filename)) {
+          if (!fileToModule.containsKey(fileName)) {
             break;
           }
-          FileModule module = fileToModule.get(filename);
+          FileModule module = fileToModule.get(fileName);
           Map<String, String> symbols = module.exportedNamespacesToSymbols;
           String exportedNamespace = nameUtil.findLongestNamePrefix(child, symbols.keySet());
           if (exportedNamespace != null) {
@@ -118,31 +140,43 @@ public final class ModuleConversionPass implements CompilerPass {
                 new Node(Token.EXPORT_SPEC, Node.newString(Token.NAME, localName))));
             parent.addChildAfter(export, n);
             // Registers symbol for rewriting local uses.
-            registerLocalSymbol(child.getSourceFileName(), exportedNamespace, exportedNamespace,
-                localName);
+            registerLocalSymbol(
+                child.getSourceFileName(), exportedNamespace, exportedNamespace, localName);
           }
           break;
         }
         case ASSIGN:
-          if (!fileToModule.containsKey(filename)) {
+          if (!fileToModule.containsKey(fileName)) {
             break;
           }
-          FileModule module = fileToModule.get(filename);
+          FileModule module = fileToModule.get(fileName);
           Node lhs = child.getFirstChild();
           Map<String, String> symbols = module.exportedNamespacesToSymbols;
 
           // We export the longest valid prefix
           String exportedNamespace = nameUtil.findLongestNamePrefix(lhs, symbols.keySet());
           if (exportedNamespace != null) {
-            convertExportAssignment(child, exportedNamespace, symbols.get(exportedNamespace));
+            convertExportAssignment(
+                child, exportedNamespace, symbols.get(exportedNamespace), fileName);
             // Registers symbol for rewriting local uses
-            registerLocalSymbol(child.getSourceFileName(), exportedNamespace, exportedNamespace,
+            registerLocalSymbol(
+                child.getSourceFileName(),
+                exportedNamespace,
+                exportedNamespace,
                 symbols.get(exportedNamespace));
           }
           break;
         default:
           break;
       }
+    }
+
+    private void collectMetdataForExports(Node namedNode, Node parent, String fileName) {
+      if (!fileToModule.containsKey(fileName)) {
+        return;
+      }
+      String nodeName = checkNotNull(namedNode.getFirstChild().getQualifiedName());
+      exportsToNodes.put(ExportedSymbol.of(fileName, nodeName, nodeName), namedNode);
     }
   }
 
@@ -274,8 +308,8 @@ public final class ModuleConversionPass implements CompilerPass {
 
       for (String child : module.providesObjectChildren.get(requiredNamespace)) {
         if (!valueRewrite.contains(n.getSourceFileName(), child)) {
-          String filename = n.getSourceFileName();
-          registerLocalSymbol(filename, fullLocalName + '.' + child,
+          String fileName = n.getSourceFileName();
+          registerLocalSymbol(fileName, fullLocalName + '.' + child,
               requiredNamespace + '.' + child, localName + '.'+ child);
         }
       }
@@ -303,27 +337,48 @@ public final class ModuleConversionPass implements CompilerPass {
    * @param assign Assignment node
    * @param exportedNamespace The prefix of the assignment name that we are exporting
    * @param exportedSymbol The symbol that we want to export from the file
-   * For example,
-   * convertExportAssignment(pre.fix = ..., "pre.fix", "name") <-> export const name = ...
-   * convertExportAssignment(pre.fix.foo = ..., "pre.fix", "name") <-> name.foo = ...
+   *    For example,
+   *    convertExportAssignment(pre.fix = ..., "pre.fix", "name") <-> export const name = ...
+   *    convertExportAssignment(pre.fix.foo = ..., "pre.fix", "name") <-> name.foo = ...
    */
-  void convertExportAssignment(Node assign, String exportedNamespace, String exportedSymbol) {
-    Preconditions.checkState(assign.isAssign());
-    Preconditions.checkState(assign.getParent().isExprResult());
+  void convertExportAssignment(
+      Node assign, String exportedNamespace, String exportedSymbol, String fileName) {
+    checkState(assign.isAssign());
+    checkState(assign.getParent().isExprResult());
 
     Node exprNode = assign.getParent();
     Node lhs = assign.getFirstChild();
     Node rhs = assign.getLastChild();
     JSDocInfo jsDoc = NodeUtil.getBestJSDocInfo(assign);
 
+    ExportedSymbol symbolToExport =
+        ExportedSymbol.fromExportAssignment(rhs, exportedNamespace, exportedSymbol, fileName);
+
     if (exportedNamespace.equals(lhs.getQualifiedName())) {
-      // Generate new export statement
       rhs.detachFromParent();
       Node exportSpecNode;
-      if (rhs.isName()
-          && (exportedSymbol.equals(rhs.getString()) || exportedNamespace.equals(EXPORTS))) {
+      if (rhs.isName() && exportsToNodes.containsKey(symbolToExport)) {
+        // Rewrite the AST to export the symbol directly using information from the export
+        // assignment.
+        Node namedNode = exportsToNodes.get(symbolToExport);
+        Node next = namedNode.getNext();
+        Node parent = namedNode.getParent();
+        namedNode.detachFromParent();
+
+        Node export = new Node(Token.EXPR_RESULT, new Node(Token.EXPORT, namedNode));
+
+        nodeComments.moveComment(namedNode, export);
+        parent.addChildBefore(export, next);
+        exprNode.detachFromParent();
+
+        compiler.reportCodeChange();
+        return;
+
+      } else if (rhs.isName() && exportedSymbol.equals(rhs.getString())) {
+        // Rewrite the export line to: <code>export {rhs}</code>.
         exportSpecNode = new Node(Token.EXPORT_SPECS, new Node(Token.EXPORT_SPEC, rhs));
       } else {
+        // Rewrite the export line to: <code>export const exportedSymbol = rhs</code>.
         exportSpecNode = IR.constNode(IR.name(exportedSymbol), rhs);
       }
       exportSpecNode.setJSDocInfo(jsDoc);
@@ -346,5 +401,86 @@ public final class ModuleConversionPass implements CompilerPass {
     valueRewrite.put(sourceFile, fullLocalName, localName);
     typeRewrite.put(sourceFile, fullLocalName, localName);
     typeRewrite.put(sourceFile, requiredNamespace, localName);
+  }
+
+  /** Metadata about an exported symbol. */
+  private static class ExportedSymbol {
+    /** The name of the file exporting the symbol. */
+    final String fileName;
+
+    /**
+     * The name that the symbol is declared in the module.
+     *
+     * <p>For example, {@code Foo} in: <code> class Foo {}</code>
+     */
+    final String localName;
+
+    /**
+     * The name that the symbol is exported under via named exports.
+     *
+     * <p>For example, {@code Bar} in: <code> exports {Bar}</code>.
+     *
+     * <p>If a symbol is directly exported, as in the case of <code>export class Foo {}</code>, the
+     * {@link #localName} and {@link #exportedName} will both be {@code Foo}.
+     */
+    final String exportedName;
+
+    private ExportedSymbol(String fileName, String localName, String exportedName) {
+      this.fileName = checkNotNull(fileName);
+      this.localName = checkNotNull(localName);
+      this.exportedName = checkNotNull(exportedName);
+    }
+
+    static ExportedSymbol of(String fileName, String localName, String exportedName) {
+      return new ExportedSymbol(fileName, localName, exportedName);
+    }
+
+    static ExportedSymbol fromExportAssignment(
+        Node rhs, String exportedNamespace, String exportedSymbol, String fileName) {
+      String localName = (rhs.getQualifiedName() != null) ? rhs.getQualifiedName() : exportedSymbol;
+
+      String exportedName;
+      if (exportedNamespace.equals(EXPORTS)) { // is a default export
+        exportedName = localName;
+      } else if (exportedNamespace.startsWith(EXPORTS)) { // is a named export
+        exportedName =
+            exportedNamespace.substring(EXPORTS.length() + 1, exportedNamespace.length());
+      } else { // exported via goog.provide
+        exportedName = exportedSymbol;
+      }
+
+      return new ExportedSymbol(fileName, localName, exportedName);
+    }
+
+    @Override
+    public String toString() {
+      return MoreObjects.toStringHelper(getClass())
+          .add("fileName", fileName)
+          .add("localName", localName)
+          .add("exportedName", exportedName)
+          .toString();
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(this.fileName, this.localName, this.exportedName);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
+        return false;
+      }
+      ExportedSymbol that = (ExportedSymbol) obj;
+      return Objects.equals(this.fileName, that.fileName)
+          && Objects.equals(this.localName, that.localName)
+          && Objects.equals(this.exportedName, that.exportedName);
+    }
   }
 }
