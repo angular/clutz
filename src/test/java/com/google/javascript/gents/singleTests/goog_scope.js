@@ -1,5 +1,7 @@
-goog.provide("A.B");
-goog.provide("A.B.C");
+goog.provide("lorem.ipsum.Foo");
+goog.provide("lorem.ipsum.Foo.qux");
+goog.provide("lorem.ipsum.Foo.Bar");
+goog.provide("lorem.ipsum.baz");
 
 goog.scope(function() {
 
@@ -7,21 +9,34 @@ goog.scope(function() {
  * @constructor
  * @param {number} n
  */
-A.B = function(n) {
+lorem.ipsum.Foo = function(n) {
   /** @type {number} */
   this.n = n;
 };
 
-// Aggressively export rather than create static methods/fields
+const Foo = lorem.ipsum.Foo;
+
+
+// TODO: Aggressively export rather than create static methods/fields
 /** @return {number} */
-A.B.foo = function() { return 4; };
+Foo.foo = function() { return 4; };
+
+//TODO: Aggressively export rather than create static methods/fields
+/** @return {number} */
+Foo.qux = function() { return 4; };
+
 /** @type {number} */
-A.B.num = 8;
+Foo.num = 8;
+
 
 /** @constructor */
-A.B.C = function() {};
+Foo.Bar = function() {};
 
 /** @return {boolean} */
-A.B.C.bar = function() { return false; };
+Foo.Bar.bar = function() { return false; };
+
+
+/** @return {boolean} */
+lorem.ipsum.baz = function() { return false; };
 
 });  // goog.scope

@@ -128,7 +128,7 @@ public final class CommentLinkingPass implements CompilerPass {
       StringBuilder sb = new StringBuilder();
       String sep = "";
       for (Comment c : group) {
-        String comment = filterTags(c.type, c.value);
+        String comment = filterCommentContent(c.type, c.value);
         if (!comment.isEmpty()) {
           sb.append(sep).append(comment);
           sep = "\n";
@@ -142,8 +142,8 @@ public final class CommentLinkingPass implements CompilerPass {
       forceAddCommentToGroup();
     }
 
-    /** Removes unneeded tags from the comment */
-    private String filterTags(Type type, String comment) {
+    /** Removes unneeded tags and markers from the comment */
+    private String filterCommentContent(Type type, String comment) {
       Pattern[] replacements = (type == Type.JSDOC) ? JSDOC_REPLACEMENTS : COMMENT_REPLACEMENTS;
       for (Pattern p : replacements) {
         comment = p.matcher(comment).replaceAll("${keep}");

@@ -5,13 +5,13 @@ import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.Nullable;
 
 /**
  * Compiler pass removing the {@code goog.scope} wrapper, so that the module and class
  * transformations can take effect.
+ *
+ * <p>This is safe because the the file is converted into a module in the following pass.
  */
 public final class RemoveGoogScopePass extends AbstractTopLevelCallback implements CompilerPass {
 
@@ -42,24 +42,22 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
     Node blockOfScopeContents = n.getLastChild().getLastChild().getLastChild();
     blockOfScopeContents.detachFromParent();
 
-    // Collect all of the children into a list before detaching them from the parent,
-    // since detaching breaks the "getNext()" chain.
-    List<Node> scopeChildren = new ArrayList<>();
-    @Nullable Node maybeChildToAdd = blockOfScopeContents.getFirstChild();
-    while (maybeChildToAdd != null) {
-      scopeChildren.add(maybeChildToAdd);
-      maybeChildToAdd = maybeChildToAdd.getNext();
-    }
 
-    // Now that we have the contents of the goog.scope, rewrite the AST.
+    // Rewrite the AST, moving each node in the contents of the scope after the node.
 
     // Create a marker so that we know where to insert the goog.scope contents.
     Node insertAfterThisNode = n;
 
-    for (Node scopeChild : scopeChildren) {
-      scopeChild.detachFromParent();
-      n.getParent().addChildAfter(scopeChild, insertAfterThisNode);
-      insertAfterThisNode = scopeChild;
+    @Nullable Node nodeToMove = blockOfScopeContents.getFirstChild();
+    while (nodeToMove != null) {
+      // Store the next node in a temp variable since detaching the node breaks the chain.
+      Node nextNodeToMove = nodeToMove.getNext();
+      nodeToMove.detachFromParent();
+
+      n.getParent().addChildAfter(nodeToMove, insertAfterThisNode);
+
+      insertAfterThisNode = nodeToMove;
+      nodeToMove = nextNodeToMove;
     }
 
     // Remove the goog.scope calls.
