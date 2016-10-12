@@ -17,13 +17,17 @@ lorem.ipsum.Foo = function(n) {
 const Foo = lorem.ipsum.Foo;
 
 
-// TODO: Aggressively export rather than create static methods/fields
-/** @return {number} */
-Foo.foo = function() { return 4; };
+/** @return {string} */
+Foo.foo = function() { 
+  return "this should create a static method on Foo, since it is NOT goog.provided"; 
+};
 
 //TODO: Aggressively export rather than create static methods/fields
-/** @return {number} */
-Foo.qux = function() { return 4; };
+/** @return {string} */
+Foo.qux = function() { 
+  return "this should be directly exported, rather than create a static method, " +
+      "since it is goog.provided"; 
+};
 
 /** @type {number} */
 Foo.num = 8;
@@ -40,3 +44,6 @@ Foo.Bar.bar = function() { return false; };
 lorem.ipsum.baz = function() { return false; };
 
 });  // goog.scope
+
+// -----------------------------------------------------------------------
+const insertGoogScopeContentsAboveMe = true;

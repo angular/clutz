@@ -2,14 +2,14 @@ export class Foo {
   static num: number = 8;
   constructor(public n: number) {}
 
-  // TODO: Aggressively export rather than create static methods/fields
-  static foo(): number {
-    return 4;
+  static foo(): string {
+    return 'this should create a static method on Foo, since it is NOT goog.provided';
   }
 
   // TODO: Aggressively export rather than create static methods/fields
-  static qux(): number {
-    return 4;
+  static qux(): string {
+    return 'this should be directly exported, rather than create a static method, ' +
+        'since it is goog.provided';
   }
 }
 
@@ -23,3 +23,6 @@ Foo.Bar = class {
 export function baz(): boolean {
   return false;
 }
+
+// -----------------------------------------------------------------------
+const insertGoogScopeContentsAboveMe = true;
