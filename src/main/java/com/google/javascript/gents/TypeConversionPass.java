@@ -139,7 +139,7 @@ public final class TypeConversionPass implements CompilerPass {
     /**
      * Map from class node to its field names.
      */
-    private Multimap<Node, String> classFieldMap = HashMultimap.create();
+    private final Multimap<Node, String> classFieldMap = HashMultimap.create();
 
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
@@ -642,12 +642,12 @@ public final class TypeConversionPass implements CompilerPass {
      * Factory method for creating a new ClassMemberDeclaration on a declaration external to
      * a class.
      * <ul>
-     * <li>{@code A.prototype.foo = function() {...}}</li>
-     * <li>{@code A.prototype.w = 4}</li>
-     * <li>{@code A.prototype.x}</li>
-     * <li>{@code A.bar = function() {...}}</li>
-     * <li>{@code A.y = 6}</li>
-     * <li>{@code A.z}</li>
+     * <li><code>A.prototype.foo = function() {...}</code>
+     * <li><code>A.prototype.w = 4</code>
+     * <li><code>A.prototype.x</code>
+     * <li><code>A.bar = function() {...}</code>
+     * <li><code>A.y = 6</code>
+     * <li><code>A.z</code>
      * </ul>
      *
      * Returns null if the expression node is an invalid member declaration.

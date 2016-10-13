@@ -107,7 +107,7 @@ public final class ModuleConversionPass implements CompilerPass {
         if (n.getToken() == Token.CONST
             || n.getToken() == Token.CLASS
             || n.getToken() == Token.FUNCTION) {
-          collectMetdataForExports(n, parent, fileName);
+          collectMetdataForExports(n, fileName);
         }
         return;
       }
@@ -171,7 +171,7 @@ public final class ModuleConversionPass implements CompilerPass {
       }
     }
 
-    private void collectMetdataForExports(Node namedNode, Node parent, String fileName) {
+    private void collectMetdataForExports(Node namedNode, String fileName) {
       if (!fileToModule.containsKey(fileName)) {
         return;
       }
