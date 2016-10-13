@@ -18,8 +18,8 @@ public class PathUtil {
    * Returns the file name without its file extension or path. The result does not include the
    * '{@code .}'.
    */
-  String getFileNameWithoutExtension(String filepath) {
-    return removeExtension(new File(filepath).getName());
+  String getFilePathWithoutExtension(String filepath) {
+    return removeExtension(new File(filepath).getPath());
   }
 
   /**
