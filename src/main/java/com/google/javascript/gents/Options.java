@@ -7,8 +7,8 @@ import com.google.gson.stream.JsonReader;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DiagnosticGroups;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -89,11 +89,12 @@ public class Options {
     options.setIdeMode(true);
   }
 
-  private Map<String, String> getExternsMap() throws FileNotFoundException {
+  private Map<String, String> getExternsMap() throws IOException {
     if (this.externsMapFile != null) {
       Type mapType = new TypeToken<Map<String, String>>() { /* empty */ }.getType();
-      JsonReader reader = new JsonReader(new FileReader(externsMapFile));
-      return new Gson().fromJson(reader, mapType);
+      try (JsonReader reader = new JsonReader(new FileReader(externsMapFile));) {
+        return new Gson().fromJson(reader, mapType);
+      }
     } else {
       return ImmutableMap.of();
     }
@@ -111,7 +112,7 @@ public class Options {
 
     try {
       externsMap = getExternsMap();
-    } catch (FileNotFoundException e) {
+    } catch (IOException e) {
       throw new CmdLineException(parser,
           "externs file " + externsMapFile + " not found.", e);
     }
@@ -121,7 +122,7 @@ public class Options {
     externsMap = ImmutableMap.of();
   }
 
-  Options(String externsMapFile) throws FileNotFoundException {
+  Options(String externsMapFile) throws IOException {
     this.externsMapFile = externsMapFile;
     externsMap = getExternsMap();
   }

@@ -7,7 +7,6 @@ import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.google.javascript.rhino.jstype.JSTypeNative.ALL_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.ARRAY_TYPE;
-import static com.google.javascript.rhino.jstype.JSTypeNative.NUMBER_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.STRING_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -184,7 +183,7 @@ class DeclarationGenerator {
    *
    * Currently, this map only contains templatized types and record types.
    */
-  private Map<JSType, String> typedefs = new HashMap<>();
+  private final Map<JSType, String> typedefs = new HashMap<>();
 
   /**
    * Aggregates all emitted types, used in a final pass to find types emitted in type position but
@@ -613,15 +612,25 @@ class DeclarationGenerator {
   }
 
   private boolean needsAlias(Set<String> shadowedSymbols, String provide, TypedVar symbol) {
-    if (!shadowedSymbols.contains(provide)) return false;
+    if (!shadowedSymbols.contains(provide)) {
+      return false;
+    }
     // Emit var foo : any for provided but not declared symbols.
-    if (symbol == null) return true;
+    if (symbol == null) {
+      return true;
+    }
     JSType type = symbol.getType();
+    if (type == null) {
+      return false;
+    }
+
     // Emit var foo : PrivateType for private symbols.
-    if (isPrivate(type.getJSDocInfo()) && !isConstructor(type.getJSDocInfo())) return true;
+    if (isPrivate(type.getJSDocInfo()) && !isConstructor(type.getJSDocInfo())) {
+      return true;
+    }
     // Only var declarations have collisions, while class, interface, and functions can coexist with
     // namespaces.
-    if (type != null && (type.isInterface() || type.isConstructor() || type.isFunctionType())) {
+    if (type.isInterface() || type.isConstructor() || type.isFunctionType()) {
       return false;
     }
     return isDefaultExport(symbol);
@@ -1128,17 +1137,19 @@ class DeclarationGenerator {
     }
 
     private void maybeEmitJsDoc(JSDocInfo docs, boolean ignoreParams) {
-      if (docs == null) return;
+      if (docs == null) {
+        return;
+      }
       String desc = docs.getBlockDescription();
-      if (desc == null) return;
+      if (desc == null) {
+        return;
+      }
       emit("/**");
       emitBreak();
-      if (desc != null) {
-        for (String line : Splitter.on('\n').split(desc)) {
-          emit(" *");
-          if (!line.isEmpty()) emit(line);
-          emitBreak();
-        }
+      for (String line : Splitter.on('\n').split(desc)) {
+        emit(" *");
+        if (!line.isEmpty()) emit(line);
+        emitBreak();
       }
       if (!ignoreParams) {
         for (String name : docs.getParameterNames()) {

@@ -213,7 +213,7 @@ public class TypeScriptGenerator {
       final InputStream stdout = process.getInputStream();
 
       // Write TypeScript code to stdin of the process
-      try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdin)); ) {
+      try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdin, UTF_8)); ) {
         writer.write(code);
         writer.close();
       }
