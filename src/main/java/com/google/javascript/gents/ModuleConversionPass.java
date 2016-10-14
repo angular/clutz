@@ -175,7 +175,11 @@ public final class ModuleConversionPass implements CompilerPass {
       if (!fileToModule.containsKey(fileName)) {
         return;
       }
-      String nodeName = checkNotNull(namedNode.getFirstChild().getQualifiedName());
+
+      String nodeName = namedNode.getFirstChild().getQualifiedName();
+      if (nodeName == null) {
+        return;
+      }
       exportsToNodes.put(ExportedSymbol.of(fileName, nodeName, nodeName), namedNode);
     }
   }
@@ -188,15 +192,26 @@ public final class ModuleConversionPass implements CompilerPass {
     public void visit(NodeTraversal t, Node n, Node parent) {
       if (NodeUtil.isNameDeclaration(n)) {
         // var x = goog.require(...);
-        Node callNode = n.getFirstFirstChild();
-        if (callNode == null || !callNode.isCall()) {
+        Node node = n.getFirstFirstChild();
+        if (node == null) {
           return;
         }
 
-        if ("goog.require".equals(callNode.getFirstChild().getQualifiedName())) {
+        if (node.isCall() && "goog.require".equals(node.getFirstChild().getQualifiedName())) {
+          Node callNode = node;
           String requiredNamespace = callNode.getLastChild().getString();
           String localName = n.getFirstChild().getQualifiedName();
           convertRequireToImportStatements(n, localName, requiredNamespace);
+          return;
+
+        }
+        if (node.isObjectPattern()
+            && "goog.require".equals(node.getNext().getFirstChild().getQualifiedName())) {
+          String namedExport = node.getFirstChild().getString();
+          String requiredNamespace = node.getNext().getFirstChild().getNext().getString();
+          requiredNamespace += "." + namedExport;
+          convertRequireToImportStatements(n, namedExport, requiredNamespace);
+          return;
         }
       } else if (n.isExprResult()) {
         // goog.require(...);
@@ -207,6 +222,7 @@ public final class ModuleConversionPass implements CompilerPass {
         if ("goog.require".equals(callNode.getFirstChild().getQualifiedName())) {
           String requiredNamespace = callNode.getLastChild().getString();
           convertRequireToImportStatements(n, requiredNamespace, requiredNamespace);
+          return;
         }
       }
     }
