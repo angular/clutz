@@ -1,3 +1,4 @@
+
 /**
  * Anonymous class
  */
@@ -50,24 +51,24 @@ class E extends C {
     super(a, b);
   }
 }
-
 let nested = {};
 nested.klass = class {};
 
 class F {
   // inline comment
 
+
   /**
-   * block comment
-   */
+     * block comment
+     */
   constructor() {}
 
   /** Do foo! */
   foo() {}
 
   /**
-   * Returns phone number.
-   */
+     * Returns phone number.
+     */
   bar(): string {
     return '';
   }
@@ -75,7 +76,7 @@ class F {
 
 class G {
   /**
-   * ES6 method short hand.
-   */
+     * ES6 method short hand.
+     */
   method() {}
 }

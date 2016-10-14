@@ -126,7 +126,7 @@ public final class CommentLinkingPass implements CompilerPass {
     /** Links a comment to the corresponding node */
     private void linkCommentToNode(Node n) {
       StringBuilder sb = new StringBuilder();
-      String sep = "";
+      String sep = "\n";
       for (Comment c : group) {
         String comment = filterCommentContent(c.type, c.value);
         if (!comment.isEmpty()) {

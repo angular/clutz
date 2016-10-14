@@ -1,3 +1,4 @@
+
 /** Possibly outdated information about Klass. */
 export class Klass {
   n: any;

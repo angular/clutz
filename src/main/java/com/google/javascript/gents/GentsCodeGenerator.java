@@ -1,5 +1,6 @@
 package com.google.javascript.gents;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.javascript.jscomp.CodeConsumer;
 import com.google.javascript.jscomp.CodeGenerator;
 import com.google.javascript.jscomp.CompilerOptions;
@@ -59,17 +60,16 @@ public class GentsCodeGenerator extends CodeGenerator {
     addNewlines(n);
   }
 
+  private static final ImmutableSet<Token> TOKENS_TO_ADD_NEWLINES_BEFORE =
+      ImmutableSet.of(
+          Token.CLASS, Token.EXPORT, Token.FUNCTION, Token.INTERFACE, Token.MEMBER_FUNCTION_DEF);
+
   /** Add newlines to the generated source */
   private void addNewlines(Node n) {
     Node nextNode = n.getNext();
     if (nextNode != null) {
-      int lineSpacing = nextNode.getLineno() - n.getLineno();
-
-      // Add an empty line if:
-      //   - the next node is further away than the next line
-      //   - the next node is a class function (but the current node is not a comment)
-      if (lineSpacing > 1 ||
-          (nextNode.getToken() == Token.MEMBER_FUNCTION_DEF && n.getToken() != Token.EMPTY)) {
+      if (nodeComments.getComment(nextNode) == null // Comments already prepend a newline.
+          && TOKENS_TO_ADD_NEWLINES_BEFORE.contains(nextNode.getToken())) {
         add("\n");
       }
     }

@@ -1,3 +1,4 @@
+
 /**
  * This comment describes a class
  */
@@ -6,6 +7,7 @@ class A {
   /* This one too (same comment block) */
   foo() {}
 }
+
 /**
  * This is a floating comment block
  * It stays together with anything not separated by an empty line
@@ -22,7 +24,9 @@ class A {
 let foo = function(deleted: number, notdeleted: number): number {
   return deleted + notdeleted;
 };
+
 // The following comment should be entirely deleted
 const x;
+
 /** @export */
 let m: number = 4;

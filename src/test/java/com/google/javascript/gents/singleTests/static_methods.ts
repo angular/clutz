@@ -6,20 +6,19 @@ goog.A = class {
   }
 
   /**
- * Untyped method
- */
+   * Untyped method
+   */
   static foo(n) {
     return n;
   }
 
   /**
- * Typed method
- */
+   * Typed method
+   */
   static bar(n: number): boolean {
     return n > 0;
   }
 };
-
 goog.A.B = {};
 
 /**

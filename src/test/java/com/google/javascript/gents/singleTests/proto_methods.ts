@@ -1,4 +1,5 @@
 let goog: any = {};
+
 /**
  * Nested anonymous class in ES6 syntax
  */
@@ -9,8 +10,8 @@ goog.A = class {
   }
 
   /**
- * Untyped method
- */
+   * Untyped method
+   */
   foo(n) {
     return n;
   }
@@ -27,15 +28,15 @@ class B extends goog.A {
   }
 
   /**
- * Typed method
- */
+   * Typed method
+   */
   bar(n: number): boolean {
     return super.foo(n) > 0;
   }
 
   /**
- * Another typed method
- */
+   * Another typed method
+   */
   baz(n: number): boolean {
     return super.foo(n) > 0;
   }
