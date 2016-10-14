@@ -175,7 +175,11 @@ public final class ModuleConversionPass implements CompilerPass {
       if (!fileToModule.containsKey(fileName)) {
         return;
       }
-      String nodeName = checkNotNull(namedNode.getFirstChild().getQualifiedName());
+
+      String nodeName = namedNode.getFirstChild().getQualifiedName();
+      if (nodeName == null) {
+        return;
+      }
       exportsToNodes.put(ExportedSymbol.of(fileName, nodeName, nodeName), namedNode);
     }
   }
