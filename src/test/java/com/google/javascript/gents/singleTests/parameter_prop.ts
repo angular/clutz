@@ -3,7 +3,6 @@ class A {
   c: number;
   constructor(public a: number, b: number, c) {
     this.b = b;
-
     this.c = c;
   }
 }

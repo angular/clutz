@@ -8,7 +8,6 @@ export {};
 
 A();
 AExports.foo();
-
 B();
 let n = B.num + B.num;
 X();

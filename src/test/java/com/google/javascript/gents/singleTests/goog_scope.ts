@@ -12,7 +12,6 @@ export class Foo {
         'since it is goog.provided';
   }
 }
-
 const Foo = Foo;
 Foo.Bar = class {
   static bar(): boolean {
