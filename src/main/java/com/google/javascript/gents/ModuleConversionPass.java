@@ -192,15 +192,26 @@ public final class ModuleConversionPass implements CompilerPass {
     public void visit(NodeTraversal t, Node n, Node parent) {
       if (NodeUtil.isNameDeclaration(n)) {
         // var x = goog.require(...);
-        Node callNode = n.getFirstFirstChild();
-        if (callNode == null || !callNode.isCall()) {
+        Node node = n.getFirstFirstChild();
+        if (node == null) {
           return;
         }
 
-        if ("goog.require".equals(callNode.getFirstChild().getQualifiedName())) {
+        if (node.isCall()
+            && "goog.require".equals(node.getFirstChild().getQualifiedName())) {
+          Node callNode = node;
           String requiredNamespace = callNode.getLastChild().getString();
           String localName = n.getFirstChild().getQualifiedName();
           convertRequireToImportStatements(n, localName, requiredNamespace);
+          return;
+
+        }
+        if (node.isObjectPattern()
+            && "goog.require".equals(node.getNext().getFirstChild().getQualifiedName())) {
+          String requiredNamespace = node.getNext().getFirstChild().getNext().getString();
+          String localName = node.getFirstChild().getString();
+          convertRequireToImportStatements(n, localName, requiredNamespace);
+          return;
         }
       } else if (n.isExprResult()) {
         // goog.require(...);
@@ -211,6 +222,7 @@ public final class ModuleConversionPass implements CompilerPass {
         if ("goog.require".equals(callNode.getFirstChild().getQualifiedName())) {
           String requiredNamespace = callNode.getLastChild().getString();
           convertRequireToImportStatements(n, requiredNamespace, requiredNamespace);
+          return;
         }
       }
     }
@@ -405,6 +417,16 @@ public final class ModuleConversionPass implements CompilerPass {
     valueRewrite.put(sourceFile, fullLocalName, localName);
     typeRewrite.put(sourceFile, fullLocalName, localName);
     typeRewrite.put(sourceFile, requiredNamespace, localName);
+  }
+
+  private static class ImportSpec {
+    final String importName;
+    final String localName;
+
+    private ImportSpec(String importName, String localName) {
+      this.importName = checkNotNull(importName);
+      this.localName = checkNotNull(localName);
+    }
   }
 
   /** Metadata about an exported symbol. */
