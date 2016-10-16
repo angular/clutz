@@ -1,3 +1,5 @@
-export function namedExport1() {}
+export const x = 4;
 
-export function namedExport2(n) {}
+export function foo() {}
+
+export function bar(n) {}

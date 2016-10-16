@@ -1,5 +1,6 @@
 package com.google.javascript.gents;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.JSError;
@@ -7,6 +8,7 @@ import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.Node;
+
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -229,7 +231,13 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
       } else if (exportsName.isGetProp() &&
           "exports".equals(exportsName.getFirstChild().getQualifiedName())) {
         String identifier = exportsName.getLastChild().getString();
-        addExport(exportsName.getQualifiedName(), fullname + "." + identifier, identifier);
+        String importName = fullname + "." + identifier;
+        addExport(exportsName.getQualifiedName(), importName, identifier);
+
+        if (importName != null && !namespaceToModule.containsKey(importName)) {
+          namespaceToModule.put(importName, this);
+          providesObjectChildren.put(importName, ImmutableSet.<String>of());
+        }
       }
     }
 

@@ -1,5 +1,5 @@
-export function D() {}
+export class D {}
 
 export const x = 4;
 
-export function foo() {}
+export function bar() {}

@@ -197,8 +197,7 @@ public final class ModuleConversionPass implements CompilerPass {
           return;
         }
 
-        if (node.isCall()
-            && "goog.require".equals(node.getFirstChild().getQualifiedName())) {
+        if (node.isCall() && "goog.require".equals(node.getFirstChild().getQualifiedName())) {
           Node callNode = node;
           String requiredNamespace = callNode.getLastChild().getString();
           String localName = n.getFirstChild().getQualifiedName();
@@ -208,9 +207,10 @@ public final class ModuleConversionPass implements CompilerPass {
         }
         if (node.isObjectPattern()
             && "goog.require".equals(node.getNext().getFirstChild().getQualifiedName())) {
+          String namedExport = node.getFirstChild().getString();
           String requiredNamespace = node.getNext().getFirstChild().getNext().getString();
-          String localName = node.getFirstChild().getString();
-          convertRequireToImportStatements(n, localName, requiredNamespace);
+          requiredNamespace += "." + namedExport;
+          convertRequireToImportStatements(n, namedExport, requiredNamespace);
           return;
         }
       } else if (n.isExprResult()) {
@@ -417,16 +417,6 @@ public final class ModuleConversionPass implements CompilerPass {
     valueRewrite.put(sourceFile, fullLocalName, localName);
     typeRewrite.put(sourceFile, fullLocalName, localName);
     typeRewrite.put(sourceFile, requiredNamespace, localName);
-  }
-
-  private static class ImportSpec {
-    final String importName;
-    final String localName;
-
-    private ImportSpec(String importName, String localName) {
-      this.importName = checkNotNull(importName);
-      this.localName = checkNotNull(localName);
-    }
   }
 
   /** Metadata about an exported symbol. */
