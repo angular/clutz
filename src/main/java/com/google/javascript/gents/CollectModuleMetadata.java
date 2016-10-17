@@ -1,5 +1,8 @@
 package com.google.javascript.gents;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
+import com.google.common.collect.ImmutableSet;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.JSError;
@@ -7,6 +10,7 @@ import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.Node;
+
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -225,11 +229,22 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     private void maybeAddGoogExport(Node exportsName) {
       String fullname = providesObjectChildren.keySet().iterator().next();
       if ("exports".equals(exportsName.getQualifiedName())) {
-        addExport(exportsName.getQualifiedName(), fullname, nameUtil.lastStepOfName(fullname));
+        String identifier =
+            firstNonNull(
+                exportsName.getNext().getQualifiedName(),
+                nameUtil.lastStepOfName(fullname));
+        addExport(exportsName.getQualifiedName(), fullname, identifier);
       } else if (exportsName.isGetProp() &&
           "exports".equals(exportsName.getFirstChild().getQualifiedName())) {
         String identifier = exportsName.getLastChild().getString();
-        addExport(exportsName.getQualifiedName(), fullname + "." + identifier, identifier);
+        String importName = fullname + "." + identifier;
+        addExport(exportsName.getQualifiedName(), importName, identifier);
+
+        // Register the named export to the module namespace.
+        if (!namespaceToModule.containsKey(importName)) {
+          namespaceToModule.put(importName, this);
+          providesObjectChildren.put(importName, ImmutableSet.<String>of());
+        }
       }
     }
 
