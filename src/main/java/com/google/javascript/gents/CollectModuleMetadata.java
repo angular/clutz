@@ -1,5 +1,7 @@
 package com.google.javascript.gents;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 import com.google.common.collect.ImmutableSet;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
@@ -227,14 +229,19 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     private void maybeAddGoogExport(Node exportsName) {
       String fullname = providesObjectChildren.keySet().iterator().next();
       if ("exports".equals(exportsName.getQualifiedName())) {
-        addExport(exportsName.getQualifiedName(), fullname, nameUtil.lastStepOfName(fullname));
+        String identifier =
+            firstNonNull(
+                exportsName.getNext().getQualifiedName(),
+                nameUtil.lastStepOfName(fullname));
+        addExport(exportsName.getQualifiedName(), fullname, identifier);
       } else if (exportsName.isGetProp() &&
           "exports".equals(exportsName.getFirstChild().getQualifiedName())) {
         String identifier = exportsName.getLastChild().getString();
         String importName = fullname + "." + identifier;
         addExport(exportsName.getQualifiedName(), importName, identifier);
 
-        if (importName != null && !namespaceToModule.containsKey(importName)) {
+        // Register the named export to the module namespace.
+        if (!namespaceToModule.containsKey(importName)) {
           namespaceToModule.put(importName, this);
           providesObjectChildren.put(importName, ImmutableSet.<String>of());
         }

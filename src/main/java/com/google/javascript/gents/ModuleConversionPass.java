@@ -191,12 +191,12 @@ public final class ModuleConversionPass implements CompilerPass {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
       if (NodeUtil.isNameDeclaration(n)) {
-        // var x = goog.require(...);
         Node node = n.getFirstFirstChild();
         if (node == null) {
           return;
         }
 
+        // var x = goog.require(...);
         if (node.isCall() && "goog.require".equals(node.getFirstChild().getQualifiedName())) {
           Node callNode = node;
           String requiredNamespace = callNode.getLastChild().getString();
@@ -205,8 +205,12 @@ public final class ModuleConversionPass implements CompilerPass {
           return;
 
         }
+
+        // var {foo} = goog.require(...);
         if (node.isObjectPattern()
             && "goog.require".equals(node.getNext().getFirstChild().getQualifiedName())) {
+          // TODO(#392): Support multiple destructured import values here.
+          //     Currently, this only allows for a single destructured import value.
           String namedExport = node.getFirstChild().getString();
           String requiredNamespace = node.getNext().getFirstChild().getNext().getString();
           requiredNamespace += "." + namedExport;
