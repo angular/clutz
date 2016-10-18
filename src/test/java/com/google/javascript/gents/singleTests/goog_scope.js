@@ -19,14 +19,12 @@ const Foo = lorem.ipsum.Foo;
 
 /** @return {string} */
 Foo.foo = function() { 
-  return "this should create a static method on Foo, since it is NOT goog.provided"; 
+	return 'this is a static method on Foo, since it is NOT goog.provided'; 
 };
 
-//TODO: Aggressively export rather than create static methods/fields
 /** @return {string} */
 Foo.qux = function() { 
-  return "this should be directly exported, rather than create a static method, " +
-      "since it is goog.provided"; 
+  return 'this is directly exported since it is goog.provided';
 };
 
 /** @type {number} */

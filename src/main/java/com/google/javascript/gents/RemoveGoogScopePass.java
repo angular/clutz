@@ -3,8 +3,13 @@ package com.google.javascript.gents;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.NodeTraversal;
+import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 
 /**
@@ -16,6 +21,8 @@ import javax.annotation.Nullable;
 public final class RemoveGoogScopePass extends AbstractTopLevelCallback implements CompilerPass {
 
   private final AbstractCompiler compiler;
+  private final Set<String> providedNamespaces = new HashSet<>();
+  private final Map<String, String> aliasToProvidedNamespace = new HashMap<>();
 
   public RemoveGoogScopePass(AbstractCompiler compiler) {
     this.compiler = compiler;
@@ -34,10 +41,21 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
     }
 
     String callName = maybeCallNode.getFirstChild().getQualifiedName();
-    if (!"goog.scope".equals(callName)) {
-      return;
-    }
 
+    switch (callName) {
+      case "goog.provide":
+        // Register the goog.provided namespaces, so that we can remove any aliases.
+        providedNamespaces.add(maybeCallNode.getLastChild().getString());
+        return;
+      case "goog.scope":
+        rewriteGoogScope(n);
+        return;
+      default:
+        return;
+    }
+  }
+
+  private void rewriteGoogScope(Node n) {
     // Extract the goog.scope contents, and add them to module being constructed.
     Node blockOfScopeContents = n.getLastChild().getLastChild().getLastChild();
     blockOfScopeContents.detachFromParent();
@@ -50,6 +68,11 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
 
     @Nullable Node nodeToMove = blockOfScopeContents.getFirstChild();
     while (nodeToMove != null) {
+      nodeToMove = maybeRewriteAlias(nodeToMove);
+      if (nodeToMove == null) {
+        break;
+      }
+
       // Store the next node in a temp variable since detaching the node breaks the chain.
       Node nextNodeToMove = nodeToMove.getNext();
       nodeToMove.detachFromParent();
@@ -60,8 +83,42 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
       nodeToMove = nextNodeToMove;
     }
 
-    // Remove the goog.scope calls.
     n.detachFromParent();
     compiler.reportCodeChange();
+  }
+
+  private Node maybeRewriteAlias(Node node) {
+    switch (node.getFirstChild().getToken()) {
+      case NAME:
+        node = maybeRecordAndRemoveAlias(node.getFirstChild());
+        break;
+      case ASSIGN:
+        maybeReasignAlias(node.getFirstChild());
+      default:
+        break;
+    }
+    return node;
+  }
+
+  private Node maybeRecordAndRemoveAlias(Node assign) {
+    Node next = assign.getParent();
+    Node lhs = assign;
+    Node rhs = assign.getLastChild();
+    if (providedNamespaces.contains(rhs.getQualifiedName())) {
+      aliasToProvidedNamespace.put(lhs.getString(), rhs.getQualifiedName());
+      next = assign.getParent().getNext();
+      assign.detachFromParent();
+    }
+    return next;
+  }
+
+  private void maybeReasignAlias(Node assign) {
+    String alias = assign.getFirstFirstChild().getQualifiedName();
+    if (aliasToProvidedNamespace.containsKey(alias)) {
+      String providedNamespace = aliasToProvidedNamespace.get(alias);
+      String suffix = assign.getFirstChild().getQualifiedName().substring(alias.length());
+      Node qName = NodeUtil.newQName(compiler, providedNamespace + suffix);
+      assign.replaceChild(assign.getFirstChild(), qName);
+    }
   }
 }
