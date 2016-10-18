@@ -146,8 +146,7 @@ public class TypeScriptGenerator {
     Node externRoot = compiler.getRoot().getFirstChild();
     Node srcRoot = compiler.getRoot().getLastChild();
 
-    RemoveGoogScopePass removeGoogScopePass = new RemoveGoogScopePass(compiler);
-    removeGoogScopePass.process(externRoot, srcRoot);
+    new RemoveGoogScopePass(compiler).process(externRoot, srcRoot);
 
     CollectModuleMetadata modulePrePass = new CollectModuleMetadata(compiler, nameUtil,
         filesToConvert);
