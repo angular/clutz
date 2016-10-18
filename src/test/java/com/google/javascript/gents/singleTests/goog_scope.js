@@ -19,7 +19,7 @@ const Foo = lorem.ipsum.Foo;
 
 /** @return {string} */
 Foo.foo = function() { 
-	return 'this is a static method on Foo, since it is NOT goog.provided'; 
+  return 'this is a static method on Foo, since it is NOT goog.provided'; 
 };
 
 /** @return {string} */
@@ -35,7 +35,10 @@ Foo.num = 8;
 Foo.Bar = function() {};
 
 /** @return {boolean} */
-Foo.Bar.bar = function() { return false; };
+Foo.Bar.prototype.instanceFunction = function() { return false; };
+
+/** @return {boolean} */
+Foo.Bar.staticBar = function() { return false; };
 
 
 /** @return {boolean} */

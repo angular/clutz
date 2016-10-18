@@ -250,8 +250,12 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
 
     private void maybeAddProvidesExport(Node exportsName) {
       String fullname = exportsName.getQualifiedName();
-      if (providesObjectChildren.containsKey(fullname) || (exportsName.isGetProp() &&
-          providesObjectChildren.containsKey(exportsName.getFirstChild().getQualifiedName()))) {
+      if (providesObjectChildren.containsKey(fullname)
+          // TODO(dpurpura): Do we want this check below?
+          //     Or should we only export items specified in goog.provide?
+          || (exportsName.isGetProp()
+              && providesObjectChildren.containsKey(
+                  exportsName.getFirstChild().getQualifiedName()))) {
         addExport(fullname, fullname, nameUtil.lastStepOfName(exportsName));
       }
     }

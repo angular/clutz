@@ -113,7 +113,14 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
   }
 
   private void maybeReasignAlias(Node assign) {
-    String alias = assign.getFirstFirstChild().getQualifiedName();
+    // Find the name of the deepest first child.
+    String alias = null;
+    for (Node child = assign.getFirstChild(); child != null; child = child.getFirstChild()) {
+      if (child.isName()) {
+        alias = child.getString();
+      }
+    }
+
     if (aliasToProvidedNamespace.containsKey(alias)) {
       String providedNamespace = aliasToProvidedNamespace.get(alias);
       String suffix = assign.getFirstChild().getQualifiedName().substring(alias.length());

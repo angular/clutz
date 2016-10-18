@@ -12,10 +12,15 @@ export function qux(): string {
 
 export const num: number = 8;
 
-export class Bar {}
-Foo.Bar.bar = function(): boolean {
+export class Bar {
+  instanceFunction(): boolean {
+    return false;
+  }
+}
+
+export function staticBar(): boolean {
   return false;
-};
+}
 
 export function baz(): boolean {
   return false;
