@@ -62,4 +62,8 @@ var retUndef = function() {};
  * @param {number} a
  * @return {number}
  */
-const arrow = a => { return a; };
+const arrowWithJsDoc = a => { return a; };
+
+const arrowNoJsDoc = a => { return a; };
+
+const implicitReturnArrow = a => a;
