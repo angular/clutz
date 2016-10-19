@@ -26,6 +26,10 @@ let paramUndef = function(u: undefined, v: undefined) {};
 // Void returns
 let retVoid = function(): void {};
 let retUndef = function(): void {};
-function arrow(a: number): number {
+const arrowWithJsDoc = (a: number): number => {
   return a;
-}
+};
+const arrowNoJsDoc = (a) => {
+  return a;
+};
+const implicitReturnArrow = (a) => a;
