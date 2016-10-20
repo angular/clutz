@@ -8,8 +8,10 @@ goog.provide("nested.E.F.Z");
 
 value.B = function() {};
 
-obj.C.x = 4;
-obj.C.y = 8;
+obj.C = {
+ x: 4,
+ y: 8,
+}
 
 both.D = function() {};
 both.D.foo = function() {};
