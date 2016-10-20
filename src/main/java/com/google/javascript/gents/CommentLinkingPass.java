@@ -28,7 +28,7 @@ public final class CommentLinkingPass implements CompilerPass {
       Pattern.compile("@(extends|implements|type)[ \t]*(\\{.*\\})[ \t]*(?<keep>)"),
       Pattern.compile("@(private|protected|public|package|const)[ \t]*(\\{.*\\})?[ \t]*(?<keep>)"),
       // Removes @param and @return if there is no description
-      Pattern.compile("@param[ \t]*(\\{.*\\})[ \t]*\\w+[ \t]*(?<keep>\\*\\/|\n)"),
+      Pattern.compile("@param[ \t]*(\\{.*\\})[ \t]*[\\w\\$]+[ \t]*(?<keep>\\*\\/|\n)"),
       Pattern.compile("@returns?[ \t]*(\\{.*\\})[ \t]*(?<keep>\\*\\/|\n)"),
       Pattern.compile("(?<keep>@(param|returns?))[ \t]*(\\{.*\\})"),
       // Remove empty lines with only *
