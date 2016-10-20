@@ -18,6 +18,7 @@ A.prototype.foo = function() {};
 
 /**
  * @param {number} deleted
+ * @param {Foo} $foo
  * @param {number} notdeleted because this has a description
  * @return {number} this also has a description
  */
