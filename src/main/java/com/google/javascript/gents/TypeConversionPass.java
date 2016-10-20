@@ -162,16 +162,17 @@ public final class TypeConversionPass implements CompilerPass {
             declaration.jsDoc != null &&
             declaration.jsDoc.getType() != null &&
             declaration.rhsEqualToField()) {
-          JSTypeExpression type = declaration.jsDoc.getType();
+          JSTypeExpression declarationType = declaration.jsDoc.getType();
           Node params = fnNode.getSecondChild();
           JSDocInfo constructorJsDoc = NodeUtil.getBestJSDocInfo(fnNode);
 
           for (Node param : params.children()) {
             JSTypeExpression paramType = constructorJsDoc.getParameterType(param.getString());
             // Names and types must be equal
-            if (declaration.memberName.equals(param.getString()) && type.equals(paramType)) {
+            if (declaration.memberName.equals(param.getString()) && declarationType.equals(paramType)) {
               // Add visibility directly to param if possible
               moveAccessModifier(declaration, param);
+              markAsConst(declaration, param);
               n.detachFromParent();
               compiler.reportCodeChange();
               return;
@@ -201,6 +202,13 @@ public final class TypeConversionPass implements CompilerPass {
         param.putProp(Node.ACCESS_MODIFIER, Visibility.PROTECTED);
       } else {
         param.putProp(Node.ACCESS_MODIFIER, Visibility.PUBLIC);
+      }
+    }
+
+    /** Mark constructor parameter as constant, so it can be annotated readonly */
+    void markAsConst(ClassMemberDeclaration declaration, Node param) {
+      if (declaration.jsDoc != null && declaration.jsDoc.isConstant()) {
+        param.putBooleanProp(Node.IS_CONSTANT_NAME, true);
       }
     }
   }

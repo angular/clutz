@@ -18,8 +18,9 @@ function A(a, b, c) {
  * @param {number} b
  * @param {number} c
  * @param {number} d
+ * @param {number} e
  */
-function B(a, b, c, d) {
+function B(a, b, c, d, e) {
   /** @public @type {number} */
   this.a = a;
   /** @package @type {number} */
@@ -28,4 +29,6 @@ function B(a, b, c, d) {
   this.c = c;
   /** @private @type {number} */
   this.d = d;
+  /** @const {number} */
+  this.e = e;
 }
