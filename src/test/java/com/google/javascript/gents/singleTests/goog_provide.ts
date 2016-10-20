@@ -1,20 +1,22 @@
 goog.require('RequiredType');
 
 export class B {
+  static num: number = 8;
   constructor(public n: number) {}
+
+  static foo(): number {
+    return 4;
+  }
 }
 
-// Aggressively export rather than create static methods/fields
-export function foo(): number {
+export function qux(): number {
   return 4;
 }
 
-export const num: number = 8;
-
-export class C {}
-
-export function bar(): boolean {
-  return false;
+export class C {
+  static bar(): boolean {
+    return false;
+  }
 }
 
 export const D = path.to.someUtilFunction();

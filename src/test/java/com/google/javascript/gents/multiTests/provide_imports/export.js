@@ -7,6 +7,8 @@ goog.provide("nested.E.F");
 
 value.B = function () {};
 
+/** @const */
+obj.C = {};
 obj.C.x = 4;
 obj.C.y = 8;
 
@@ -16,5 +18,5 @@ both.D.foo = function() {};
 nested.E = function() {};
 nested.E.bar = function() {};
 /** @constructor */
-nested.E.F.G = function () {};
-nested.E.F.G.baz = function() {};
+nested.E.F = function () {};
+nested.E.F.baz = function() {};

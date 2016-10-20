@@ -1,5 +1,4 @@
 class foo {}
 
-export const typD = foo;
-
-export const valD = new foo();
+export const D = foo;
+D.valD = new foo();

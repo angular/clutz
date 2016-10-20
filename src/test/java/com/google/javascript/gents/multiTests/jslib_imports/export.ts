@@ -1,3 +1,2 @@
 export function A() {}
-
-export function foo() {}
+A.foo = function() {};

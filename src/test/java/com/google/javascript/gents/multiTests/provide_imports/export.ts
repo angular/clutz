@@ -1,17 +1,15 @@
 export function B() {}
 
-export const x = 4;
-
-export const y = 8;
+export const C = {};
+C.x = 4;
+C.y = 8;
 
 export function D() {}
-
-export function foo() {}
+D.foo = function() {};
 
 export function E() {}
+E.bar = function() {};
 
-export function bar() {}
-
-export class G {
+export class F {
   static baz() {}
 }

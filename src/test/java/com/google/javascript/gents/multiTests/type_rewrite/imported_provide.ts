@@ -1,5 +1,5 @@
 class foo {}
 
-export const typB = foo;
-
-export const valB = new foo();
+export const B = {};
+B.typB = foo;
+B.valB = new foo();

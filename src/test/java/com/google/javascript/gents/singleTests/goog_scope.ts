@@ -1,6 +1,7 @@
 goog.require('path.to.someUtilFunction');
 
 export class Foo {
+  static num: number = 8;
   constructor(public n: number) {}
 
   static foo(): string {
@@ -11,8 +12,6 @@ export class Foo {
 export function qux(): string {
   return 'this is directly exported since it is goog.provided';
 }
-
-export const num: number = 8;
 
 export class Bar {
   instanceFunction(): boolean {
@@ -26,10 +25,10 @@ export class Bar {
   setB(b: number): Bar {
     return this;
   }
-}
 
-export function staticBar(): boolean {
-  return false;
+  static staticBar(): boolean {
+    return false;
+  }
 }
 
 export const exportedValue = path.to.someUtilFunction();

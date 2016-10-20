@@ -1,10 +1,8 @@
 import './export';
+import './export';
 
-import * as Z from './export';
 import * as FExports from './export';
 import * as EExports from './export';
-import * as DExports from './export';
-import * as C from './export';
 import {B} from './export';
 import {D} from './export';
 import {E} from './export';
@@ -12,13 +10,13 @@ import {F} from './export';
 import {Z as stuff} from './export';
 
 B();
-let num = C.x + C.y;
+let num = obj.C.x + obj.C.y;
 D();
-DExports.foo();
+D.foo();
 E();
-EExports.bar();
+E.bar();
 F();
-let o = new FExports.G();
-FExports.G.baz();
+let o = new F.G();
+F.G.baz();
 stuff();
-Z.fun();
+stuff.fun();

@@ -1,23 +1,17 @@
 export function B() {}
-
-export const x = 4;
-
-export const y = 8;
+obj.C.x = 4;
+obj.C.y = 8;
 
 export function D() {}
-
-export function foo() {}
+D.foo = function() {};
 
 export function E() {}
-
-export function bar() {}
+E.bar = function() {};
 
 export function F() {}
-
-export class G {
+F.G = class {
   static baz() {}
-}
+};
 
 export function Z() {}
-
-export function fun() {}
+Z.fun = function() {};
