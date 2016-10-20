@@ -7,7 +7,6 @@ import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
-
 import java.util.Map;
 
 /**
@@ -109,6 +108,10 @@ public class GentsCodeGenerator extends CodeGenerator {
               default:
                 break;
             }
+          }
+
+          if (n.getBooleanProp(Node.IS_CONSTANT_NAME)) {
+            add("readonly ");
           }
         }
         return false;

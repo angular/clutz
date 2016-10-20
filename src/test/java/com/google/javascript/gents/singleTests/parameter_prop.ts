@@ -10,5 +10,5 @@ class A {
 class B {
   constructor(
       public a: number, public b: number, protected c: number,
-      private d: number) {}
+      private d: number, public readonly e: number) {}
 }
