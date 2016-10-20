@@ -7,8 +7,6 @@ import {foo} from './unimported_module';
 import {typC} from './unimported_module';
 import {typD} from './unimported_provide';
 
-export {};
-
 let a: X = A.valA;
 let b: A.typA = A.valA;
 let c: X = A.valA;

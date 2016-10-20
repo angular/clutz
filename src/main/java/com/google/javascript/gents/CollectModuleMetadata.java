@@ -88,6 +88,12 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
           case "goog.provide":
             registerProvidesModule(child, filename, child.getLastChild().getString());
             break;
+          case "goog.require":
+            FileModule module = fileToModule.get(filename);
+            if (module != null) {
+              module.reportImport();
+            }
+            break;
           default:
             break;
         }
@@ -148,6 +154,9 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     /** Declared with goog.module rather than goog.provide */
     private final boolean isGoogModule;
 
+    /** {@code True}, if the module has any imports (e.g.{@code goog.require}). */
+    private boolean hasImports = false;
+
     /**
      * Map from each provided namespace to all exported subproperties. Note that only namespaces
      * declared with 'goog.module' or 'goog.provide' are considered provided. Their subproperties
@@ -199,6 +208,16 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     /** Returns if the file actually exports any symbols. */
     boolean hasExports() {
       return !exportedNamespacesToSymbols.isEmpty();
+    }
+
+    /** Records that the module has at least one import. */
+    void reportImport() {
+      this.hasImports = true;
+    }
+
+    /** Returns {@code true} if the module has at least one import. */
+    boolean hasImports() {
+      return this.hasImports;
     }
 
     /**

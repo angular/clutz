@@ -88,11 +88,16 @@ public final class ModuleConversionPass implements CompilerPass {
       if (n.isScript()) {
         if (fileToModule.containsKey(fileName)) {
           // Module is declared purely for side effects
-          if (!fileToModule.get(fileName).hasExports()) {
+          FileModule module = fileToModule.get(fileName);
+          if (!module.hasImports() && !module.hasExports()) {
             // export {};
-            // TODO(renez): Add comment to explain that this statement is used to change file
-            // into a module.
-            Node exportNode = new Node(Token.EXPORT, new Node(Token.EXPORT_SPECS));
+            Node commentNode = new Node(Token.EMPTY);
+            nodeComments.putComment(
+                commentNode,
+                "\n//  Empty export added to coerce the file to be a module, since it does not have"
+                + " any imports or exports.");
+
+            Node exportNode = new Node(Token.EXPORT, new Node(Token.EXPORT_SPECS, commentNode));
 
             if (n.hasChildren() && n.getFirstChild().isModuleBody()) {
               n.getFirstChild().addChildToFront(exportNode);
