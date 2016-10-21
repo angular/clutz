@@ -1,5 +1,10 @@
 goog.provide("A.B");
 goog.provide("A.B.C");
+goog.provide("A.B.D")
+
+goog.provide("path.to.someUtilFunction");
+
+goog.require("RequiredType");
 
 /**
  * @constructor
@@ -21,3 +26,6 @@ A.B.C = function() {};
 
 /** @return {boolean} */
 A.B.C.bar = function() { return false; };
+
+A.B.D = path.to.someUtilFunction();
+A.B.D.setA(1).setB(2);

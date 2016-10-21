@@ -1,3 +1,5 @@
+goog.require('path.to.someUtilFunction');
+
 export class Foo {
   constructor(public n: number) {}
 
@@ -16,11 +18,22 @@ export class Bar {
   instanceFunction(): boolean {
     return false;
   }
+
+  setA(a: number): Bar {
+    return this;
+  }
+
+  setB(b: number): Bar {
+    return this;
+  }
 }
 
 export function staticBar(): boolean {
   return false;
 }
+
+export const exportedValue = path.to.someUtilFunction();
+exportedValue.setA(1).setB(2);
 
 export function baz(): boolean {
   return false;

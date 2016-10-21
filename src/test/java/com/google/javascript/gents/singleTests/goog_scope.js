@@ -2,6 +2,9 @@ goog.provide("lorem.ipsum.Foo");
 goog.provide("lorem.ipsum.Foo.qux");
 goog.provide("lorem.ipsum.Foo.Bar");
 goog.provide("lorem.ipsum.baz");
+goog.provide("lorem.ipsum.exportedValue");
+
+goog.require("path.to.someUtilFunction");
 
 goog.scope(function() {
 
@@ -37,8 +40,24 @@ Foo.Bar = function() {};
 /** @return {boolean} */
 Foo.Bar.prototype.instanceFunction = function() { return false; };
 
+/**
+ * @param {number} a 
+ * @return {lorem.ipsum.Foo.Bar} 
+ */
+Foo.Bar.prototype.setA = function(a) { return this; };
+
+/**
+ * @param {number} b 
+ * @return {lorem.ipsum.Foo.Bar} 
+ */
+Foo.Bar.prototype.setB = function(b) { return this; };
+
+
 /** @return {boolean} */
 Foo.Bar.staticBar = function() { return false; };
+
+lorem.ipsum.exportedValue = path.to.someUtilFunction();
+lorem.ipsum.exportedValue.setA(1).setB(2);
 
 
 /** @return {boolean} */
