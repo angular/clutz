@@ -94,8 +94,7 @@ public final class ModuleConversionPass implements CompilerPass {
             Node commentNode = new Node(Token.EMPTY);
             nodeComments.putComment(
                 commentNode,
-                "\n//  Empty export added to coerce the file to be a module, since it does not have"
-                + " any imports or exports.");
+                "\n// gents: force this file to be an ES6 module (no imports or exports)");
 
             Node exportNode = new Node(Token.EXPORT, new Node(Token.EXPORT_SPECS, commentNode));
 

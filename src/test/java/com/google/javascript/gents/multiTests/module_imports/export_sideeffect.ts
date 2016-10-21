@@ -1,5 +1,4 @@
 export {
-  //  Empty export added to coerce the file to be a module, since it does not
-  //  have any imports or exports.
+  // gents: force this file to be an ES6 module (no imports or exports)
 };
 console.log('hello');
