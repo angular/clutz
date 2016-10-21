@@ -1,11 +1,7 @@
 import './export_sideeffect';
-
 import {A} from './export_default';
 import {A as X} from './export_default';
 import {foo} from './export_named';
-
-export {};
-
 import * as namespace from './export_namespace';
 import {D} from './export_both';
 import * as DExports from './export_both';

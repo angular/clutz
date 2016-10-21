@@ -4,8 +4,6 @@ import X from 'goog:lib.C';
 import * as AExports from './export';
 import {A} from './export';
 
-export {};
-
 A();
 AExports.foo();
 B();
