@@ -1,3 +1,5 @@
+goog.require('RequiredType');
+
 export class B {
   constructor(public n: number) {}
 }
@@ -14,3 +16,6 @@ export class C {}
 export function bar(): boolean {
   return false;
 }
+
+export const D = path.to.someUtilFunction();
+D.setA(1).setB(2);

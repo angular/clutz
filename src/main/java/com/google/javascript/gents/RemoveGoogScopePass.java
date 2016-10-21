@@ -41,6 +41,9 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
     }
 
     String callName = maybeCallNode.getFirstChild().getQualifiedName();
+    if (callName == null) {
+      return;
+    }
 
     switch (callName) {
       case "goog.provide":
