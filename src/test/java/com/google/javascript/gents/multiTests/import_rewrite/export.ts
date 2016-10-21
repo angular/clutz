@@ -5,16 +5,22 @@ export const C = {
   y: 8
 };
 
-export function D() {}
-D.foo = function() {};
+export class D {
+  static foo() {}
+}
 
-export function E() {}
-E.bar = function() {};
+export class E {
+  bar() {}
+}
 
-export function F() {}
-F.G = class {
+class G {
   static baz() {}
+}
+
+export const F = {
+  G: G
 };
 
-export function Z() {}
-Z.fun = function() {};
+export class Z {
+  static fun() {}
+}

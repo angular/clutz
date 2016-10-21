@@ -13,16 +13,22 @@ obj.C = {
  y: 8,
 }
 
+/** @constructor */
 both.D = function() {};
 both.D.foo = function() {};
 
+/** @constructor */
 nested.E = function() {};
-nested.E.bar = function() {};
-nested.E.F = function() {};
+nested.E.prototype.bar = function() {};
 
 /** @constructor */
-nested.E.F.G = function () {};
-nested.E.F.G.baz = function() {};
+var G = function () {};
+G.baz = function() {};
 
+nested.E.F = {
+  G: G,
+};
+
+/** @constructor */
 nested.E.F.Z = function() {};
 nested.E.F.Z.fun = function() {};
