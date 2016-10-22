@@ -1,9 +1,8 @@
 export function B() {}
 
-export const C = {
-  x: 4,
-  y: 8
-};
+export const x = 4;
+
+export const y = 8;
 
 export function D() {}
 
@@ -13,6 +12,6 @@ export function E() {}
 
 export function bar() {}
 
-export class F {
+export class G {
   static baz() {}
 }
