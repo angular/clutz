@@ -10,11 +10,11 @@ import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.Node;
-
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 /**
  * Preprocesses all source and library files to build a mapping between Closure namespaces and
@@ -171,6 +171,10 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
      * Would result in providesObjectChildren['A.B'] = {'C'}
      */
     final Map<String, Set<String>> providesObjectChildren = new LinkedHashMap<>();
+
+    /** Map of the goog.provided namespace to the node assigned to it. */
+    private final Map<String, Node> googProvideNamespaceToNode = new LinkedHashMap<>();
+
     /**
      * Map from the fully qualified name being exported to the exported symbol. For example,
      * goog.module('A.B');
@@ -182,6 +186,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
      * exportedNamespacesToSymbols['exports.C'] = 'C'
      */
     final Map<String, String> exportedNamespacesToSymbols = new LinkedHashMap<>();
+
     /**
      * Map from the fully qualified name that would be imported to the exported symbol. For example,
      * goog.module('A.B');
@@ -269,8 +274,25 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
 
     private void maybeAddProvidesExport(Node exportsName) {
       String fullname = exportsName.getQualifiedName();
+
       if (providesObjectChildren.containsKey(fullname)) {
+        googProvideNamespaceToNode.put(fullname, exportsName);
         addExport(fullname, fullname, nameUtil.lastStepOfName(exportsName));
+
+      } else if (exportsName.isGetProp()
+          && providesObjectChildren.containsKey(exportsName.getFirstChild().getQualifiedName())) {
+        googProvideNamespaceToNode.put(fullname, exportsName);
+
+        // functions declared on functions should be exported.
+        // static functions on classes should not be exported.
+        String parentName = exportsName.getFirstChild().getQualifiedName();
+        @Nullable Node parentNode = googProvideNamespaceToNode.get(parentName);
+        JSDocInfo jsDoc = parentNode != null ? NodeUtil.getBestJSDocInfo(parentNode) : null;
+
+        if (providesObjectChildren.containsKey(parentName)
+            && (jsDoc == null || !jsDoc.isConstructor())) {
+          addExport(fullname, fullname, nameUtil.lastStepOfName(exportsName));
+        }
       }
     }
 

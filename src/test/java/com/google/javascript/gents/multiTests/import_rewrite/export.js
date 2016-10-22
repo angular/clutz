@@ -8,27 +8,19 @@ goog.provide("nested.E.F.Z");
 
 value.B = function() {};
 
-obj.C = {
- x: 4,
- y: 8,
-}
+obj.C.x = 4;
+obj.C.y = 8;
 
-/** @constructor */
 both.D = function() {};
 both.D.foo = function() {};
 
-/** @constructor */
 nested.E = function() {};
-nested.E.prototype.bar = function() {};
+nested.E.bar = function() {};
+nested.E.F = function() {};
 
 /** @constructor */
-var G = function () {};
-G.baz = function() {};
+nested.E.F.G = function () {};
+nested.E.F.G.baz = function() {};
 
-nested.E.F = {
-  G: G,
-};
-
-/** @constructor */
 nested.E.F.Z = function() {};
 nested.E.F.Z.fun = function() {};

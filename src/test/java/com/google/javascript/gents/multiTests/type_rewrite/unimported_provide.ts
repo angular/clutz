@@ -1,4 +1,5 @@
 class foo {}
 
 export const D = foo;
-D.valD = new foo();
+
+export const valD = new foo();

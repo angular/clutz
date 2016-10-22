@@ -1,26 +1,23 @@
 export function B() {}
 
-export const C = {
-  x: 4,
-  y: 8
-};
+export const x = 4;
 
-export class D {
-  static foo() {}
-}
+export const y = 8;
 
-export class E {
-  bar() {}
-}
+export function D() {}
 
-class G {
+export function foo() {}
+
+export function E() {}
+
+export function bar() {}
+
+export function F() {}
+
+export class G {
   static baz() {}
 }
 
-export const F = {
-  G: G
-};
+export function Z() {}
 
-export class Z {
-  static fun() {}
-}
+export function fun() {}

@@ -6,10 +6,12 @@ export const C = {
 };
 
 export function D() {}
-D.foo = function() {};
+
+export function foo() {}
 
 export function E() {}
-E.bar = function() {};
+
+export function bar() {}
 
 export class F {
   static baz() {}

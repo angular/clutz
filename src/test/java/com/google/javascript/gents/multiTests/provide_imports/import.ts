@@ -1,6 +1,7 @@
 import './export';
 
 import * as EExports from './export';
+import * as DExports from './export';
 import {B} from './export';
 import {C} from './export';
 import {D} from './export';
