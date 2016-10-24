@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.javascript.jscomp.CodeConsumer;
 import com.google.javascript.jscomp.CodeGenerator;
 import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
@@ -121,6 +122,14 @@ public class GentsCodeGenerator extends CodeGenerator {
         if (anyTypeName != null) {
           add(anyTypeName);
           return true;
+        }
+        return false;
+      case MEMBER_FUNCTION_DEF:
+        // Add special newline insertion handling for constructors, since adding a newline after
+        // a node doesn't work between properties and the constructor due to semi-colon insertion.
+        if ("constructor".equals(n.getString())
+            && nodeComments.getComment(n) == null) {
+          add("\n");
         }
         return false;
       default:

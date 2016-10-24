@@ -4,6 +4,7 @@
  */
 class A {
   a: any;
+
   constructor(a: number) {
     this.a = a;
   }
@@ -15,6 +16,7 @@ class A {
 class B {
   a: any;
   b: any;
+
   constructor(a, b) {
     this.a = a;
     this.b = b;
@@ -26,6 +28,7 @@ class B {
  */
 class C extends A {
   b: any;
+
   constructor(a, b) {
     super(a);
     this.b = b;
@@ -37,6 +40,7 @@ class C extends A {
  */
 class D extends B {
   c: any;
+
   constructor(a, b, c) {
     super(a, b);
     this.c = c;
