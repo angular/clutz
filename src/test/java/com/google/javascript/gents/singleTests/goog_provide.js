@@ -1,4 +1,5 @@
 goog.provide("A.B");
+goog.provide("A.B.qux");
 goog.provide("A.B.C");
 goog.provide("A.B.D")
 
@@ -15,9 +16,10 @@ A.B = function(n) {
   this.n = n;
 };
 
-// Aggressively export rather than create static methods/fields
 /** @return {number} */
 A.B.foo = function() { return 4; };
+/** @return {number} */
+A.B.qux = function() { return 4; };
 /** @type {number} */
 A.B.num = 8;
 
