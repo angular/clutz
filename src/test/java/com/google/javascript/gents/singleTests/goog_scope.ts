@@ -2,6 +2,7 @@ goog.require('path.to.someUtilFunction');
 
 export class Foo {
   static num: number = 8;
+
   constructor(public n: number) {}
 
   static foo(): string {
