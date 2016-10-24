@@ -3,6 +3,7 @@
 export class Klass {
   n: any;
   x: any = 4;
+
   constructor(n: number) {
     this.n = n;
   }

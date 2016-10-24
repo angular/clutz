@@ -1,6 +1,7 @@
 let goog: any = {};
 goog.A = class {
   a: any;
+
   constructor(a: number) {
     this.a = a;
   }
@@ -31,6 +32,7 @@ goog.A.B.baz = function(n: number): void {};
  */
 goog.B = class extends goog.A {
   static num: number = 4;
+
   constructor(a) {
     super(a);
   }

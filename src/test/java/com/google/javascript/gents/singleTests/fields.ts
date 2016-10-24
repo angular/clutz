@@ -13,6 +13,7 @@ class A {
   // These are undeclared fields
   u: any;
   x: any;
+
   constructor(public a: number) {
     let y = 1;
     this.z = y + 1;
