@@ -2,6 +2,7 @@ goog.require('RequiredType');
 
 export class B {
   static num: number = 8;
+
   constructor(public n: number) {}
 
   static foo(): number {
