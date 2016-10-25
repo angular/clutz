@@ -83,6 +83,14 @@ lorem.ipsum.baz = function() { return false; };
 Foo.InnerTypedef;
 
 
+/**
+ * @typedef {{
+ *   myFunction: function(?): PrivateTypedef_,
+ * }}
+ */
+var PrivateTypedef_;
+
+
 /** @enum {number} */
 Foo.FruitType = {
   UNKNOWN: 0,

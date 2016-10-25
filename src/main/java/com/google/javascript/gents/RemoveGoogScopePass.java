@@ -110,6 +110,9 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
     Node next = assign.getParent();
     Node lhs = assign;
     Node rhs = assign.getLastChild();
+    if (rhs == null) { // var foo;
+      return next;
+    }
     if (providedNamespaces.contains(rhs.getQualifiedName())) {
       aliasToProvidedNamespace.put(lhs.getString(), rhs.getQualifiedName());
       next = assign.getParent().getNext();
