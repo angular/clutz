@@ -14,6 +14,10 @@ public class NodeComments {
     nodeToComment.put(n, comment);
   }
 
+  boolean hasComment(Node n) {
+    return nodeToComment.containsKey(n);
+  }
+
   String getComment(Node n) {
     return nodeToComment.get(n);
   }

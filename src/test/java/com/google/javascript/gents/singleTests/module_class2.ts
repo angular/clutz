@@ -1,4 +1,8 @@
 
+/**
+ * @fileoverview Rivoting description of the file.
+ */
+
 /** Possibly outdated information about Klass. */
 export class Klass {
   n: any;

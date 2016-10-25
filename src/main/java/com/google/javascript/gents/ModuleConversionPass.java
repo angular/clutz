@@ -122,7 +122,11 @@ public final class ModuleConversionPass implements CompilerPass {
           String callName = child.getFirstChild().getQualifiedName();
           if ("goog.module".equals(callName) || "goog.provide".equals(callName)) {
             // Remove the goog.module and goog.provide calls.
-            n.detachFromParent();
+            if (nodeComments.hasComment(n)) {
+              nodeComments.replaceWithComment(n, new Node(Token.EMPTY));
+            } else {
+              n.detachFromParent();
+            }
             compiler.reportCodeChange();
           }
           break;
