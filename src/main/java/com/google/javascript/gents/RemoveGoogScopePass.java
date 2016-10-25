@@ -48,7 +48,7 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
     }
 
     switch (callName) {
-      case "goog.provide":  // FALL-THROUGH
+      case "goog.provide":
       case "goog.require":
         // Register the goog.provide/require namespaces, so that we can remove any aliases.
         providedNamespaces.add(maybeCallNode.getLastChild().getString());
