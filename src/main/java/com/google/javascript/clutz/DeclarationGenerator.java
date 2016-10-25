@@ -689,7 +689,7 @@ class DeclarationGenerator {
       List<TypedVar> allSymbols = Lists.newArrayList(compiler.getTopScope().getAllSymbols());
       sortSymbols(allSymbols);
 
-      ObjectType objType = (ObjectType) symbol.getType();
+      ObjectType objType = symbol.getType().toMaybeObjectType();
       // Can be null if the symbol is provided, but not defined.
       Set<String> propertyNames =
           objType != null ? objType.getPropertyNames() : Collections.<String>emptySet();
