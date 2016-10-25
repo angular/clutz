@@ -1,5 +1,7 @@
 package com.google.javascript.gents;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.NodeTraversal;
@@ -47,7 +49,8 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
 
     switch (callName) {
       case "goog.provide":
-        // Register the goog.provided namespaces, so that we can remove any aliases.
+      case "goog.require":
+        // Register the goog.provide/require namespaces, so that we can remove any aliases.
         providedNamespaces.add(maybeCallNode.getLastChild().getString());
         return;
       case "goog.scope":
@@ -111,24 +114,34 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
       aliasToProvidedNamespace.put(lhs.getString(), rhs.getQualifiedName());
       next = assign.getParent().getNext();
       assign.detachFromParent();
+      compiler.reportCodeChange();
     }
     return next;
   }
 
   private void maybeReasignAlias(Node assign) {
+    Node lhs = assign.getFirstChild();
+    if (!lhs.isGetProp()) {
+      // TODO(dpurpura): Add support for GET_ELEM.  (e.g. Foo['abc'])
+      return;
+    }
+
     // Find the name of the deepest first child.
     String alias = null;
-    for (Node child = assign.getFirstChild(); child != null; child = child.getFirstChild()) {
+    for (Node child = lhs; child != null; child = child.getFirstChild()) {
       if (child.isName()) {
         alias = child.getQualifiedName();
       }
     }
 
+    checkNotNull(alias, "Missing name for alias");
     if (aliasToProvidedNamespace.containsKey(alias)) {
       String providedNamespace = aliasToProvidedNamespace.get(alias);
-      String suffix = assign.getFirstChild().getQualifiedName().substring(alias.length());
-      Node qName = NodeUtil.newQName(compiler, providedNamespace + suffix);
-      assign.replaceChild(assign.getFirstChild(), qName);
+
+      String suffix = lhs.getQualifiedName().substring(alias.length());
+      Node fullName = NodeUtil.newQName(compiler, providedNamespace + suffix);
+      assign.replaceChild(lhs, fullName);
+      compiler.reportCodeChange();
     }
   }
 }

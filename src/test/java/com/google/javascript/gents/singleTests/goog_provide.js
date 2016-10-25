@@ -3,9 +3,8 @@ goog.provide("A.B.qux");
 goog.provide("A.B.C");
 goog.provide("A.B.D")
 
-goog.provide("path.to.someUtilFunction");
-
-goog.require("RequiredType");
+// This is used to test muli-level calls.
+var path = {to: {someUtilFunction: function() {}}};
 
 /**
  * @constructor
