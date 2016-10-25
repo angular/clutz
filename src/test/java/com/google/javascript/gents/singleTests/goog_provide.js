@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Rivoting description of the file.
+ */
 goog.provide("A.B");
 goog.provide("A.B.qux");
 goog.provide("A.B.C");

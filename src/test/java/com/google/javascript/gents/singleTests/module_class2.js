@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Rivoting description of the file.
+ */
 goog.module("A.B.Klass");
 
 /** Possibly outdated information about Klass. */

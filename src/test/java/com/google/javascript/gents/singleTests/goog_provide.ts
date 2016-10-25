@@ -1,4 +1,8 @@
 
+/**
+ * @fileoverview Rivoting description of the file.
+ */
+
 // This is used to test muli-level calls.
 let path = {to: {someUtilFunction: function() {}}};
 export class B {
