@@ -50,6 +50,9 @@ type InnerTypedef = {
   key: number,
   value: string
 };
+type PrivateTypedef_ = {
+  myFunction: (p1: any) => PrivateTypedef_
+};
 /** @enum {number} */
 Foo.FruitType = {
   UNKNOWN: 0,
