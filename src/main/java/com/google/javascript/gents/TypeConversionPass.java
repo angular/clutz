@@ -152,7 +152,10 @@ public final class TypeConversionPass implements CompilerPass {
 
         Node fnNode = NodeUtil.getEnclosingFunction(n);
         Node fnParent = fnNode.getParent();
-        String fnName = (fnParent.isGetProp()) ? fnParent.getQualifiedName() : fnParent.getString();
+
+        // Use the QualifiedName if the function is on an object/namespace: `foo.moreFoo()`;
+        // otherwise, use the string on the node `function foo()` => `foo`.
+        String fnName = fnParent.isGetProp()? fnParent.getQualifiedName() : fnParent.getString();
 
         // TODO(gmoothart): in many cases we should be able to infer the type from the rhs if there
         // is no jsDoc
