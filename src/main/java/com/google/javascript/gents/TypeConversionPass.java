@@ -151,7 +151,8 @@ public final class TypeConversionPass implements CompilerPass {
         }
 
         Node fnNode = NodeUtil.getEnclosingFunction(n);
-        String fnName = fnNode.getParent().getString();
+        Node fnParent = fnNode.getParent();
+        String fnName = (fnParent.isGetProp()) ? fnParent.getQualifiedName() : fnParent.getString();
 
         // TODO(gmoothart): in many cases we should be able to infer the type from the rhs if there
         // is no jsDoc
