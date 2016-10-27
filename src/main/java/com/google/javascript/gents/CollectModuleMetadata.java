@@ -62,12 +62,24 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
 
   @Override
   public void visit(NodeTraversal t, Node n, Node parent) {
+    String filename = n.getSourceFileName();
+    @Nullable FileModule module = fileToModule.get(filename);
+
+    // const A = goog.require('path.to.A');
+    if (module != null && (n.isConst() || n.isLet() || n.isVar())) {
+      @Nullable Node rhs = n.getFirstChild().getLastChild();
+      if (rhs != null
+          && rhs.isCall()
+          && "goog.require".equals(rhs.getFirstChild().getQualifiedName())) {
+        module.reportImport();
+      }
+    }
+
     if (!n.isExprResult()) {
       return;
     }
 
     Node child = n.getFirstChild();
-    String filename = n.getSourceFileName();
     switch (child.getToken()) {
       case CALL:
         // Ignore unusual call cases
@@ -89,7 +101,6 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
             registerProvidesModule(child, filename, child.getLastChild().getString());
             break;
           case "goog.require":
-            FileModule module = fileToModule.get(filename);
             if (module != null) {
               module.reportImport();
             }
@@ -101,16 +112,14 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
       case GETPROP:
         // Typedefs are often just on property gets, not on assignments.
         JSDocInfo jsdoc = NodeUtil.getBestJSDocInfo(n);
-        if (jsdoc != null && jsdoc.containsTypeDefinition() && fileToModule.containsKey(filename)) {
-          FileModule module = fileToModule.get(filename);
+        if (jsdoc != null && jsdoc.containsTypeDefinition() && module != null) {
           module.maybeAddExport(child);
         }
         break;
       case ASSIGN:
-        if (!fileToModule.containsKey(filename)) {
+        if (module == null) {
           break;
         }
-        FileModule module = fileToModule.get(filename);
         module.maybeAddExport(child.getFirstChild());
         break;
       default:
