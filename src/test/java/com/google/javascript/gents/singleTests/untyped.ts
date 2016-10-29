@@ -5,6 +5,7 @@ let s = 'hello';
 let foo = function(v) {
   return v;
 };
+
 function bar(b) {
   return !b;
 }

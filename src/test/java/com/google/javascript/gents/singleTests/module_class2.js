@@ -3,6 +3,7 @@
  */
 goog.module("A.B.Klass");
 
+
 /** Possibly outdated information about Klass. */
 const Klass = goog.defineClass(null, {
 

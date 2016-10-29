@@ -25,10 +25,11 @@ public class GentsCodeGenerator extends CodeGenerator {
 
   @Override
   protected void add(Node n, Context ctx) {
+    maybeAddNewline(n);
+
     String comment = nodeComments.getComment(n);
     if (comment != null) {
       add(comment);
-      // temporary new line
       add("\n");
     }
 
@@ -55,23 +56,28 @@ public class GentsCodeGenerator extends CodeGenerator {
       default:
         break;
     }
-
-    addNewlines(n);
   }
 
   private static final ImmutableSet<Token> TOKENS_TO_ADD_NEWLINES_BEFORE =
       ImmutableSet.of(
           Token.CLASS, Token.EXPORT, Token.FUNCTION, Token.INTERFACE, Token.MEMBER_FUNCTION_DEF);
 
-  /** Add newlines to the generated source */
-  private void addNewlines(Node n) {
-    Node nextNode = n.getNext();
-    if (nextNode != null) {
-      if (nodeComments.getComment(nextNode) == null // Comments already prepend a newline.
-          && TOKENS_TO_ADD_NEWLINES_BEFORE.contains(nextNode.getToken())) {
-        add("\n");
-      }
+  /** Add newlines to the generated source. */
+  private void maybeAddNewline(Node n) {
+    Node previousNode = n.getPrevious();
+    boolean hasComment = nodeComments.hasComment(n) || nodeComments.hasComment(n.getParent());
+    if (isEmptyAndHasComment(previousNode)
+        || (n.getParent() != null && isEmptyAndHasComment(n.getParent().getPrevious()))) {
+      hasComment = true;
     }
+
+    if (!hasComment && TOKENS_TO_ADD_NEWLINES_BEFORE.contains(n.getToken())) {
+      add("\n");
+    }
+  }
+
+  private boolean isEmptyAndHasComment(Node n) {
+    return n != null && n.getToken() == Token.EMPTY && nodeComments.hasComment(n);
   }
 
   /**
@@ -121,14 +127,6 @@ public class GentsCodeGenerator extends CodeGenerator {
         if (anyTypeName != null) {
           add(anyTypeName);
           return true;
-        }
-        return false;
-      case MEMBER_FUNCTION_DEF:
-        // Add special newline insertion handling for constructors, since adding a newline after
-        // a node doesn't work between properties and the constructor due to semi-colon insertion.
-        if ("constructor".equals(n.getString())
-            && nodeComments.getComment(n) == null) {
-          add("\n");
         }
         return false;
       default:

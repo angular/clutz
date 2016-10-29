@@ -6,6 +6,7 @@ import {ProvidedSubclass} from './export';
 let instanceOfAlias = new ImportedClass();
 let instanceofProvidedAlias = new ImportedClass.ProvidedSubclass();
 let instanceofNotProvidedAlias = new ImportedClass.NotProvidedSubclass();
+
 export class Foo {
   static num: number = 8;
 

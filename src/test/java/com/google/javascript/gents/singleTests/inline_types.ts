@@ -1,3 +1,4 @@
+
 interface Foo {}
 /** !Foo */
 let foo: Foo = {};
