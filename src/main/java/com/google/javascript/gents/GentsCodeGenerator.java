@@ -65,11 +65,11 @@ public class GentsCodeGenerator extends CodeGenerator {
   /** Add newlines to the generated source. */
   private void maybeAddNewline(Node n) {
     Node previousNode = n.getPrevious();
-    boolean hasComment = nodeComments.hasComment(n) || nodeComments.hasComment(n.getParent());
-    if (isEmptyAndHasComment(previousNode)
-        || (n.getParent() != null && isEmptyAndHasComment(n.getParent().getPrevious()))) {
-      hasComment = true;
-    }
+    boolean hasComment =
+        nodeComments.hasComment(n)
+            || nodeComments.hasComment(n.getParent())
+            || isEmptyAndHasComment(previousNode)
+            || (n.getParent() != null && isEmptyAndHasComment(n.getParent().getPrevious()));
 
     if (!hasComment && TOKENS_TO_ADD_NEWLINES_BEFORE.contains(n.getToken())) {
       add("\n");
