@@ -64,20 +64,23 @@ public class GentsCodeGenerator extends CodeGenerator {
 
   /** Add newlines to the generated source. */
   private void maybeAddNewline(Node n) {
-    Node previousNode = n.getPrevious();
     boolean hasComment =
         nodeComments.hasComment(n)
             || nodeComments.hasComment(n.getParent())
-            || isEmptyAndHasComment(previousNode)
-            || (n.getParent() != null && isEmptyAndHasComment(n.getParent().getPrevious()));
+            || isPreviousEmptyAndHasComment(n)
+            || (n.getParent() != null && isPreviousEmptyAndHasComment(n.getParent()));
 
     if (!hasComment && TOKENS_TO_ADD_NEWLINES_BEFORE.contains(n.getToken())) {
       add("\n");
     }
   }
 
-  private boolean isEmptyAndHasComment(Node n) {
-    return n != null && n.getToken() == Token.EMPTY && nodeComments.hasComment(n);
+  private boolean isPreviousEmptyAndHasComment(Node n) {
+    if (n == null || n.getParent() == null) {
+      return false;
+    }
+    Node prev = n.getPrevious();
+    return prev != null && prev.getToken() == Token.EMPTY && nodeComments.hasComment(prev);
   }
 
   /**
