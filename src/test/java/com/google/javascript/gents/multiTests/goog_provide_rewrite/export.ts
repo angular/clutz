@@ -1,3 +1,4 @@
+
 export function aFunction() {}
 
 export class ImportedClass {}

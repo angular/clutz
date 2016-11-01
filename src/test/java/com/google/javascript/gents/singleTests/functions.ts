@@ -2,12 +2,14 @@ let nop = function() {};
 
 // Function params
 let oneParam = function(n: number) {};
+
 function twoParams(b: boolean, s: string) {}
 
 // Function returns
 let anyReturn = function(): any {
   return 'hello';
 };
+
 function typedReturn(): number {
   return 4;
 }

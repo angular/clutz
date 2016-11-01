@@ -6,7 +6,9 @@ let num = 4;
 let B = function(): number {
   return num;
 };
+
 export {B};
+
 export function C(): number {
   return num;
 };
@@ -17,6 +19,7 @@ export function C(): number {
 let L = function(): number {
   return num;
 };
+
 export {L};
 
 export {num};

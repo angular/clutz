@@ -1,3 +1,4 @@
+
 class A {
   b: any;
   c: number;

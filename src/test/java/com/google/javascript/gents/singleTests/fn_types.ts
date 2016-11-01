@@ -21,6 +21,7 @@ let optParams: (p1: number, p2?: string, p3?: boolean) =>
 // Variadic parameters
 let restParams: (p1: number, ...p2) => any = function(n, r) {};
 let restParamsTyped: (p1: number, ...p2: boolean[]) => any = function(n, br) {};
+
 function complex(n: number, o?: boolean, ...r: any[]): number {
   return n;
 }

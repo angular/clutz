@@ -53,6 +53,7 @@ class A {
 
   static anon() {
     // Anonymous function call
+
     (function() {})();
   }
 }

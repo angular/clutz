@@ -1,3 +1,4 @@
+
 export class D {}
 
 export const x = 4;
