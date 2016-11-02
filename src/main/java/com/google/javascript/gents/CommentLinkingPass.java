@@ -10,6 +10,7 @@ import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -19,22 +20,31 @@ public final class CommentLinkingPass implements CompilerPass {
   /** Regex matcher for all 3 empty comment types */
   private static final Pattern EMPTY_COMMENT_REGEX = Pattern.compile(
       "^\\s*(\\/\\/|\\/\\*(\\s|\\*)*\\*\\/)\\s*$");
+
+  /**
+   * Regex fragment that optionally matches the beginning of a JSDOC line.
+   */
+  private static final String BEGIN_JSDOC_LINE = "(?<block>[ \t]*\\*[ \t]*)?";
+
+  /**
+   * Regex fragment to optionally match end-of-line
+   */
+  private static final String EOL = "([ \t]*\n)?";
+
   /**
    * These jsdocs delete everything except for the `keep` capture group
    * Some regexes contain an empty capture group for uniform handling.
    */
   private static final Pattern[] JSDOC_REPLACEMENTS = {
-      Pattern.compile("@(constructor|interface|record)[ \t]*(?<keep>)"),
-      Pattern.compile("@(extends|implements|type)[ \t]*(\\{.*\\})[ \t]*(?<keep>)"),
-      Pattern.compile("@(private|protected|public|package|const)[ \t]*(\\{.*\\})?[ \t]*(?<keep>)"),
+      Pattern.compile(BEGIN_JSDOC_LINE + "@(extends|implements|type)[ \t]*(\\{.*\\})[ \t]*(?<keep>)" + EOL),
+      Pattern.compile(BEGIN_JSDOC_LINE + "@(constructor|interface|record)[ \t]*(?<keep>)" + EOL),
+      Pattern.compile(BEGIN_JSDOC_LINE + "@(private|protected|public|package|const)[ \t]*(\\{.*\\})?[ \t]*(?<keep>)" + EOL),
       // Removes @param and @return if there is no description
-      Pattern.compile("@param[ \t]*(\\{.*\\})[ \t]*[\\w\\$]+[ \t]*(?<keep>\\*\\/|\n)"),
-      Pattern.compile("@returns?[ \t]*(\\{.*\\})[ \t]*(?<keep>\\*\\/|\n)"),
-      Pattern.compile("(?<keep>@(param|returns?))[ \t]*(\\{.*\\})"),
-      // Remove empty lines with only *
-      Pattern.compile("(?m)^[ \t]*\\*\\s*\n(?<keep>)"),
+      Pattern.compile(BEGIN_JSDOC_LINE + "@param[ \t]*(\\{.*\\})[ \t]*[\\w\\$]+[ \t]*(?<keep>\\*\\/|\n)"),
+      Pattern.compile(BEGIN_JSDOC_LINE + "@returns?[ \t]*(\\{.*\\})[ \t]*(?<keep>\\*\\/|\n)"),
+      Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@(param|returns?))[ \t]*(\\{.*\\})"),
       // Remove type annotation from @export
-      Pattern.compile("(?<keep>@export)[ \t]*(\\{.*\\})")};
+      Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@export)[ \t]*(\\{.*\\})")};
 
   private static final Pattern[] COMMENT_REPLACEMENTS = {
       Pattern.compile("//\\s*goog.scope\\s*(?<keep>)")};
@@ -146,7 +156,14 @@ public final class CommentLinkingPass implements CompilerPass {
     private String filterCommentContent(Type type, String comment) {
       Pattern[] replacements = (type == Type.JSDOC) ? JSDOC_REPLACEMENTS : COMMENT_REPLACEMENTS;
       for (Pattern p : replacements) {
-        comment = p.matcher(comment).replaceAll("${keep}");
+        Matcher m = p.matcher(comment);
+        if (m.find() && m.group("keep") != null && m.group("keep").trim().length() > 0) {
+          // keep documentation, if any
+          comment = m.replaceAll("${block}${keep}");
+        } else {
+          // nothing to keep, remove the line
+          comment = m.replaceAll("");
+        }
       }
       return isWhitespaceOnly(comment) ? "" : comment;
     }
