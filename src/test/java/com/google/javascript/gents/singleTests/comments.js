@@ -17,6 +17,9 @@ var A = function() {};
 A.prototype.foo = function() {};
 
 /**
+ * This is a comment
+ *
+ * with empty line breaks that are preserved
  * @param {number} deleted
  * @param {Foo} $foo
  * @param {number} notdeleted because this has a description
@@ -25,13 +28,14 @@ A.prototype.foo = function() {};
 // This is just some extra stuff
 var foo = function(deleted, notdeleted) { return deleted + notdeleted; };
 
-// The following comment should be entirely deleted
+// The following comment should be mostly deleted
 /**
  * @constructor
  * @extends {A}
  * @type {number}
  * @private {number}
  * @protected {number}
+ * @param {number} foo description of foo
  * @public {number}
  * @package {number}
  * @const {number}

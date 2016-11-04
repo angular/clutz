@@ -17,6 +17,9 @@ class A {
 // Here too
 
 /**
+ * This is a comment
+ *
+ * with empty line breaks that are preserved
  * @param notdeleted because this has a description
  * @return this also has a description
  */
@@ -25,7 +28,10 @@ let foo = function(deleted: number, notdeleted: number): number {
   return deleted + notdeleted;
 };
 
-// The following comment should be entirely deleted
+// The following comment should be mostly deleted
+/**
+ * @param foo description of foo
+ */
 const x;
 
 /** @export */
