@@ -5,6 +5,8 @@ let oneParam = function(n: number) {};
 
 function twoParams(b: boolean, s: string) {}
 
+function withDefaultValue(list = []) {}
+
 // Function returns
 let anyReturn = function(): any {
   return 'hello';
