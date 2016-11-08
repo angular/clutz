@@ -171,9 +171,11 @@ public final class TypeConversionPass implements CompilerPass {
           JSDocInfo constructorJsDoc = NodeUtil.getBestJSDocInfo(fnNode);
 
           for (Node param : params.children()) {
-            JSTypeExpression paramType = constructorJsDoc.getParameterType(param.getString());
+            String paramName =
+                param.isDefaultValue() ? param.getFirstChild().getString() : param.getString();
+            JSTypeExpression paramType = constructorJsDoc.getParameterType(paramName);
             // Names and types must be equal
-            if (declaration.memberName.equals(param.getString()) && declarationType.equals(paramType)) {
+            if (declaration.memberName.equals(paramName) && declarationType.equals(paramType)) {
               // Add visibility directly to param if possible
               moveAccessModifier(declaration, param);
               markAsConst(declaration, param);
