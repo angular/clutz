@@ -18,6 +18,10 @@ var A = function(a) {
   baz.v = 1;
   this.n = 12;
   this.n = 13;
+
+  this.m = () => {
+    this.o = 'ooo';
+  };
 };
 
 A.prototype.foo = function() {

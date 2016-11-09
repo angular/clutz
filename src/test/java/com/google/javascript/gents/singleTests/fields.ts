@@ -8,6 +8,8 @@ class A {
   z: number;
   w: any;
   n: any = 12;
+  o: any;
+  m: any;
   c: number;
   d: string;
 
@@ -21,6 +23,9 @@ class A {
     this.w.bar = 'bar';
     baz.v = 1;
     this.n = 13;
+    this.m = () => {
+      this.o = 'ooo';
+    };
   }
 
   foo() {

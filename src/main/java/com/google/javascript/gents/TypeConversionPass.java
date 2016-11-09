@@ -151,11 +151,7 @@ public final class TypeConversionPass implements CompilerPass {
         }
 
         Node fnNode = NodeUtil.getEnclosingFunction(n);
-        Node fnParent = fnNode.getParent();
-
-        // Use the QualifiedName if the function is on an object/namespace: `foo.moreFoo()`;
-        // otherwise, use the string on the node `function foo()` => `foo`.
-        String fnName = fnParent.isGetProp()? fnParent.getQualifiedName() : fnParent.getString();
+        String fnName = getFnName(fnNode);
 
         // TODO(gmoothart): in many cases we should be able to infer the type from the rhs if there
         // is no jsDoc
@@ -438,7 +434,7 @@ public final class TypeConversionPass implements CompilerPass {
 
     Node fnNode = NodeUtil.getEnclosingFunction(declaration.exprRoot);
     if (fnNode != null) {
-      String fnName = fnNode.getParent().getString();
+      String fnName = getFnName(fnNode);
       if (!"constructor".equals(fnName)) {
         return false;
       }
@@ -619,6 +615,21 @@ public final class TypeConversionPass implements CompilerPass {
       return;
     }
     types.put(typeName, n);
+  }
+
+  private String getFnName(Node fnNode) {
+    if (fnNode.isArrowFunction()) {
+      return null;
+    }
+
+    // Use the QualifiedName if the function is on an object/namespace: `foo.moreFoo()`;
+    // otherwise, use the string on the node: `foo` for `function foo()`
+    Node fnParent = fnNode.getParent();
+    if (fnParent.isGetProp()) {
+      return fnParent.getQualifiedName();
+    }
+
+    return fnParent.getString();
   }
 
   /**
