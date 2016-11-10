@@ -1,10 +1,12 @@
 /**
  * @constructor
- * @param {number} a
+ * @param {number} parameterProp
+ * @param {Object} objectParam
  */
-var A = function(a) {
+var A = function(parameterProp, objectParam) {
   /** @type {number} */
-  this.a = a;
+  this.parameterProp = parameterProp;
+
   /** @type {boolean} */
   this.b;
 
@@ -18,6 +20,12 @@ var A = function(a) {
   baz.v = 1;
   this.n = 12;
   this.n = 13;
+
+  this.arrowFuncField = () => {
+    this.fieldSetFromArrowFunc = 'f';
+  };
+
+  this.functionResultField = objectParam.foo.bar();
 };
 
 A.prototype.foo = function() {
