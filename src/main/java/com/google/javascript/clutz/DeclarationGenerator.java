@@ -85,11 +85,15 @@ class DeclarationGenerator {
       "RequestContext", "Response", "ReadableByteStream", "ResponseType",
       "ReadableStreamController", "CountQueuingStrategy", "ByteLengthQueuingStrategy",
       "ReadableByteStreamReader", "ReadableStream", "WritableStream", "ReadableStreamReader",
-      "Entry", "DirectoryEntry", "FileSystem", "Metadata", "FileError", "DirectoryReader",
+      "Entry", "DirectoryEntry", "FileSystem", "FileSystemFlags", "Metadata", "FileError", "DirectoryReader",
       "FileEntry", "FileWriter", "FileSaver", "ChromeEvent", "Tab", "ChromeStringArrayEvent",
       "ChromeStringStringEvent", "ChromeObjectEvent", "ChromeStringEvent", "ChromeBooleanEvent",
       "MessageSender", "Port", "Body", "RequestInit", "RequestDestination", "FetchRequestType",
-      "RequestRedirect", "RefererrerPolicy", "ResponseInit", "ReferrerPolicy", "Iterable");
+      "RequestRedirect", "RefererrerPolicy", "ResponseInit", "ReferrerPolicy", "Iterable",
+      "WritableStreamSink", "PipeOptions", "WritableStreamDefaultWriter", "TransformStream",
+      "ReadableStreamBYOBReader", "ReadableStreamDefaultReader", "ReadableStreamSource",
+      "ReadableByteStreamController", "ReadableStreamDefaultController",
+      "WritableStreamDefaultController", "ReadableStreamBYOBRequest");
 
   /**
    * List of files that are part of closures platform externs.
