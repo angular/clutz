@@ -14,7 +14,11 @@ declare namespace ಠ_ಠ.clutz {
   class ByteLengthQueuingStrategy_Instance {
     private noStructuralTyping_: any;
     constructor (config : { highWaterMark : number } ) ;
-    size (chunk : any ) : number ;
+    /**
+     * If we don't want to be strict we can define chunk as {*}
+     * and return as {number|undefined}
+     */
+    size (chunk : { byteLength : number } ) : number ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -112,8 +116,8 @@ declare namespace ಠ_ಠ.clutz {
   }
   class DirectoryEntry_Instance extends Entry_Instance {
     createReader ( ) : DirectoryReader ;
-    getDirectory (path : string , options ? : Object | null , successCallback ? : (a : DirectoryEntry ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
-    getFile (path : string , options ? : Object | null , successCallback ? : (a : FileEntry ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
+    getDirectory (path : string , options ? : FileSystemFlags , successCallback ? : (a : DirectoryEntry ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
+    getFile (path : string , options ? : FileSystemFlags , successCallback ? : (a : FileEntry ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
     removeRecursively (successCallback : ( ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
   }
 }
@@ -224,6 +228,12 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  interface FileSystemFlags {
+    create ? : boolean ;
+    exclusive ? : boolean ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   class FileWriter extends FileWriter_Instance {
   }
   class FileWriter_Instance extends FileSaver_Instance {
@@ -307,6 +317,13 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  interface PipeOptions {
+    preventAbort : boolean ;
+    preventCancel : boolean ;
+    preventClose : boolean ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   class Port extends Port_Instance {
   }
   class Port_Instance {
@@ -334,29 +351,16 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class ReadableByteStream extends ReadableByteStream_Instance {
-  }
-  class ReadableByteStream_Instance {
-    private noStructuralTyping_: any;
-    constructor (opt_underlyingSource ? : { cancel ? : (a : any ) => Promise < any > | undefined , pull ? : (a : ReadableStreamController ) => Promise < any > | undefined , start ? : (a : ReadableStreamController ) => Promise < any > | undefined } | null , opt_strategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark : number , size ? : (a : any ) => number } ) ;
-    cancel (reason : any ) : any ;
-    getReader ( ) : ReadableByteStreamReader ;
-    locked : boolean ;
-    pipeThrough (transform : { readable : ReadableStream , writable : WritableStream } , opt_options ? : { preventAbort ? : boolean , preventCancel ? : boolean , preventClose ? : boolean } ) : ReadableByteStream ;
-    pipeTo (dest : WritableStream , opt_options ? : { preventAbort ? : boolean , preventCancel ? : boolean , preventClose ? : boolean } ) : Promise < any > ;
-    tee ( ) : ReadableByteStream [] ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  class ReadableByteStreamReader extends ReadableByteStreamReader_Instance {
-  }
-  class ReadableByteStreamReader_Instance {
-    private noStructuralTyping_: any;
-    constructor (stream : ReadableByteStream ) ;
-    cancel (reason : any ) : any ;
-    closed : boolean ;
-    read ( ) : Promise < { done : boolean , value ? : any } > ;
-    releaseLock ( ) : void ;
+  /**
+   * The ReadableByteStreamController constructor cannot be used directly;
+   * it only works on a ReadableStream that is in the middle of being constructed.
+   */
+  interface ReadableByteStreamController {
+    byobRequest : ReadableStreamBYOBRequest ;
+    close ( ) : void ;
+    desiredSize : number ;
+    enqueue (chunk : ArrayBufferView ) : void ;
+    error (err : any ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -364,37 +368,65 @@ declare namespace ಠ_ಠ.clutz {
   }
   class ReadableStream_Instance {
     private noStructuralTyping_: any;
-    constructor (opt_underlyingSource ? : { cancel ? : (a : any ) => Promise < any > | undefined , pull ? : (a : ReadableStreamController ) => Promise < any > | undefined , start ? : (a : ReadableStreamController ) => Promise < any > | undefined } | null , opt_strategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark : number , size ? : (a : any ) => number } ) ;
-    cancel (reason : any ) : any ;
-    getReader ( ) : ReadableStreamReader ;
+    constructor (opt_underlyingSource ? : ReadableStreamSource , opt_queuingStrategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark : number , size ? : (a : any ) => number } ) ;
+    cancel (reason : any ) : Promise < undefined > ;
+    getReader (opt_options ? : { mode ? : string } ) : ReadableStreamDefaultReader | ReadableStreamBYOBReader ;
     locked : boolean ;
-    pipeThrough (transform : { readable : ReadableStream , writable : WritableStream } , opt_options ? : { preventAbort ? : boolean , preventCancel ? : boolean , preventClose ? : boolean } ) : ReadableStream ;
-    pipeTo (dest : WritableStream , opt_options ? : { preventAbort ? : boolean , preventCancel ? : boolean , preventClose ? : boolean } ) : Promise < any > ;
+    pipeThrough (transform : TransformStream , opt_options ? : PipeOptions ) : ReadableStream ;
+    pipeTo (dest : WritableStream , opt_options ? : PipeOptions ) : Promise < undefined > ;
     tee ( ) : ReadableStream [] ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class ReadableStreamController extends ReadableStreamController_Instance {
-  }
-  class ReadableStreamController_Instance {
-    private noStructuralTyping_: any;
-    constructor (stream : ReadableStream ) ;
-    close ( ) : void ;
-    desiredSize : number ;
-    enqueue (chunk : any ) : void ;
-    error (e : any ) : void ;
+  /**
+   * The ReadableStreamBYOBReader constructor is generally not meant to be used
+   * directly; instead, a stream’s getReader() method should be used.
+   */
+  interface ReadableStreamBYOBReader {
+    cancel (reason : any ) : Promise < any > ;
+    closed : Promise < undefined > ;
+    read (view : ArrayBufferView ) : Promise < { done : boolean , value : any } > ;
+    releaseLock ( ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class ReadableStreamReader extends ReadableStreamReader_Instance {
+  interface ReadableStreamBYOBRequest {
+    respond (bytesWritten : number ) : void ;
+    respondWithNewView (view : ArrayBufferView ) : void ;
+    view : ArrayBufferView ;
   }
-  class ReadableStreamReader_Instance {
-    private noStructuralTyping_: any;
-    constructor (stream : ReadableStream ) ;
-    cancel (reason : any ) : void ;
-    closed : boolean ;
-    read ( ) : Promise < { done : boolean , value ? : any } > ;
+}
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * The ReadableStreamDefaultController constructor cannot be used directly;
+   * it only works on a ReadableStream that is in the middle of being constructed.
+   */
+  interface ReadableStreamDefaultController {
+    close ( ) : void ;
+    desiredSize : number ;
+    enqueue (chunk : any ) : void ;
+    error (err : any ) : void ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * The ReadableStreamDefaultReader constructor is generally not meant to be used directly;
+   * instead, a stream’s getReader() method should be used.
+   */
+  interface ReadableStreamDefaultReader {
+    cancel (reason : any ) : Promise < any > ;
+    closed : Promise < undefined > ;
+    read ( ) : Promise < { done : boolean , value : any } > ;
     releaseLock ( ) : void ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface ReadableStreamSource {
+    autoAllocateChunkSize ? : number ;
+    cancel ? : (a : any ) => Promise < any > | undefined ;
+    pull ? : (a : ReadableByteStreamController | ReadableStreamDefaultController ) => Promise < any > | undefined ;
+    start ? : (a : ReadableByteStreamController | ReadableStreamDefaultController ) => Promise < any > | undefined ;
+    type ? : string ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -575,6 +607,12 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  interface TransformStream {
+    readable : ReadableStream ;
+    writable : WritableStream ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   interface WorkerLocation {
     hash : string ;
     host : string ;
@@ -592,12 +630,37 @@ declare namespace ಠ_ಠ.clutz {
   }
   class WritableStream_Instance {
     private noStructuralTyping_: any;
-    constructor (opt_underlyingSink ? : { abort ? : (a : any ) => Promise < any > | undefined , close ? : ( ) => Promise < any > | undefined , start ? : (a : any ) => Promise < any > | undefined , write ? : (a : any ) => Promise < any > | undefined } , opt_strategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark : number , size ? : (a : any ) => number } ) ;
+    constructor (opt_underlyingSink ? : WritableStreamSink , opt_queuingStrategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark : number , size ? : (a : any ) => number } ) ;
+    abort (reason : any ) : Promise < undefined > ;
+    getWriter ( ) : WritableStreamDefaultWriter ;
+    locked : boolean ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * The WritableStreamDefaultController constructor cannot be used directly;
+   * it only works on a WritableStream that is in the middle of being constructed.
+   */
+  interface WritableStreamDefaultController {
+    error (err : any ) : Promise < undefined > ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface WritableStreamDefaultWriter {
     abort (reason : any ) : Promise < undefined > ;
     close ( ) : Promise < undefined > ;
-    closed : Promise < any > ;
-    ready : Promise < any > ;
-    state : string ;
-    write (chunk : any ) : Promise < any > ;
+    closed : Promise < undefined > ;
+    desiredSize : number ;
+    ready : Promise < number > ;
+    releaseLock ( ) : void ;
+    write (chunk : any ) : Promise < undefined > ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface WritableStreamSink {
+    abort ? : (a : any ) => Promise < any > | undefined ;
+    close ? : ( ) => Promise < any > | undefined ;
+    start ? : (a : WritableStreamDefaultController ) => Promise < any > | undefined ;
+    write ? : (a : WritableStreamDefaultController ) => Promise < any > | undefined ;
   }
 }
