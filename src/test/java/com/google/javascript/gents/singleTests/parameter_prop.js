@@ -2,14 +2,17 @@
  * @constructor
  * @param {number} a
  * @param {number} b
+ * @param {Foo} parameterPropWithInferredType
  */
-function A(a, b, c) {
+function A(a, b, c, parameterPropWithInferredType) {
   /** @type {number} */
   this.a = a;
   /** @type {?} */
   this.b = b;
   /** @type {number} */
   this.c = c;
+  /** @private @const */
+  this.parameterPropWithInferredType = parameterPropWithInferredType;
 }
 
 /**
