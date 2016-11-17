@@ -3,7 +3,9 @@ class A {
   b: any;
   c: number;
 
-  constructor(public a: number, b: number, c) {
+  constructor(
+      public a: number, b: number, c,
+      private readonly parameterPropWithInferredType: Foo) {
     this.b = b;
     this.c = c;
   }
