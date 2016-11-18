@@ -632,9 +632,9 @@ class DeclarationGenerator {
     if (isPrivate(type.getJSDocInfo()) && !isConstructor(type.getJSDocInfo())) {
       return true;
     }
-    // Only var declarations have collisions, while class, interface, and functions can coexist with
-    // namespaces.
-    if (type.isInterface() || type.isConstructor() || type.isFunctionType()) {
+    // Only var declarations have collisions, while class, interface, function, and typedef can
+    // coexist with namespaces.
+    if (type.isInterface() || type.isConstructor() || type.isFunctionType() || isTypedef(type)) {
       return false;
     }
     return isDefaultExport(symbol);
