@@ -12,7 +12,6 @@ import com.google.javascript.jscomp.CodePrinter.Builder.CodeGeneratorFactory;
 import com.google.javascript.jscomp.CodePrinter.Format;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.ErrorFormat;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.rhino.Node;
@@ -23,6 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,11 +96,11 @@ public class TypeScriptGenerator {
     this.nameUtil = new NameUtil(compiler);
   }
 
-  boolean hasErrors() {
+  public boolean hasErrors() {
     return errorManager.getErrorCount() > 0;
   }
 
-  void generateTypeScript() {
+  private void generateTypeScript() {
     List<SourceFile> srcFiles = getFiles(opts.srcFiles);
     List<SourceFile> externFiles = getFiles(opts.externs);
     Set<String> filesToConvert = Sets.newLinkedHashSet(opts.filesToConvert);
@@ -132,11 +132,10 @@ public class TypeScriptGenerator {
     }
   }
 
-  /**
-   * Returns a map from the basename to the TypeScript code generated for the file.
-   */
-  Map<String, String> generateTypeScript(Set<String> filesToConvert,
-      List<SourceFile> srcFiles, List<SourceFile> externs) throws AssertionError {
+  /** Returns a map from the basename to the TypeScript code generated for the file. */
+  public Map<String, String> generateTypeScript(
+      Set<String> filesToConvert, List<SourceFile> srcFiles, List<SourceFile> externs)
+      throws AssertionError {
     Map<String, String> sourceFileMap = new LinkedHashMap<>();
 
     final CompilerOptions compilerOpts = opts.getCompilerOptions();
@@ -163,15 +162,19 @@ public class TypeScriptGenerator {
         modulePrePass.getFileMap(), modulePrePass.getNamespaceMap(), comments);
     modulePass.process(externRoot, srcRoot);
 
-    CompilerPass classPass = new TypeConversionPass(compiler, comments);
-    classPass.process(externRoot, srcRoot);
+    new TypeConversionPass(compiler, comments).process(externRoot, srcRoot);
 
-    CompilerPass typingPass = new TypeAnnotationPass(compiler, pathUtil, nameUtil,
-        modulePrePass.getSymbolMap(), modulePass.getTypeRewrite(), comments, opts.externsMap);
-    typingPass.process(externRoot, srcRoot);
+    new TypeAnnotationPass(
+            compiler,
+            pathUtil,
+            nameUtil,
+            modulePrePass.getSymbolMap(),
+            modulePass.getTypeRewrite(),
+            comments,
+            opts.externsMap)
+        .process(externRoot, srcRoot);
 
-    CompilerPass stylePass = new StyleFixPass(compiler, comments);
-    stylePass.process(externRoot, srcRoot);
+    new StyleFixPass(compiler, comments).process(externRoot, srcRoot);
 
     // We only use the source root as the extern root is ignored for codegen
     for (Node file : srcRoot.children()) {
@@ -200,10 +203,10 @@ public class TypeScriptGenerator {
   }
 
   /**
-   * Attempts to format the generated TypeScript using clang-format.
-   * On failure to format (ie. clang-format does not exist), return the inputted string.
+   * Attempts to format the generated TypeScript using clang-format. On failure to format (i.e.
+   * clang-format does not exist), return the inputed string.
    */
-  String tryClangFormat(String code) {
+  private static String tryClangFormat(String code) {
     Process process = null;
     try {
       process = Runtime.getRuntime().exec(CLANG_FORMAT);
@@ -234,7 +237,7 @@ public class TypeScriptGenerator {
     }
   }
 
-  private String readStream(final InputStream stream) throws IOException {
+  private static String readStream(final InputStream stream) throws IOException {
     ByteSource byteSource = new ByteSource() {
       @Override
       public InputStream openStream() throws IOException {
@@ -244,10 +247,8 @@ public class TypeScriptGenerator {
     return byteSource.asCharSource(UTF_8).read();
   }
 
-  /**
-   * Removes the root nodes for all the library files from the source node.
-   */
-  void stripNonCompiledNodes(Node n, Set<String> filesToCompile) {
+  /** Removes the root nodes for all the library files from the source node. */
+  private static void stripNonCompiledNodes(Node n, Set<String> filesToCompile) {
     for (Node child : n.children()) {
       if (!filesToCompile.contains(child.getSourceFileName())) {
         child.detachFromParent();
@@ -255,11 +256,9 @@ public class TypeScriptGenerator {
     }
   }
 
-  /**
-   * Returns a list of source files from a list of file names.
-   */
-  List<SourceFile> getFiles(Iterable<String> fileNames) {
-    List<SourceFile> files = new ArrayList<>();
+  /** Returns a list of source files from a list of file names. */
+  private static List<SourceFile> getFiles(Collection<String> fileNames) {
+    List<SourceFile> files = new ArrayList<>(fileNames.size());
     for (String fileName : fileNames) {
       files.add(SourceFile.fromFile(fileName, UTF_8));
     }
