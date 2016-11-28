@@ -75,6 +75,7 @@ public class Options {
     options.setWrapGoogModulesForWhitespaceOnly(false);
     // Stop escaping the characters "=&<>"
     options.setTrustedStrings(true);
+    options.setPreferSingleQuotes(true);
 
     // Compiler passes must be disabled to disable down-transpilation to ES5.
     options.skipAllCompilerPasses();
