@@ -215,7 +215,7 @@ public final class ModuleConversionPass implements CompilerPass {
         }
 
         // var {foo} = goog.require(...);
-        if (node.isObjectPattern()
+        if (node.isObjectPattern() && node.getNext().getFirstChild() != null
             && "goog.require".equals(node.getNext().getFirstChild().getQualifiedName())) {
           // TODO(#392): Support multiple destructured import values here.
           //     Currently, this only allows for a single destructured import value.
