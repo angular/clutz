@@ -9,9 +9,12 @@ import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.javascript.clutz.DeclarationGeneratorTests;
 import com.google.javascript.jscomp.SourceFile;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -111,10 +114,17 @@ public class TypeScriptGeneratorTests {
         String sourceText = getFileText(sourceFile);
         String goldenText = getFileText(goldenFile);
 
+        ByteArrayOutputStream errStream = new ByteArrayOutputStream();
+        gents.setErrorStream(new PrintStream(errStream));
+
         Map<String, String> transpiledSource = gents.generateTypeScript(
             Collections.singleton(sourceFile.getName()),
             Collections.singletonList(SourceFile.fromCode(sourceFile.getName(), sourceText)),
             Collections.<SourceFile>emptyList());
+
+        String errors = new String(errStream.toByteArray(),StandardCharsets.UTF_8 );
+        assertThat(errors).isEmpty();
+        assertThat(gents.hasErrors()).isFalse();
 
         assertThat(transpiledSource).hasSize(1);
         assertThat(transpiledSource).containsKey(basename);

@@ -5,7 +5,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
-import com.google.javascript.jscomp.AstValidator;
 import com.google.javascript.jscomp.CodeConsumer;
 import com.google.javascript.jscomp.CodeGenerator;
 import com.google.javascript.jscomp.CodePrinter;
@@ -24,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -38,8 +38,9 @@ import org.kohsuke.args4j.CmdLineException;
  */
 public class TypeScriptGenerator {
   /** Diagnostic that indicates Gents somehow produced an incorrect AST structure. */
-  private static final DiagnosticType CLUTZ_MALFORMED_AST = DiagnosticType.error(
-      "CLUTZ_INTERNAL_ERROR", "Clutz produced a malformed AST: {0}");
+  private static final DiagnosticType GENTS_INTERNAL_ERROR = DiagnosticType.error(
+      "CLUTZ_INTERNAL_ERROR", "Gents failed: {0}");
+
   /**
    * Command line clang-format string to format stdin. The filename 'a.ts' is only used to inform
    * clang-format of the file type (TS).
@@ -86,7 +87,6 @@ public class TypeScriptGenerator {
 
   private final Options opts;
   private final Compiler compiler;
-  private final GentsErrorManager errorManager;
 
   final PathUtil pathUtil;
   final NameUtil nameUtil;
@@ -95,16 +95,21 @@ public class TypeScriptGenerator {
     this.opts = opts;
     this.compiler = new Compiler();
     compiler.disableThreads();
-    this.errorManager = new GentsErrorManager(System.err,
-        ErrorFormat.MULTILINE.toFormatter(compiler, true), opts.debug);
-    compiler.setErrorManager(errorManager);
+    setErrorStream(System.err);
 
     this.pathUtil = new PathUtil(opts.root);
     this.nameUtil = new NameUtil(compiler);
   }
+  
+  void setErrorStream(PrintStream errStream) {
+    GentsErrorManager errorManager =
+        new GentsErrorManager(
+            errStream, ErrorFormat.MULTILINE.toFormatter(compiler, true), opts.debug);
+    compiler.setErrorManager(errorManager);
+  }
 
   public boolean hasErrors() {
-    return errorManager.getErrorCount() > 0;
+    return compiler.getErrorManager().getErrorCount() > 0;
   }
 
   private void generateTypeScript() {
@@ -183,15 +188,17 @@ public class TypeScriptGenerator {
 
     new StyleFixPass(compiler, comments).process(externRoot, srcRoot);
 
-    new AstValidator(
-            compiler,
-            new AstValidator.ViolationHandler() {
-              @Override
-              public void handleViolation(String message, Node n) {
-                compiler.report(JSError.make(n, CLUTZ_MALFORMED_AST, message));
-              }
-            })
-        .process(externRoot, srcRoot);
+    // Sadly this doesn't work. Gents produces an AST that doesn't validate for class fields that
+    // get initialized ("class X { y = 1; }"), which Closure Compiler rejects.
+    //new AstValidator(
+    //        compiler,
+    //        new AstValidator.ViolationHandler() {
+    //          @Override
+    //          public void handleViolation(String message, Node n) {
+    //            compiler.report(JSError.make(n, GENTS_MALFORMED_AST, message));
+    //          }
+    //        })
+    //    .process(externRoot, srcRoot);
 
     // We only use the source root as the extern root is ignored for codegen
     for (Node file : srcRoot.children()) {
@@ -218,11 +225,13 @@ public class TypeScriptGenerator {
         sourceFileMap.put(filepath, tryClangFormat(tsCode));
       } catch (Throwable t) {
         System.err.println("Failed while converting " + file.getSourceFileName());
-        throw t;
+        t.printStackTrace(System.err);
+        compiler.report(
+            JSError.make(file.getSourceFileName(), -1, -1, GENTS_INTERNAL_ERROR, t.getMessage()));
       }
     }
 
-    errorManager.doGenerateReport();
+    ((GentsErrorManager) compiler.getErrorManager()).doGenerateReport();
     return sourceFileMap;
   }
 
