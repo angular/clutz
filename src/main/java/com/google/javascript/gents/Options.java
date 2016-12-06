@@ -68,7 +68,7 @@ public class Options {
     // Report duplicate definitions, e.g. for accidentally duplicated externs.
     options.setWarningLevel(DiagnosticGroups.DUPLICATE_VARS, CheckLevel.ERROR);
 
-    options.setLanguage(CompilerOptions.LanguageMode.ECMASCRIPT6);
+    options.setLanguage(CompilerOptions.LanguageMode.ECMASCRIPT6_TYPED);
     options.setLanguageOut(CompilerOptions.LanguageMode.NO_TRANSPILE);
 
     // Do not transpile module declarations

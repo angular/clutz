@@ -9,9 +9,12 @@ import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.javascript.clutz.DeclarationGeneratorTests;
 import com.google.javascript.jscomp.SourceFile;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -82,10 +85,17 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
           }
         }
 
+        ByteArrayOutputStream errStream = new ByteArrayOutputStream();
+        gents.setErrorStream(new PrintStream(errStream));
+
         Map<String, String> transpiledSource = gents.generateTypeScript(
             sourceNames,
             sourceFiles,
             Collections.<SourceFile>emptyList());
+
+        String errors = new String(errStream.toByteArray(),StandardCharsets.UTF_8 );
+        assertThat(errors).isEmpty();
+        assertThat(gents.hasErrors()).isFalse();
 
         assertThat(transpiledSource).hasSize(sourceNames.size());
         for (String basename : goldenFiles.keySet()) {
