@@ -118,6 +118,7 @@ public final class TypeAnnotationPass implements CompilerPass {
               for (JSTypeExpression type : interfaces) {
                 impls.addChildToBack(convertTypeNodeAST(type.getRoot()));
               }
+              impls.useSourceInfoFrom(n);
               n.putProp(Node.IMPLEMENTS, impls);
             }
           }

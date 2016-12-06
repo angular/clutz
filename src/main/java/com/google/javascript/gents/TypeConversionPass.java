@@ -270,6 +270,7 @@ public final class TypeConversionPass implements CompilerPass {
           .getFirstChild() // ignore the ! node as we always output non nullable types
           .getString();
       superClass = NodeUtil.newQName(compiler, superClassName);
+      superClass.useSourceInfoFrom(n);
     }
 
     Node typeNode;
@@ -283,6 +284,7 @@ public final class TypeConversionPass implements CompilerPass {
         superClass = superInterfaces;
       }
       typeNode = new Node(Token.INTERFACE, name, superClass, new Node(Token.INTERFACE_MEMBERS));
+      typeNode.useSourceInfoFromForTree(n);
       // Must be registered here, as JSCompiler cannot extract names from INTERFACE nodes.
       addTypeToScope(typeNode, typeName);
     } else {
@@ -291,6 +293,7 @@ public final class TypeConversionPass implements CompilerPass {
           "constructor",
           IR.function(IR.name(""), params, body)
       );
+      constructor.useSourceInfoFrom(n);
       // Sets jsdoc info to preserve type declarations on method
       constructor.setJSDocInfo(jsDoc);
       Node classMembers = new Node(Token.CLASS_MEMBERS, constructor);
@@ -315,6 +318,7 @@ public final class TypeConversionPass implements CompilerPass {
     }
 
     Node classMembers = new Node(Token.CLASS_MEMBERS);
+    classMembers.useSourceInfoFrom(n);
     for (Node child : n.getLastChild().children()) {
       if (child.isStringKey() || child.isMemberFunctionDef()) {
         // Handle static methods
@@ -332,6 +336,7 @@ public final class TypeConversionPass implements CompilerPass {
       }
     }
     Node classNode = new Node(Token.CLASS, IR.empty(), superClass, classMembers);
+    classNode.useSourceInfoFrom(n);
 
     nodeComments.replaceWithComment(n, classNode);
     compiler.reportCodeChange();

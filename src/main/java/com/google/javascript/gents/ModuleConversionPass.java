@@ -92,11 +92,13 @@ public final class ModuleConversionPass implements CompilerPass {
           if (!module.hasImports() && !module.hasExports()) {
             // export {};
             Node commentNode = new Node(Token.EMPTY);
+            commentNode.useSourceInfoFrom(n);
             nodeComments.putComment(
                 commentNode,
                 "\n// gents: force this file to be an ES6 module (no imports or exports)");
 
             Node exportNode = new Node(Token.EXPORT, new Node(Token.EXPORT_SPECS, commentNode));
+            commentNode.useSourceInfoFromForTree(n);
 
             if (n.hasChildren() && n.getFirstChild().isModuleBody()) {
               n.getFirstChild().addChildToFront(exportNode);
@@ -146,6 +148,7 @@ public final class ModuleConversionPass implements CompilerPass {
             String localName = symbols.get(exportedNamespace);
             Node export = new Node(Token.EXPORT, new Node(Token.EXPORT_SPECS,
                 new Node(Token.EXPORT_SPEC, Node.newString(Token.NAME, localName))));
+            export.useSourceInfoFromForTree(child);
             parent.addChildAfter(export, n);
             // Registers symbol for rewriting local uses.
             registerLocalSymbol(
@@ -315,6 +318,7 @@ public final class ModuleConversionPass implements CompilerPass {
           IR.empty(),
           new Node(Token.IMPORT_SPECS, importSpec),
           Node.newString(referencedFile));
+      importNode.useSourceInfoFromForTree(n);
       n.getParent().addChildBefore(importNode, n);
       nodeComments.moveComment(n, importNode);
       imported = true;
@@ -331,6 +335,7 @@ public final class ModuleConversionPass implements CompilerPass {
           Node.newString(Token.IMPORT_STAR, localName),
           Node.newString(referencedFile));
       n.getParent().addChildBefore(importNode, n);
+      importNode.useSourceInfoFromForTree(n);
       nodeComments.moveComment(n, importNode);
       imported = true;
 
@@ -349,6 +354,7 @@ public final class ModuleConversionPass implements CompilerPass {
           IR.empty(),
           IR.empty(),
           Node.newString(referencedFile));
+      importNode.useSourceInfoFromForTree(n);
       n.getParent().addChildBefore(importNode, n);
       nodeComments.moveComment(n, importNode);
     }
@@ -394,6 +400,7 @@ public final class ModuleConversionPass implements CompilerPass {
         namedNode.detachFromParent();
 
         Node export = new Node(Token.EXPR_RESULT, new Node(Token.EXPORT, namedNode));
+        export.useSourceInfoFromForTree(assign);
 
         nodeComments.moveComment(namedNode, export);
         parent.addChildBefore(export, next);
@@ -405,9 +412,11 @@ public final class ModuleConversionPass implements CompilerPass {
       } else if (rhs.isName() && exportedSymbol.equals(rhs.getString())) {
         // Rewrite the export line to: <code>export {rhs}</code>.
         exportSpecNode = new Node(Token.EXPORT_SPECS, new Node(Token.EXPORT_SPEC, rhs));
+        exportSpecNode.useSourceInfoFrom(rhs);
       } else {
         // Rewrite the export line to: <code>export const exportedSymbol = rhs</code>.
         exportSpecNode = IR.constNode(IR.name(exportedSymbol), rhs);
+        exportSpecNode.useSourceInfoFrom(rhs);
       }
       exportSpecNode.setJSDocInfo(jsDoc);
       Node exportNode = new Node(Token.EXPORT, exportSpecNode);
