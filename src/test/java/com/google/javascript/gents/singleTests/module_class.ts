@@ -7,4 +7,4 @@ export class Klass {
   foo(): boolean {
     return false;
   }
-};
+}

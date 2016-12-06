@@ -1,5 +1,5 @@
 
-export class foo {};
+export class foo {}
 
 export const typA = foo;
 

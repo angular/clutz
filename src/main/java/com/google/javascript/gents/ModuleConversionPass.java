@@ -379,6 +379,10 @@ public final class ModuleConversionPass implements CompilerPass {
       Node assign, String exportedNamespace, String exportedSymbol, String fileName) {
     checkState(assign.isAssign());
     checkState(assign.getParent().isExprResult());
+    Node grandParent = assign.getParent().getParent();
+    checkState(
+        grandParent.isScript() || grandParent.isModuleBody(),
+        "export assignment must be in top level script or module body");
 
     Node exprNode = assign.getParent();
     Node lhs = assign.getFirstChild();
@@ -399,7 +403,7 @@ public final class ModuleConversionPass implements CompilerPass {
         Node parent = namedNode.getParent();
         namedNode.detachFromParent();
 
-        Node export = new Node(Token.EXPR_RESULT, new Node(Token.EXPORT, namedNode));
+        Node export = new Node(Token.EXPORT, namedNode);
         export.useSourceInfoFromForTree(assign);
 
         nodeComments.moveComment(namedNode, export);
@@ -408,7 +412,6 @@ public final class ModuleConversionPass implements CompilerPass {
 
         compiler.reportCodeChange();
         return;
-
       } else if (rhs.isName() && exportedSymbol.equals(rhs.getString())) {
         // Rewrite the export line to: <code>export {rhs}</code>.
         exportSpecNode = new Node(Token.EXPORT_SPECS, new Node(Token.EXPORT_SPEC, rhs));
