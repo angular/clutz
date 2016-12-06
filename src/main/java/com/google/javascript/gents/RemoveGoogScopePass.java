@@ -100,6 +100,7 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
         break;
       case ASSIGN:
         maybeReasignAlias(node.getFirstChild());
+        break;
       default:
         break;
     }

@@ -5,6 +5,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
+import com.google.javascript.jscomp.AstValidator;
 import com.google.javascript.jscomp.CodeConsumer;
 import com.google.javascript.jscomp.CodeGenerator;
 import com.google.javascript.jscomp.CodePrinter;
@@ -12,7 +13,9 @@ import com.google.javascript.jscomp.CodePrinter.Builder.CodeGeneratorFactory;
 import com.google.javascript.jscomp.CodePrinter.Format;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.DiagnosticType;
 import com.google.javascript.jscomp.ErrorFormat;
+import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.rhino.Node;
 import java.io.BufferedWriter;
@@ -34,6 +37,9 @@ import org.kohsuke.args4j.CmdLineException;
  * TypeScript.
  */
 public class TypeScriptGenerator {
+  /** Diagnostic that indicates Clutz somehow produced an incorrect AST structure. */
+  private static final DiagnosticType CLUTZ_MALFORMED_AST = DiagnosticType.error(
+      "CLUTZ_INTERNAL_ERROR", "Clutz produced a malformed AST: {0}");
   /**
    * Command line clang-format string to format stdin. The filename 'a.ts' is only used to inform
    * clang-format of the file type (TS).
@@ -62,8 +68,9 @@ public class TypeScriptGenerator {
       System.err.println();
       System.exit(1);
     }
+    TypeScriptGenerator generator = null;
     try {
-      TypeScriptGenerator generator = new TypeScriptGenerator(options);
+      generator = new TypeScriptGenerator(options);
       generator.generateTypeScript();
       if (generator.hasErrors()) {
         // Already reported through the print stream.
@@ -176,26 +183,42 @@ public class TypeScriptGenerator {
 
     new StyleFixPass(compiler, comments).process(externRoot, srcRoot);
 
+    new AstValidator(
+            compiler,
+            new AstValidator.ViolationHandler() {
+              @Override
+              public void handleViolation(String message, Node n) {
+                compiler.report(JSError.make(n, CLUTZ_MALFORMED_AST, message));
+              }
+            })
+        .process(externRoot, srcRoot);
+
     // We only use the source root as the extern root is ignored for codegen
     for (Node file : srcRoot.children()) {
-      String filepath = pathUtil.getFilePathWithoutExtension(file.getSourceFileName());
-      CodeGeneratorFactory factory = new CodeGeneratorFactory() {
-        @Override
-        public CodeGenerator getCodeGenerator(Format outputFormat, CodeConsumer cc) {
-          return new GentsCodeGenerator(cc, compilerOpts, comments, opts.externsMap);
-        }
-      };
+      try {
+        String filepath = pathUtil.getFilePathWithoutExtension(file.getSourceFileName());
+        CodeGeneratorFactory factory =
+            new CodeGeneratorFactory() {
+              @Override
+              public CodeGenerator getCodeGenerator(Format outputFormat, CodeConsumer cc) {
+                return new GentsCodeGenerator(cc, compilerOpts, comments, opts.externsMap);
+              }
+            };
 
-      String tsCode = new CodePrinter.Builder(file)
-          .setCompilerOptions(opts.getCompilerOptions())
-          .setTypeRegistry(compiler.getTypeRegistry())
-          .setCodeGeneratorFactory(factory)
-          .setPrettyPrint(true)
-          .setLineBreak(true)
-          .setOutputTypes(true)
-          .build();
+        String tsCode =
+            new CodePrinter.Builder(file)
+                .setCompilerOptions(opts.getCompilerOptions())
+                .setTypeRegistry(compiler.getTypeRegistry())
+                .setCodeGeneratorFactory(factory)
+                .setPrettyPrint(true)
+                .setLineBreak(true)
+                .setOutputTypes(true)
+                .build();
 
-      sourceFileMap.put(filepath, tryClangFormat(tsCode));
+        sourceFileMap.put(filepath, tryClangFormat(tsCode));
+      } catch (Throwable t) {
+        System.err.println("Failed while converting " + file.getSourceFileName());
+      }
     }
 
     errorManager.doGenerateReport();
