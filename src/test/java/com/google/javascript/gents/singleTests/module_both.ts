@@ -11,7 +11,7 @@ export {B};
 
 export function C(): number {
   return num;
-};
+}
 
 /**
  * Note: `let` may be unsafe to export directly.

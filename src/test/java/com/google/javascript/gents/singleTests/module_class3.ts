@@ -17,4 +17,4 @@ export class Klass {
   static myStaticFunction(): string {
     return '';
   }
-};
+}
