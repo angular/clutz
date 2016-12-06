@@ -37,7 +37,7 @@ import org.kohsuke.args4j.CmdLineException;
  * TypeScript.
  */
 public class TypeScriptGenerator {
-  /** Diagnostic that indicates Clutz somehow produced an incorrect AST structure. */
+  /** Diagnostic that indicates Gents somehow produced an incorrect AST structure. */
   private static final DiagnosticType CLUTZ_MALFORMED_AST = DiagnosticType.error(
       "CLUTZ_INTERNAL_ERROR", "Clutz produced a malformed AST: {0}");
   /**
@@ -218,6 +218,7 @@ public class TypeScriptGenerator {
         sourceFileMap.put(filepath, tryClangFormat(tsCode));
       } catch (Throwable t) {
         System.err.println("Failed while converting " + file.getSourceFileName());
+        throw t;
       }
     }
 
