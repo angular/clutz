@@ -188,18 +188,6 @@ public class TypeScriptGenerator {
 
     new StyleFixPass(compiler, comments).process(externRoot, srcRoot);
 
-    // Sadly this doesn't work. Gents produces an AST that doesn't validate for class fields that
-    // get initialized ("class X { y = 1; }"), which Closure Compiler rejects.
-    //new AstValidator(
-    //        compiler,
-    //        new AstValidator.ViolationHandler() {
-    //          @Override
-    //          public void handleViolation(String message, Node n) {
-    //            compiler.report(JSError.make(n, GENTS_MALFORMED_AST, message));
-    //          }
-    //        })
-    //    .process(externRoot, srcRoot);
-
     // We only use the source root as the extern root is ignored for codegen
     for (Node file : srcRoot.children()) {
       try {
