@@ -12,7 +12,6 @@ import com.google.common.truth.StringSubject;
 import com.google.common.truth.Subject;
 import com.google.common.truth.SubjectFactory;
 import com.google.javascript.jscomp.SourceFile;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
@@ -21,7 +20,6 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.annotation.Nullable;
 
 /**
@@ -64,7 +62,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
 
   void generatesDeclarations(String expected) {
     String[] parseResult = parse();
-    assertThat(parseResult[1]).is("");
+    assertThat(parseResult[1]).isEqualTo("");
     String actual = parseResult[0];
     String stripped =
         DeclarationGeneratorTests.GOLDEN_FILE_COMMENTS_REGEXP.matcher(actual).replaceAll("");
@@ -86,25 +84,25 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
 
     // base.js is needed for the type declaration of goog.require for
     // all tests, except the base.js one itself.
-    if (getSubject().roots.isEmpty() || !getSubject().roots.get(0).getName().equals("base.js")) {
+    if (actual().roots.isEmpty() || !actual().roots.get(0).getName().equals("base.js")) {
       sourceFiles.add(CLUTZ_GOOG_BASE);
     }
 
     Set<String> nonroots = new LinkedHashSet<>();
-    for (File nonroot : getSubject().nonroots) {
+    for (File nonroot : actual().nonroots) {
       sourceFiles.add(SourceFile.fromFile(nonroot, UTF_8));
       nonroots.add(nonroot.getPath());
     }
 
     Set<String> roots = new LinkedHashSet<>();
 
-    for (File root : getSubject().roots) {
+    for (File root : actual().roots) {
       sourceFiles.add(SourceFile.fromFile(root, UTF_8));
       roots.add(root.getPath());
     }
 
-    if (getSubject().sourceText != null) {
-      sourceFiles.add(SourceFile.fromCode("main.js", getSubject().sourceText));
+    if (actual().sourceText != null) {
+      sourceFiles.add(SourceFile.fromCode("main.js", actual().sourceText));
       roots.add("main.js");
     }
 
