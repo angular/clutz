@@ -17,15 +17,15 @@ public class DepgraphTest {
   @Test
   public void testParseFile() throws Exception {
     Depgraph depgraph = parseFile();
-    assertThat((Iterable<String>) depgraph.getRoots())
+    assertThat(depgraph.getRoots())
         .containsExactly(
             "my/thing/static/js/annotations/annotations-canvas-controller.js",
             "blaze-out/blah/my/blaze-out-file.js")
         .inOrder();
-    assertThat((Iterable<String>) depgraph.getNonroots())
+    assertThat(depgraph.getNonroots())
         .containsExactly("javascript/closure/base.js", "javascript/closure/string/string.js")
         .inOrder();
-    assertThat((Iterable<String>) depgraph.getExterns())
+    assertThat(depgraph.getExterns())
         .containsExactly("javascript/common/dom.js")
         .inOrder();
   }

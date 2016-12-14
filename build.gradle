@@ -41,13 +41,13 @@ repositories {
 
 dependencies {
   runtime 'args4j:args4j:2.0.26'
-  runtime 'com.google.code.gson:gson:2.3.1'
+  runtime 'com.google.code.gson:gson:2.4.0'
 
-  compile 'com.google.javascript:closure-compiler:v20161024'
-  compile 'com.google.guava:guava:18.0'
+  compile 'com.google.javascript:closure-compiler:v20161201'
+  compile 'com.google.guava:guava:19.0'
 
   testCompile 'junit:junit:4.11'
-  testCompile 'com.google.truth:truth:0.25'
+  testCompile 'com.google.truth:truth:0.30'
 }
 
 tasks.withType(Test) {
