@@ -84,3 +84,11 @@ class G {
      */
   method() {}
 }
+
+class ClassWithNoConstructorJsDocAndProperties {
+  private foo: string;
+
+  constructor(foo) {
+    this.foo = foo;
+  }
+}

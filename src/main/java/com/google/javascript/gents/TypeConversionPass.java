@@ -163,16 +163,19 @@ public final class TypeConversionPass implements CompilerPass {
             declaration.rhsEqualToField()) {
           JSTypeExpression declarationType = declaration.jsDoc.getType();
           Node params = fnNode.getSecondChild();
-          JSDocInfo constructorJsDoc = NodeUtil.getBestJSDocInfo(fnNode);
+          @Nullable JSDocInfo constructorJsDoc = NodeUtil.getBestJSDocInfo(fnNode);
 
           for (Node param : params.children()) {
             String paramName =
                 param.isDefaultValue() ? param.getFirstChild().getString() : param.getString();
-            JSTypeExpression paramType = constructorJsDoc.getParameterType(paramName);
+            @Nullable
+            JSTypeExpression paramType =
+                constructorJsDoc == null ? null : constructorJsDoc.getParameterType(paramName);
             // Names must be equal. Types must be equal, or if the declaration has no type it is
             // assumed to be the type of the parameter.
             if (declaration.memberName.equals(paramName) &&
                 (declarationType == null || declarationType.equals(paramType))) {
+
               // Add visibility directly to param if possible
               moveAccessModifier(declaration, param);
               markAsConst(declaration, param);
