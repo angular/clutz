@@ -82,3 +82,10 @@ const G = goog.defineClass(null, {
   method() {
   },
 });
+
+class ClassWithNoConstructorJsDocAndProperties {
+  constructor(foo) {
+    /** @private {string} */
+    this.foo = foo;
+  }
+}
