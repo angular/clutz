@@ -64,7 +64,7 @@ public final class TypeAnnotationPass implements CompilerPass {
   // filename -> extra imports needed to be added
   private final Multimap<String, Node> importsNeeded = LinkedHashMultimap.create();
   // extern -> typing map for when extern and TS typing names differ
-  private Map<String, String> externsMap;
+  private final Map<String, String> externsMap;
 
   public TypeAnnotationPass(AbstractCompiler compiler, PathUtil pathUtil, NameUtil nameUtil,
       Map<String, FileModule> symbolMap, Table<String, String, String> typeRewrite,
@@ -182,7 +182,7 @@ public final class TypeAnnotationPass implements CompilerPass {
   }
 
   /** Annotates variables with their corresponding modifiers. (ie. private, protected) */
-  private class AccessModifierConverter extends AbstractPostOrderCallback {
+  private static class AccessModifierConverter extends AbstractPostOrderCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
       JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
@@ -248,7 +248,7 @@ public final class TypeAnnotationPass implements CompilerPass {
         }
       };
 
-  private final Function<Node, TypeDeclarationNode> CAST_TYPE_NODE =
+  private static final Function<Node, TypeDeclarationNode> CAST_TYPE_NODE =
       new Function<Node, TypeDeclarationNode>() {
         @Override
         public TypeDeclarationNode apply(Node node) {
