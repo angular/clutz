@@ -636,7 +636,7 @@ public final class TypeConversionPass implements CompilerPass {
     // Use the QualifiedName if the function is on an object/namespace: `foo.moreFoo()`;
     // otherwise, use the string on the node: `foo` for `function foo()`
     Node fnParent = fnNode.getParent();
-    if (fnParent.isGetProp()) {
+    if (fnParent.isGetProp() || fnParent.isCall()) {
       return NodeUtil.getName(fnNode);
     }
 
