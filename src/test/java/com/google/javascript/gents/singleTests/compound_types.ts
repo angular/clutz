@@ -7,15 +7,15 @@ let foo = function(s: string): boolean {
 };
 
 // Nullable types
-let niln: null|number = null;
-let bar = function(s: null|string): null | boolean {
+let niln: number|null = null;
+let bar = function(s: string|null): boolean | null {
   return null;
 };
 
 // Union types
 let sn: string|number = 9;
-let snb: string|null|number|boolean = false;
-let manyNulls: null|string|number|string = null;
-let baz = function(s: number|null|string): null | boolean {
+let snb: string|number|null|boolean = false;
+let manyNulls: string|null|number|string|null = null;
+let baz = function(s: number|string|null): null | boolean {
   return null;
 };

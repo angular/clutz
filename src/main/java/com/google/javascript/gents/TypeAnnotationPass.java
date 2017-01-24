@@ -20,7 +20,6 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
 import com.google.javascript.gents.CollectModuleMetadata.FileModule;
@@ -36,6 +35,8 @@ import com.google.javascript.rhino.JSTypeExpression;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Node.TypeDeclarationNode;
 import com.google.javascript.rhino.Token;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -298,8 +299,8 @@ public final class TypeAnnotationPass implements CompilerPass {
           return anyType();
         } else {
           ImmutableList<TypeDeclarationNode> types = ImmutableList.of(
-              new TypeDeclarationNode(Token.NULL),
-              convertTypeNodeAST(child)
+              convertTypeNodeAST(child),
+              new TypeDeclarationNode(Token.NULL)
           );
           return flatUnionType(types);
         }
@@ -517,7 +518,7 @@ public final class TypeAnnotationPass implements CompilerPass {
    * @return A flattened union type with at most 1 null.
    */
   TypeDeclarationNode flatUnionType(Iterable<TypeDeclarationNode> types) {
-    List<TypeDeclarationNode> flatTypes = Lists.newArrayList();
+    List<TypeDeclarationNode> flatTypes = new ArrayList<>();
     flatten(types, flatTypes, false);
     return unionType(flatTypes);
   }
