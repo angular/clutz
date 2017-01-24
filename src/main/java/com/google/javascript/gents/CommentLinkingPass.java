@@ -1,5 +1,6 @@
 package com.google.javascript.gents;
 
+import com.google.common.collect.ImmutableList;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.NodeTraversal;
@@ -65,7 +66,8 @@ public final class CommentLinkingPass implements CompilerPass {
   public void process(Node externs, Node root) {
     for (Node script : root.children()) {
       if (script.isScript()) {
-        List<Comment> comments = compiler.getComments(script.getSourceFileName());
+        ImmutableList<Comment> comments =
+            ImmutableList.copyOf(compiler.getComments(script.getSourceFileName()));
         NodeTraversal.traverseEs6(compiler, script, new LinkCommentsForOneFile(comments));
       }
     }
@@ -80,15 +82,15 @@ public final class CommentLinkingPass implements CompilerPass {
    */
   private class LinkCommentsForOneFile implements Callback {
     /** List of all comments in the file */
-    private final List<Comment> comments;
+    private final ImmutableList<Comment> comments;
     /** Buffer of all comments that are currently grouped together */
-    private List<Comment> group = new ArrayList<>();
+    private List<Comment> currentCommentGroup = new ArrayList<>();
     private int lastCommentIndex = 0;
 
-    private LinkCommentsForOneFile(List<Comment> comments) {
+    private LinkCommentsForOneFile(ImmutableList<Comment> comments) {
       this.comments = comments;
-      if (comments.size() > 0) {
-        group.add(comments.get(0));
+      if (!comments.isEmpty()) {
+        currentCommentGroup.add(comments.get(0));
       }
     }
 
@@ -102,54 +104,48 @@ public final class CommentLinkingPass implements CompilerPass {
       return lastCommentIndex < comments.size() - 1;
     }
 
+    private Comment getCurrentComment() {
+      return comments.get(lastCommentIndex);
+    }
+
+    private Comment getNextComment() {
+      return comments.get(lastCommentIndex + 1);
+    }
+
     /** Returns the ending line number of the current comment */
     private int getLastLineOfCurrentComment() {
-      return comments.get(lastCommentIndex).location.end.line + 1;
+      return getCurrentComment().location.end.line + 1;
     }
 
     /** Returns the starting line number of the next comment */
     private int getFirstLineOfNextComment() {
-      return comments.get(lastCommentIndex + 1).location.start.line + 1;
+      return getNextComment().location.start.line + 1;
     }
 
     /** Shifts a new comment into the group */
-    private void forceAddCommentToGroup() {
+    private void addNextCommentTo(List<Comment> commentGroup) {
       if (hasRemainingComments()) {
-        group.add(comments.get(lastCommentIndex + 1));
+        commentGroup.add(getNextComment());
       }
       lastCommentIndex++;
     }
 
-    /**
-     * Shifts a new comment into the group.
-     * If the new comment is separated from the current one by at least a line, outputs the
-     * current group of comments.
-     */
-    private void addCommentToGroup(Node n) {
-      if (getFirstLineOfNextComment() - getLastLineOfCurrentComment() > 1) {
-        n.getParent().addChildBefore(newFloatingComment(), n);
-      } else {
-        forceAddCommentToGroup();
-      }
-    }
-
     /** Links a comment to the corresponding node */
-    private void linkCommentToNode(Node n) {
+    private void linkCommentGroupToNode(List<Comment> commentGroup, Node n) {
       StringBuilder sb = new StringBuilder();
       String sep = "\n";
-      for (Comment c : group) {
+      for (Comment c : commentGroup) {
         String comment = filterCommentContent(c.type, c.value);
         if (!comment.isEmpty()) {
           sb.append(sep).append(comment);
-          sep = "\n";
         }
       }
 
-      if (sb.toString().length() > 0) {
-        nodeComments.putComment(n, sb.toString());
+      String comment = sb.toString();
+      if (!comment.isEmpty()) {
+        nodeComments.putComment(n, comment);
       }
-      group.clear();
-      forceAddCommentToGroup();
+      commentGroup.clear();
     }
 
     /** Removes unneeded tags and markers from the comment */
@@ -174,9 +170,9 @@ public final class CommentLinkingPass implements CompilerPass {
     }
 
     /** Returns a new comment attached to an empty node */
-    private Node newFloatingComment() {
+    private Node newFloatingComment(List<Comment> comments) {
       Node c = new Node(Token.EMPTY);
-      linkCommentToNode(c);
+      linkCommentGroupToNode(comments, c);
       return c;
     }
 
@@ -203,22 +199,29 @@ public final class CommentLinkingPass implements CompilerPass {
         return true;
       }
 
-      // Continue to build group
       while (hasRemainingComments() && !isCommentAdjacentToLine(line)) {
-        addCommentToGroup(n);
+        // If the new comment is separated from the current one by at least a line,
+        // output the current group of comments.
+        if (getFirstLineOfNextComment() - getLastLineOfCurrentComment() > 1) {
+          parent.addChildBefore(newFloatingComment(currentCommentGroup), n);
+        }
+        addNextCommentTo(currentCommentGroup);
       }
 
       if (getLastLineOfCurrentComment() == line) {
         // Comment on same line as code
-        linkCommentToNode(n);
+        linkCommentGroupToNode(currentCommentGroup, n);
+
       } else if (getLastLineOfCurrentComment() == line - 1) {
         // Comment ends just before code
-        linkCommentToNode(n);
+        linkCommentGroupToNode(currentCommentGroup, n);
+
       } else if (!hasRemainingComments()) {
         // Exhausted all comments, output floating comment before current node
-        n.getParent().addChildBefore(newFloatingComment(), n);
+        parent.addChildBefore(newFloatingComment(currentCommentGroup), n);
       }
 
+      addNextCommentTo(currentCommentGroup);
       return true;
     }
 
@@ -233,9 +236,15 @@ public final class CommentLinkingPass implements CompilerPass {
         n.addChildToBack(dummy);
 
         while (hasRemainingComments()) {
-          addCommentToGroup(dummy);
+          // If the new comment is separated from the current one by at least a line,
+          // output the current group of comments.
+          if (getFirstLineOfNextComment() - getLastLineOfCurrentComment() > 1) {
+            dummy.getParent().addChildBefore(newFloatingComment(currentCommentGroup), dummy);
+          }
+          addNextCommentTo(currentCommentGroup);
         }
-        n.addChildBefore(newFloatingComment(), dummy);
+        n.addChildBefore(newFloatingComment(currentCommentGroup), dummy);
+        addNextCommentTo(currentCommentGroup);
         n.removeChild(dummy);
       }
     }
