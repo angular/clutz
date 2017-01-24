@@ -1,2 +1,2 @@
-let n = (x as null | string | undefined);
+let n = (x as string | null | undefined);
 let m = (foo() as number);
