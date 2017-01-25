@@ -66,6 +66,8 @@ public final class CommentLinkingPass implements CompilerPass {
   public void process(Node externs, Node root) {
     for (Node script : root.children()) {
       if (script.isScript()) {
+        // Note: this doesn't actually copy the list since the underlying list is already an
+        // immutable list.
         ImmutableList<Comment> comments =
             ImmutableList.copyOf(compiler.getComments(script.getSourceFileName()));
         NodeTraversal.traverseEs6(compiler, script, new LinkCommentsForOneFile(comments));
@@ -211,11 +213,9 @@ public final class CommentLinkingPass implements CompilerPass {
       if (getLastLineOfCurrentComment() == line) {
         // Comment on same line as code
         linkCommentGroupToNode(currentCommentGroup, n);
-
       } else if (getLastLineOfCurrentComment() == line - 1) {
         // Comment ends just before code
         linkCommentGroupToNode(currentCommentGroup, n);
-
       } else if (!hasRemainingComments()) {
         // Exhausted all comments, output floating comment before current node
         parent.addChildBefore(newFloatingComment(currentCommentGroup), n);
