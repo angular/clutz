@@ -1,6 +1,13 @@
 
+/**
+ * @fileoverview test comment about this file to ensure comments are
+ * appropriately placed
+ */
+
+/** test comment about value to ensure that comments are appropriately placed */
 export function B() {}
 
+/** test comment about value to ensure that comments are appropriately placed */
 export const x = 4;
 
 export const y = 8;

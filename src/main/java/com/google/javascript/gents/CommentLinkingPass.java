@@ -202,6 +202,11 @@ public final class CommentLinkingPass implements CompilerPass {
       }
 
       while (hasRemainingComments() && !isCommentAdjacentToLine(line)) {
+        // Comment is AFTER this line
+        if (getLastLineOfCurrentComment() > line) {
+          return true;
+        }
+
         // If the new comment is separated from the current one by at least a line,
         // output the current group of comments.
         if (getFirstLineOfNextComment() - getLastLineOfCurrentComment() > 1) {
