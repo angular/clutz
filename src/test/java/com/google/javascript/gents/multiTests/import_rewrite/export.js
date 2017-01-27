@@ -1,3 +1,8 @@
+/**
+ * @fileoverview test comment about this file to ensure comments are 
+ * appropriately placed
+ */
+
 goog.provide("sideeffect.A");
 goog.provide("value.B");
 goog.provide("obj.C");
@@ -6,8 +11,10 @@ goog.provide("nested.E");
 goog.provide("nested.E.F");
 goog.provide("nested.E.F.Z");
 
+/** test comment about value to ensure that comments are appropriately placed */ 
 value.B = function() {};
 
+/** test comment about value to ensure that comments are appropriately placed */ 
 obj.C.x = 4;
 obj.C.y = 8;
 
