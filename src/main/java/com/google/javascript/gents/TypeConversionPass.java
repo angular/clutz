@@ -245,7 +245,7 @@ public final class TypeConversionPass implements CompilerPass {
     Preconditions.checkState(n.isFunction());
     Preconditions.checkState(n.getFirstChild().isName());
     Preconditions.checkState(n.getSecondChild().isParamList());
-    Preconditions.checkState(n.getLastChild().isBlock());
+    Preconditions.checkState(n.getLastChild().isNormalBlock());
     String typeName = NodeUtil.getName(n);
     // Break up function
     Node name = n.getFirstChild();
@@ -391,7 +391,7 @@ public final class TypeConversionPass implements CompilerPass {
     memberFunc.setJSDocInfo(declaration.jsDoc);
     if (declaration.classNode.getToken() == Token.INTERFACE) {
       Node body = declaration.rhs.getLastChild();
-      Preconditions.checkState(body.isBlock());
+      Preconditions.checkState(body.isNormalBlock());
       if (body.getChildCount() != 0) {
         compiler.report(JSError.make(
             declaration.rhs,
