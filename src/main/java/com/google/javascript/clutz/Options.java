@@ -83,7 +83,7 @@ public class Options {
     // Late Provides are errors by default, but they do not prevent clutz from transpiling.
     options.setWarningLevel(DiagnosticGroups.LATE_PROVIDE, CheckLevel.OFF);
 
-    options.setLanguage(CompilerOptions.LanguageMode.ECMASCRIPT6);
+    options.setLanguage(CompilerOptions.LanguageMode.ECMASCRIPT_2015);
     options.setLanguageOut(CompilerOptions.LanguageMode.ECMASCRIPT5);
     options.setCheckTypes(true);
     options.setInferTypes(true);
