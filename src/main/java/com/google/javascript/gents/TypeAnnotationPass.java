@@ -328,7 +328,7 @@ public final class TypeAnnotationPass implements CompilerPass {
             String newTypeName = convertTypeName(n.getSourceFileName(), typeName);
             newTypeName = convertExternNameToTypingName(newTypeName);
             TypeDeclarationNode root = namedType(newTypeName);
-            if (n.getChildCount() > 0 && n.getFirstChild().isBlock()) {
+            if (n.getChildCount() > 0 && n.getFirstChild().isNormalBlock()) {
               Node block = n.getFirstChild();
               // Convert {Array<t>} to t[]
               if ("Array".equals(typeName)) {
