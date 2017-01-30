@@ -424,8 +424,8 @@ declare namespace ಠ_ಠ.clutz {
   interface ReadableStreamSource {
     autoAllocateChunkSize ? : number ;
     cancel ? : (a : any ) => Promise < any > | undefined ;
-    pull ? : (a : ReadableByteStreamController | ReadableStreamDefaultController ) => Promise < any > | undefined ;
-    start ? : (a : ReadableByteStreamController | ReadableStreamDefaultController ) => Promise < any > | undefined ;
+    pull ? : (a : ReadableByteStreamController | ReadableStreamDefaultController ) => PromiseLike < any > | undefined ;
+    start ? : (a : ReadableByteStreamController | ReadableStreamDefaultController ) => PromiseLike < any > | undefined ;
     type ? : string ;
   }
 }
@@ -658,9 +658,9 @@ declare namespace ಠ_ಠ.clutz {
 }
 declare namespace ಠ_ಠ.clutz {
   interface WritableStreamSink {
-    abort ? : (a : any ) => Promise < any > | undefined ;
-    close ? : ( ) => Promise < any > | undefined ;
-    start ? : (a : WritableStreamDefaultController ) => Promise < any > | undefined ;
-    write ? : (a : WritableStreamDefaultController ) => Promise < any > | undefined ;
+    abort ? : (a : any ) => PromiseLike < any > | undefined ;
+    close ? : ( ) => PromiseLike < any > | undefined ;
+    start ? : (a : WritableStreamDefaultController ) => PromiseLike < any > | undefined ;
+    write ? : (a : WritableStreamDefaultController ) => PromiseLike < any > | undefined ;
   }
 }
