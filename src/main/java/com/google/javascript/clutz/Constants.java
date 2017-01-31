@@ -1,7 +1,7 @@
 package com.google.javascript.clutz;
 
 /** Shared constants for Clutz. */
-public class Constants {
+public interface Constants {
   /**
    * The namespace prefix. Admittedly this only exists here so that Eclipse's font rendering is not
    * disturbed by the extended Unicode character.

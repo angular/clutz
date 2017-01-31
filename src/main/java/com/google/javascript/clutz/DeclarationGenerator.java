@@ -2,24 +2,22 @@ package com.google.javascript.clutz;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.Iterables.any;
 import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Sets.newHashSet;
 import static com.google.javascript.rhino.jstype.JSTypeNative.ALL_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.ARRAY_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.STRING_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.toCollection;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
@@ -79,57 +77,161 @@ class DeclarationGenerator {
    * Contains symbols that are part of platform externs, but not yet in lib.d.ts. This list is
    * incomplete and will grow as needed.
    */
-  private static final Set<String> platformSymbolsMissingInTypeScript = ImmutableSet.of(
-      "Image", "IDBDatabaseException", "RequestCache",
-      "RequestCredentials", "Request", "Headers", "RequestMode", "WorkerLocation", "Promise",
-      "RequestContext", "Response", "ReadableByteStream", "ResponseType",
-      "ReadableStreamController", "CountQueuingStrategy", "ByteLengthQueuingStrategy",
-      "ReadableByteStreamReader", "ReadableStream", "WritableStream", "ReadableStreamReader",
-      "Entry", "DirectoryEntry", "FileSystem", "FileSystemFlags", "Metadata", "FileError", "DirectoryReader",
-      "FileEntry", "FileWriter", "FileSaver", "ChromeEvent", "Tab", "ChromeStringArrayEvent",
-      "ChromeStringStringEvent", "ChromeObjectEvent", "ChromeStringEvent", "ChromeBooleanEvent",
-      "MessageSender", "Port", "Body", "RequestInit", "RequestDestination", "FetchRequestType",
-      "RequestRedirect", "RefererrerPolicy", "ResponseInit", "ReferrerPolicy", "Iterable",
-      "WritableStreamSink", "PipeOptions", "WritableStreamDefaultWriter", "TransformStream",
-      "ReadableStreamBYOBReader", "ReadableStreamDefaultReader", "ReadableStreamSource",
-      "ReadableByteStreamController", "ReadableStreamDefaultController",
-      "WritableStreamDefaultController", "ReadableStreamBYOBRequest");
+  private static final ImmutableSet<String> PLATFORM_SYMBOLS_MISSING_IN_TYPESCRIPT =
+      ImmutableSet.of(
+          "Image",
+          "IDBDatabaseException",
+          "RequestCache",
+          "RequestCredentials",
+          "Request",
+          "Headers",
+          "RequestMode",
+          "WorkerLocation",
+          "Promise",
+          "RequestContext",
+          "Response",
+          "ReadableByteStream",
+          "ResponseType",
+          "ReadableStreamController",
+          "CountQueuingStrategy",
+          "ByteLengthQueuingStrategy",
+          "ReadableByteStreamReader",
+          "ReadableStream",
+          "WritableStream",
+          "ReadableStreamReader",
+          "Entry",
+          "DirectoryEntry",
+          "FileSystem",
+          "FileSystemFlags",
+          "Metadata",
+          "FileError",
+          "DirectoryReader",
+          "FileEntry",
+          "FileWriter",
+          "FileSaver",
+          "ChromeEvent",
+          "Tab",
+          "ChromeStringArrayEvent",
+          "ChromeStringStringEvent",
+          "ChromeObjectEvent",
+          "ChromeStringEvent",
+          "ChromeBooleanEvent",
+          "MessageSender",
+          "Port",
+          "Body",
+          "RequestInit",
+          "RequestDestination",
+          "FetchRequestType",
+          "RequestRedirect",
+          "RefererrerPolicy",
+          "ResponseInit",
+          "ReferrerPolicy",
+          "Iterable",
+          "WritableStreamSink",
+          "PipeOptions",
+          "WritableStreamDefaultWriter",
+          "TransformStream",
+          "ReadableStreamBYOBReader",
+          "ReadableStreamDefaultReader",
+          "ReadableStreamSource",
+          "ReadableByteStreamController",
+          "ReadableStreamDefaultController",
+          "WritableStreamDefaultController",
+          "ReadableStreamBYOBRequest");
 
   /**
-   * List of files that are part of closures platform externs.
-   * Not exhaustive, see isPlatformExtern for the rest.
+   * List of files that are part of closures platform externs. Not exhaustive, see isPlatformExtern
+   * for the rest.
    */
-  private static final Set<String> platformExternsFilenames = ImmutableSet.of(
-      "chrome.js", "deprecated.js", "fetchapi.js", "fileapi.js", "flash.js",
-      "google.js", "html5.js", "intl.js", "iphone.js", "mediakeys.js",
-      "mediasource.js", "page_visibility.js", "streamapi.js", "url.js",
-      "v8.js", "webgl.js", "webstorage.js", "whatwg_encoding.js",
-      "window.js");
+  private static final ImmutableSet<String> PLATFORM_EXTERNS_FILENAMES =
+      ImmutableSet.of(
+          "chrome.js",
+          "deprecated.js",
+          "fetchapi.js",
+          "fileapi.js",
+          "flash.js",
+          "google.js",
+          "html5.js",
+          "intl.js",
+          "iphone.js",
+          "mediakeys.js",
+          "mediasource.js",
+          "page_visibility.js",
+          "streamapi.js",
+          "url.js",
+          "v8.js",
+          "webgl.js",
+          "webstorage.js",
+          "whatwg_encoding.js",
+          "window.js");
 
-  /**
-   * Reserved words in ES6.1.
-   * Thanks to https://mathiasbynens.be/notes/reserved-keywords.
-   */
-  private static final Set<String> reservedJsWords = ImmutableSet.of(
-      "arguments", "await", "break", "case", "catch", "class", "const",
-      "continue", "debugger", "default", "delete", "do", "else", "enum", "eval",
-      "export", "extends", "false", "finally", "for", "function", "if",
-      "implements", "import", "in", "instanceof", "interface", "let", "new",
-      "null", "package", "private", "protected", "public", "return", "static",
-      "super", "switch", "this", "throw", "true", "try", "typeof", "var",
-      "void", "while", "with", "yield");
+  /** Reserved words in ES6.1. Thanks to https://mathiasbynens.be/notes/reserved-keywords. */
+  private static final ImmutableSet<String> RESERVED_JS_WORDS =
+      ImmutableSet.of(
+          "arguments",
+          "await",
+          "break",
+          "case",
+          "catch",
+          "class",
+          "const",
+          "continue",
+          "debugger",
+          "default",
+          "delete",
+          "do",
+          "else",
+          "enum",
+          "eval",
+          "export",
+          "extends",
+          "false",
+          "finally",
+          "for",
+          "function",
+          "if",
+          "implements",
+          "import",
+          "in",
+          "instanceof",
+          "interface",
+          "let",
+          "new",
+          "null",
+          "package",
+          "private",
+          "protected",
+          "public",
+          "return",
+          "static",
+          "super",
+          "switch",
+          "this",
+          "throw",
+          "true",
+          "try",
+          "typeof",
+          "var",
+          "void",
+          "while",
+          "with",
+          "yield");
 
   private static final String GOOG_BASE_NAMESPACE = "goog";
 
   /**
-   * List of global platform symbols that are redirected through an alias in closure.lib.d.ts
-   * This allows the following pattern to work:
+   * List of global platform symbols that are redirected through an alias in closure.lib.d.ts This
+   * allows the following pattern to work:
+   *
+   * <pre>
    * namespace foo {
    *   class Error extends Error {}
    * }
+   * </pre>
+   *
    * by replacing the second Error with GlobalError.
    */
-  private static final Set<String> globalSymbolAliases = ImmutableSet.of("Error", "Event");
+  private static final Set<String> GLOBAL_SYMBOL_ALIASES = ImmutableSet.of("Error", "Event");
   private final JSType UNKNOWN_TYPE;
   private final JSType NUMBER_TYPE;
 
@@ -163,22 +265,13 @@ class DeclarationGenerator {
       "A dependency does not compile because it is missing some types. This is often caused by "
           + "the referenced code missing dependencies or by missing externs in your build rule.");
 
-  private static final Function<Node, String> NODE_GET_STRING = new Function<Node, String>() {
-    @Override
-    public String apply(Node input) {
-      return input.getString();
-    }
-  };
-
   private final Options opts;
   private final Compiler compiler;
   private final ClutzErrorManager errorManager;
   private StringWriter out = new StringWriter();
 
-  /**
-   * If symbols x.y.z and x.y.w exist, childListMap['x.y'] contains the TypedVars for z and w.
-   */
-  private final HashMap<String, List<TypedVar>> childListMap = new HashMap<>();
+  /** If symbols x.y.z and x.y.w exist, childListMap['x.y'] contains the TypedVars for z and w. */
+  private final ListMultimap<String, TypedVar> childListMap = ArrayListMultimap.create();
 
   /**
    * Maps types to names for all emitted typedefs, so that further type walks just use the name.
@@ -218,8 +311,7 @@ class DeclarationGenerator {
     for (TypedVar var : compiler.getTopScope().getAllSymbols()) {
       String namespace = getNamespace(var.getName());
       if (!namespace.equals("")) {
-        if (!childListMap.containsKey(namespace)) childListMap.put(namespace, new ArrayList<TypedVar>());
-        childListMap.get(namespace).add(var);
+        childListMap.put(namespace, var);
       }
     }
   }
@@ -235,7 +327,10 @@ class DeclarationGenerator {
       // symbols. The type of the symbol corresponding to the typedef is *not* the same as the type
       // declared by the typedef.
       JSType type = var.getType();
-      if (type == null || !isTypedef(type) || var.getName().startsWith("window.") || isPrivate(var.getJSDocInfo())) continue;
+      if (type == null
+          || !isTypedef(type)
+          || var.getName().startsWith("window.")
+          || isPrivate(var.getJSDocInfo())) continue;
       JSType realType = compiler.getTypeRegistry().getType(var.getName());
 
       if (realType != null && shouldEmitTypedefByName(realType)) {
@@ -398,26 +493,36 @@ class DeclarationGenerator {
   /**
    * Reserved words are problematic because they cannot be used as var declarations, but are valid
    * properties. For example:
+   *
+   * <pre>
    * var switch = 0;  // parses badly in JS.
    * foo.switch = 0;  // ok.
+   * </pre>
    *
    * This means that closure code is allowed to goog.provide('ng.components.switch'), which cannot
    * trivially translate in TS to:
+   *
+   * <pre>
    * namespace ng.components {
    *   var switch : ...;
    * }
+   * </pre>
+   *
    * Instead, go one step higher and generate:
+   *
+   * <pre>
    * namespace ng {
    *   var components : {switch: ..., };
    * }
-   * This turns a namespace into a property of its parent namespace.
-   * Note: this violates the invariant that generated namespaces are 1-1 with getNamespace of
-   * goog.provides.
+   * </pre>
+   *
+   * This turns a namespace into a property of its parent namespace. Note: this violates the
+   * invariant that generated namespaces are 1-1 with getNamespace of goog.provides.
    */
   private void processReservedSymbols(TreeSet<String> provides, TypedScope topScope) {
     Set<String> collapsedNamespaces = new TreeSet<>();
     for (String reservedProvide : provides) {
-      if (reservedJsWords.contains(getUnqualifiedName(reservedProvide))) {
+      if (RESERVED_JS_WORDS.contains(getUnqualifiedName(reservedProvide))) {
         String namespace = getNamespace(reservedProvide);
         if (collapsedNamespaces.contains(namespace)) continue;
         collapsedNamespaces.add(namespace);
@@ -604,12 +709,12 @@ class DeclarationGenerator {
   }
 
   private static final Ordering<TypedVar> BY_VAR_NAME =
-      Ordering.natural().onResultOf(new Function<TypedVar, Comparable<String>>() {
-        @Nullable @Override public Comparable<String> apply(@Nullable TypedVar input) {
-          if (input == null) return null;
-          return input.getName();
-        }
-      });
+      Ordering.natural()
+          .onResultOf(
+              input -> {
+                if (input == null) return null;
+                return input.getName();
+              });
 
   private void sortSymbols(List<TypedVar> symbols) {
     Collections.sort(symbols, BY_VAR_NAME);
@@ -652,15 +757,18 @@ class DeclarationGenerator {
   /** For platform externs we skip emitting, to avoid collisions with lib.d.ts. */
   private boolean isPlatformExtern(String filePath, String symbolName) {
     // Some symbols are not yet provided by lib.d.ts, so we have to emit them.
-    if (platformSymbolsMissingInTypeScript.contains(symbolName)) return false;
+    if (PLATFORM_SYMBOLS_MISSING_IN_TYPESCRIPT.contains(symbolName)) return false;
     // This matches our test setup.
     if (filePath.startsWith("externs.zip//")) return true;
     String fileName = new File(filePath).getName();
     // This loosly matches the filenames from
     // https://github.com/google/closure-compiler/tree/master/externs
-    return platformExternsFilenames.contains(fileName) ||
-        fileName.startsWith("es") || fileName.startsWith("gecko_") ||
-        fileName.startsWith("w3c_") || fileName.startsWith("ie_") || fileName.startsWith("webkit_");
+    return PLATFORM_EXTERNS_FILENAMES.contains(fileName)
+        || fileName.startsWith("es")
+        || fileName.startsWith("gecko_")
+        || fileName.startsWith("w3c_")
+        || fileName.startsWith("ie_")
+        || fileName.startsWith("webkit_");
   }
 
   /**
@@ -690,7 +798,7 @@ class DeclarationGenerator {
       // JSCompiler treats "foo.x" as one variable name, so collect all provides that start with
       // $provide + "." but are not sub-properties.
       Set<String> desiredSymbols = new TreeSet<>();
-      List<TypedVar> allSymbols = Lists.newArrayList(compiler.getTopScope().getAllSymbols());
+      List<TypedVar> allSymbols = new ArrayList<>(compiler.getTopScope().getAllSymbols());
       sortSymbols(allSymbols);
 
       ObjectType objType = symbol.getType().toMaybeObjectType();
@@ -1022,15 +1130,6 @@ class DeclarationGenerator {
     /** Whether the symbol we are walking was defined in an extern file */
     private final boolean isExtern;
     private int valueSymbolsWalked = 0;
-    /**
-     * The void type in closure contains only the undefined value.
-     */
-    private final Predicate<JSType> isVoidType = new Predicate<JSType>() {
-      @Override
-      public boolean apply(JSType type) {
-        return type.isVoidType();
-      }
-    };
 
     private TreeWalker(JSTypeRegistry typeRegistry, Set<String> provides, boolean isExtern) {
       this.typeRegistry = typeRegistry;
@@ -1635,7 +1734,7 @@ class DeclarationGenerator {
         String propName = it.next();
         emit(propName);
         UnionType unionType = type.getPropertyType(propName).toMaybeUnionType();
-        if (unionType != null && any(unionType.getAlternates(), isVoidType)) {
+        if (unionType != null && unionType.getAlternates().stream().anyMatch(JSType::isVoidType)) {
           emit("?");
           visitTypeDeclaration(type.getPropertyType(propName), false, true);
         } else {
@@ -1649,11 +1748,12 @@ class DeclarationGenerator {
     }
 
     private Set<String> getSortedPropertyNamesToEmit(final ObjectType type) {
-      return sorted(Sets.filter(type.getOwnPropertyNames(), new Predicate<String>() {
-        @Override public boolean apply(String propName) {
-          return !isEmittableProperty(type, propName) && !isTypeCheckSuppressedProperty(type, propName);
-        }
-      }));
+      return sorted(
+          Sets.filter(
+              type.getOwnPropertyNames(),
+              propName ->
+                  !isEmittableProperty(type, propName)
+                      && !isTypeCheckSuppressedProperty(type, propName)));
     }
 
     private Set<String> sorted(Set<String> elements) {
@@ -1668,12 +1768,7 @@ class DeclarationGenerator {
       // means defacto `foo` has type `T | undefined` in the body.
       // Skip explicitly emitting the undefined union in such cases.
       if (inOptionalPosition) {
-        alts = Collections2.filter(alts, new Predicate<JSType>() {
-          @Override
-          public boolean apply(JSType input) {
-            return !input.isVoidType();
-          }
-        });
+        alts = Collections2.filter(alts, input -> !input.isVoidType());
       }
       if (alts.size() == 0) {
         // If the only type was "undefined" and it got filtered, emit it explicitly.
@@ -1901,7 +1996,7 @@ class DeclarationGenerator {
       if (!propertyType.isFunctionType() || forcePropDeclaration) {
         UnionType unionType = propertyType.toMaybeUnionType();
         boolean isOptionalProperty = false;
-        if (unionType != null && any(unionType.getAlternates(), isVoidType)) {
+        if (unionType != null && unionType.getAlternates().stream().anyMatch(JSType::isVoidType)) {
           emit("?");
           isOptionalProperty = true;
         }
@@ -2010,15 +2105,12 @@ class DeclarationGenerator {
       if (objType.getTemplateTypeMap() == null) {
         return Collections.emptySet();
       }
-      return newHashSet(
-          transform(
-              objType.getTemplateTypeMap().getTemplateKeys(),
-              new Function<JSType, String>() {
-                @Override
-                public String apply(JSType jsType) {
-                  return jsType != null ? jsType.getDisplayName() : "";
-                }
-              }));
+      return objType
+          .getTemplateTypeMap()
+          .getTemplateKeys()
+          .stream()
+          .map(jsType -> jsType != null ? jsType.getDisplayName() : "")
+          .collect(toCollection(HashSet::new));
     }
 
 
@@ -2070,7 +2162,7 @@ class DeclarationGenerator {
       if (functionSource != null) {
         // functionSource AST: FUNCTION -> (NAME, PARAM_LIST, BLOCK ...)
         Iterable<Node> parameterNodes = functionSource.getFirstChild().getNext().children();
-        names = transform(parameterNodes, NODE_GET_STRING).iterator();
+        names = transform(parameterNodes, Node::getString).iterator();
       }
       int paramCount = 0;
       while (parameters.hasNext()) {
@@ -2196,7 +2288,7 @@ class DeclarationGenerator {
 
     public Void emitObjectType(ObjectType type, boolean extendingInstanceClass,
                                boolean inExtendsImplementsPosition) {
-      if (type.getDisplayName() != null && globalSymbolAliases.contains(type.getDisplayName())) {
+      if (type.getDisplayName() != null && GLOBAL_SYMBOL_ALIASES.contains(type.getDisplayName())) {
         emit("Global" + type.getDisplayName());
         return null;
       }
