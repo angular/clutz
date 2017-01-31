@@ -13,7 +13,6 @@ import static com.google.javascript.rhino.TypeDeclarationsIR.undefinedType;
 import static com.google.javascript.rhino.TypeDeclarationsIR.unionType;
 import static com.google.javascript.rhino.TypeDeclarationsIR.voidType;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.HashBasedTable;
@@ -35,7 +34,6 @@ import com.google.javascript.rhino.JSTypeExpression;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Node.TypeDeclarationNode;
 import com.google.javascript.rhino.Token;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,13 +56,13 @@ public final class TypeAnnotationPass implements CompilerPass {
   private final NameUtil nameUtil;
   private final NodeComments nodeComments;
 
-  // symbolName -> fileModule
+  /** symbolName -> fileModule */
   private final Map<String, FileModule> symbolToModule;
-  // filename, namespace -> local name
+  /** filename, namespace -> local name */
   private final Table<String, String, String> typeRewrite;
-  // filename -> extra imports needed to be added
+  /** filename -> extra imports needed to be added */
   private final Multimap<String, Node> importsNeeded = LinkedHashMultimap.create();
-  // extern -> typing map for when extern and TS typing names differ
+  /** extern -> typing map for when extern and TS typing names differ */
   private final Map<String, String> externsMap;
 
   public TypeAnnotationPass(AbstractCompiler compiler, PathUtil pathUtil, NameUtil nameUtil,
@@ -240,23 +238,6 @@ public final class TypeAnnotationPass implements CompilerPass {
     }
   }
 
-  // Allow functional-style Iterables.transform over collections of nodes.
-  private final Function<Node, TypeDeclarationNode> CONVERT_TYPE_NODE =
-      new Function<Node, TypeDeclarationNode>() {
-        @Override
-        public TypeDeclarationNode apply(Node node) {
-          return convertTypeNodeAST(node);
-        }
-      };
-
-  private static final Function<Node, TypeDeclarationNode> CAST_TYPE_NODE =
-      new Function<Node, TypeDeclarationNode>() {
-        @Override
-        public TypeDeclarationNode apply(Node node) {
-          return (TypeDeclarationNode) node;
-        }
-      };
-
   @Nullable
   public TypeDeclarationNode convert(@Nullable JSTypeExpression typeExpr,
       boolean isReturnType) {
@@ -335,9 +316,10 @@ public final class TypeAnnotationPass implements CompilerPass {
                 return arrayType(convertTypeNodeAST(block.getFirstChild()));
               }
               // Convert generic types
-              return parameterizedType(root,
+              return parameterizedType(
+                  root,
                   Iterables.filter(
-                      Iterables.transform(block.children(), CONVERT_TYPE_NODE),
+                      Iterables.transform(block.children(), this::convertTypeNodeAST),
                       Predicates.notNull()));
             }
             return root;
@@ -357,11 +339,13 @@ public final class TypeAnnotationPass implements CompilerPass {
           properties.put(fieldName, fieldType);
         }
         return recordType(properties);
-      // Convert unions
+        // Convert unions
       case PIPE:
-        ImmutableList<TypeDeclarationNode> types = FluentIterable
-            .from(n.children()).transform(CONVERT_TYPE_NODE)
-            .filter(Predicates.notNull()).toList();
+        ImmutableList<TypeDeclarationNode> types =
+            FluentIterable.from(n.children())
+                .transform(this::convertTypeNodeAST)
+                .filter(Predicates.notNull())
+                .toList();
         switch (types.size()) {
           case 0:
             return null;
@@ -428,9 +412,10 @@ public final class TypeAnnotationPass implements CompilerPass {
    * Converts the global type name to the local type name.
    */
   String convertTypeName(String sourceFile, String typeName) {
-    Map<String, String> rewriteMap = typeRewrite.containsRow(sourceFile) ?
-        typeRewrite.rowMap().get(sourceFile) :
-        new HashMap<String, String>();
+    Map<String, String> rewriteMap =
+        typeRewrite.containsRow(sourceFile)
+            ? typeRewrite.rowMap().get(sourceFile)
+            : new HashMap<>();
 
     // All type symbols declared anywhere in the compilation unit
     Set<String> allTypes = new HashSet<>();
@@ -497,10 +482,10 @@ public final class TypeAnnotationPass implements CompilerPass {
           }
           break;
         case UNION_TYPE:
-          Iterable<TypeDeclarationNode> children = FluentIterable
-              .from(t.children())
-              .transform(CAST_TYPE_NODE)
-              .toList();
+          Iterable<TypeDeclarationNode> children =
+              FluentIterable.from(t.children())
+                  .transform(node -> (TypeDeclarationNode) node)
+                  .toList();
           // We had to invoke .toList() as detachChildren() breaks the Iterable.
           t.detachChildren();
           flatten(children, result, hasNull);
