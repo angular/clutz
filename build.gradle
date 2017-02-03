@@ -44,7 +44,7 @@ dependencies {
   // Verify all versions match closure-compiler's deps to avoid version conflicts.
   // https://github.com/google/closure-compiler/blob/master/pom-main.xml
   runtime 'args4j:args4j:2.0.26'
-  runtime 'com.google.code.gson:gson:2.7.0'
+  runtime 'com.google.code.gson:gson:2.7'
   
   compile 'com.google.javascript:closure-compiler:v20170124'
   
