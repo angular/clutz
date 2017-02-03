@@ -29,7 +29,7 @@ def createScript(project, mainClass, name) {
 startScripts.enabled = false
 run.enabled = false
 
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
 version = '1.0'
 
 createScript(project, 'com.google.javascript.clutz.DeclarationGenerator', 'clutz')
@@ -40,14 +40,20 @@ repositories {
 }
 
 dependencies {
+  
+  // Verify all versions match closure-compiler's deps to avoid version conflicts.
+  // https://github.com/google/closure-compiler/blob/master/pom-main.xml
   runtime 'args4j:args4j:2.0.26'
-  runtime 'com.google.code.gson:gson:2.8.0'
-
+  runtime 'com.google.code.gson:gson:2.7'
+  
   compile 'com.google.javascript:closure-compiler:v20170124'
-  compile 'com.google.guava:guava:20.0'
-
+  
+  
+  compile 'com.google.code.findbugs:jsr305:3.0.1'
+  compile 'com.google.guava:guava:20.0' 
+  
   testCompile 'junit:junit:4.11'
-  testCompile 'com.google.truth:truth:0.31'
+  testCompile 'com.google.truth:truth:0.30'
 }
 
 tasks.withType(Test) {
