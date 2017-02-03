@@ -18,6 +18,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
@@ -798,7 +799,7 @@ class DeclarationGenerator {
       // JSCompiler treats "foo.x" as one variable name, so collect all provides that start with
       // $provide + "." but are not sub-properties.
       Set<String> desiredSymbols = new TreeSet<>();
-      List<TypedVar> allSymbols = new ArrayList<>(compiler.getTopScope().getAllSymbols());
+      List<TypedVar> allSymbols = Lists.newArrayList(compiler.getTopScope().getAllSymbols());
       sortSymbols(allSymbols);
 
       ObjectType objType = symbol.getType().toMaybeObjectType();
