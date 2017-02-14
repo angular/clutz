@@ -54,13 +54,20 @@ public final class ModuleConversionPass implements CompilerPass {
   /** fileName, namespace -> local name */
   private final Table<String, String, String> typeRewrite = HashBasedTable.create();
 
+  private final String alreadyConvertedPrefix;
+
   public Table<String, String, String> getTypeRewrite() {
     return typeRewrite;
   }
 
-  public ModuleConversionPass(AbstractCompiler compiler, PathUtil pathUtil, NameUtil nameUtil,
-      Map<String, FileModule> fileToModule, Map<String, FileModule> namespaceToModule,
-      NodeComments nodeComments) {
+  public ModuleConversionPass(
+      AbstractCompiler compiler,
+      PathUtil pathUtil,
+      NameUtil nameUtil,
+      Map<String, FileModule> fileToModule,
+      Map<String, FileModule> namespaceToModule,
+      NodeComments nodeComments,
+      String alreadyConvertedPrefix) {
     this.compiler = compiler;
     this.pathUtil = pathUtil;
     this.nameUtil = nameUtil;
@@ -68,6 +75,7 @@ public final class ModuleConversionPass implements CompilerPass {
 
     this.fileToModule = fileToModule;
     this.namespaceToModule = namespaceToModule;
+    this.alreadyConvertedPrefix = alreadyConvertedPrefix;
   }
 
   @Override
@@ -276,9 +284,13 @@ public final class ModuleConversionPass implements CompilerPass {
    * import "./sideEffectsOnly"
    */
   void convertRequireToImportStatements(Node n, String fullLocalName, String requiredNamespace) {
-    if (!namespaceToModule.containsKey(requiredNamespace)) {
-      compiler.report(JSError.make(n, GentsErrorManager.GENTS_MODULE_PASS_ERROR,
-          String.format("Module %s does not exist.", requiredNamespace)));
+    boolean alreadyConverted = requiredNamespace.startsWith(this.alreadyConvertedPrefix + ".");
+    if (!namespaceToModule.containsKey(requiredNamespace) && !alreadyConverted) {
+      compiler.report(
+          JSError.make(
+              n,
+              GentsErrorManager.GENTS_MODULE_PASS_ERROR,
+              String.format("Module %s does not exist.", requiredNamespace)));
       return;
     }
 
@@ -289,6 +301,12 @@ public final class ModuleConversionPass implements CompilerPass {
     String moduleSuffix = nameUtil.lastStepOfName(requiredNamespace);
     // Avoid name collisions
     String backupName = moduleSuffix.equals(localName) ? moduleSuffix + "Exports" : moduleSuffix;
+    String referencedFile = pathUtil.getImportPath(n.getSourceFileName(), module.file);
+
+    if (alreadyConverted) {
+      convertRequireForAlreadyConverted(n, fullLocalName, referencedFile);
+      return;
+    }
 
     // Uses default import syntax as this is a javascript namespace
     if (module.shouldUseOldSyntax()) {
@@ -302,8 +320,6 @@ public final class ModuleConversionPass implements CompilerPass {
       registerLocalSymbol(n.getSourceFileName(), fullLocalName, requiredNamespace, localName);
       return;
     }
-
-    String referencedFile = pathUtil.getImportPath(n.getSourceFileName(), module.file);
 
     boolean imported = false;
     if (module.importedNamespacesToSymbols.containsKey(requiredNamespace)) {
@@ -360,6 +376,28 @@ public final class ModuleConversionPass implements CompilerPass {
     }
 
     n.getParent().removeChild(n);
+    compiler.reportCodeChange();
+  }
+
+  private void convertRequireForAlreadyConverted(
+      Node n, String fullLocalName, String referencedFile) {
+    // case of side-effectful imports.
+    // goog.require('...'); -> import '...';
+    Node importSpec = IR.empty();
+    if (n.getFirstChild() != null && n.getFirstChild().isDestructuringLhs()) {
+      // case of destructuring imports.
+      // only single object is supported - https://github.com/angular/clutz/issues/392
+      // const {A} = goog.require('...'); -> import {A} from '...';
+      importSpec =
+          new Node(Token.IMPORT_SPECS, new Node(Token.IMPORT_SPEC, IR.name(fullLocalName)));
+    } else if (n.getFirstChild() != null && n.getFirstChild().isName()) {
+      // case of full module import.
+      // const A = goog.require('...'); -> import * as A from '...';
+      importSpec = Node.newString(Token.IMPORT_STAR, fullLocalName);
+    }
+    Node importNode =
+        new Node(Token.IMPORT, IR.empty(), importSpec, Node.newString(referencedFile));
+    nodeComments.replaceWithComment(n, importNode);
     compiler.reportCodeChange();
   }
 

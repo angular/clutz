@@ -54,6 +54,11 @@ public class Options {
       metaVar = "EXTERNSMAP")
   String externsMapFile = null;
 
+  @Option(name = "--alreadyConvertedPrefix",
+      usage = "Goog.modules starting with this prefix are assumed to be already in TypeScript",
+      metaVar = "ALREADY_CONVERTED_PREFIX")
+  String alreadyConvertedPrefix = "google3";
+
   @Argument
   List<String> arguments = new ArrayList<>();
 
@@ -92,7 +97,8 @@ public class Options {
 
   private Map<String, String> getExternsMap() throws IOException {
     if (this.externsMapFile != null) {
-      Type mapType = new TypeToken<Map<String, String>>() { /* empty */ }.getType();
+      Type mapType = new TypeToken<Map<String, String>>() { /* empty */
+      }.getType();
       try (JsonReader reader = new JsonReader(new FileReader(externsMapFile));) {
         return new Gson().fromJson(reader, mapType);
       }

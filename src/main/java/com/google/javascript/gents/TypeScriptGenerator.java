@@ -171,7 +171,8 @@ public class TypeScriptGenerator {
     final NodeComments comments = commentsPass.getComments();
 
     ModuleConversionPass modulePass = new ModuleConversionPass(compiler, pathUtil, nameUtil,
-        modulePrePass.getFileMap(), modulePrePass.getNamespaceMap(), comments);
+        modulePrePass.getFileMap(), modulePrePass.getNamespaceMap(), comments,
+        opts.alreadyConvertedPrefix);
     modulePass.process(externRoot, srcRoot);
 
     new TypeConversionPass(compiler, comments).process(externRoot, srcRoot);
