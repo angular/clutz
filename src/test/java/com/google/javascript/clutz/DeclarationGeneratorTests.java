@@ -4,16 +4,6 @@ import static com.google.javascript.clutz.ProgramSubject.assertThatProgram;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
-
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
-
-import org.junit.runner.Describable;
-import org.junit.runner.Description;
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -22,32 +12,42 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+import junit.framework.Test;
+import junit.framework.TestResult;
+import junit.framework.TestSuite;
+import org.junit.runner.Describable;
+import org.junit.runner.Description;
+import org.junit.runner.RunWith;
+import org.junit.runners.AllTests;
 
 @RunWith(AllTests.class)
 public class DeclarationGeneratorTests {
   /** Comments in .d.ts and .js golden files starting with '//!!' are stripped. */
   public static final Pattern GOLDEN_FILE_COMMENTS_REGEXP = Pattern.compile("(?m)^\\s*//!!.*\\n");
 
-  public static final FilenameFilter JS = new FilenameFilter() {
-    @Override
-    public boolean accept(File dir, String name) {
-      return name.endsWith(".js");
-    }
-  };
+  public static final FilenameFilter JS =
+      new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+          return name.endsWith(".js");
+        }
+      };
 
-  public static final FilenameFilter JS_NO_EXTERNS = new FilenameFilter() {
-    @Override
-    public boolean accept(File dir, String name) {
-      return name.endsWith(".js") && !name.endsWith(".externs.js");
-    }
-  };
+  public static final FilenameFilter JS_NO_EXTERNS =
+      new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+          return name.endsWith(".js") && !name.endsWith(".externs.js");
+        }
+      };
 
-  public static final FilenameFilter TS_SOURCES = new FilenameFilter() {
-    @Override
-    public boolean accept(File dir, String name) {
-      return name.endsWith(".ts");
-    }
-  };
+  public static final FilenameFilter TS_SOURCES =
+      new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+          return name.endsWith(".ts");
+        }
+      };
   public static final String PLATFORM_MARKER = "/** Insert general_with_platform.d.ts here */\n";
 
   public static TestSuite suite() throws IOException {

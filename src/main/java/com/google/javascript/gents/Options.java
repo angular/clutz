@@ -36,31 +36,39 @@ public class Options {
   @Option(name = "--debug", usage = "run in debug mode (prints compiler warnings)")
   boolean debug = false;
 
-  @Option(name = "--convert",
-      usage = "list of all files to be converted to TypeScript\n"
-          + "This list of files does not have to be mutually exclusive from the source files",
-      metaVar = "CONV...",
-      handler = StringArrayOptionHandler.class)
+  @Option(
+    name = "--convert",
+    usage =
+        "list of all files to be converted to TypeScript\n"
+            + "This list of files does not have to be mutually exclusive from the source files",
+    metaVar = "CONV...",
+    handler = StringArrayOptionHandler.class
+  )
   List<String> filesToConvert = new ArrayList<>();
 
-  @Option(name = "--externs",
-      usage = "list of files to read externs definitions (as separate args)",
-      metaVar = "EXTERN...",
-      handler = StringArrayOptionHandler.class)
+  @Option(
+    name = "--externs",
+    usage = "list of files to read externs definitions (as separate args)",
+    metaVar = "EXTERN...",
+    handler = StringArrayOptionHandler.class
+  )
   List<String> externs = new ArrayList<>();
 
-  @Option(name = "--externsMap",
-      usage = "File mapping externs to their TypeScript typings equivalent. Formatted as json",
-      metaVar = "EXTERNSMAP")
+  @Option(
+    name = "--externsMap",
+    usage = "File mapping externs to their TypeScript typings equivalent. Formatted as json",
+    metaVar = "EXTERNSMAP"
+  )
   String externsMapFile = null;
 
-  @Option(name = "--alreadyConvertedPrefix",
-      usage = "Goog.modules starting with this prefix are assumed to be already in TypeScript",
-      metaVar = "ALREADY_CONVERTED_PREFIX")
+  @Option(
+    name = "--alreadyConvertedPrefix",
+    usage = "Goog.modules starting with this prefix are assumed to be already in TypeScript",
+    metaVar = "ALREADY_CONVERTED_PREFIX"
+  )
   String alreadyConvertedPrefix = "google3";
 
-  @Argument
-  List<String> arguments = new ArrayList<>();
+  @Argument List<String> arguments = new ArrayList<>();
 
   Set<String> srcFiles = new LinkedHashSet<>();
   Map<String, String> externsMap = null;
@@ -97,9 +105,11 @@ public class Options {
 
   private Map<String, String> getExternsMap() throws IOException {
     if (this.externsMapFile != null) {
-      Type mapType = new TypeToken<Map<String, String>>() { /* empty */
-      }.getType();
-      try (JsonReader reader = new JsonReader(new FileReader(externsMapFile));) {
+      Type mapType =
+          new TypeToken<Map<String, String>>() {
+            /* empty */
+          }.getType();
+      try (JsonReader reader = new JsonReader(new FileReader(externsMapFile)); ) {
         return new Gson().fromJson(reader, mapType);
       }
     } else {
@@ -120,8 +130,7 @@ public class Options {
     try {
       externsMap = getExternsMap();
     } catch (IOException e) {
-      throw new CmdLineException(parser,
-          "externs file " + externsMapFile + " not found.", e);
+      throw new CmdLineException(parser, "externs file " + externsMapFile + " not found.", e);
     }
   }
 

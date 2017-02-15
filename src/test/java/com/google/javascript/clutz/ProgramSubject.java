@@ -22,14 +22,13 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 
-/**
- * A subject that supports assertions on {@link DeclarationGenerator}'s results.
- */
+/** A subject that supports assertions on {@link DeclarationGenerator}'s results. */
 class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
 
   /** A stripped down version of Closure's base.js for Clutz tests. */
   private static final SourceFile CLUTZ_GOOG_BASE =
       SourceFile.fromFile("src/test/java/com/google/javascript/clutz/base.js", UTF_8);
+
   public boolean withPlatform = false;
   public String extraExternFile = null;
   public boolean emitPlatformExterns;
@@ -127,8 +126,9 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       System.setErr(new PrintStream(out));
       DeclarationGenerator generator = new DeclarationGenerator(opts);
-      String dts = generator.generateDeclarations(sourceFiles, externFiles,
-          Depgraph.forRoots(roots, nonroots));
+      String dts =
+          generator.generateDeclarations(
+              sourceFiles, externFiles, Depgraph.forRoots(roots, nonroots));
       String diagnostics = out.toString();
       return new String[] {dts, diagnostics};
     } finally {
@@ -139,8 +139,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
   static class Program {
     private final List<File> roots;
     private final List<File> nonroots;
-    @Nullable
-    private final String sourceText;
+    @Nullable private final String sourceText;
 
     Program(String sourceText) {
       this.roots = Collections.emptyList();

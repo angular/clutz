@@ -31,12 +31,13 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
 
   static final String multiTestPath = "multiTests";
 
-  public static final FilenameFilter DIR = new FilenameFilter() {
-    @Override
-    public boolean accept(File dir, String name) {
-      return new File(dir, name).isDirectory();
-    }
-  };
+  public static final FilenameFilter DIR =
+      new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+          return new File(dir, name).isDirectory();
+        }
+      };
 
   public static TestSuite suite() throws IOException {
     TestSuite suite = new TestSuite(TypeScriptGeneratorMultiTests.class.getName());
@@ -63,8 +64,8 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
       try {
         TypeScriptGenerator gents = new TypeScriptGenerator(new Options());
 
-        List<File> testFiles = getTestInputFilesRecursive(DeclarationGeneratorTests.JS,
-            multiTestPath, dirName);
+        List<File> testFiles =
+            getTestInputFilesRecursive(DeclarationGeneratorTests.JS, multiTestPath, dirName);
 
         Set<String> sourceNames = new HashSet<>();
         List<SourceFile> sourceFiles = new ArrayList<>();
@@ -88,12 +89,10 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
         ByteArrayOutputStream errStream = new ByteArrayOutputStream();
         gents.setErrorStream(new PrintStream(errStream));
 
-        Map<String, String> transpiledSource = gents.generateTypeScript(
-            sourceNames,
-            sourceFiles,
-            Collections.<SourceFile>emptyList());
+        Map<String, String> transpiledSource =
+            gents.generateTypeScript(sourceNames, sourceFiles, Collections.<SourceFile>emptyList());
 
-        String errors = new String(errStream.toByteArray(),StandardCharsets.UTF_8 );
+        String errors = new String(errStream.toByteArray(), StandardCharsets.UTF_8);
         assertThat(errors).isEmpty();
         assertThat(gents.hasErrors()).isFalse();
 
@@ -135,7 +134,6 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
       }
 
       return filesBuilder.build();
-
     }
   }
 }

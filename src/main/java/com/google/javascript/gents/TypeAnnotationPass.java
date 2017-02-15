@@ -47,7 +47,7 @@ import javax.annotation.Nullable;
  * Converts JavaScript code into JavaScript code annotated with TypeScript {@code
  * TypeDeclarationNode} information provided by the corresponding jsdoc.
  *
- * This compiler pass is based off of the {@code JsdocToEs6TypedConverter} compiler pass.
+ * <p>This compiler pass is based off of the {@code JsdocToEs6TypedConverter} compiler pass.
  */
 public final class TypeAnnotationPass implements CompilerPass {
 
@@ -65,9 +65,14 @@ public final class TypeAnnotationPass implements CompilerPass {
   /** extern -> typing map for when extern and TS typing names differ */
   private final Map<String, String> externsMap;
 
-  public TypeAnnotationPass(AbstractCompiler compiler, PathUtil pathUtil, NameUtil nameUtil,
-      Map<String, FileModule> symbolMap, Table<String, String, String> typeRewrite,
-      NodeComments nodeComments, Map<String, String> externsMap) {
+  public TypeAnnotationPass(
+      AbstractCompiler compiler,
+      PathUtil pathUtil,
+      NameUtil nameUtil,
+      Map<String, FileModule> symbolMap,
+      Table<String, String, String> typeRewrite,
+      NodeComments nodeComments,
+      Map<String, String> externsMap) {
     this.compiler = compiler;
     this.pathUtil = pathUtil;
     this.nameUtil = nameUtil;
@@ -93,7 +98,7 @@ public final class TypeAnnotationPass implements CompilerPass {
     public void visit(NodeTraversal t, Node n, Node parent) {
       JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
       switch (n.getToken()) {
-        // Fields default to any type
+          // Fields default to any type
         case MEMBER_VARIABLE_DEF:
           if (bestJSDocInfo != null && bestJSDocInfo.getType() != null) {
             setTypeExpression(n, bestJSDocInfo.getType(), false);
@@ -101,7 +106,7 @@ public final class TypeAnnotationPass implements CompilerPass {
             n.setDeclaredTypeExpression(anyType());
           }
           break;
-        // Functions are annotated with their return type
+          // Functions are annotated with their return type
         case FUNCTION:
           if (bestJSDocInfo != null) {
             setTypeExpression(n, bestJSDocInfo.getReturnType(), true);
@@ -135,7 +140,7 @@ public final class TypeAnnotationPass implements CompilerPass {
             n.addChildToBack(convertTypeNodeAST(typeDef.getRoot()));
           }
           break;
-        // Names and properties are annotated with their types
+          // Names and properties are annotated with their types
         case NAME:
         case GETPROP:
           if (parent == null) {
@@ -203,9 +208,7 @@ public final class TypeAnnotationPass implements CompilerPass {
     }
   }
 
-  /**
-   * Adds nodes for new imports required to resolve type declarations.
-   */
+  /** Adds nodes for new imports required to resolve type declarations. */
   void addTypeOnlyImports(Node script) {
     if (!script.isScript() || !importsNeeded.containsKey(script.getSourceFileName())) {
       return;
@@ -227,9 +230,7 @@ public final class TypeAnnotationPass implements CompilerPass {
     }
   }
 
-  /**
-   * Sets the annotated type expression corresponding to Node {@code n}.
-   */
+  /** Sets the annotated type expression corresponding to Node {@code n}. */
   private void setTypeExpression(Node n, JSTypeExpression type, boolean isReturnType) {
     TypeDeclarationNode node = convert(type, isReturnType);
     if (node != null) {
@@ -239,8 +240,7 @@ public final class TypeAnnotationPass implements CompilerPass {
   }
 
   @Nullable
-  public TypeDeclarationNode convert(@Nullable JSTypeExpression typeExpr,
-      boolean isReturnType) {
+  public TypeDeclarationNode convert(@Nullable JSTypeExpression typeExpr, boolean isReturnType) {
     if (typeExpr == null) {
       return null;
     }
@@ -248,9 +248,9 @@ public final class TypeAnnotationPass implements CompilerPass {
   }
 
   /**
-   * The root of a JSTypeExpression is very different from an AST node, even though we use the
-   * same Java class to represent them. This function converts root nodes of JSTypeExpressions
-   * into TypeDeclaration ASTs, to make them more similar to ordinary AST nodes.
+   * The root of a JSTypeExpression is very different from an AST node, even though we use the same
+   * Java class to represent them. This function converts root nodes of JSTypeExpressions into
+   * TypeDeclaration ASTs, to make them more similar to ordinary AST nodes.
    *
    * @return the root node of a TypeDeclaration AST, or null if no type is available for the node.
    */
@@ -262,16 +262,16 @@ public final class TypeAnnotationPass implements CompilerPass {
   @Nullable
   public TypeDeclarationNode convertTypeNodeAST(Node n, boolean isReturnType) {
     switch (n.getToken()) {
-      // for function types that don't declare a return type
-      // ex. /** @return */ var f = function() {};
+        // for function types that don't declare a return type
+        // ex. /** @return */ var f = function() {};
       case EMPTY:
         return null;
-      // TODO(renez): re-evaluate whether or not we want to convert {*} to the any type.
+        // TODO(renez): re-evaluate whether or not we want to convert {*} to the any type.
       case STAR:
         return anyType();
       case VOID:
         return isReturnType ? voidType() : undefinedType();
-      // TypeScript types are non-nullable by default with --strictNullChecks
+        // TypeScript types are non-nullable by default with --strictNullChecks
       case BANG:
         return convertTypeNodeAST(n.getFirstChild());
       case QMARK:
@@ -279,10 +279,8 @@ public final class TypeAnnotationPass implements CompilerPass {
         if (child == null) {
           return anyType();
         } else {
-          ImmutableList<TypeDeclarationNode> types = ImmutableList.of(
-              convertTypeNodeAST(child),
-              new TypeDeclarationNode(Token.NULL)
-          );
+          ImmutableList<TypeDeclarationNode> types =
+              ImmutableList.of(convertTypeNodeAST(child), new TypeDeclarationNode(Token.NULL));
           return flatUnionType(types);
         }
       case STRING:
@@ -297,11 +295,11 @@ public final class TypeAnnotationPass implements CompilerPass {
           case "null":
             // TODO(renez): refactor this once Token.NULL_TYPE exists
             return new TypeDeclarationNode(Token.NULL);
-          // Both undefined and void are converted to undefined for all non-return types.
-          // In closure, "void" and "undefined" are type aliases and thus, equivalent types.
-          // However, in TS, it is more ideomatic to emit "void" for return types.
-          // Additionally, there is semantic difference to note: TS "undefined" return types require
-          // a return statement, while "void" does not.
+            // Both undefined and void are converted to undefined for all non-return types.
+            // In closure, "void" and "undefined" are type aliases and thus, equivalent types.
+            // However, in TS, it is more ideomatic to emit "void" for return types.
+            // Additionally, there is semantic difference to note: TS "undefined" return types require
+            // a return statement, while "void" does not.
           case "undefined":
           case "void":
             return isReturnType ? voidType() : undefinedType();
@@ -324,7 +322,7 @@ public final class TypeAnnotationPass implements CompilerPass {
             }
             return root;
         }
-      // Convert records
+        // Convert records
       case LC:
         LinkedHashMap<String, TypeDeclarationNode> properties = new LinkedHashMap<>();
         for (Node field : n.getFirstChild().children()) {
@@ -334,8 +332,8 @@ public final class TypeAnnotationPass implements CompilerPass {
           if (fieldName.startsWith("'") || fieldName.startsWith("\"")) {
             fieldName = fieldName.substring(1, fieldName.length() - 1);
           }
-          TypeDeclarationNode fieldType = isFieldTypeDeclared
-              ? convertTypeNodeAST(field.getLastChild()) : null;
+          TypeDeclarationNode fieldType =
+              isFieldTypeDeclared ? convertTypeNodeAST(field.getLastChild()) : null;
           properties.put(fieldName, fieldType);
         }
         return recordType(properties);
@@ -354,7 +352,7 @@ public final class TypeAnnotationPass implements CompilerPass {
           default:
             return flatUnionType(types);
         }
-      // Convert function types
+        // Convert function types
       case FUNCTION:
         Node returnType = anyType();
         LinkedHashMap<String, TypeDeclarationNode> requiredParams = new LinkedHashMap<>();
@@ -391,26 +389,23 @@ public final class TypeAnnotationPass implements CompilerPass {
           }
         }
         return functionType(returnType, requiredParams, optionalParams, restName, restType);
-      // Variable function parameters are encoded as an array.
+        // Variable function parameters are encoded as an array.
       case ELLIPSIS:
         Node arrType = convertTypeNodeAST(n.getFirstChild());
         if (arrType == null) {
           arrType = anyType();
         }
         return arrayType(arrType);
-      // Optional parameters are entirely encoded within the parameter name while the type
-      // remains the same.
+        // Optional parameters are entirely encoded within the parameter name while the type
+        // remains the same.
       case EQUALS:
         return convertTypeNodeAST(n.getFirstChild());
       default:
-        throw new IllegalArgumentException(
-            "Unsupported node type:\n" + n.toStringTree());
+        throw new IllegalArgumentException("Unsupported node type:\n" + n.toStringTree());
     }
   }
 
-  /**
-   * Converts the global type name to the local type name.
-   */
+  /** Converts the global type name to the local type name. */
   String convertTypeName(String sourceFile, String typeName) {
     Map<String, String> rewriteMap =
         typeRewrite.containsRow(sourceFile)
@@ -468,11 +463,9 @@ public final class TypeAnnotationPass implements CompilerPass {
     }
   }
 
-  /**
-   * Helper function to recursively flatten union types.
-   */
-  void flatten(Iterable<TypeDeclarationNode> types,
-      List<TypeDeclarationNode> result, boolean hasNull) {
+  /** Helper function to recursively flatten union types. */
+  void flatten(
+      Iterable<TypeDeclarationNode> types, List<TypeDeclarationNode> result, boolean hasNull) {
     for (TypeDeclarationNode t : types) {
       switch (t.getToken()) {
         case NULL:
