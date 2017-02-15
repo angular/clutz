@@ -14,41 +14,42 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Links comments directly to the AST to preserve locations in file
- */
+/** Links comments directly to the AST to preserve locations in file */
 public final class CommentLinkingPass implements CompilerPass {
   /** Regex matcher for all 3 empty comment types */
-  private static final Pattern EMPTY_COMMENT_REGEX = Pattern.compile(
-      "^\\s*(\\/\\/|\\/\\*(\\s|\\*)*\\*\\/)\\s*$");
+  private static final Pattern EMPTY_COMMENT_REGEX =
+      Pattern.compile("^\\s*(\\/\\/|\\/\\*(\\s|\\*)*\\*\\/)\\s*$");
 
-  /**
-   * Regex fragment that optionally matches the beginning of a JSDOC line.
-   */
+  /** Regex fragment that optionally matches the beginning of a JSDOC line. */
   private static final String BEGIN_JSDOC_LINE = "(?<block>[ \t]*\\*[ \t]*)?";
 
-  /**
-   * Regex fragment to optionally match end-of-line
-   */
+  /** Regex fragment to optionally match end-of-line */
   private static final String EOL = "([ \t]*\n)?";
 
   /**
-   * These jsdocs delete everything except for the `keep` capture group
-   * Some regexes contain an empty capture group for uniform handling.
+   * These jsdocs delete everything except for the `keep` capture group Some regexes contain an
+   * empty capture group for uniform handling.
    */
   private static final Pattern[] JSDOC_REPLACEMENTS = {
-      Pattern.compile(BEGIN_JSDOC_LINE + "@(extends|implements|type)[ \t]*(\\{.*\\})[ \t]*(?<keep>)" + EOL),
-      Pattern.compile(BEGIN_JSDOC_LINE + "@(constructor|interface|record)[ \t]*(?<keep>)" + EOL),
-      Pattern.compile(BEGIN_JSDOC_LINE + "@(private|protected|public|package|const)[ \t]*(\\{.*\\})?[ \t]*(?<keep>)" + EOL),
-      // Removes @param and @return if there is no description
-      Pattern.compile(BEGIN_JSDOC_LINE + "@param[ \t]*(\\{.*\\})[ \t]*[\\w\\$]+[ \t]*(?<keep>\\*\\/|\n)"),
-      Pattern.compile(BEGIN_JSDOC_LINE + "@returns?[ \t]*(\\{.*\\})[ \t]*(?<keep>\\*\\/|\n)"),
-      Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@(param|returns?))[ \t]*(\\{.*\\})"),
-      // Remove type annotation from @export
-      Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@export)[ \t]*(\\{.*\\})")};
+    Pattern.compile(
+        BEGIN_JSDOC_LINE + "@(extends|implements|type)[ \t]*(\\{.*\\})[ \t]*(?<keep>)" + EOL),
+    Pattern.compile(BEGIN_JSDOC_LINE + "@(constructor|interface|record)[ \t]*(?<keep>)" + EOL),
+    Pattern.compile(
+        BEGIN_JSDOC_LINE
+            + "@(private|protected|public|package|const)[ \t]*(\\{.*\\})?[ \t]*(?<keep>)"
+            + EOL),
+    // Removes @param and @return if there is no description
+    Pattern.compile(
+        BEGIN_JSDOC_LINE + "@param[ \t]*(\\{.*\\})[ \t]*[\\w\\$]+[ \t]*(?<keep>\\*\\/|\n)"),
+    Pattern.compile(BEGIN_JSDOC_LINE + "@returns?[ \t]*(\\{.*\\})[ \t]*(?<keep>\\*\\/|\n)"),
+    Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@(param|returns?))[ \t]*(\\{.*\\})"),
+    // Remove type annotation from @export
+    Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@export)[ \t]*(\\{.*\\})")
+  };
 
   private static final Pattern[] COMMENT_REPLACEMENTS = {
-      Pattern.compile("//\\s*goog.scope\\s*(?<keep>)")};
+    Pattern.compile("//\\s*goog.scope\\s*(?<keep>)")
+  };
 
   private final Compiler compiler;
   private final NodeComments nodeComments;
@@ -78,15 +79,16 @@ public final class CommentLinkingPass implements CompilerPass {
   /**
    * Links all the comments in one file to the AST.
    *
-   * Comments are grouped based on location in the source file. Adjacent comments are grouped
-   * together in order to assure that the we do not break up the same coherent thought.
-   * Comment groups are separated based on empty lines or lines of code.
+   * <p>Comments are grouped based on location in the source file. Adjacent comments are grouped
+   * together in order to assure that the we do not break up the same coherent thought. Comment
+   * groups are separated based on empty lines or lines of code.
    */
   private class LinkCommentsForOneFile implements Callback {
     /** List of all comments in the file */
     private final ImmutableList<Comment> comments;
     /** Collects of all comments that are grouped together. */
     private List<Comment> commentBuffer = new ArrayList<>();
+
     private int lastCommentIndex = 0;
 
     private LinkCommentsForOneFile(ImmutableList<Comment> comments) {
@@ -181,8 +183,8 @@ public final class CommentLinkingPass implements CompilerPass {
     /** Returns if the current comment is directly adjacent to a line. */
     private boolean isCommentAdjacentToLine(int line) {
       int commentLine = getLastLineOfCurrentComment();
-      return commentLine == line ||
-          (commentLine == line - 1 && commentLine != getFirstLineOfNextComment());
+      return commentLine == line
+          || (commentLine == line - 1 && commentLine != getFirstLineOfNextComment());
     }
 
     @Override
@@ -254,5 +256,4 @@ public final class CommentLinkingPass implements CompilerPass {
       }
     }
   }
-
 }

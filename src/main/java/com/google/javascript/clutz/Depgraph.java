@@ -17,9 +17,9 @@ import java.util.regex.Pattern;
 /**
  * Representation of the data contained in a depgraph file.
  *
- * This JSON file is produced by Bazel javascript rules, and describes the shape of the dependency
- * graph for a given rule. We use it to determine which inputs to the compiler are srcs and which
- * come from deps.
+ * <p>This JSON file is produced by Bazel javascript rules, and describes the shape of the
+ * dependency graph for a given rule. We use it to determine which inputs to the compiler are srcs
+ * and which come from deps.
  */
 class Depgraph {
 
@@ -72,12 +72,13 @@ class Depgraph {
       try {
         String depgraph = Files.toString(new File(depgraphName), UTF_8);
         List<List<?>> list =
-            new Gson().fromJson(depgraph, new TypeToken<List<List<?>>>() { /* empty */ }.getType());
+            new Gson().fromJson(depgraph, new TypeToken<List<List<?>>>() {}.getType());
+
         for (List<?> outer : list) {
           String key = (String) outer.get(0);
           @SuppressWarnings("unchecked")
           List<List<?>> value = (List<List<?>>) outer.get(1);
-          result.collectFiles("roots".equals(key) , value);
+          result.collectFiles("roots".equals(key), value);
         }
       } catch (FileNotFoundException e) {
         throw new IllegalArgumentException("depgraph file not found: " + depgraphName, e);
@@ -106,10 +107,9 @@ class Depgraph {
       @SuppressWarnings("unchecked")
       List<List<?>> fileProperties = (List<List<?>>) rootDescriptor.get(1);
       boolean isExterns = false;
-      for (List<?> tuple: fileProperties) {
+      for (List<?> tuple : fileProperties) {
         String key = (String) tuple.get(0);
-        if ("is_externs".equals(key)
-            && Boolean.TRUE.equals(tuple.get(1))) {
+        if ("is_externs".equals(key) && Boolean.TRUE.equals(tuple.get(1))) {
           isExterns = true;
           break;
         }

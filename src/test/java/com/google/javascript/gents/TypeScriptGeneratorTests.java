@@ -36,14 +36,15 @@ public class TypeScriptGeneratorTests {
 
   static final String singleTestPath = "singleTests";
 
-  static final String TEST_EXTERNS_MAP = TypeScriptGeneratorTests
-      .getTestDirPath("test_externs_map.json").toString();
+  static final String TEST_EXTERNS_MAP =
+      TypeScriptGeneratorTests.getTestDirPath("test_externs_map.json").toString();
 
   public static TestSuite suite() throws IOException {
     // Map of test filename -> Options for tests which need a specific set of options
-    final Map<String, Options> testOptionsMap = ImmutableMap.<String, Options>builder()
-        .put("externs_map.js", new Options(TypeScriptGeneratorTests.TEST_EXTERNS_MAP))
-        .build();
+    final Map<String, Options> testOptionsMap =
+        ImmutableMap.<String, Options>builder()
+            .put("externs_map.js", new Options(TypeScriptGeneratorTests.TEST_EXTERNS_MAP))
+            .build();
 
     TestSuite suite = new TestSuite(TypeScriptGeneratorTests.class.getName());
 
@@ -77,9 +78,8 @@ public class TypeScriptGeneratorTests {
 
   static String getFileText(final File input) throws IOException {
     String text = Files.asCharSource(input, Charsets.UTF_8).read();
-    String cleanText = DeclarationGeneratorTests.GOLDEN_FILE_COMMENTS_REGEXP
-        .matcher(text)
-        .replaceAll("");
+    String cleanText =
+        DeclarationGeneratorTests.GOLDEN_FILE_COMMENTS_REGEXP.matcher(text).replaceAll("");
     return cleanText;
   }
 
@@ -117,12 +117,13 @@ public class TypeScriptGeneratorTests {
         ByteArrayOutputStream errStream = new ByteArrayOutputStream();
         gents.setErrorStream(new PrintStream(errStream));
 
-        Map<String, String> transpiledSource = gents.generateTypeScript(
-            Collections.singleton(sourceFile.getName()),
-            Collections.singletonList(SourceFile.fromCode(sourceFile.getName(), sourceText)),
-            Collections.<SourceFile>emptyList());
+        Map<String, String> transpiledSource =
+            gents.generateTypeScript(
+                Collections.singleton(sourceFile.getName()),
+                Collections.singletonList(SourceFile.fromCode(sourceFile.getName(), sourceText)),
+                Collections.<SourceFile>emptyList());
 
-        String errors = new String(errStream.toByteArray(),StandardCharsets.UTF_8 );
+        String errors = new String(errStream.toByteArray(), StandardCharsets.UTF_8);
         assertThat(errors).isEmpty();
         assertThat(gents.hasErrors()).isFalse();
 
@@ -166,17 +167,15 @@ public class TypeScriptGeneratorTests {
     }
 
     return gents.generateTypeScript(
-        sourceNames,
-        Lists.newArrayList(sourceFiles),
-        Collections.<SourceFile>emptyList());
+        sourceNames, Lists.newArrayList(sourceFiles), Collections.<SourceFile>emptyList());
   }
 
   @Test
   public void testMultiFile() throws Exception {
-    Map<String, String> result = runGents(
-        SourceFile.fromCode("foo", "/** @type {number} */ var x = 4;"),
-        SourceFile.fromCode("bar", "/** @const {string} */ var y = \"hello\";")
-    );
+    Map<String, String> result =
+        runGents(
+            SourceFile.fromCode("foo", "/** @type {number} */ var x = 4;"),
+            SourceFile.fromCode("bar", "/** @const {string} */ var y = \"hello\";"));
     assertThat(result).hasSize(2);
     assertThat(result).containsEntry("bar", "var y: string = \"hello\";\n");
     assertThat(result).containsEntry("foo", "var x: number = 4;\n");
@@ -191,10 +190,11 @@ public class TypeScriptGeneratorTests {
 
   @Test
   public void testNoExterns() throws Exception {
-    Map<String, String> result = runGents(
-        SourceFile.fromCode("foo", "/** @type {number} */ var x = 4;"),
-        SourceFile.fromCode("bar", "/** @externs */ /** @const {string} */ var y = \"hello\";")
-    );
+    Map<String, String> result =
+        runGents(
+            SourceFile.fromCode("foo", "/** @type {number} */ var x = 4;"),
+            SourceFile.fromCode(
+                "bar", "/** @externs */ /** @const {string} */ var y = \"hello\";"));
     assertThat(result).hasSize(1);
     assertThat(result).containsEntry("foo", "var x: number = 4;\n");
   }

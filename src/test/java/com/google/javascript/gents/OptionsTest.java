@@ -12,13 +12,21 @@ public class OptionsTest {
 
   @Test
   public void testFullUsage() throws Exception {
-    final String TEST_EXTERNS_MAP = TypeScriptGeneratorTests
-        .getTestDirPath("test_externs_map.json").toString();
+    final String TEST_EXTERNS_MAP =
+        TypeScriptGeneratorTests.getTestDirPath("test_externs_map.json").toString();
 
-    Options opts = new Options(new String[]{
-        "foo.js", "--externs", "extern1.js", "extern2.js", "-o", "output", "--externsMap",
-        TEST_EXTERNS_MAP,
-    });
+    Options opts =
+        new Options(
+            new String[] {
+              "foo.js",
+              "--externs",
+              "extern1.js",
+              "extern2.js",
+              "-o",
+              "output",
+              "--externsMap",
+              TEST_EXTERNS_MAP,
+            });
     assertThat(opts.arguments).containsExactly("foo.js");
     assertThat(opts.externs).containsExactly("extern1.js", "extern2.js").inOrder();
     assertThat(opts.output).isEqualTo("output");

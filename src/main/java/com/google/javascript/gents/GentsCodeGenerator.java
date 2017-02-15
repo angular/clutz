@@ -9,15 +9,16 @@ import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
 import java.util.Map;
 
-/**
- * Code generator for gents to add TypeScript specific code generation.
- */
+/** Code generator for gents to add TypeScript specific code generation. */
 public class GentsCodeGenerator extends CodeGenerator {
   private final NodeComments nodeComments;
   private final Map<String, String> externsMap;
 
-  protected GentsCodeGenerator(CodeConsumer consumer, CompilerOptions options,
-      NodeComments nodeComments, Map<String, String> externsMap) {
+  protected GentsCodeGenerator(
+      CodeConsumer consumer,
+      CompilerOptions options,
+      NodeComments nodeComments,
+      Map<String, String> externsMap) {
     super(consumer, options);
     this.nodeComments = nodeComments;
     this.externsMap = externsMap;
@@ -85,10 +86,11 @@ public class GentsCodeGenerator extends CodeGenerator {
 
   /**
    * Attempts to seize control of code generation if necessary.
+   *
    * @return true if no further code generation on this node is needed.
    */
   boolean maybeOverrideCodeGen(Node n) {
-    switch(n.getToken()) {
+    switch (n.getToken()) {
       case UNDEFINED_TYPE:
         add("undefined");
         return true;

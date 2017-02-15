@@ -38,8 +38,8 @@ import org.kohsuke.args4j.CmdLineException;
  */
 public class TypeScriptGenerator {
   /** Diagnostic that indicates Gents somehow produced an incorrect AST structure. */
-  private static final DiagnosticType GENTS_INTERNAL_ERROR = DiagnosticType.error(
-      "CLUTZ_INTERNAL_ERROR", "Gents failed: {0}");
+  private static final DiagnosticType GENTS_INTERNAL_ERROR =
+      DiagnosticType.error("CLUTZ_INTERNAL_ERROR", "Gents failed: {0}");
 
   /**
    * Command line clang-format string to format stdin. The filename 'a.ts' is only used to inform
@@ -100,7 +100,7 @@ public class TypeScriptGenerator {
     this.pathUtil = new PathUtil(opts.root);
     this.nameUtil = new NameUtil(compiler);
   }
-  
+
   void setErrorStream(PrintStream errStream) {
     GentsErrorManager errorManager =
         new GentsErrorManager(
@@ -131,8 +131,7 @@ public class TypeScriptGenerator {
       } else {
         String tsFilename = pathUtil.removeExtension(relativePath) + ".ts";
         File output = new File(new File(opts.output), tsFilename);
-        if (!output.getParentFile().exists() &&
-            !output.getParentFile().mkdirs()) {
+        if (!output.getParentFile().exists() && !output.getParentFile().mkdirs()) {
           throw new IllegalArgumentException("Unable to make directories " + output.getParent());
         }
         try {
@@ -159,8 +158,8 @@ public class TypeScriptGenerator {
 
     new RemoveGoogScopePass(compiler).process(externRoot, srcRoot);
 
-    CollectModuleMetadata modulePrePass = new CollectModuleMetadata(compiler, nameUtil,
-        filesToConvert);
+    CollectModuleMetadata modulePrePass =
+        new CollectModuleMetadata(compiler, nameUtil, filesToConvert);
     modulePrePass.process(externRoot, srcRoot);
 
     // Strips all file nodes that we are not compiling.
@@ -170,9 +169,15 @@ public class TypeScriptGenerator {
     commentsPass.process(externRoot, srcRoot);
     final NodeComments comments = commentsPass.getComments();
 
-    ModuleConversionPass modulePass = new ModuleConversionPass(compiler, pathUtil, nameUtil,
-        modulePrePass.getFileMap(), modulePrePass.getNamespaceMap(), comments,
-        opts.alreadyConvertedPrefix);
+    ModuleConversionPass modulePass =
+        new ModuleConversionPass(
+            compiler,
+            pathUtil,
+            nameUtil,
+            modulePrePass.getFileMap(),
+            modulePrePass.getNamespaceMap(),
+            comments,
+            opts.alreadyConvertedPrefix);
     modulePass.process(externRoot, srcRoot);
 
     new TypeConversionPass(compiler, comments).process(externRoot, srcRoot);
@@ -249,7 +254,9 @@ public class TypeScriptGenerator {
       if (process != null) {
         try {
           System.err.println(readStream(process.getErrorStream()));
-        } catch (@SuppressWarnings("unused") IOException ignored) {
+        } catch (
+            @SuppressWarnings("unused")
+            IOException ignored) {
           // Ignored.
         }
         // TODO(renez): Use .waitFor(n, TimeUnit.SECONDS) and .destroyForcibly() once we moved to
@@ -260,12 +267,13 @@ public class TypeScriptGenerator {
   }
 
   private static String readStream(final InputStream stream) throws IOException {
-    ByteSource byteSource = new ByteSource() {
-      @Override
-      public InputStream openStream() throws IOException {
-        return stream;
-      }
-    };
+    ByteSource byteSource =
+        new ByteSource() {
+          @Override
+          public InputStream openStream() throws IOException {
+            return stream;
+          }
+        };
     return byteSource.asCharSource(UTF_8).read();
   }
 

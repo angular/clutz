@@ -9,9 +9,7 @@ public class ClutzErrorManagerTest {
   @Test
   public void testMissingSymbolOrExtern() {
     assertThatProgram(
-            "goog.provide('foo.x');",
-            "/** @param {some.Unknown} y */",
-            "foo.x = function(y) {};")
+            "goog.provide('foo.x');", "/** @param {some.Unknown} y */", "foo.x = function(y) {};")
         .diagnosticStream()
         .containsMatch("ERROR.*missing some types");
   }
@@ -19,9 +17,7 @@ public class ClutzErrorManagerTest {
   @Test
   public void testDuplicateSymbol() {
     // Useful
-    assertThatProgram(
-            "/** @type {number} */ var x = 1;",
-            "/** @type {number} */ var x = 2;")
+    assertThatProgram("/** @type {number} */ var x = 1;", "/** @type {number} */ var x = 2;")
         .diagnosticStream()
         .containsMatch("ERROR.*variable x redefined");
   }
@@ -29,18 +25,14 @@ public class ClutzErrorManagerTest {
   @Test
   public void testReportsSourceSnippets() {
     assertThatProgram(
-            "goog.provide('foo.x');",
-            "/** @param {some.Unknown} y */",
-            "foo.x = function(y) {};")
+            "goog.provide('foo.x');", "/** @param {some.Unknown} y */", "foo.x = function(y) {};")
         .diagnosticStream()
         .contains("foo.x = function");
   }
 
   @Test
   public void testReportsWarningsInTests() {
-    assertThatProgram(
-            "/** @see */",
-            "var noSee;")
+    assertThatProgram("/** @see */", "var noSee;")
         .diagnosticStream()
         .containsMatch("WARNING.*@see tag missing description");
   }
