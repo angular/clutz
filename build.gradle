@@ -7,6 +7,9 @@ plugins {
 
   // Generate executable scripts
   id 'application'
+
+  // enforces consistent formatting
+  id 'com.github.sherter.google-java-format' version '0.6'
 }
 
 def createScript(project, mainClass, name) {
@@ -65,4 +68,8 @@ test {
   testLogging {
     exceptionFormat = 'full'
   }
+}
+
+googleJavaFormat {
+  toolVersion '1.3'
 }

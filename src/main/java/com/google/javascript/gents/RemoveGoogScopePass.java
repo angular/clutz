@@ -66,7 +66,6 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
     Node blockOfScopeContents = n.getLastChild().getLastChild().getLastChild();
     blockOfScopeContents.detachFromParent();
 
-
     // Rewrite the AST, moving each node in the contents of the scope after the node.
 
     // Create a marker so that we know where to insert the goog.scope contents.

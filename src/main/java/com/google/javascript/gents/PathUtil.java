@@ -4,9 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/**
- * Utility methods for file path resolution.
- */
+/** Utility methods for file path resolution. */
 public class PathUtil {
   private String rootpath = null;
 
@@ -22,18 +20,15 @@ public class PathUtil {
     return removeExtension(new File(filepath).getPath());
   }
 
-  /**
-   * Returns the file name without its file extension.
-   */
+  /** Returns the file name without its file extension. */
   String removeExtension(String filename) {
     int dotIndex = filename.lastIndexOf(".");
     return (dotIndex == -1) ? filename : filename.substring(0, dotIndex);
   }
 
   /**
-   * Returns the proper import path for a referenced file.
-   * Defaults to an absolute path if the referenced file is more than 2 directories above
-   * the current source file.
+   * Returns the proper import path for a referenced file. Defaults to an absolute path if the
+   * referenced file is more than 2 directories above the current source file.
    */
   String getImportPath(String sourceFile, String referencedFile) {
     referencedFile = removeExtension(referencedFile);

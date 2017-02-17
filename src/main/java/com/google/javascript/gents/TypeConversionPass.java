@@ -22,8 +22,8 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 /**
- * Converts ES5 JavaScript classes and interfaces into ES6 JavaScript classes and TypeScript interfaces. Prototype
- * declarations are converted into the new class definitions of ES6.
+ * Converts ES5 JavaScript classes and interfaces into ES6 JavaScript classes and TypeScript
+ * interfaces. Prototype declarations are converted into the new class definitions of ES6.
  */
 public final class TypeConversionPass implements CompilerPass {
 
@@ -51,16 +51,15 @@ public final class TypeConversionPass implements CompilerPass {
     }
   }
 
-  /**
-   * Converts @constructor annotated functions into classes.
-   */
+  /** Converts @constructor annotated functions into classes. */
   private class TypeConverter extends AbstractPostOrderCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
       switch (n.getToken()) {
         case FUNCTION:
           JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
-          if (bestJSDocInfo != null && (bestJSDocInfo.isConstructor() || bestJSDocInfo.isInterface())) {
+          if (bestJSDocInfo != null
+              && (bestJSDocInfo.isConstructor() || bestJSDocInfo.isInterface())) {
             convertConstructorToClass(n, bestJSDocInfo);
           }
           break;
@@ -102,9 +101,7 @@ public final class TypeConversionPass implements CompilerPass {
     }
   }
 
-  /**
-   * Converts class prototype methods and static methods.
-   */
+  /** Converts class prototype methods and static methods. */
   private class TypeMemberConverter extends AbstractPostOrderCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
@@ -132,13 +129,9 @@ public final class TypeConversionPass implements CompilerPass {
     }
   }
 
-  /**
-   * Converts fields declared internally inside a class using the "this" keyword.
-   */
+  /** Converts fields declared internally inside a class using the "this" keyword. */
   private class FieldOnThisConverter extends AbstractPostOrderCallback {
-    /**
-     * Map from class node to its field names.
-     */
+    /** Map from class node to its field names. */
     private final Multimap<Node, String> classFieldMap = HashMultimap.create();
 
     @Override
@@ -158,9 +151,9 @@ public final class TypeConversionPass implements CompilerPass {
 
         // Convert fields to parameter properties when we are in the constructor and have a
         // declaration of the form this.name = name;
-        if ("constructor".equals(fnName) &&
-            declaration.jsDoc != null &&
-            declaration.rhsEqualToField()) {
+        if ("constructor".equals(fnName)
+            && declaration.jsDoc != null
+            && declaration.rhsEqualToField()) {
           JSTypeExpression declarationType = declaration.jsDoc.getType();
           Node params = fnNode.getSecondChild();
           @Nullable JSDocInfo constructorJsDoc = NodeUtil.getBestJSDocInfo(fnNode);
@@ -173,8 +166,8 @@ public final class TypeConversionPass implements CompilerPass {
                 constructorJsDoc == null ? null : constructorJsDoc.getParameterType(paramName);
             // Names must be equal. Types must be equal, or if the declaration has no type it is
             // assumed to be the type of the parameter.
-            if (declaration.memberName.equals(paramName) &&
-                (declarationType == null || declarationType.equals(paramType))) {
+            if (declaration.memberName.equals(paramName)
+                && (declarationType == null || declarationType.equals(paramType))) {
 
               // Add visibility directly to param if possible
               moveAccessModifier(declaration, param);
@@ -219,9 +212,7 @@ public final class TypeConversionPass implements CompilerPass {
     }
   }
 
-  /**
-   * Converts inheritance and superclass calls.
-   */
+  /** Converts inheritance and superclass calls. */
   private class InheritanceConverter extends AbstractPostOrderCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
@@ -238,9 +229,7 @@ public final class TypeConversionPass implements CompilerPass {
     }
   }
 
-  /**
-   * Converts @constructor annotated functions into class definitions.
-   */
+  /** Converts @constructor annotated functions into class definitions. */
   void convertConstructorToClass(Node n, JSDocInfo jsDoc) {
     Preconditions.checkState(n.isFunction());
     Preconditions.checkState(n.getFirstChild().isName());
@@ -267,11 +256,12 @@ public final class TypeConversionPass implements CompilerPass {
       // Fullname of superclass
       // Closure Compiler generates non-nullable base classes:
       // ie. A.B.C is parsed as !A.B.C
-      String superClassName = jsDoc
-          .getBaseType()
-          .getRoot()
-          .getFirstChild() // ignore the ! node as we always output non nullable types
-          .getString();
+      String superClassName =
+          jsDoc
+              .getBaseType()
+              .getRoot()
+              .getFirstChild() // ignore the ! node as we always output non nullable types
+              .getString();
       superClass = NodeUtil.newQName(compiler, superClassName);
       superClass.useSourceInfoFrom(n);
     }
@@ -292,10 +282,8 @@ public final class TypeConversionPass implements CompilerPass {
       addTypeToScope(typeNode, typeName);
     } else {
       // Generate new class node with only a constructor method
-      Node constructor = IR.memberFunctionDef(
-          "constructor",
-          IR.function(IR.name(""), params, body)
-      );
+      Node constructor =
+          IR.memberFunctionDef("constructor", IR.function(IR.name(""), params, body));
       constructor.useSourceInfoFrom(n);
       // Sets jsdoc info to preserve type declarations on method
       constructor.setJSDocInfo(jsDoc);
@@ -308,9 +296,7 @@ public final class TypeConversionPass implements CompilerPass {
     compiler.reportCodeChange();
   }
 
-  /**
-   * Converts goog.defineClass calls into class definitions.
-   */
+  /** Converts goog.defineClass calls into class definitions. */
   void convertDefineClassToClass(Node n) {
     Preconditions.checkState(n.isCall());
     Node superClass = n.getSecondChild();
@@ -346,8 +332,8 @@ public final class TypeConversionPass implements CompilerPass {
   }
 
   /**
-   * Converts functions and variables declared in object literals into member method and
-   * field definitions
+   * Converts functions and variables declared in object literals into member method and field
+   * definitions
    */
   void convertObjectLiteral(Node classMembers, Node objectLiteralMember, boolean isStatic) {
     Preconditions.checkState(
@@ -393,10 +379,11 @@ public final class TypeConversionPass implements CompilerPass {
       Node body = declaration.rhs.getLastChild();
       Preconditions.checkState(body.isNormalBlock());
       if (body.getChildCount() != 0) {
-        compiler.report(JSError.make(
-            declaration.rhs,
-            GentsErrorManager.GENTS_CLASS_PASS_ERROR,
-            String.format("Interface method %s should be empty.", declaration.memberName)));
+        compiler.report(
+            JSError.make(
+                declaration.rhs,
+                GentsErrorManager.GENTS_CLASS_PASS_ERROR,
+                String.format("Interface method %s should be empty.", declaration.memberName)));
       }
       declaration.rhs.replaceChild(body, new Node(Token.EMPTY));
     }
@@ -455,11 +442,10 @@ public final class TypeConversionPass implements CompilerPass {
   }
 
   /**
-   * Attempts to remove an inheritance statement.
-   * ex. goog.inherits(base, super)
+   * Attempts to remove an inheritance statement. ex. goog.inherits(base, super)
    *
-   * This returns without any modification if the node is not an inheritance statement.
-   * This fails by reporting an error when the node is an invalid inheritance statement.
+   * <p>This returns without any modification if the node is not an inheritance statement. This
+   * fails by reporting an error when the node is an invalid inheritance statement.
    */
   void maybeRemoveInherits(Node exprNode) {
     Preconditions.checkState(exprNode.isExprResult());
@@ -474,10 +460,11 @@ public final class TypeConversionPass implements CompilerPass {
 
       // Check that class exists
       if (!types.containsKey(className)) {
-        compiler.report(JSError.make(
-            exprNode,
-            GentsErrorManager.GENTS_CLASS_PASS_ERROR,
-            String.format("Class %s could not be found.", className)));
+        compiler.report(
+            JSError.make(
+                exprNode,
+                GentsErrorManager.GENTS_CLASS_PASS_ERROR,
+                String.format("Class %s could not be found.", className)));
         return;
       }
 
@@ -485,10 +472,11 @@ public final class TypeConversionPass implements CompilerPass {
       Node classNode = types.get(className);
       String storedSuperClassName = classNode.getSecondChild().getQualifiedName();
       if (classNode.getSecondChild().isEmpty() || !storedSuperClassName.equals(superClassName)) {
-        compiler.report(JSError.make(
-            exprNode,
-            GentsErrorManager.GENTS_CLASS_PASS_ERROR,
-            String.format("Invalid superclass for %s", className)));
+        compiler.report(
+            JSError.make(
+                exprNode,
+                GentsErrorManager.GENTS_CLASS_PASS_ERROR,
+                String.format("Invalid superclass for %s", className)));
         return;
       }
 
@@ -499,11 +487,13 @@ public final class TypeConversionPass implements CompilerPass {
       // Report error if trying to assign to prototype directly
       Node lhs = assignNode.getFirstChild();
       if (lhs.isGetProp() && "prototype".equals(lhs.getLastChild().getString())) {
-        compiler.report(JSError.make(
-            exprNode,
-            GentsErrorManager.GENTS_CLASS_PASS_ERROR,
-            String.format("Cannot directly assign to prototype for %s",
-                lhs.getFirstChild().getQualifiedName())));
+        compiler.report(
+            JSError.make(
+                exprNode,
+                GentsErrorManager.GENTS_CLASS_PASS_ERROR,
+                String.format(
+                    "Cannot directly assign to prototype for %s",
+                    lhs.getFirstChild().getQualifiedName())));
       }
     }
   }
@@ -511,12 +501,11 @@ public final class TypeConversionPass implements CompilerPass {
   /**
    * Attempts to convert a ES5 superclass call into a ES6 super() call.
    *
-   * ex. B.call(this, args) -> super(args);
-   * ex. B.prototype.foo.call(this, args) -> super.foo(args);
-   * ex. A.base(this, 'constructor', args) -> super(args);
-   * ex. A.base(this, 'foo', args) -> super.foo(args);
+   * <p>ex. B.call(this, args) -> super(args); ex. B.prototype.foo.call(this, args) ->
+   * super.foo(args); ex. A.base(this, 'constructor', args) -> super(args); ex. A.base(this, 'foo',
+   * args) -> super.foo(args);
    *
-   * This returns without any modification if the node is not an superclass call statement.
+   * <p>This returns without any modification if the node is not an superclass call statement.
    */
   void maybeReplaceSuperCall(Node callNode) {
     Preconditions.checkState(callNode.isCall());
@@ -533,14 +522,14 @@ public final class TypeConversionPass implements CompilerPass {
     // Translate super constructor or super method calls as follows:
     // A.base(this, 'constructor', args) -> super(args);
     // A.base(this, 'foo', args) -> super.foo(args);
-    if (callName.equals(className + ".base") &&
-        callNode.getSecondChild().isThis()) {
+    if (callName.equals(className + ".base") && callNode.getSecondChild().isThis()) {
       // Super calls for root classes are not converted
       if (classNode.getSecondChild().isEmpty()) {
-        compiler.report(JSError.make(
-            callNode,
-            GentsErrorManager.GENTS_CLASS_PASS_ERROR,
-            String.format("Cannot call superclass in root class %s", className)));
+        compiler.report(
+            JSError.make(
+                callNode,
+                GentsErrorManager.GENTS_CLASS_PASS_ERROR,
+                String.format("Cannot call superclass in root class %s", className)));
         return;
       }
       String methodName = callNode.getChildAtIndex(2).getString();
@@ -548,8 +537,8 @@ public final class TypeConversionPass implements CompilerPass {
       if ("constructor".equals(methodName)) {
         nodeComments.replaceWithComment(callNode.getFirstChild(), IR.superNode());
       } else {
-        nodeComments.replaceWithComment(callNode.getFirstChild(),
-            NodeUtil.newQName(compiler, "super." + methodName));
+        nodeComments.replaceWithComment(
+            callNode.getFirstChild(), NodeUtil.newQName(compiler, "super." + methodName));
       }
 
       // Remove twice to get rid of "this" and the method name
@@ -561,8 +550,7 @@ public final class TypeConversionPass implements CompilerPass {
 
     String superClassName = classNode.getSecondChild().getQualifiedName();
     // B.call(this, args) -> super(args);
-    if (callName.equals(superClassName + ".call") &&
-        callNode.getSecondChild().isThis()) {
+    if (callName.equals(superClassName + ".call") && callNode.getSecondChild().isThis()) {
       nodeComments.replaceWithComment(callNode.getFirstChild(), IR.superNode());
 
       callNode.removeChild(callNode.getSecondChild());
@@ -571,8 +559,7 @@ public final class TypeConversionPass implements CompilerPass {
     }
 
     // B.prototype.foo.call(this, args) -> super.foo(args);
-    if (callName.startsWith(superClassName + ".prototype.") &&
-        callName.endsWith(".call")) {
+    if (callName.startsWith(superClassName + ".prototype.") && callName.endsWith(".call")) {
       if (callNode.getSecondChild().isThis()) {
         // Determine name of method being called
         Node nameNode = callNode.getFirstChild().getFirstChild();
@@ -605,7 +592,7 @@ public final class TypeConversionPass implements CompilerPass {
   /**
    * Adds a class node to the top level scope.
    *
-   * This determines the classname using the nearest available name node.
+   * <p>This determines the classname using the nearest available name node.
    */
   void addClassToScope(Node n) {
     Preconditions.checkState(n.isClass());
@@ -619,10 +606,11 @@ public final class TypeConversionPass implements CompilerPass {
 
   private void addTypeToScope(Node n, String typeName) {
     if (types.containsKey(typeName)) {
-      compiler.report(JSError.make(
-          n,
-          GentsErrorManager.GENTS_CLASS_PASS_ERROR,
-          String.format("Type %s has been defined multiple times.", typeName)));
+      compiler.report(
+          JSError.make(
+              n,
+              GentsErrorManager.GENTS_CLASS_PASS_ERROR,
+              String.format("Type %s has been defined multiple times.", typeName)));
       return;
     }
     types.put(typeName, n);
@@ -643,9 +631,7 @@ public final class TypeConversionPass implements CompilerPass {
     return fnParent.getString();
   }
 
-  /**
-   * Represents a declaration of a class member.
-   */
+  /** Represents a declaration of a class member. */
   private static class ClassMemberDeclaration {
     Node exprRoot;
     Node rhs;
@@ -664,24 +650,22 @@ public final class TypeConversionPass implements CompilerPass {
       this.memberName = memberName;
     }
 
-    /**
-     * Returns whether the rhs is the same as the method name being declared
-     * eg. this.a = a;
-     */
+    /** Returns whether the rhs is the same as the method name being declared eg. this.a = a; */
     boolean rhsEqualToField() {
       return rhs != null && memberName.equals(rhs.getQualifiedName());
     }
 
     /**
-     * Factory method for creating a new ClassMemberDeclaration on a declaration external to
-     * a class.
+     * Factory method for creating a new ClassMemberDeclaration on a declaration external to a
+     * class.
+     *
      * <ul>
-     * <li><code>A.prototype.foo = function() {...}</code>
-     * <li><code>A.prototype.w = 4</code>
-     * <li><code>A.prototype.x</code>
-     * <li><code>A.bar = function() {...}</code>
-     * <li><code>A.y = 6</code>
-     * <li><code>A.z</code>
+     *   <li><code>A.prototype.foo = function() {...}</code>
+     *   <li><code>A.prototype.w = 4</code>
+     *   <li><code>A.prototype.x</code>
+     *   <li><code>A.bar = function() {...}</code>
+     *   <li><code>A.y = 6</code>
+     *   <li><code>A.z</code>
      * </ul>
      *
      * Returns null if the expression node is an invalid member declaration.
@@ -695,9 +679,10 @@ public final class TypeConversionPass implements CompilerPass {
       }
 
       boolean isStatic = isStatic(fullName);
-      String className = isStatic ?
-          fullName.getFirstChild().getQualifiedName() :
-          fullName.getFirstFirstChild().getQualifiedName();
+      String className =
+          isStatic
+              ? fullName.getFirstChild().getQualifiedName()
+              : fullName.getFirstFirstChild().getQualifiedName();
 
       // Class must exist in scope
       if (!classes.containsKey(className)) {
@@ -710,11 +695,12 @@ public final class TypeConversionPass implements CompilerPass {
     }
 
     /**
-     * Factory method for creating a new ClassMemberDeclarationOnThis on a declaration internal
-     * to a class via the "this" keyword.
+     * Factory method for creating a new ClassMemberDeclarationOnThis on a declaration internal to a
+     * class via the "this" keyword.
+     *
      * <ul>
-     * <li>{@code this.a = 5}</li>
-     * <li>{@code this.b}</li>
+     *   <li>{@code this.a = 5}
+     *   <li>{@code this.b}
      * </ul>
      *
      * Returns null if the expression node is an invalid member declaration.
@@ -740,33 +726,25 @@ public final class TypeConversionPass implements CompilerPass {
       return new ClassMemberDeclaration(n, false, classNode, memberName);
     }
 
-    /**
-     * Returns the full name of the class member being declared.
-     */
+    /** Returns the full name of the class member being declared. */
     static Node getFullName(Node n) {
       return n.getFirstChild().isAssign() ? n.getFirstFirstChild() : n.getFirstChild();
     }
 
-    /**
-     * Returns the right hand side of the member declaration.
-     */
+    /** Returns the right hand side of the member declaration. */
     static Node getRhs(Node n) {
       return n.getFirstChild().isAssign() ? n.getFirstChild().getLastChild() : null;
     }
 
-    /**
-     * Returns whether a name starts with "this."
-     */
+    /** Returns whether a name starts with "this." */
     static boolean containsThis(Node fullName) {
       return fullName.isThis() || (fullName.isGetProp() && containsThis(fullName.getFirstChild()));
     }
 
-    /**
-     * Returns if a name refers to a static member of a class.
-     */
+    /** Returns if a name refers to a static member of a class. */
     static boolean isStatic(Node fullName) {
-      return !(fullName.getFirstChild().isGetProp() &&
-          "prototype".equals(fullName.getFirstChild().getLastChild().getString()));
+      return !(fullName.getFirstChild().isGetProp()
+          && "prototype".equals(fullName.getFirstChild().getLastChild().getString()));
     }
   }
 }

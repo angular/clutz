@@ -4,7 +4,6 @@ import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.MessageFormatter;
 import com.google.javascript.jscomp.PrintStreamErrorManager;
-
 import java.io.PrintStream;
 
 /**

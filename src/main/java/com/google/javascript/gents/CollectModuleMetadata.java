@@ -17,8 +17,8 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 /**
- * Preprocesses all source and library files to build a mapping between Closure namespaces and
- * file based modules.
+ * Preprocesses all source and library files to build a mapping between Closure namespaces and file
+ * based modules.
  */
 public final class CollectModuleMetadata extends AbstractTopLevelCallback implements CompilerPass {
 
@@ -48,8 +48,8 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     return out;
   }
 
-  public CollectModuleMetadata(AbstractCompiler compiler, NameUtil nameUtil,
-      Set<String> filesToConvert) {
+  public CollectModuleMetadata(
+      AbstractCompiler compiler, NameUtil nameUtil, Set<String> filesToConvert) {
     this.compiler = compiler;
     this.nameUtil = nameUtil;
     this.filesToConvert = filesToConvert;
@@ -91,8 +91,11 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
         switch (child.getFirstChild().getQualifiedName()) {
           case "goog.module":
             if (!parent.getFirstChild().equals(n)) { // is first statement
-              compiler.report(JSError.make(n, GentsErrorManager.GENTS_MODULE_PASS_ERROR,
-                  "goog.module must be the first top level statement."));
+              compiler.report(
+                  JSError.make(
+                      n,
+                      GentsErrorManager.GENTS_MODULE_PASS_ERROR,
+                      "goog.module must be the first top level statement."));
               break;
             }
             registerGoogModule(child, filename, child.getLastChild().getString());
@@ -130,8 +133,12 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
   /** Registers a goog.module namespace for future lookup. */
   void registerGoogModule(Node n, String file, String namespace) {
     if (fileToModule.containsKey(file)) {
-      compiler.report(JSError.make(n, GentsErrorManager.GENTS_MODULE_PASS_ERROR,
-          String.format("goog.module files cannot contain other goog.module or goog.provides.")));
+      compiler.report(
+          JSError.make(
+              n,
+              GentsErrorManager.GENTS_MODULE_PASS_ERROR,
+              String.format(
+                  "goog.module files cannot contain other goog.module or goog.provides.")));
       return;
     }
     FileModule module = new FileModule(file, true);
@@ -143,8 +150,11 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     FileModule module;
     if (fileToModule.containsKey(file)) {
       if (fileToModule.get(file).isGoogModule) {
-        compiler.report(JSError.make(n, GentsErrorManager.GENTS_MODULE_PASS_ERROR,
-            String.format("goog.provide cannot be used in the same file as goog.module.")));
+        compiler.report(
+            JSError.make(
+                n,
+                GentsErrorManager.GENTS_MODULE_PASS_ERROR,
+                String.format("goog.provide cannot be used in the same file as goog.module.")));
         return;
       }
       module = fileToModule.get(file);
@@ -172,12 +182,8 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
      * are considered exported from the file, but not directly provided. This is to determine what
      * namespaces other files are allowed to reference with 'goog.require'.
      *
-     * For example,
-     * goog.module('A.B');
-     * exports = ...;
-     * exports.C = ...;
-     * exports.C.D = ...;
-     * Would result in providesObjectChildren['A.B'] = {'C'}
+     * <p>For example, goog.module('A.B'); exports = ...; exports.C = ...; exports.C.D = ...; Would
+     * result in providesObjectChildren['A.B'] = {'C'}
      */
     final Map<String, Set<String>> providesObjectChildren = new LinkedHashMap<>();
 
@@ -186,25 +192,15 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
 
     /**
      * Map from the fully qualified name being exported to the exported symbol. For example,
-     * goog.module('A.B');
-     * exports = ...;
-     * exports.C = ...;
-     * exports.C.D = ...;
-     * Would result in:
-     * exportedNamespacesToSymbols['exports'] = 'B'
-     * exportedNamespacesToSymbols['exports.C'] = 'C'
+     * goog.module('A.B'); exports = ...; exports.C = ...; exports.C.D = ...; Would result in:
+     * exportedNamespacesToSymbols['exports'] = 'B' exportedNamespacesToSymbols['exports.C'] = 'C'
      */
     final Map<String, String> exportedNamespacesToSymbols = new LinkedHashMap<>();
 
     /**
      * Map from the fully qualified name that would be imported to the exported symbol. For example,
-     * goog.module('A.B');
-     * exports = ...;
-     * exports.C = ...;
-     * exports.C.D = ...;
-     * Would result in:
-     * importedNamespacesToSymbols['A.B'] = 'B'
-     * importedNamespacesToSymbols['A.B.C'] = 'C'
+     * goog.module('A.B'); exports = ...; exports.C = ...; exports.C.D = ...; Would result in:
+     * importedNamespacesToSymbols['A.B'] = 'B' importedNamespacesToSymbols['A.B.C'] = 'C'
      */
     final Map<String, String> importedNamespacesToSymbols = new LinkedHashMap<>();
 
@@ -235,8 +231,8 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     }
 
     /**
-     * Register namespace name to global scope so that other files can call 'goog.require'
-     * on the qualified name.
+     * Register namespace name to global scope so that other files can call 'goog.require' on the
+     * qualified name.
      */
     void registerNamespaceToGlobalScope(String namespace) {
       providesObjectChildren.put(namespace, new LinkedHashSet<String>());
@@ -248,8 +244,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     }
 
     /**
-     * Attempts to export the name exportsName.
-     * Does nothing if exportsName is an invalid export.
+     * Attempts to export the name exportsName. Does nothing if exportsName is an invalid export.
      */
     void maybeAddExport(Node exportsName) {
       if (isGoogModule) {
@@ -264,11 +259,10 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
       if ("exports".equals(exportsName.getQualifiedName())) {
         String identifier =
             firstNonNull(
-                exportsName.getNext().getQualifiedName(),
-                nameUtil.lastStepOfName(fullname));
+                exportsName.getNext().getQualifiedName(), nameUtil.lastStepOfName(fullname));
         addExport(exportsName.getQualifiedName(), fullname, identifier);
-      } else if (exportsName.isGetProp() &&
-          "exports".equals(exportsName.getFirstChild().getQualifiedName())) {
+      } else if (exportsName.isGetProp()
+          && "exports".equals(exportsName.getFirstChild().getQualifiedName())) {
         String identifier = exportsName.getLastChild().getString();
         String importName = fullname + "." + identifier;
         addExport(exportsName.getQualifiedName(), importName, identifier);

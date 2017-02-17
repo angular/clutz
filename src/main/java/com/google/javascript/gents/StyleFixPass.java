@@ -12,9 +12,7 @@ import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Node.TypeDeclarationNode;
 import com.google.javascript.rhino.Token;
 
-/**
- * Fixes the style of the final TypeScript code to be more idiomatic.
- */
+/** Fixes the style of the final TypeScript code to be more idiomatic. */
 public final class StyleFixPass extends AbstractPostOrderCallback implements CompilerPass {
 
   private final AbstractCompiler compiler;
@@ -33,9 +31,9 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
   @Override
   public void visit(NodeTraversal t, Node n, Node parent) {
     switch (n.getToken()) {
-      // Var is converted to let
-      // This is to output more idiomatic TypeScript even if it slightly changes the semantics
-      // of the original code.
+        // Var is converted to let
+        // This is to output more idiomatic TypeScript even if it slightly changes the semantics
+        // of the original code.
       case VAR:
         n.setToken(Token.LET);
         //$FALL-THROUGH$
@@ -127,10 +125,8 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
   }
 
   /**
-   * Attempts to lift class or functions declarations of the form
-   * 'var/let/const x = class/function {...}'
-   * into
-   * 'class/function x {...}'
+   * Attempts to lift class or functions declarations of the form 'var/let/const x = class/function
+   * {...}' into 'class/function x {...}'
    */
   void liftClassOrFunctionDefinition(Node n) {
     Node rhs = n.getFirstFirstChild();
@@ -143,5 +139,4 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
     nodeComments.replaceWithComment(oldName, newName);
     nodeComments.replaceWithComment(n, rhs);
   }
-
 }

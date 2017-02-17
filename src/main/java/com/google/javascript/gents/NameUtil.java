@@ -8,9 +8,7 @@ import com.google.javascript.rhino.Token;
 import java.util.Set;
 import javax.annotation.Nullable;
 
-/**
- * Utility methods for variable naming.
- */
+/** Utility methods for variable naming. */
 public class NameUtil {
   private AbstractCompiler compiler;
 
@@ -29,8 +27,8 @@ public class NameUtil {
   }
 
   /**
-   * Gets the longest namespace that is a prefix of the name string.
-   * Returns null if no namespaces are valid prefixes.
+   * Gets the longest namespace that is a prefix of the name string. Returns null if no namespaces
+   * are valid prefixes.
    */
   @Nullable
   String findLongestNamePrefix(String name, Set<String> namespaces) {
@@ -38,8 +36,8 @@ public class NameUtil {
   }
 
   /**
-   * Gets the longest namespace that is a prefix of the name node.
-   * Returns null if no namespaces are valid prefixes.
+   * Gets the longest namespace that is a prefix of the name node. Returns null if no namespaces are
+   * valid prefixes.
    */
   @Nullable
   String findLongestNamePrefix(Node name, Set<String> namespaces) {
@@ -52,8 +50,8 @@ public class NameUtil {
   }
 
   /**
-   * Returns the new name string with a prefix replaced with the new prefix.
-   * Returns input name if prefix does not exist.
+   * Returns the new name string with a prefix replaced with the new prefix. Returns input name if
+   * prefix does not exist.
    */
   String replacePrefixInName(String name, String prefix, String newPrefix) {
     Node nameNode = NodeUtil.newQName(compiler, name);
@@ -64,8 +62,8 @@ public class NameUtil {
   }
 
   /**
-   * In-place replaces a prefix with a new prefix in a name node.
-   * Does nothing if prefix does not exist.
+   * In-place replaces a prefix with a new prefix in a name node. Does nothing if prefix does not
+   * exist.
    */
   void replacePrefixInName(Node name, String prefix, String newPrefix) {
     if (prefix.equals(name.getQualifiedName())) {

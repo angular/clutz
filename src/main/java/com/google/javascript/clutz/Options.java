@@ -23,40 +23,53 @@ public class Options {
   @Option(name = "--debug", usage = "run in debug mode (prints compiler warnings)")
   boolean debug = false;
 
-  @Option(name = "--externs",
-      usage = "list of files to read externs definitions (as separate args)",
-      metaVar = "EXTERN...",
-      handler = StringArrayOptionHandler.class)
+  @Option(
+    name = "--externs",
+    usage = "list of files to read externs definitions (as separate args)",
+    metaVar = "EXTERN...",
+    handler = StringArrayOptionHandler.class
+  )
   List<String> externs = new ArrayList<>();
 
-  @Option(name = "--depgraphs",
-      usage = "only generate output for files listed as a root in the given depgraphs",
-      metaVar = "file.depgraph...",
-      handler = StringArrayOptionHandler.class)
+  @Option(
+    name = "--depgraphs",
+    usage = "only generate output for files listed as a root in the given depgraphs",
+    metaVar = "file.depgraph...",
+    handler = StringArrayOptionHandler.class
+  )
   List<String> depgraphFiles = new ArrayList<>();
 
-  @Option(name = "--strict_deps",
-      usage = "generates no modules for nonroots (but does generate types), so that nonroots "
-          + "cannot be imported by TypeScript code.")
+  @Option(
+    name = "--strict_deps",
+    usage =
+        "generates no modules for nonroots (but does generate types), so that nonroots "
+            + "cannot be imported by TypeScript code."
+  )
   boolean strictDeps = false;
 
-  @Option(name = "--depgraphs_filter_sources",
-      usage = "only include sources from the arguments list that appear in the given depgraphs")
+  @Option(
+    name = "--depgraphs_filter_sources",
+    usage = "only include sources from the arguments list that appear in the given depgraphs"
+  )
   boolean filterSourcesWithDepgraphs = false;
 
-  @Option(name = "--emitPlatformExterns",
-      usage = "emits platform externs, instead of omitting them in favor of TS lib.d.ts")
+  @Option(
+    name = "--emitPlatformExterns",
+    usage = "emits platform externs, instead of omitting them in favor of TS lib.d.ts"
+  )
   boolean emitPlatformExterns;
 
-  @Option(name = "--closure_entry_points",
-      usage = "only generate output for the given entry points to the program. Must be" +
-              " goog.provide'd symbols.",
-      metaVar = "ENTRYPOINT...",
-      handler = StringArrayOptionHandler.class)
+  @Option(
+    name = "--closure_entry_points",
+    usage =
+        "only generate output for the given entry points to the program. Must be"
+            + " goog.provide'd symbols.",
+    metaVar = "ENTRYPOINT...",
+    handler = StringArrayOptionHandler.class
+  )
   List<String> entryPoints = new ArrayList<>();
 
-  @Argument
-  List<String> arguments = new ArrayList<>();
+  @Argument List<String> arguments = new ArrayList<>();
 
   Depgraph depgraph;
 

@@ -4,9 +4,7 @@ import com.google.javascript.rhino.Node;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Represents the mapping from an AST Node to its corresponding comment.
- */
+/** Represents the mapping from an AST Node to its corresponding comment. */
 public class NodeComments {
   final Map<Node, String> nodeToComment = new HashMap<>();
 

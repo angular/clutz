@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Converts Closure-style modules into TypeScript (ES6) modules (not namespaces).
- * All module metadata must be populated before running this CompilerPass.
+ * Converts Closure-style modules into TypeScript (ES6) modules (not namespaces). All module
+ * metadata must be populated before running this CompilerPass.
  */
 public final class ModuleConversionPass implements CompilerPass {
 
@@ -86,8 +86,8 @@ public final class ModuleConversionPass implements CompilerPass {
   }
 
   /**
-   * Converts "exports" assignments into TypeScript export statements.
-   * This also builds a map of all the declared modules.
+   * Converts "exports" assignments into TypeScript export statements. This also builds a map of all
+   * the declared modules.
    */
   private class ModuleExportConverter extends AbstractTopLevelCallback {
     @Override
@@ -140,30 +140,35 @@ public final class ModuleConversionPass implements CompilerPass {
             compiler.reportCodeChange();
           }
           break;
-        case GETPROP: {
-          JSDocInfo jsdoc = NodeUtil.getBestJSDocInfo(child);
-          if (jsdoc == null || !jsdoc.containsTypeDefinition()) {
-            // GETPROPs on the root level are only exports for @typedefs
+        case GETPROP:
+          {
+            JSDocInfo jsdoc = NodeUtil.getBestJSDocInfo(child);
+            if (jsdoc == null || !jsdoc.containsTypeDefinition()) {
+              // GETPROPs on the root level are only exports for @typedefs
+              break;
+            }
+            if (!fileToModule.containsKey(fileName)) {
+              break;
+            }
+            FileModule module = fileToModule.get(fileName);
+            Map<String, String> symbols = module.exportedNamespacesToSymbols;
+            String exportedNamespace = nameUtil.findLongestNamePrefix(child, symbols.keySet());
+            if (exportedNamespace != null) {
+              String localName = symbols.get(exportedNamespace);
+              Node export =
+                  new Node(
+                      Token.EXPORT,
+                      new Node(
+                          Token.EXPORT_SPECS,
+                          new Node(Token.EXPORT_SPEC, Node.newString(Token.NAME, localName))));
+              export.useSourceInfoFromForTree(child);
+              parent.addChildAfter(export, n);
+              // Registers symbol for rewriting local uses.
+              registerLocalSymbol(
+                  child.getSourceFileName(), exportedNamespace, exportedNamespace, localName);
+            }
             break;
           }
-          if (!fileToModule.containsKey(fileName)) {
-            break;
-          }
-          FileModule module = fileToModule.get(fileName);
-          Map<String, String> symbols = module.exportedNamespacesToSymbols;
-          String exportedNamespace = nameUtil.findLongestNamePrefix(child, symbols.keySet());
-          if (exportedNamespace != null) {
-            String localName = symbols.get(exportedNamespace);
-            Node export = new Node(Token.EXPORT, new Node(Token.EXPORT_SPECS,
-                new Node(Token.EXPORT_SPEC, Node.newString(Token.NAME, localName))));
-            export.useSourceInfoFromForTree(child);
-            parent.addChildAfter(export, n);
-            // Registers symbol for rewriting local uses.
-            registerLocalSymbol(
-                child.getSourceFileName(), exportedNamespace, exportedNamespace, localName);
-          }
-          break;
-        }
         case ASSIGN:
           if (!fileToModule.containsKey(fileName)) {
             break;
@@ -203,9 +208,7 @@ public final class ModuleConversionPass implements CompilerPass {
     }
   }
 
-  /**
-   * Converts goog.require statements into TypeScript import statements.
-   */
+  /** Converts goog.require statements into TypeScript import statements. */
   private class ModuleImportConverter extends AbstractTopLevelCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
@@ -222,11 +225,11 @@ public final class ModuleConversionPass implements CompilerPass {
           String localName = n.getFirstChild().getQualifiedName();
           convertRequireToImportStatements(n, localName, requiredNamespace);
           return;
-
         }
 
         // var {foo} = goog.require(...);
-        if (node.isObjectPattern() && node.getNext().getFirstChild() != null
+        if (node.isObjectPattern()
+            && node.getNext().getFirstChild() != null
             && "goog.require".equals(node.getNext().getFirstChild().getQualifiedName())) {
           // TODO(#392): Support multiple destructured import values here.
           //     Currently, this only allows for a single destructured import value.
@@ -251,9 +254,7 @@ public final class ModuleConversionPass implements CompilerPass {
     }
   }
 
-  /**
-   * Rewrites variable names used in the file to correspond to the newly imported symbols.
-   */
+  /** Rewrites variable names used in the file to correspond to the newly imported symbols. */
   private class ModuleImportRewriter extends AbstractPreOrderCallback {
     @Override
     public boolean shouldTraverse(NodeTraversal t, Node n, Node parent) {
@@ -277,11 +278,9 @@ public final class ModuleConversionPass implements CompilerPass {
   /**
    * Converts a Closure goog.require call into a TypeScript import statement.
    *
-   * The resulting node is dependent on the exports by the module being imported:
-   * import localName from "goog:old.namespace.syntax";
-   * import {A as localName} from "./valueExports";
-   * import * as localName from "./objectExports";
-   * import "./sideEffectsOnly"
+   * <p>The resulting node is dependent on the exports by the module being imported: import
+   * localName from "goog:old.namespace.syntax"; import {A as localName} from "./valueExports";
+   * import * as localName from "./objectExports"; import "./sideEffectsOnly"
    */
   void convertRequireToImportStatements(Node n, String fullLocalName, String requiredNamespace) {
     boolean alreadyConverted = requiredNamespace.startsWith(this.alreadyConvertedPrefix + ".");
@@ -310,10 +309,12 @@ public final class ModuleConversionPass implements CompilerPass {
 
     // Uses default import syntax as this is a javascript namespace
     if (module.shouldUseOldSyntax()) {
-      Node importNode = new Node(Token.IMPORT,
-          IR.empty(),
-          Node.newString(Token.NAME, localName),
-          Node.newString("goog:" + requiredNamespace));
+      Node importNode =
+          new Node(
+              Token.IMPORT,
+              IR.empty(),
+              Node.newString(Token.NAME, localName),
+              Node.newString("goog:" + requiredNamespace));
       nodeComments.replaceWithComment(n, importNode);
       compiler.reportCodeChange();
 
@@ -330,10 +331,12 @@ public final class ModuleConversionPass implements CompilerPass {
         importSpec.addChildToBack(IR.name(localName));
       }
 
-      Node importNode = new Node(Token.IMPORT,
-          IR.empty(),
-          new Node(Token.IMPORT_SPECS, importSpec),
-          Node.newString(referencedFile));
+      Node importNode =
+          new Node(
+              Token.IMPORT,
+              IR.empty(),
+              new Node(Token.IMPORT_SPECS, importSpec),
+              Node.newString(referencedFile));
       importNode.useSourceInfoFromForTree(n);
       n.getParent().addChildBefore(importNode, n);
       nodeComments.moveComment(n, importNode);
@@ -346,10 +349,12 @@ public final class ModuleConversionPass implements CompilerPass {
 
     if (module.providesObjectChildren.get(requiredNamespace).size() > 0) {
       // import * as var from "./file"
-      Node importNode = new Node(Token.IMPORT,
-          IR.empty(),
-          Node.newString(Token.IMPORT_STAR, localName),
-          Node.newString(referencedFile));
+      Node importNode =
+          new Node(
+              Token.IMPORT,
+              IR.empty(),
+              Node.newString(Token.IMPORT_STAR, localName),
+              Node.newString(referencedFile));
       n.getParent().addChildBefore(importNode, n);
       importNode.useSourceInfoFromForTree(n);
       nodeComments.moveComment(n, importNode);
@@ -358,18 +363,19 @@ public final class ModuleConversionPass implements CompilerPass {
       for (String child : module.providesObjectChildren.get(requiredNamespace)) {
         if (!valueRewrite.contains(n.getSourceFileName(), child)) {
           String fileName = n.getSourceFileName();
-          registerLocalSymbol(fileName, fullLocalName + '.' + child,
-              requiredNamespace + '.' + child, localName + '.'+ child);
+          registerLocalSymbol(
+              fileName,
+              fullLocalName + '.' + child,
+              requiredNamespace + '.' + child,
+              localName + '.' + child);
         }
       }
     }
 
     if (!imported) {
       // side effects only
-      Node importNode = new Node(Token.IMPORT,
-          IR.empty(),
-          IR.empty(),
-          Node.newString(referencedFile));
+      Node importNode =
+          new Node(Token.IMPORT, IR.empty(), IR.empty(), Node.newString(referencedFile));
       importNode.useSourceInfoFromForTree(n);
       n.getParent().addChildBefore(importNode, n);
       nodeComments.moveComment(n, importNode);
@@ -402,16 +408,14 @@ public final class ModuleConversionPass implements CompilerPass {
   }
 
   /**
-   * Converts a Closure assignment on a goog.module or goog.provide namespace into
-   * a TypeScript export statement.
-   * This method should only be called on a node within a module.
+   * Converts a Closure assignment on a goog.module or goog.provide namespace into a TypeScript
+   * export statement. This method should only be called on a node within a module.
    *
    * @param assign Assignment node
    * @param exportedNamespace The prefix of the assignment name that we are exporting
-   * @param exportedSymbol The symbol that we want to export from the file
-   *    For example,
-   *    convertExportAssignment(pre.fix = ..., "pre.fix", "name") <-> export const name = ...
-   *    convertExportAssignment(pre.fix.foo = ..., "pre.fix", "name") <-> name.foo = ...
+   * @param exportedSymbol The symbol that we want to export from the file For example,
+   *     convertExportAssignment(pre.fix = ..., "pre.fix", "name") <-> export const name = ...
+   *     convertExportAssignment(pre.fix.foo = ..., "pre.fix", "name") <-> name.foo = ...
    */
   void convertExportAssignment(
       Node assign, String exportedNamespace, String exportedSymbol, String fileName) {
@@ -471,11 +475,9 @@ public final class ModuleConversionPass implements CompilerPass {
     compiler.reportCodeChange();
   }
 
-  /**
-   * Saves the local name for imported symbols to be used for code rewriting later.
-   */
-  void registerLocalSymbol(String sourceFile, String fullLocalName, String requiredNamespace,
-      String localName) {
+  /** Saves the local name for imported symbols to be used for code rewriting later. */
+  void registerLocalSymbol(
+      String sourceFile, String fullLocalName, String requiredNamespace, String localName) {
     valueRewrite.put(sourceFile, fullLocalName, localName);
     typeRewrite.put(sourceFile, fullLocalName, localName);
     typeRewrite.put(sourceFile, requiredNamespace, localName);

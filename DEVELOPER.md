@@ -26,3 +26,11 @@ The `gradle` configuration makes sure that tests use the locally installed
 `clang-format` by setting the system property `gents.clangFormat`, see
 `build.gradle`. Make sure to configure your IDE's test runner to pass the same
 property for reproducible results.
+
+## Java Formatting
+
+The project verifies that all java source is formatted properly with
+(google-java-format)[https://github.com/google/google-java-format]. The
+verification happens through `gradle verifyGoogleJavaFormat`.
+
+You can manually reformat the source with `gradle googleJavaFormat`.
