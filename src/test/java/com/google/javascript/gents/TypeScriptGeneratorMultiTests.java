@@ -5,6 +5,7 @@ import static com.google.common.truth.Truth.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
 import com.google.javascript.clutz.DeclarationGeneratorTests;
+import com.google.javascript.gents.TypeScriptGenerator.GentsResult;
 import com.google.javascript.jscomp.SourceFile;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -89,8 +90,9 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
         ByteArrayOutputStream errStream = new ByteArrayOutputStream();
         gents.setErrorStream(new PrintStream(errStream));
 
-        Map<String, String> transpiledSource =
+        GentsResult gentsResult =
             gents.generateTypeScript(sourceNames, sourceFiles, Collections.<SourceFile>emptyList());
+        Map<String, String> transpiledSource = gentsResult.sourceFileMap;
 
         String errors = new String(errStream.toByteArray(), StandardCharsets.UTF_8);
         assertThat(errors).isEmpty();
@@ -101,6 +103,11 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
           String goldenText = goldenFiles.get(basename);
           assertThat(transpiledSource).containsKey(basename);
           assertThat(transpiledSource.get(basename)).isEqualTo(goldenText);
+        }
+        File logFile = getTestDirPath(multiTestPath).resolve(dirName).resolve("log").toFile();
+        if (logFile.exists()) {
+          String goldenLog = getFileText(logFile);
+          assertThat(gentsResult.moduleRewriteLog).isEqualTo(goldenLog);
         }
       } catch (Throwable t) {
         result.addError(this, t);
