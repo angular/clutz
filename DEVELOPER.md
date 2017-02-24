@@ -1,4 +1,4 @@
-# Hacking on Clutz
+# Hacking on Clutz and Gents
 
 ## Prerequisites
 
@@ -8,9 +8,9 @@
 
 ## NPM dependencies
 
-Clutz uses some tools that are installed using NPM (`clang-format` and
-`typescript`, specifically). Run `npm install` in your project folder to install
-them.
+Clutz and Gents use some tools that are installed using npm (`clang-format` and
+`typescript`, specifically). Run `npm install` in your project folder to
+install them.
 
 ## Building
 
