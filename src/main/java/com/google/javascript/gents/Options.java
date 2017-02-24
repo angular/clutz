@@ -37,6 +37,13 @@ public class Options {
   boolean debug = false;
 
   @Option(
+    name = "--log",
+    usage = "output a log of module rewriting to this location",
+    metaVar = "MODULE_REWRITE_LOG"
+  )
+  String moduleRewriteLog = null;
+
+  @Option(
     name = "--convert",
     usage =
         "list of all files to be converted to TypeScript\n"

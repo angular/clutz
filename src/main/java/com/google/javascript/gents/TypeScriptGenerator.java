@@ -117,12 +117,13 @@ public class TypeScriptGenerator {
     List<SourceFile> externFiles = getFiles(opts.externs);
     Set<String> filesToConvert = Sets.newLinkedHashSet(opts.filesToConvert);
 
-    Map<String, String> result = generateTypeScript(filesToConvert, srcFiles, externFiles);
+    GentsResult result = generateTypeScript(filesToConvert, srcFiles, externFiles);
+    Map<String, String> resultFileMap = result.sourceFileMap;
 
     for (String filename : filesToConvert) {
       String relativePath = pathUtil.getRelativePath(".", filename);
       String filepath = pathUtil.getFilePathWithoutExtension(relativePath);
-      String tsCode = result.get(filepath);
+      String tsCode = resultFileMap.get(filepath);
       if ("-".equals(opts.output)) {
         System.out.println("========================================");
         System.out.println("File: " + relativePath);
@@ -144,10 +145,10 @@ public class TypeScriptGenerator {
   }
 
   /** Returns a map from the basename to the TypeScript code generated for the file. */
-  public Map<String, String> generateTypeScript(
+  public GentsResult generateTypeScript(
       Set<String> filesToConvert, List<SourceFile> srcFiles, List<SourceFile> externs)
       throws AssertionError {
-    Map<String, String> sourceFileMap = new LinkedHashMap<>();
+    GentsResult result = new GentsResult();
 
     final CompilerOptions compilerOpts = opts.getCompilerOptions();
     // Compile javascript code
@@ -216,7 +217,7 @@ public class TypeScriptGenerator {
                 .setOutputTypes(true)
                 .build();
 
-        sourceFileMap.put(filepath, tryClangFormat(tsCode));
+        result.sourceFileMap.put(filepath, tryClangFormat(tsCode));
       } catch (Throwable t) {
         System.err.println("Failed while converting " + file.getSourceFileName());
         t.printStackTrace(System.err);
@@ -225,8 +226,11 @@ public class TypeScriptGenerator {
       }
     }
 
+    result.moduleRewriteLog =
+        new ModuleRenameLogger()
+            .generateModuleRewriteLog(filesToConvert, modulePrePass.getNamespaceMap());
     ((GentsErrorManager) compiler.getErrorManager()).doGenerateReport();
-    return sourceFileMap;
+    return result;
   }
 
   /**
@@ -293,5 +297,10 @@ public class TypeScriptGenerator {
       files.add(SourceFile.fromFile(fileName, UTF_8));
     }
     return files;
+  }
+
+  class GentsResult {
+    public Map<String, String> sourceFileMap = new LinkedHashMap<>();
+    public String moduleRewriteLog = "";
   }
 }

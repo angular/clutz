@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.javascript.clutz.DeclarationGeneratorTests;
+import com.google.javascript.gents.TypeScriptGenerator.GentsResult;
 import com.google.javascript.jscomp.SourceFile;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -117,11 +118,12 @@ public class TypeScriptGeneratorTests {
         ByteArrayOutputStream errStream = new ByteArrayOutputStream();
         gents.setErrorStream(new PrintStream(errStream));
 
-        Map<String, String> transpiledSource =
+        GentsResult gentsResult =
             gents.generateTypeScript(
                 Collections.singleton(sourceFile.getName()),
                 Collections.singletonList(SourceFile.fromCode(sourceFile.getName(), sourceText)),
                 Collections.<SourceFile>emptyList());
+        Map<String, String> transpiledSource = gentsResult.sourceFileMap;
 
         String errors = new String(errStream.toByteArray(), StandardCharsets.UTF_8);
         assertThat(errors).isEmpty();
@@ -160,7 +162,7 @@ public class TypeScriptGeneratorTests {
     gents = new TypeScriptGenerator(new Options());
   }
 
-  private Map<String, String> runGents(SourceFile... sourceFiles) {
+  private GentsResult runGents(SourceFile... sourceFiles) {
     Set<String> sourceNames = Sets.newHashSet();
     for (SourceFile src : sourceFiles) {
       sourceNames.add(src.getName());
@@ -172,13 +174,14 @@ public class TypeScriptGeneratorTests {
 
   @Test
   public void testMultiFile() throws Exception {
-    Map<String, String> result =
+    GentsResult result =
         runGents(
             SourceFile.fromCode("foo", "/** @type {number} */ var x = 4;"),
             SourceFile.fromCode("bar", "/** @const {string} */ var y = \"hello\";"));
-    assertThat(result).hasSize(2);
-    assertThat(result).containsEntry("bar", "var y: string = \"hello\";\n");
-    assertThat(result).containsEntry("foo", "var x: number = 4;\n");
+
+    assertThat(result.sourceFileMap).hasSize(2);
+    assertThat(result.sourceFileMap).containsEntry("bar", "var y: string = \"hello\";\n");
+    assertThat(result.sourceFileMap).containsEntry("foo", "var x: number = 4;\n");
   }
 
   @Test
@@ -190,12 +193,12 @@ public class TypeScriptGeneratorTests {
 
   @Test
   public void testNoExterns() throws Exception {
-    Map<String, String> result =
+    GentsResult result =
         runGents(
             SourceFile.fromCode("foo", "/** @type {number} */ var x = 4;"),
             SourceFile.fromCode(
                 "bar", "/** @externs */ /** @const {string} */ var y = \"hello\";"));
-    assertThat(result).hasSize(1);
-    assertThat(result).containsEntry("foo", "var x: number = 4;\n");
+    assertThat(result.sourceFileMap).hasSize(1);
+    assertThat(result.sourceFileMap).containsEntry("foo", "var x: number = 4;\n");
   }
 }
