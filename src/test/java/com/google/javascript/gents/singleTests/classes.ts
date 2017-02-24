@@ -63,16 +63,16 @@ class F {
 
 
   /**
-     * block comment
-     */
+   * block comment
+   */
   constructor() {}
 
   /** Do foo! */
   foo() {}
 
   /**
-     * Returns phone number.
-     */
+   * Returns phone number.
+   */
   bar(): string {
     return '';
   }
@@ -80,8 +80,8 @@ class F {
 
 class G {
   /**
-     * ES6 method short hand.
-     */
+   * ES6 method short hand.
+   */
   method() {}
 }
 

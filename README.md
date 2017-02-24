@@ -15,7 +15,7 @@ auto-complete) as if the imported code was written in TypeScript.
 
 We don't offer a binary distribution, so first you need to build:
 ```shell
-$ npm install clang-format
+$ npm install 
 $ gradle build installDist
 ...
 BUILD SUCCESSFUL
@@ -50,5 +50,6 @@ bug in Closure Compiler).
 ## Supported Version of TypeScript
 Clutz produces declaration files that are guaranteed to be accepted by a
 version of TypeScript
-[2.0.6](https://github.com/Microsoft/TypeScript/tree/v2.0.6). The current test
-suite runs against `typescript@next`, so that is always a good choice.
+[2.1.6](https://github.com/Microsoft/TypeScript/tree/v2.1.6). The current test
+suite runs against the version of `typescript` in `npm-shrinkwrap.json`, so that is
+always a good choice.

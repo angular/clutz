@@ -16,7 +16,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -66,14 +65,6 @@ public class DeclarationSyntaxTest {
           "es5,dom,es2015.iterable",
           "--noImplicitAny",
           "--strictNullChecks");
-
-  @BeforeClass
-  public static void setUpTsc() throws Exception {
-    if (!TSC.toFile().exists()) {
-      System.err.println("Installing typescript...");
-      runChecked("npm", "install", "typescript@next");
-    }
-  }
 
   @Test
   public void testDeclarationSyntax() throws Exception {
