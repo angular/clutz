@@ -142,6 +142,11 @@ public class TypeScriptGenerator {
         }
       }
     }
+    try {
+      Files.write(result.moduleRewriteLog, new File(opts.moduleRewriteLog), UTF_8);
+    } catch (IOException e) {
+      throw new IllegalArgumentException("Unable to write to file " + opts.moduleRewriteLog, e);
+    }
   }
 
   /** Returns a map from the basename to the TypeScript code generated for the file. */
