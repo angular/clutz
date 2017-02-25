@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
+import com.google.gson.Gson;
 import com.google.javascript.clutz.DeclarationGeneratorTests;
 import com.google.javascript.gents.TypeScriptGenerator.GentsResult;
 import com.google.javascript.jscomp.SourceFile;
@@ -104,9 +105,11 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
           assertThat(transpiledSource).containsKey(basename);
           assertThat(transpiledSource.get(basename)).isEqualTo(goldenText);
         }
-        File logFile = getTestDirPath(multiTestPath).resolve(dirName).resolve("log").toFile();
+        File logFile = getTestDirPath(multiTestPath).resolve(dirName).resolve("log.json").toFile();
         if (logFile.exists()) {
           String goldenLog = getFileText(logFile);
+          // asserts that golden parses correctly as JSON, result is not needed.
+          new Gson().fromJson(goldenLog, Object.class);
           assertThat(gentsResult.moduleRewriteLog).isEqualTo(goldenLog);
         }
       } catch (Throwable t) {

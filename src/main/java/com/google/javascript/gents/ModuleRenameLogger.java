@@ -1,6 +1,9 @@
 package com.google.javascript.gents;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,20 +35,19 @@ class ModuleRenameLogger {
     }
   }
 
-  private Gson gson = new Gson();
+  private Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
   String generateModuleRewriteLog(
       Set<String> filesToConvert, Map<String, CollectModuleMetadata.FileModule> namespaceMap) {
-    StringBuilder builder = new StringBuilder();
+    List<LogItem> items = new ArrayList<>();
     for (Map.Entry<String, CollectModuleMetadata.FileModule> entry : namespaceMap.entrySet()) {
       String file = entry.getValue().file;
       String defaultRename =
           entry.getValue().exportedNamespacesToSymbols.getOrDefault("exports", "");
       if (filesToConvert.contains(file)) {
-        builder.append(gson.toJson(new LogItem(entry.getKey(), file, defaultRename)));
-        builder.append("\n");
+        items.add(new LogItem(entry.getKey(), file, defaultRename));
       }
     }
-    return builder.toString();
+    return gson.toJson(items);
   }
 }
