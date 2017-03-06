@@ -80,7 +80,7 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
           String filepath = sourceFile.getPath();
           sourceFiles.add(SourceFile.fromCode(filepath, sourceText));
 
-          if (!filepath.endsWith("_keep.js")) {
+          if (!filepath.endsWith("_keep.js") && !filepath.endsWith("_keep.es5.js")) {
             sourceNames.add(filepath);
 
             String basename = gents.pathUtil.getFilePathWithoutExtension(filepath);
