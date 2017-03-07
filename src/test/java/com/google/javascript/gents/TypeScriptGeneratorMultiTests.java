@@ -3,9 +3,11 @@ package com.google.javascript.gents;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.javascript.clutz.DeclarationGeneratorTests;
+import com.google.javascript.gents.ModuleRenameLogger.LogItem;
 import com.google.javascript.gents.TypeScriptGenerator.GentsResult;
 import com.google.javascript.jscomp.SourceFile;
 import java.io.ByteArrayOutputStream;
@@ -108,9 +110,14 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
         File logFile = getTestDirPath(multiTestPath).resolve(dirName).resolve("log.json").toFile();
         if (logFile.exists()) {
           String goldenLog = getFileText(logFile);
-          // asserts that golden parses correctly as JSON, result is not needed.
-          new Gson().fromJson(goldenLog, Object.class);
-          assertThat(gentsResult.moduleRewriteLog).isEqualTo(goldenLog);
+          // order independent comparison of the log entries.
+          Set<LogItem> goldenLogItems =
+              ImmutableSet.copyOf(new Gson().fromJson(goldenLog, LogItem[].class));
+          Set<LogItem> emittedLogItems =
+              ImmutableSet.copyOf(
+                  new Gson().fromJson(gentsResult.moduleRewriteLog, LogItem[].class));
+
+          assertThat(emittedLogItems).isEqualTo(goldenLogItems);
         }
       } catch (Throwable t) {
         result.addError(this, t);
