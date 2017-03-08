@@ -91,6 +91,18 @@ public class GentsCodeGenerator extends CodeGenerator {
    */
   boolean maybeOverrideCodeGen(Node n) {
     switch (n.getToken()) {
+      case INDEX_SIGNATURE:
+        Node first = n.getFirstChild();
+        if (null != first) {
+          add("{[");
+          add(first);
+          add(":");
+          add(first.getDeclaredTypeExpression());
+          add("]:");
+          add(n.getDeclaredTypeExpression());
+          add("}");
+        }
+        return true;
       case UNDEFINED_TYPE:
         add("undefined");
         return true;
