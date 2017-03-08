@@ -24,7 +24,7 @@ import java.util.Set;
  * <p>Which generates the following log line: foo.bar,buz.ts,A
  */
 class ModuleRenameLogger {
-  public class LogItem {
+  static class LogItem {
     String originalName;
     String tsFile;
     String defaultRename;
@@ -35,6 +35,7 @@ class ModuleRenameLogger {
       this.defaultRename = defaultRename;
     }
 
+    @Override
     public boolean equals(Object obj) {
       if (!(obj instanceof LogItem)) return false;
       LogItem o = (LogItem) obj;
@@ -43,6 +44,7 @@ class ModuleRenameLogger {
           && this.defaultRename.equals(o.defaultRename);
     }
 
+    @Override
     public String toString() {
       return "{originalName: "
           + this.originalName

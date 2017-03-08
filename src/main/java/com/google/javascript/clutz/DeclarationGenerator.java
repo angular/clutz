@@ -832,7 +832,7 @@ class DeclarationGenerator {
       for (String property : propertyNames) {
         // When parsing externs namespaces are explicitly declared with a var of Object type
         // Do not emit the var declaration, as it will conflict with the namespace.
-        if (!(isEmittableProperty(objType, property) && isValidJSProperty(property)
+        if (!((isEmittableProperty(objType, property) && isValidJSProperty(property))
             || (isExtern && isLikelyNamespace(objType.getOwnPropertyJSDocInfo(property))))) {
           desiredSymbols.add(symbol.getName() + "." + property);
         }
@@ -1019,7 +1019,7 @@ class DeclarationGenerator {
     // Dereference the named type before checking if it is a typedef.
     NamedType nType = type.toMaybeNamedType();
     if (typedefs.containsKey(type)
-        || nType != null && typedefs.containsKey(nType.getReferencedType())) {
+        || (nType != null && typedefs.containsKey(nType.getReferencedType()))) {
       return false;
     }
 
@@ -1681,7 +1681,7 @@ class DeclarationGenerator {
 
     /** Whether the type was written as the literal 'Function' type */
     private boolean isLiteralFunction(JSType type) {
-      return type == typeRegistry.getNativeType(JSTypeNative.FUNCTION_INSTANCE_TYPE);
+      return type.equals(typeRegistry.getNativeType(JSTypeNative.FUNCTION_INSTANCE_TYPE));
     }
 
     private Void emitTemplatizedType(

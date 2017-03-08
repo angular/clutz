@@ -1,5 +1,7 @@
 package com.google.javascript.gents;
 
+import static com.google.common.base.Charsets.UTF_8;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -7,9 +9,10 @@ import com.google.gson.stream.JsonReader;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DiagnosticGroups;
-import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -116,7 +119,8 @@ public class Options {
           new TypeToken<Map<String, String>>() {
             /* empty */
           }.getType();
-      try (JsonReader reader = new JsonReader(new FileReader(externsMapFile)); ) {
+      try (JsonReader reader =
+          new JsonReader(Files.newBufferedReader(Paths.get(externsMapFile), UTF_8))) {
         return new Gson().fromJson(reader, mapType);
       }
     } else {
