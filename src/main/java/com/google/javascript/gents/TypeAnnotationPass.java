@@ -313,6 +313,16 @@ public final class TypeAnnotationPass implements CompilerPass {
               if ("Array".equals(typeName)) {
                 return arrayType(convertTypeNodeAST(block.getFirstChild()));
               }
+
+              // Convert index signature types
+              if ("Object".equals(typeName)) {
+                TypeDeclarationNode indexSignatureNode =
+                    indexSignatureType(
+                        convertTypeNodeAST(block.getFirstChild()),
+                        convertTypeNodeAST(block.getSecondChild()));
+                return indexSignatureNode;
+              }
+
               // Convert generic types
               return parameterizedType(
                   root,
@@ -403,6 +413,18 @@ public final class TypeAnnotationPass implements CompilerPass {
       default:
         throw new IllegalArgumentException("Unsupported node type:\n" + n.toStringTree());
     }
+  }
+
+  /** Returns a new node representing an index signature type. */
+  TypeDeclarationNode indexSignatureType(
+      TypeDeclarationNode keyType, TypeDeclarationNode valueType) {
+    TypeDeclarationNode node = new TypeDeclarationNode(Token.INDEX_SIGNATURE);
+    TypeDeclarationNode first = null;
+    first = new TypeDeclarationNode(Token.STRING_KEY, "key");
+    first.setDeclaredTypeExpression(keyType);
+    node.addChildToBack(first);
+    node.setDeclaredTypeExpression(valueType);
+    return node;
   }
 
   /** Converts the global type name to the local type name. */
