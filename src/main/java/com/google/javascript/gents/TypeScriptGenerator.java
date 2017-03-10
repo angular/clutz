@@ -304,7 +304,7 @@ public class TypeScriptGenerator {
     return files;
   }
 
-  class GentsResult {
+  static class GentsResult {
     public Map<String, String> sourceFileMap = new LinkedHashMap<>();
     public String moduleRewriteLog = "";
   }

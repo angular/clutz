@@ -10,6 +10,9 @@ plugins {
 
   // enforces consistent formatting
   id 'com.github.sherter.google-java-format' version '0.6'
+
+  // enforces java style
+  id 'net.ltgt.errorprone' version '0.0.9'
 }
 
 def createScript(project, mainClass, name) {
