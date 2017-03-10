@@ -73,11 +73,18 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
 
     @Nullable Node nodeToMove = blockOfScopeContents.getFirstChild();
     while (nodeToMove != null) {
-      nodeToMove = maybeRewriteAlias(nodeToMove);
-      if (nodeToMove == null) {
-        break;
+      // After maybeRewriteAlias, nodeToMove is either (1)already detached or (2)needs to be moved.
+      @Nullable Node nodeToCheck = maybeRewriteAlias(nodeToMove);
+      // (1) nodeToMove is detached, alias to provided namespace is recorded, the next node is
+      // returned. The next node should be 'maybeRewriteAlias()' checked before it can be moved out
+      // of goog.scope
+      if (nodeToCheck != null) {
+        nodeToMove = nodeToCheck;
+        continue;
       }
 
+      // (2) Alias is re-assigned with the provided namespace. In this case, node is not detached
+      // and null is returned. nodeToMove needs to be moved out of goog.scope
       // Store the next node in a temp variable since detaching the node breaks the chain.
       Node nextNodeToMove = nodeToMove.getNext();
       nodeToMove.detachFromParent();
@@ -92,18 +99,23 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
     compiler.reportCodeChange();
   }
 
+  /**
+   * If the node is a local alias declaration for a provided namespace then store mapping and detach
+   * the node. If the node is an assignment for a local alias's property then rewrite the local
+   * alias.
+   *
+   * @return the next node if the current node is detached, return null otherwise.
+   */
   private Node maybeRewriteAlias(Node node) {
     switch (node.getFirstChild().getToken()) {
       case NAME:
-        node = maybeRecordAndRemoveAlias(node.getFirstChild());
-        break;
+        return maybeRecordAndRemoveAlias(node.getFirstChild());
       case ASSIGN:
-        maybeReasignAlias(node.getFirstChild());
-        break;
+        maybeReassignAlias(node.getFirstChild());
+        return null;
       default:
-        break;
+        return null;
     }
-    return node;
   }
 
   private Node maybeRecordAndRemoveAlias(Node assign) {
@@ -111,18 +123,29 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
     Node lhs = assign;
     Node rhs = assign.getLastChild();
     if (rhs == null) { // var foo;
-      return next;
+      return null;
     }
-    if (providedNamespaces.contains(rhs.getQualifiedName())) {
+    if (isInProvidedNamespace(rhs)) {
       aliasToProvidedNamespace.put(lhs.getString(), rhs.getQualifiedName());
       next = assign.getParent().getNext();
       assign.detachFromParent();
       compiler.reportCodeChange();
+      return next;
     }
-    return next;
+    return null;
   }
 
-  private void maybeReasignAlias(Node assign) {
+  private boolean isInProvidedNamespace(Node node) {
+    for (String providedNamespace : providedNamespaces) {
+      @Nullable String rhsQualifiedName = node.getQualifiedName();
+      if ((rhsQualifiedName != null) && providedNamespace.startsWith(node.getQualifiedName())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private void maybeReassignAlias(Node assign) {
     Node lhs = assign.getFirstChild();
     if (!lhs.isGetProp()) {
       // TODO(dpurpura): Add support for GET_ELEM.  (e.g. Foo['abc'])
@@ -146,5 +169,6 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
       assign.replaceChild(lhs, fullName);
       compiler.reportCodeChange();
     }
+    return;
   }
 }
