@@ -82,6 +82,8 @@ lorem.ipsum.baz = function() { return false; };
 /** @typedef {{key: number, value: string}} */
 Foo.InnerTypedef;
 
+/** @typedef {{key: number, value: string}} */
+Foo.InnerTypedefWithAssignment = {};
 
 /**
  * @typedef {{

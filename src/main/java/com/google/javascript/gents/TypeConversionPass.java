@@ -30,11 +30,13 @@ public final class TypeConversionPass implements CompilerPass {
   private final AbstractCompiler compiler;
   private final NodeComments nodeComments;
   private Map<String, Node> types;
+  private Map<String, String> typesToRename;
 
   public TypeConversionPass(AbstractCompiler compiler, NodeComments nodeComments) {
     this.compiler = compiler;
     this.nodeComments = nodeComments;
     this.types = new LinkedHashMap<>();
+    this.typesToRename = new LinkedHashMap<>();
   }
 
   @Override
@@ -43,10 +45,15 @@ public final class TypeConversionPass implements CompilerPass {
       // We convert each file independently to avoid merging class methods from different files.
       if (child.isScript()) {
         this.types = new LinkedHashMap<>();
+        this.typesToRename = new LinkedHashMap<>();
         NodeTraversal.traverseEs6(compiler, child, new TypeConverter());
         NodeTraversal.traverseEs6(compiler, child, new TypeMemberConverter());
         NodeTraversal.traverseEs6(compiler, child, new FieldOnThisConverter());
         NodeTraversal.traverseEs6(compiler, child, new InheritanceConverter());
+        if (!typesToRename.isEmpty()) {
+          // TODO(bowenni): Also rename the references in other files.
+          NodeTraversal.traverseEs6(compiler, child, new TypeAliasConverter());
+        }
       }
     }
   }
@@ -55,9 +62,10 @@ public final class TypeConversionPass implements CompilerPass {
   private class TypeConverter extends AbstractPostOrderCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
+      JSDocInfo bestJSDocInfo = null;
       switch (n.getToken()) {
         case FUNCTION:
-          JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
+          bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
           if (bestJSDocInfo != null
               && (bestJSDocInfo.isConstructor() || bestJSDocInfo.isInterface())) {
             convertConstructorToClass(n, bestJSDocInfo);
@@ -69,34 +77,69 @@ public final class TypeConversionPass implements CompilerPass {
           }
           break;
         case GETPROP:
+          // Converts a class inner typedef into a top level interface, which then later has its
+          // members converted in TypeAnnotationPass.
+          // Most class inner @typedef meant @record in closure but they were added before @record
+          // was supported. Also in TypeScript interfaces are preferred to type alias because of
+          // better error reporting and ability to extend.
+          bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
+          if (bestJSDocInfo != null && bestJSDocInfo.hasTypedefType()) {
+            String interfaceName = n.getSecondChild().getString();
+            Node interfaceMember = Node.newString(Token.INTERFACE_MEMBERS, interfaceName);
+            typesToRename.put(n.getQualifiedName(), interfaceName);
+            types.put(interfaceName, interfaceMember);
+            interfaceMember.setJSDocInfo(bestJSDocInfo);
+            Node interfaceNode = new Node(Token.INTERFACE, IR.empty(), IR.empty(), interfaceMember);
+            Node nameNode = Node.newString(Token.NAME, interfaceName);
+            nameNode.addChildToBack(interfaceNode);
+            Node exportNode = new Node(Token.EXPORT, new Node(Token.CONST, nameNode));
+            replaceExpressionOrAssignment(n, parent, exportNode);
+          }
+          break;
         case NAME:
         case VAR:
         case LET:
         case CONST:
-          // Converts a typedef into an interface, which then later has its members converted in
-          // TypeAnnotationPass.
-          JSDocInfo jsdoc = NodeUtil.getBestJSDocInfo(n);
-          if (jsdoc != null && jsdoc.hasTypedefType()) {
+          // Creates a type alias
+          bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
+          if (bestJSDocInfo != null && bestJSDocInfo.hasTypedefType()) {
             String name;
             if (n.getToken() == Token.NAME) {
               name = n.getString();
-            } else if (n.getToken() == Token.GETPROP) {
-              name = n.getSecondChild().getString();
             } else {
               name = n.getFirstChild().getString();
             }
             Node typeDef = Node.newString(Token.TYPE_ALIAS, name);
             types.put(name, typeDef);
-            typeDef.setJSDocInfo(jsdoc);
-            if (parent.getToken() == Token.EXPR_RESULT) {
-              parent.getParent().replaceChild(parent, typeDef);
-            } else {
-              parent.replaceChild(n, typeDef);
-            }
+            typeDef.setJSDocInfo(bestJSDocInfo);
+            replaceExpressionOrAssignment(n, parent, typeDef);
           }
           break;
         default:
           break;
+      }
+    }
+
+    private void replaceExpressionOrAssignment(Node n, Node parent, Node newNode) {
+      if (parent.getToken() == Token.EXPR_RESULT) {
+        // Handles case: Myclass.Type;
+        // AST:
+        // EXPR_RESULT
+        //     GETPROP
+        //         NAME MyClass
+        //         STRING Type
+        parent.getParent().replaceChild(parent, newNode);
+      } else if (parent.getToken() == Token.ASSIGN) {
+        // Handles case: Myclass.Type = {};
+        // AST:
+        // ASSIGN
+        //     GETPROP
+        //         NAME MyClass
+        //         STRING Type
+        //     OBJECTLIST
+        parent.getGrandparent().replaceChild(parent.getParent(), newNode);
+      } else {
+        parent.replaceChild(n, newNode);
       }
     }
   }
@@ -225,6 +268,46 @@ public final class TypeConversionPass implements CompilerPass {
           break;
         default:
           break;
+      }
+    }
+  }
+
+  /**
+   * Go through all JSDocs and rename everything from typesToRename map. For example: when a class
+   * inner typedef is converted to a top level interface, all the references of the typedef in any
+   * JSDocs are renamed to the top level interface name.
+   */
+  private class TypeAliasConverter extends AbstractPostOrderCallback {
+    @Override
+    public void visit(NodeTraversal t, Node n, Node parent) {
+      // Go through JSDocs, find and replace typedefs
+      @Nullable JSDocInfo bestJSDoc = NodeUtil.getBestJSDocInfo(n);
+      if (bestJSDoc != null) {
+        JSTypeExpression type = bestJSDoc.getType();
+        if (type != null) {
+          maybeRename(type.getRoot());
+        }
+
+        for (String parameterName : bestJSDoc.getParameterNames()) {
+          @Nullable JSTypeExpression parameterType = bestJSDoc.getParameterType(parameterName);
+          if (parameterType != null) {
+            maybeRename(parameterType.getRoot());
+          }
+        }
+      }
+    }
+
+    private void maybeRename(Node n) {
+      if (n != null) {
+        for (Node child : n.children()) {
+          maybeRename(child);
+        }
+        if (n.isString()) {
+          String name = n.getString();
+          if (name != null && typesToRename.containsKey(name)) {
+            n.setString(typesToRename.get(name));
+          }
+        }
       }
     }
   }

@@ -179,6 +179,44 @@ public final class TypeAnnotationPass implements CompilerPass {
         case CAST:
           setTypeExpression(n, n.getJSDocInfo().getType(), false);
           break;
+        case INTERFACE_MEMBERS:
+          // Closure code generator expects the form:
+          //
+          // INTERFACE_MEMBERS
+          //     MEMBER_VARIABLE_DEF property1 [jsdoc_info: JSDocInfo]
+          //     MEMBER_VARIABLE_DEF property2 [jsdoc_info: JSDocInfo]
+          //
+          // Each MEMBER_VARIABLE_DEF has a jsdoc about its typing.
+          //
+          // Closure annotated interfaces are already in this format at this point so it's a no-op
+          // here. typedefs inside classes are converted to top level interfaces in
+          // TypeConversionPass. They are in a different format:
+          //
+          // INTERFACE_MEMBERS [jsdoc_info: JSDocInfo]
+          //
+          // There are no MEMBER_VARIABLE_DEFs yet. All the information are stored in
+          // INTERFACE_MEMBERS's jsdoc. We are extracting the properties from the jsdoc and
+          // creating each MEMBER_VARIABLE_DEFs so code generator works.
+          if (bestJSDocInfo != null && bestJSDocInfo.hasTypedefType()) {
+            // TODO(bowenni): Also extract MEMBER_FUNCTION_DEFs from the jsdoc
+            Node typedefTypeRoot = bestJSDocInfo.getTypedefType().getRoot();
+            //LC
+            //    LB
+            //        COLON
+            //            STRING_KEY a
+            //            STRING number
+            //        COLON
+            //            STRING_KEY b
+            //            STRING number
+            for (Node colonNode : typedefTypeRoot.getFirstChild().children()) {
+              Node memberVariableDefNode =
+                  Node.newString(Token.MEMBER_VARIABLE_DEF, colonNode.getFirstChild().getString());
+              memberVariableDefNode.setDeclaredTypeExpression(
+                  convertTypeNodeAST(colonNode.getSecondChild()));
+              n.addChildToBack(memberVariableDefNode);
+            }
+          }
+          break;
         default:
           break;
       }
