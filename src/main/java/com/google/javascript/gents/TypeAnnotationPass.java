@@ -490,20 +490,21 @@ public final class TypeAnnotationPass implements CompilerPass {
       FileModule module = symbolToModule.get(importedNamespace);
       String symbol = module.importedNamespacesToSymbols.get(importedNamespace);
 
-      // Create new import statement
-      Node importSpec;
-      Node importFile;
-      if (module.shouldUseOldSyntax()) {
-        importSpec = Node.newString(Token.NAME, symbol);
-        importFile = Node.newString("goog:" + importedNamespace);
-      } else {
-        importSpec = new Node(Token.IMPORT_SPECS, new Node(Token.IMPORT_SPEC, IR.name(symbol)));
-        String referencedFile = pathUtil.getImportPath(sourceFile, module.file);
-        importFile = Node.newString(referencedFile);
+      // Create a new import statement if the symbol to import isn't from the same file.
+      if (!sourceFile.equals(symbolToModule.get(typeName).file)) {
+        Node importSpec;
+        Node importFile;
+        if (module.shouldUseOldSyntax()) {
+          importSpec = Node.newString(Token.NAME, symbol);
+          importFile = Node.newString("goog:" + importedNamespace);
+        } else {
+          importSpec = new Node(Token.IMPORT_SPECS, new Node(Token.IMPORT_SPEC, IR.name(symbol)));
+          String referencedFile = pathUtil.getImportPath(sourceFile, module.file);
+          importFile = Node.newString(referencedFile);
+        }
+        Node importNode = new Node(Token.IMPORT, IR.empty(), importSpec, importFile);
+        importsNeeded.put(sourceFile, importNode);
       }
-      Node importNode = new Node(Token.IMPORT, IR.empty(), importSpec, importFile);
-      importsNeeded.put(sourceFile, importNode);
-
       typeRewrite.put(sourceFile, importedNamespace, symbol);
       return nameUtil.replacePrefixInName(typeName, importedNamespace, symbol);
     }

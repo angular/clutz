@@ -3,6 +3,7 @@ package com.google.javascript.gents;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.javascript.gents.CollectModuleMetadata.FileModule;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.JSError;
@@ -19,6 +20,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import javax.annotation.Nullable;
 
 /**
@@ -29,33 +31,41 @@ public final class TypeConversionPass implements CompilerPass {
 
   private final AbstractCompiler compiler;
   private final NodeComments nodeComments;
+  private final CollectModuleMetadata modulePrepass;
   private Map<String, Node> types;
+  /**
+   * typesToRename is an <oldName, newName> map typesToFilename is an <oldName, definedFromFile> map
+   * Together they are used for cross files renaming of certain types.
+   */
   private Map<String, String> typesToRename;
 
-  public TypeConversionPass(AbstractCompiler compiler, NodeComments nodeComments) {
+  private Map<String, String> typesToFilename;
+
+  public TypeConversionPass(
+      AbstractCompiler compiler, CollectModuleMetadata modulePrepass, NodeComments nodeComments) {
     this.compiler = compiler;
+    this.modulePrepass = modulePrepass;
     this.nodeComments = nodeComments;
     this.types = new LinkedHashMap<>();
     this.typesToRename = new LinkedHashMap<>();
+    this.typesToFilename = new LinkedHashMap<>();
   }
 
   @Override
   public void process(Node externs, Node root) {
+    this.typesToRename = new LinkedHashMap<>();
+    this.typesToFilename = new LinkedHashMap<>();
     for (Node child : root.children()) {
       // We convert each file independently to avoid merging class methods from different files.
       if (child.isScript()) {
         this.types = new LinkedHashMap<>();
-        this.typesToRename = new LinkedHashMap<>();
         NodeTraversal.traverseEs6(compiler, child, new TypeConverter());
         NodeTraversal.traverseEs6(compiler, child, new TypeMemberConverter());
         NodeTraversal.traverseEs6(compiler, child, new FieldOnThisConverter());
         NodeTraversal.traverseEs6(compiler, child, new InheritanceConverter());
-        if (!typesToRename.isEmpty()) {
-          // TODO(bowenni): Also rename the references in other files.
-          NodeTraversal.traverseEs6(compiler, child, new TypeAliasConverter());
-        }
       }
     }
+    convertTypeAlias();
   }
 
   /** Converts @constructor annotated functions into classes. */
@@ -87,6 +97,7 @@ public final class TypeConversionPass implements CompilerPass {
             String interfaceName = n.getSecondChild().getString();
             Node interfaceMember = Node.newString(Token.INTERFACE_MEMBERS, interfaceName);
             typesToRename.put(n.getQualifiedName(), interfaceName);
+            typesToFilename.put(n.getQualifiedName(), n.getSourceFileName());
             types.put(interfaceName, interfaceMember);
             interfaceMember.setJSDocInfo(bestJSDocInfo);
             Node interfaceNode = new Node(Token.INTERFACE, IR.empty(), IR.empty(), interfaceMember);
@@ -273,42 +284,35 @@ public final class TypeConversionPass implements CompilerPass {
   }
 
   /**
-   * Go through all JSDocs and rename everything from typesToRename map. For example: when a class
-   * inner typedef is converted to a top level interface, all the references of the typedef in any
-   * JSDocs are renamed to the top level interface name.
+   * Put every type alias into their fileModule's importedNamespacesToSymbols Map so
+   * TypeAnnotationPass can actually fix all references across multiple files importing the type and
+   * create import statements if needed.
+   *
+   * <p>TODO(bowenni): If the type to rename is exported as an alias then the references in other
+   * files will not get renamed.
+   *
+   * <pre>
+   * goog.module('A');
+   * exports.alias = typeToRename;
+   *
+   * goog.require('A');
+   * {@literal @}typedef {A.alias};
+   * </pre>
+   *
+   * In this case the child module won't rename 'A.alias' because the child module is expecting to
+   * rename 'typeToRename'
    */
-  private class TypeAliasConverter extends AbstractPostOrderCallback {
-    @Override
-    public void visit(NodeTraversal t, Node n, Node parent) {
-      // Go through JSDocs, find and replace typedefs
-      @Nullable JSDocInfo bestJSDoc = NodeUtil.getBestJSDocInfo(n);
-      if (bestJSDoc != null) {
-        JSTypeExpression type = bestJSDoc.getType();
-        if (type != null) {
-          maybeRename(type.getRoot());
-        }
-
-        for (String parameterName : bestJSDoc.getParameterNames()) {
-          @Nullable JSTypeExpression parameterType = bestJSDoc.getParameterType(parameterName);
-          if (parameterType != null) {
-            maybeRename(parameterType.getRoot());
-          }
-        }
-      }
-    }
-
-    private void maybeRename(Node n) {
-      if (n != null) {
-        for (Node child : n.children()) {
-          maybeRename(child);
-        }
-        if (n.isString()) {
-          String name = n.getString();
-          if (name != null && typesToRename.containsKey(name)) {
-            n.setString(typesToRename.get(name));
-          }
-        }
-      }
+  private void convertTypeAlias() {
+    Map<String, FileModule> fileMap = modulePrepass.getFileMap();
+    for (Entry<String, String> entry : typesToRename.entrySet()) {
+      // Need to add a module entry in the file to module map otherwise TypeAnnotationPass won't
+      // convert any symbols in the file.
+      String oldTypeName = entry.getKey();
+      String newTypeName = entry.getValue();
+      String filename = typesToFilename.get(oldTypeName);
+      FileModule module = fileMap.get(filename);
+      // TypeAnnotationPass will convert the global type name to the local type name using this mapping.
+      module.importedNamespacesToSymbols.put(oldTypeName, newTypeName);
     }
   }
 
