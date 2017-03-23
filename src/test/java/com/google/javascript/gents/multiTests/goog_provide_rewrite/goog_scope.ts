@@ -47,10 +47,16 @@ exportedValue.setA(1).setB(2);
 export function baz(): boolean {
   return false;
 }
-type InnerTypedef = {
-  key: number,
-  value: string
-};
+
+export interface InnerTypedef {
+  key: number;
+  value: string;
+}
+
+export interface InnerTypedefWithAssignment {
+  key: number;
+  value: string;
+}
 type PrivateTypedef_ = {
   myFunction: (p1: any) => PrivateTypedef_
 };

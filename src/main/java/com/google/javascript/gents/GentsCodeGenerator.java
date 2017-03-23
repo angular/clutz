@@ -146,6 +146,18 @@ public class GentsCodeGenerator extends CodeGenerator {
           return true;
         }
         return false;
+      case EXPORT:
+        // When a type alias is exported, closure code generator will add two semi-colons, one for type alias and one for export
+        // For example: export type T = {key: string};;
+        if (n.getChildCount() != 1) {
+          return false;
+        }
+        if (n.getFirstChild().getToken() == Token.TYPE_ALIAS) {
+          add("export");
+          add(n.getFirstChild());
+          return true;
+        }
+        return false;
       default:
         return false;
     }
