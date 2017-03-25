@@ -231,7 +231,7 @@ class DeclarationGenerator {
    * by replacing the second Error with GlobalError.
    */
   private static final ImmutableSet<String> GLOBAL_SYMBOL_ALIASES =
-      ImmutableSet.of("Error", "Event");
+      ImmutableSet.of("Error", "Event", "EventTarget");
 
   private final JSType UNKNOWN_TYPE;
   private final JSType NUMBER_TYPE;
