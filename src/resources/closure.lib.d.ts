@@ -6,6 +6,8 @@ declare namespace ಠ_ಠ.clutz {
   var GlobalError: ErrorConstructor;
   type GlobalEvent = Event;
   var GlobalEvent: typeof Event;
+  type GlobalEventTarget = EventTarget;
+  var GlobalEventTarget: typeof EventTarget;
   /** Represents the type returned when goog.require-ing an unknown symbol */
   type ClosureSymbolNotGoogProvided = void;
   /** Represents a Closure type that is private, represented by an empty interface. */
