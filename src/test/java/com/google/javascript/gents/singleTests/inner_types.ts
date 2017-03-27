@@ -29,6 +29,7 @@ export interface InnerTypedef { a: number; }
 export interface InnerTypedefWithNestedTypes {
   a: {b: {c: number}};
   d: string;
+  e: (p1: string, p2: number) => number;
 }
 type Typedef = {
   a: {b: {c: number}}

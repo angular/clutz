@@ -198,7 +198,6 @@ public final class TypeAnnotationPass implements CompilerPass {
           // INTERFACE_MEMBERS's jsdoc. We are extracting the properties from the jsdoc and
           // creating each MEMBER_VARIABLE_DEFs so code generator works.
           if (bestJSDocInfo != null && bestJSDocInfo.hasTypedefType()) {
-            // TODO(bowenni): Also extract MEMBER_FUNCTION_DEFs from the jsdoc
             Node typedefTypeRoot = bestJSDocInfo.getTypedefType().getRoot();
             //LC
             //    LB
