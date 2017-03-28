@@ -1,4 +1,12 @@
 declare namespace ಠ_ಠ.clutz.undefinedns {
+  class C extends C_Instance {
+  }
+  class C_Instance {
+    private noStructuralTyping_: any;
+    //!! Intentionally keeping string | undefined, as more stylistically correct than
+    //!! string | void.
+    constructor (f : ( ) => void , g : ( ) => string | undefined ) ;
+  }
   var a : undefined ;
   type alias = { foo ? : boolean } ;
   var b : undefined ;

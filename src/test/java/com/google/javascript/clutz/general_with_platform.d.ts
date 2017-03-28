@@ -29,10 +29,10 @@ declare namespace ಠ_ಠ.clutz {
   }
   class ChromeBooleanEvent_Instance {
     private noStructuralTyping_: any;
-    addListener (callback : (a : boolean ) => undefined ) : void ;
-    hasListener (callback : (a : boolean ) => undefined ) : boolean ;
+    addListener (callback : (a : boolean ) => void ) : void ;
+    hasListener (callback : (a : boolean ) => void ) : boolean ;
     hasListeners ( ) : boolean ;
-    removeListener (callback : (a : boolean ) => undefined ) : void ;
+    removeListener (callback : (a : boolean ) => void ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -54,10 +54,10 @@ declare namespace ಠ_ಠ.clutz {
   }
   class ChromeObjectEvent_Instance {
     private noStructuralTyping_: any;
-    addListener (callback : (a : Object ) => undefined ) : void ;
-    hasListener (callback : (a : Object ) => undefined ) : boolean ;
+    addListener (callback : (a : Object ) => void ) : void ;
+    hasListener (callback : (a : Object ) => void ) : boolean ;
     hasListeners ( ) : boolean ;
-    removeListener (callback : (a : Object ) => undefined ) : void ;
+    removeListener (callback : (a : Object ) => void ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -68,10 +68,10 @@ declare namespace ಠ_ಠ.clutz {
   }
   class ChromeStringArrayEvent_Instance {
     private noStructuralTyping_: any;
-    addListener (callback : (a : string [] ) => undefined ) : void ;
-    hasListener (callback : (a : string [] ) => undefined ) : boolean ;
+    addListener (callback : (a : string [] ) => void ) : void ;
+    hasListener (callback : (a : string [] ) => void ) : boolean ;
     hasListeners ( ) : boolean ;
-    removeListener (callback : (a : string [] ) => undefined ) : void ;
+    removeListener (callback : (a : string [] ) => void ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -82,10 +82,10 @@ declare namespace ಠ_ಠ.clutz {
   }
   class ChromeStringEvent_Instance {
     private noStructuralTyping_: any;
-    addListener (callback : (a : string ) => undefined ) : void ;
-    hasListener (callback : (a : string ) => undefined ) : boolean ;
+    addListener (callback : (a : string ) => void ) : void ;
+    hasListener (callback : (a : string ) => void ) : boolean ;
     hasListeners ( ) : boolean ;
-    removeListener (callback : (a : string ) => undefined ) : void ;
+    removeListener (callback : (a : string ) => void ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -96,10 +96,10 @@ declare namespace ಠ_ಠ.clutz {
   }
   class ChromeStringStringEvent_Instance {
     private noStructuralTyping_: any;
-    addListener (callback : (a : string , b : string ) => undefined ) : void ;
-    hasListener (callback : (a : string , b : string ) => undefined ) : boolean ;
+    addListener (callback : (a : string , b : string ) => void ) : void ;
+    hasListener (callback : (a : string , b : string ) => void ) : boolean ;
     hasListeners ( ) : boolean ;
-    removeListener (callback : (a : string , b : string ) => undefined ) : void ;
+    removeListener (callback : (a : string , b : string ) => void ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {

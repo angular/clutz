@@ -1662,7 +1662,15 @@ class DeclarationGenerator {
               JSType returnType = type.getReturnType();
               if (returnType != null) {
                 emit("=>");
-                visitType(returnType);
+                // Closure conflates 'undefined' and 'void', and in general visitType always emits `undefined`
+                // for that type.
+                // In idiomatic TypeScript, `void` is used for function return types, and the "void",
+                // "undefined" types are not the same.
+                if (returnType.isVoidType()) {
+                  emit("void");
+                } else {
+                  visitType(returnType);
+                }
               }
               return null;
             }
@@ -2211,8 +2219,8 @@ class DeclarationGenerator {
       emit(":");
       // Closure conflates 'undefined' and 'void', and in general visitType always emits `undefined`
       // for that type.
-      // In ideomatic TypeScript, `void` is used for function return types, and the types
-      // are not strictly the same.
+      // In idiomatic TypeScript, `void` is used for function return types, and the "void",
+      // "undefined" types are not the same.
       if (type.isVoidType()) {
         emit("void");
       } else if (typeOfThis != null && typeOfThis.isTemplateType() && typeOfThis.equals(type)) {
