@@ -3,4 +3,4 @@ type NamespacedTypedef = {
 };
 
 export {NamespacedTypedef};
-let y: NamespacedTypedef = 'x';
+let y: NamespacedTypedef = {'x': 'foo'};

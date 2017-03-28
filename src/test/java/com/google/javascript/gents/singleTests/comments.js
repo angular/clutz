@@ -28,19 +28,27 @@ A.prototype.foo = function() {};
 // This is just some extra stuff
 var foo = function(deleted, notdeleted) { return deleted + notdeleted; };
 
-// The following comment should be mostly deleted
+// The following comments should be mostly deleted
 /**
- * @constructor
- * @extends {A}
  * @type {number}
  * @private {number}
  * @protected {number}
  * @param {number} foo description of foo
  * @public {number}
  * @package {number}
- * @const {number}
  */
 var x;
+
+/**
+ * @const {number}
+ */
+var xConst = 1;
+
+/**
+ * @constructor
+ * @extends {A}
+ */
+var X = function() {}
 
 /** @export {number} */
 let m = 4;

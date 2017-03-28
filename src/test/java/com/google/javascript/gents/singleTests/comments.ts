@@ -28,11 +28,14 @@ let foo = function(deleted: number, notdeleted: number): number {
   return deleted + notdeleted;
 };
 
-// The following comment should be mostly deleted
+// The following comments should be mostly deleted
 /**
  * @param foo description of foo
  */
-const x;
+let x: number;
+const xConst: number = 1;
+
+class X extends A {}
 
 /** @export */
 let m: number = 4;

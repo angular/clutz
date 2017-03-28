@@ -9,7 +9,7 @@ A.B.Klass = function() {};
 A.B.Klass.NUM = 4;
 
 A.B();
-var x = A.B.Klass();
+var x = new A.B.Klass();
 var y = A.B.Klass.NUM;
 
 /** @type {A.B.Klass} */
