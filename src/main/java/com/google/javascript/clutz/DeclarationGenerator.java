@@ -136,7 +136,8 @@ class DeclarationGenerator {
           "ReadableByteStreamController",
           "ReadableStreamDefaultController",
           "WritableStreamDefaultController",
-          "ReadableStreamBYOBRequest");
+          "ReadableStreamBYOBRequest",
+          "MutedInfo");
 
   /**
    * List of files that are part of closures platform externs. Not exhaustive, see isPlatformExtern
