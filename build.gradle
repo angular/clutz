@@ -52,7 +52,7 @@ dependencies {
   runtime 'args4j:args4j:2.0.26'
   runtime 'com.google.code.gson:gson:2.7'
 
-  compile 'com.google.javascript:closure-compiler:v20170124'
+  compile 'com.google.javascript:closure-compiler:v20170218'
 
 
   compile 'com.google.code.findbugs:jsr305:3.0.1'

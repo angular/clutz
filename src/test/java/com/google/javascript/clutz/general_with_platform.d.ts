@@ -148,19 +148,6 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  type FetchRequestType = string ;
-  var FetchRequestType : {
-    AUDIO : FetchRequestType ,
-    FONT : FetchRequestType ,
-    IMAGE : FetchRequestType ,
-    NONE : FetchRequestType ,
-    SCRIPT : FetchRequestType ,
-    STYLE : FetchRequestType ,
-    TRACK : FetchRequestType ,
-    VIDEO : FetchRequestType ,
-  };
-}
-declare namespace ಠ_ಠ.clutz {
   class FileEntry extends FileEntry_Instance {
   }
   class FileEntry_Instance extends Entry_Instance {
@@ -317,6 +304,16 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  class MutedInfo extends MutedInfo_Instance {
+  }
+  class MutedInfo_Instance {
+    private noStructuralTyping_: any;
+    extensionId ? : string ;
+    muted : boolean ;
+    reason ? : string ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   interface PipeOptions {
     preventAbort : boolean ;
     preventCancel : boolean ;
@@ -430,20 +427,6 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  type ReferrerPolicy = string ;
-  var ReferrerPolicy : {
-    NONE : ReferrerPolicy ,
-    NO_REFERRER : ReferrerPolicy ,
-    NO_REFERRER_WHEN_DOWNGRADE : ReferrerPolicy ,
-    ORIGIN : ReferrerPolicy ,
-    ORIGIN_WHEN_CROSS_ORIGIN : ReferrerPolicy ,
-    SAMEO_RIGIN : ReferrerPolicy ,
-    STRICT_ORIGIN : ReferrerPolicy ,
-    STRICT_ORIGIN_WHEN_CROSS_ORIGIN : ReferrerPolicy ,
-    UNSAFE_URL : ReferrerPolicy ,
-  };
-}
-declare namespace ಠ_ಠ.clutz {
   class Request extends Request_Instance {
   }
   class Request_Instance implements Body {
@@ -452,93 +435,37 @@ declare namespace ಠ_ಠ.clutz {
     arrayBuffer ( ) : Promise < ArrayBuffer > ;
     blob ( ) : Promise < Blob > ;
     bodyUsed : any ;
-    cache : RequestCache ;
+    cache : string ;
     clone ( ) : Request ;
-    credentials : RequestCredentials ;
-    destination : RequestDestination ;
+    credentials : string ;
+    destination : string ;
     formData ( ) : Promise < FormData > ;
     headers : Headers ;
     integrity : string ;
     json ( ) : Promise < any > ;
     method : string ;
-    mode : RequestMode ;
-    redirect : RequestRedirect ;
+    mode : string ;
+    redirect : string ;
     referrer : string ;
     text ( ) : Promise < string > ;
-    type : FetchRequestType ;
+    type : string ;
     url : string ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  type RequestCache = string ;
-  var RequestCache : {
-    DEFAULT : RequestCache ,
-    FORCE_CACHE : RequestCache ,
-    NO_CACHE : RequestCache ,
-    NO_STORE : RequestCache ,
-    ONLY_IF_CACHED : RequestCache ,
-    RELOAD : RequestCache ,
-  };
-}
-declare namespace ಠ_ಠ.clutz {
-  type RequestCredentials = string ;
-  var RequestCredentials : {
-    INCLUDE : RequestCredentials ,
-    OMIT : RequestCredentials ,
-    SAME_ORIGIN : RequestCredentials ,
-  };
-}
-declare namespace ಠ_ಠ.clutz {
-  type RequestDestination = string ;
-  var RequestDestination : {
-    DOCUMENT : RequestDestination ,
-    EMBED : RequestDestination ,
-    FONT : RequestDestination ,
-    IMAGE : RequestDestination ,
-    MANIFEST : RequestDestination ,
-    MEDIA : RequestDestination ,
-    NONE : RequestDestination ,
-    OBJECT : RequestDestination ,
-    REPORT : RequestDestination ,
-    SCRIPT : RequestDestination ,
-    SERVICEWORKER : RequestDestination ,
-    SHAREDWORKER : RequestDestination ,
-    STYLE : RequestDestination ,
-    WORKER : RequestDestination ,
-    XSLT : RequestDestination ,
-  };
-}
-declare namespace ಠ_ಠ.clutz {
   interface RequestInit {
     body ? : Blob | ArrayBuffer | ArrayBufferView | FormData | string | null ;
-    cache ? : RequestCache ;
-    credentials ? : RequestCredentials ;
+    cache ? : string ;
+    credentials ? : string ;
     headers ? : Headers | string [] [] | IObject < string , string > ;
-    intergrity ? : string ;
+    integrity ? : string ;
     method ? : string ;
-    mode ? : RequestMode ;
-    redirect ? : RequestRedirect ;
+    mode ? : string ;
+    redirect ? : string ;
     referrer ? : string ;
-    referrerPolicy ? : ReferrerPolicy ;
+    referrerPolicy ? : string ;
     window ? : null ;
   }
-}
-declare namespace ಠ_ಠ.clutz {
-  type RequestMode = string ;
-  var RequestMode : {
-    CORS : RequestMode ,
-    NAVIGATE : RequestMode ,
-    NO_CORS : RequestMode ,
-    SAME_ORIGIN : RequestMode ,
-  };
-}
-declare namespace ಠ_ಠ.clutz {
-  type RequestRedirect = string ;
-  var RequestRedirect : {
-    ERROR : RequestRedirect ,
-    FOLLOW : RequestRedirect ,
-    MANUAL : RequestRedirect ,
-  };
 }
 declare namespace ಠ_ಠ.clutz {
   class Response extends Response_Instance {
@@ -562,7 +489,7 @@ declare namespace ಠ_ಠ.clutz {
     statusText : string ;
     text ( ) : Promise < string > ;
     trailer : Promise < Headers > ;
-    type : ResponseType ;
+    type : string ;
     url : string ;
   }
 }
@@ -574,28 +501,21 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  type ResponseType = string ;
-  var ResponseType : {
-    BASIC : ResponseType ,
-    CORS : ResponseType ,
-    DEFAULT : ResponseType ,
-    ERROR : ResponseType ,
-    OPAQUE : ResponseType ,
-    OPAQUEREDIRECT : ResponseType ,
-  };
-}
-declare namespace ಠ_ಠ.clutz {
   class Tab extends Tab_Instance {
   }
   class Tab_Instance {
     private noStructuralTyping_: any;
     active : boolean ;
+    audible ? : boolean ;
+    autoDiscardable : boolean ;
+    discarded : boolean ;
     favIconUrl : string ;
     height ? : number ;
     highlighted : boolean ;
     id : number ;
     incognito : boolean ;
     index : number ;
+    mutedInfo ? : MutedInfo ;
     openerTabId : number ;
     pinned : boolean ;
     sessionId ? : string ;
