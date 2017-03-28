@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
 /**
@@ -123,10 +124,11 @@ public class DeclarationSyntaxTest {
   }
 
   private static void runChecked(final List<String> command) throws Exception {
-    // TODO(martinprobst): Use waitFor(n, TimeUnit.SECONDS) and .destroyForcibly once we moved to
-    // Java 1.8.
     final Process tsc = new ProcessBuilder().command(command).redirectErrorStream(true).start();
-    if (tsc.waitFor() != 0) {
+    if (!tsc.waitFor(2, TimeUnit.SECONDS)) {
+      tsc.destroyForcibly();
+    }
+    if (tsc.exitValue() != 0) {
       InputStreamReader isr = new InputStreamReader(tsc.getInputStream(), Charsets.UTF_8);
       String consoleOut = CharStreams.toString(isr);
       fail(command + ": exited abnormally with code " + tsc.exitValue() + "\n" + consoleOut);
