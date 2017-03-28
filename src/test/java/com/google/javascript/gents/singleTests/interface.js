@@ -27,7 +27,13 @@ ns.Interface3 = function() {}
 ns.Interface3.prototype.baz = function(a) {};
 
 /** @implements {ns.Interface2} */
-class X {}
+class X {
+  /**
+   * @param {string} a
+   * @return {number}
+   */
+  bar(a) {return 1;}
+}
 
 /**
  * @constructor
@@ -35,6 +41,16 @@ class X {}
  * @implements {ns.Interface3}
  */
 function Y() {}
+/**
+ * @param {string} a
+ * @return {number}
+ */
+Y.prototype.bar = function(a) {return 1;}
+/**
+ * @param {string} a
+ * @return {number}
+ */
+Y.prototype.baz = function(a) {return 1;}
 
 /** @record */
 ns.StructuralInterface = function() {}

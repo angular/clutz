@@ -32,4 +32,3 @@ A.B.C = function() {};
 A.B.C.bar = function() { return false; };
 
 A.B.D = path.to.someUtilFunction();
-A.B.D.setA(1).setB(2);

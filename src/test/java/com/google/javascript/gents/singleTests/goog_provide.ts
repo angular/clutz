@@ -27,4 +27,3 @@ export class C {
 }
 
 export const D = path.to.someUtilFunction();
-D.setA(1).setB(2);

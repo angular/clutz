@@ -1,3 +1,6 @@
+/** @typedef {string} */
+var Foo;
+
 /**
  * @constructor
  * @param {number} a
