@@ -18,7 +18,7 @@ ns.Interface2 = function() {}
  */
 ns.Interface2.prototype.bar = function(a) {};
 
-/** @interface @implements {ns.Interface2} */
+/** @interface @extends {ns.Interface2} */
 ns.Interface3 = function() {}
 /**
  * @param {string} a

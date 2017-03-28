@@ -351,7 +351,7 @@ public final class TypeConversionPass implements CompilerPass {
 
     Node typeNode;
     if (jsDoc.isInterface()) {
-      List<JSTypeExpression> interfaces = jsDoc.getImplementedInterfaces();
+      List<JSTypeExpression> interfaces = jsDoc.getExtendedInterfaces();
       if (!interfaces.isEmpty()) {
         Node superInterfaces = new Node(Token.INTERFACE_EXTENDS);
         for (JSTypeExpression type : interfaces) {
