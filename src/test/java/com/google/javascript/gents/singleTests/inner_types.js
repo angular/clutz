@@ -40,6 +40,7 @@ MyClass.InnerTypedef;
  * @typedef {{
  *     a: {b: {c: number}},
  *     d: string,
+ *     e: function(string, number): number,
  * }}
  */
 MyClass.InnerTypedefWithNestedTypes;
