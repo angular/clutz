@@ -186,7 +186,7 @@ public class TypeScriptGenerator {
             opts.alreadyConvertedPrefix);
     modulePass.process(externRoot, srcRoot);
 
-    new TypeConversionPass(compiler, comments).process(externRoot, srcRoot);
+    new TypeConversionPass(compiler, modulePrePass, comments).process(externRoot, srcRoot);
 
     new TypeAnnotationPass(
             compiler,

@@ -33,6 +33,12 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     return fileToModule;
   }
 
+  void addFileMap(String filename) {
+    if (!fileToModule.containsKey(filename)) {
+      fileToModule.put(filename, new FileModule(filename, false));
+    }
+  }
+
   Map<String, FileModule> getNamespaceMap() {
     return namespaceToModule;
   }
