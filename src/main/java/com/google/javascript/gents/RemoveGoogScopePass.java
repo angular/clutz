@@ -6,6 +6,7 @@ import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.jscomp.NodeUtil;
+import com.google.javascript.rhino.IR;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
 import java.util.HashMap;
@@ -73,18 +74,17 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
 
     @Nullable Node nodeToMove = blockOfScopeContents.getFirstChild();
     while (nodeToMove != null) {
-      // After maybeRewriteAlias, nodeToMove is either (1)already detached or (2)needs to be moved.
-      @Nullable Node nodeToCheck = maybeRewriteAlias(nodeToMove);
+      RewriteStatus rewriteStatus = maybeRewriteAlias(nodeToMove);
       // (1) nodeToMove is detached, alias to provided namespace is recorded, the next node is
       // returned. The next node should be 'maybeRewriteAlias()' checked before it can be moved out
       // of goog.scope
-      if (nodeToCheck != null) {
-        nodeToMove = nodeToCheck;
+      if (rewriteStatus != stillAttached) {
+        nodeToMove = rewriteStatus.nextNode;
         continue;
       }
 
       // (2) Alias is re-assigned with the provided namespace. In this case, node is not detached
-      // and null is returned. nodeToMove needs to be moved out of goog.scope
+      // and stillAttached sentinel is returned. nodeToMove needs to be moved out of goog.scope
       // Store the next node in a temp variable since detaching the node breaks the chain.
       Node nextNodeToMove = nodeToMove.getNext();
       nodeToMove.detachFromParent();
@@ -104,35 +104,52 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
    * the node. If the node is an assignment for a local alias's property then rewrite the local
    * alias.
    *
-   * @return the next node if the current node is detached, return null otherwise.
+   * @return RewriteStatus (see class comment).
    */
-  private Node maybeRewriteAlias(Node node) {
+  private RewriteStatus maybeRewriteAlias(Node node) {
     switch (node.getFirstChild().getToken()) {
       case NAME:
         return maybeRecordAndRemoveAlias(node.getFirstChild());
       case ASSIGN:
         maybeReassignAlias(node.getFirstChild());
-        return null;
+        return stillAttached;
       default:
-        return null;
+        return stillAttached;
     }
   }
 
-  private Node maybeRecordAndRemoveAlias(Node assign) {
-    Node next = assign.getParent();
+  /** Sentinel value used to express that the node is still attached. */
+  private static final RewriteStatus stillAttached = new RewriteStatus(IR.number(0));
+
+  /**
+   * When going over nodes the results is that either: (1) node is already detached. (2) node is
+   * still attached and needs to be moved.
+   *
+   * <p>If the node is detached RewriteStatus keeps track of the next node to process. That node
+   * could be null, if there is nothing to process.
+   */
+  private static class RewriteStatus {
+    private final Node nextNode;
+
+    private RewriteStatus(Node node) {
+      this.nextNode = node;
+    }
+  }
+
+  private RewriteStatus maybeRecordAndRemoveAlias(Node assign) {
     Node lhs = assign;
     Node rhs = assign.getLastChild();
     if (rhs == null) { // var foo;
-      return null;
+      return stillAttached;
     }
     if (isInProvidedNamespace(rhs)) {
       aliasToProvidedNamespace.put(lhs.getString(), rhs.getQualifiedName());
-      next = assign.getParent().getNext();
+      Node next = assign.getParent().getNext();
       assign.detachFromParent();
       compiler.reportCodeChange();
-      return next;
+      return new RewriteStatus(next);
     }
-    return null;
+    return stillAttached;
   }
 
   private boolean isInProvidedNamespace(Node node) {
