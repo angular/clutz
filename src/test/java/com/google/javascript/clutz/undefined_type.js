@@ -42,3 +42,11 @@ undefinedns.i = function() {};
  * @typedef {{foo: (boolean | undefined)}}
  */
 undefinedns.alias;
+
+
+/**
+ * @param {function(): void} f
+ * @param {function(): (string|void)} g
+ * @constructor
+ */
+undefinedns.C = function(f, g) {};
