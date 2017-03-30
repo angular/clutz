@@ -48,6 +48,15 @@ public class DeclarationGeneratorTests {
           return name.endsWith(".ts");
         }
       };
+
+  public static final FilenameFilter D_TS =
+      new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+          return name.endsWith(".d.ts");
+        }
+      };
+
   public static final String PLATFORM_MARKER = "/** Insert general_with_platform.d.ts here */\n";
 
   public static TestSuite suite() throws IOException {
@@ -80,7 +89,7 @@ public class DeclarationGeneratorTests {
     return externFile.toFile().exists() ? externFile.toString() : null;
   }
 
-  static List<File> getTestInputFiles(FilenameFilter filter) {
+  public static List<File> getTestInputFiles(FilenameFilter filter) {
     File[] testFiles = getPackagePath().toFile().listFiles(filter);
     return Arrays.asList(testFiles);
   }
