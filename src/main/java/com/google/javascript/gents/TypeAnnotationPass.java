@@ -199,14 +199,19 @@ public final class TypeAnnotationPass implements CompilerPass {
           // creating each MEMBER_VARIABLE_DEFs so code generator works.
           if (bestJSDocInfo != null && bestJSDocInfo.hasTypedefType()) {
             Node typedefTypeRoot = bestJSDocInfo.getTypedefType().getRoot();
-            //LC
-            //    LB
-            //        COLON
-            //            STRING_KEY a
-            //            STRING number
-            //        COLON
-            //            STRING_KEY b
-            //            STRING number
+            if ((typedefTypeRoot.getToken() == Token.BANG)
+                || (typedefTypeRoot.getToken() == Token.QMARK)) {
+              typedefTypeRoot = typedefTypeRoot.getFirstChild();
+            }
+            // (BANG|QMARK)
+            //     LC
+            //         LB
+            //             COLON
+            //                 STRING_KEY a
+            //                 STRING number
+            //             COLON
+            //                 STRING_KEY b
+            //                 STRING number
             for (Node colonNode : typedefTypeRoot.getFirstChild().children()) {
               Node memberVariableDefNode =
                   Node.newString(Token.MEMBER_VARIABLE_DEF, colonNode.getFirstChild().getString());

@@ -87,13 +87,20 @@ public final class TypeConversionPass implements CompilerPass {
           }
           break;
         case GETPROP:
-          // Converts a class inner typedef into a top level interface, which then later has its
-          // members converted in TypeAnnotationPass.
+          // Converts a class inner typedef into either (1) a top level interface, which then later
+          // has its members converted in TypeAnnotationPass; or (2) a type alias.
           // Most class inner @typedef meant @record in closure but they were added before @record
           // was supported. Also in TypeScript interfaces are preferred to type alias because of
-          // better error reporting and ability to extend.
+          // better error reporting and ability to extend. However simple types such as string are
+          // still type aliases.
           bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
-          if (bestJSDocInfo != null && bestJSDocInfo.hasTypedefType()) {
+          if (bestJSDocInfo == null || !bestJSDocInfo.hasTypedefType()) {
+            break;
+          }
+
+          Node typedefNode = bestJSDocInfo.getTypedefType().getRoot();
+          if (containsObject(typedefNode)) {
+            // Interface
             String interfaceName = n.getSecondChild().getString();
             Node interfaceMember = Node.newString(Token.INTERFACE_MEMBERS, interfaceName);
             typesToRename.put(n.getQualifiedName(), interfaceName);
@@ -105,29 +112,58 @@ public final class TypeConversionPass implements CompilerPass {
             nameNode.addChildToBack(interfaceNode);
             Node exportNode = new Node(Token.EXPORT, new Node(Token.CONST, nameNode));
             replaceExpressionOrAssignment(n, parent, exportNode);
+            break;
           }
+
+          // Typedef of simple types
+          createTypeAlias(n, parent);
           break;
         case NAME:
         case VAR:
         case LET:
         case CONST:
-          // Creates a type alias
-          bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
-          if (bestJSDocInfo != null && bestJSDocInfo.hasTypedefType()) {
-            String name;
-            if (n.getToken() == Token.NAME) {
-              name = n.getString();
-            } else {
-              name = n.getFirstChild().getString();
-            }
-            Node typeDef = Node.newString(Token.TYPE_ALIAS, name);
-            types.put(name, typeDef);
-            typeDef.setJSDocInfo(bestJSDocInfo);
-            replaceExpressionOrAssignment(n, parent, typeDef);
-          }
+          createTypeAlias(n, parent);
           break;
         default:
           break;
+      }
+    }
+
+    private boolean containsObject(Node typedefNode) {
+      Token typedefToken = typedefNode.getToken();
+      if (typedefToken == Token.LC) {
+        return true;
+      }
+
+      if ((typedefToken == Token.QMARK || typedefToken == Token.BANG)
+          && (typedefNode.hasOneChild())) {
+        // child Node is a simple type or a LC
+        return containsObject(typedefNode.getFirstChild());
+      }
+
+      return false;
+    }
+
+    private void createTypeAlias(Node n, Node parent) {
+      JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
+      if (bestJSDocInfo != null && bestJSDocInfo.hasTypedefType()) {
+        String name;
+        switch (n.getToken()) {
+          case NAME:
+            name = n.getString();
+            break;
+          case GETPROP:
+            // Inner typedef
+            name = n.getSecondChild().getString();
+            break;
+          default:
+            name = n.getFirstChild().getString();
+            break;
+        }
+        Node typeDef = Node.newString(Token.TYPE_ALIAS, name);
+        types.put(name, typeDef);
+        typeDef.setJSDocInfo(bestJSDocInfo);
+        replaceExpressionOrAssignment(n, parent, typeDef);
       }
     }
 

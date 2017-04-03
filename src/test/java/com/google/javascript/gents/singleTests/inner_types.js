@@ -30,6 +30,22 @@ class MyClass {
 MyClass.InnerTypedefWithAssignment = {};
 
 /**
+ * @typedef {!{
+ *     a: number,
+ *     b: number,
+ * }}
+ */
+MyClass.InnerTypedefNonNullable = {};
+
+/**
+ * @typedef {?{
+ *     a: number,
+ *     b: number,
+ * }}
+ */
+MyClass.InnerTypedefNullable = {};
+
+/**
  * @typedef {{
  *     a: number,
  * }}
@@ -45,11 +61,44 @@ MyClass.InnerTypedef;
  */
 MyClass.InnerTypedefWithNestedTypes;
 
+/** @typedef {string} */
+MyClass.InnerMyStringType;
+
+/** @typedef {!string} */
+MyClass.InnerMyStringTypeNonNullable;
+
+/** @typedef {?string} */
+MyClass.InnerMyStringTypeNullable;
+
+/** @typedef {?} */
+MyClass.InnerMyAny1;
+
+/** @typedef {*} */
+MyClass.InnerMyAny2;
+
+/** @typedef {boolean|number|string} */
+MyClass.InnerUnionType;
+
+/** @typedef {!Array<number>} */
+MyClass.InnerNumberArrayType;
+
 /**
  * @typedef {{
  *     a: {b: {c: number}},
  * }}
  */
 var Typedef;
+
+/** @typedef {string} */
+var MyStringType;
+
+/** @typedef {!string} */
+var MyStringTypeNonNullable;
+
+/** @typedef {?string} */
+var MyStringTypeNullable;
+
+/** @typedef {?} */
+var MyAny;
 
 exports = MyClass;
