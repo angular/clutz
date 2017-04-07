@@ -1,3 +1,4 @@
+type Foo = string;
 
 class A {
   b: any;

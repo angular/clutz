@@ -1,7 +1,7 @@
 /**
  * @constructor
  * @param {number} parameterProp
- * @param {Object} objectParam
+ * @param {{foo: {bar: function() : number}}} objectParam
  */
 var A = function(parameterProp, objectParam) {
   /** @type {number} */
@@ -17,9 +17,10 @@ var A = function(parameterProp, objectParam) {
   this.w;
   this.w.bar = 'bar';
 
-  baz.v = 1;
   this.n = 12;
   this.n = 13;
+
+  this.a;
 
   this.arrowFuncField = () => {
     this.fieldSetFromArrowFunc = 'f';
@@ -35,9 +36,9 @@ A.prototype.foo = function() {
   this.d;
 
   this.n = 14;
+  this.x = this.a;
   // These are undeclared fields
   this.u;
-  this.x = this.a;
 };
 
 /** @type {number} */

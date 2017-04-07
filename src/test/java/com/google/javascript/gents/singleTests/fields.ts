@@ -8,21 +8,23 @@ class A {
   z: number;
   w: any;
   n: any = 12;
+  a: any;
   fieldSetFromArrowFunc: any;
   arrowFuncField: any;
   functionResultField: any;
   c: number;
   d: string;
+  x: any;
 
   // These are undeclared fields
   u: any;
-  x: any;
 
-  constructor(public parameterProp: number, objectParam: Object) {
+  constructor(public parameterProp: number, objectParam: {
+    foo: {bar: () => number}
+  }) {
     let y = 1;
     this.z = y + 1;
     this.w.bar = 'bar';
-    baz.v = 1;
     this.n = 13;
     this.arrowFuncField = () => {
       this.fieldSetFromArrowFunc = 'f';
