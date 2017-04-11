@@ -36,3 +36,17 @@ const x;
 
 /** @export */
 let m: number = 4;
+let a = function() {
+  return {b: function() {}};
+};
+let c = function() {};
+
+// comment before GETPROP
+
+// comment in GETPROP
+a().b();
+
+// comment after GETPROP
+c();
+
+// comment in the end
