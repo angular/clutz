@@ -180,6 +180,22 @@ public final class CommentLinkingPass implements CompilerPass {
       return c;
     }
 
+    /**
+     * If the parent is NOT a GETPROP node, then outputs floating comments by attaching to a new
+     * EMPTY node before the current node. If the parent is a GETPROP node, then attach the comments
+     * to the parent node to avoid messing up GETPROP node's children count.
+     *
+     * @param n current node
+     * @param parent parent node
+     */
+    private void outputFloatingCommentFromBufferToParentOrCurrentNode(Node n, Node parent) {
+      if (parent.getToken() == Token.GETPROP) {
+        linkCommentBufferToNode(parent);
+      } else {
+        parent.addChildBefore(newFloatingCommentFromBuffer(), n);
+      }
+    }
+
     /** Returns if the current comment is directly adjacent to a line. */
     private boolean isCommentAdjacentToLine(int line) {
       int commentLine = getLastLineOfCurrentComment();
@@ -203,6 +219,7 @@ public final class CommentLinkingPass implements CompilerPass {
         return true;
       }
 
+      boolean outputCommentAfterLine = false;
       while (hasRemainingComments() && !isCommentAdjacentToLine(line)) {
         // Comment is AFTER this line
         if (getLastLineOfCurrentComment() > line) {
@@ -212,9 +229,10 @@ public final class CommentLinkingPass implements CompilerPass {
         // If the new comment is separated from the current one by at least a line,
         // output the current group of comments.
         if (getFirstLineOfNextComment() - getLastLineOfCurrentComment() > 1) {
-          parent.addChildBefore(newFloatingCommentFromBuffer(), n);
+          outputFloatingCommentFromBufferToParentOrCurrentNode(n, parent);
         }
         addNextCommentToBuffer();
+        outputCommentAfterLine = true;
       }
 
       if (getLastLineOfCurrentComment() == line) {
@@ -223,12 +241,14 @@ public final class CommentLinkingPass implements CompilerPass {
       } else if (getLastLineOfCurrentComment() == line - 1) {
         // Comment ends just before code
         linkCommentBufferToNode(n);
-      } else if (!hasRemainingComments()) {
-        // Exhausted all comments, output floating comment before current node
-        parent.addChildBefore(newFloatingCommentFromBuffer(), n);
+      } else if (!hasRemainingComments() && !outputCommentAfterLine) {
+        // Exhausted all comments, output floating comment before current node or at parent node.
+        outputFloatingCommentFromBufferToParentOrCurrentNode(n, parent);
       }
 
-      addNextCommentToBuffer();
+      if (!outputCommentAfterLine) {
+        addNextCommentToBuffer();
+      }
       return true;
     }
 
