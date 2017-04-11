@@ -1,6 +1,7 @@
 package com.google.javascript.gents;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.NodeTraversal;
@@ -50,6 +51,20 @@ public final class CommentLinkingPass implements CompilerPass {
   private static final Pattern[] COMMENT_REPLACEMENTS = {
     Pattern.compile("//\\s*goog.scope\\s*(?<keep>)")
   };
+
+  /**
+   * These nodes can expand their children with new EMPTY nodes. We will use that as a placeholder
+   * for floating comments.
+   */
+  private static final ImmutableSet<Token> TOKENS_CAN_HAVE_EMPTY_CHILD =
+      ImmutableSet.of(Token.SCRIPT, Token.MODULE_BODY, Token.BLOCK);
+  /**
+   * Comments assigned to these nodes will not be emitted during code generation because these nodes
+   * don't use add(Node n, Context ctx). Therefore we avoid assigning comments to them.
+   */
+  // TODO(bowenni): More nodes missing here?
+  private static final ImmutableSet<Token> TOKENS_IGNORE_COMMENTS =
+      ImmutableSet.of(Token.LABEL_NAME, Token.NAME, Token.GENERIC_TYPE, Token.BLOCK);
 
   private final Compiler compiler;
   private final NodeComments nodeComments;
@@ -136,6 +151,10 @@ public final class CommentLinkingPass implements CompilerPass {
 
     /** Flushes the comment buffer, linking it to the provided node. */
     private void linkCommentBufferToNode(Node n) {
+      if (!canHaveComment(n)) {
+        linkCommentBufferToNode(n.getParent());
+        return;
+      }
       StringBuilder sb = new StringBuilder();
       String sep = "\n";
       for (Comment c : commentBuffer) {
@@ -180,6 +199,41 @@ public final class CommentLinkingPass implements CompilerPass {
       return c;
     }
 
+    /**
+     * If the parent node can survive code generation with an extra EMPTY node child, then output
+     * floating comments by attaching to a new EMPTY node before the current node. Otherwise try to
+     * put the comment in current node. If the current node doesn't accept comments (for example a
+     * BLOCK node will ignore any comments mapped to it), then attach the comments to the parent
+     * node. The parent node might not be the best place to hold the comment but at least we don't
+     * lose the comment and we don't break code generation.
+     */
+    private void outputFloatingCommentFromBuffer(Node n) {
+      Node parent = n.getParent();
+      if (parent == null) {
+        linkCommentBufferToNode(n);
+      } else if (TOKENS_CAN_HAVE_EMPTY_CHILD.contains(parent.getToken())) {
+        parent.addChildBefore(newFloatingCommentFromBuffer(), n);
+      } else if (canHaveComment(n)) {
+        linkCommentBufferToNode(n);
+      } else {
+        outputFloatingCommentFromBuffer(parent);
+      }
+    }
+
+    private boolean canHaveComment(Node n) {
+      if (TOKENS_IGNORE_COMMENTS.contains(n.getToken())) {
+        return false;
+      }
+
+      // Special case: GETPROP node's second child(the property name) loses comments.
+      Node parent = n.getParent();
+      if (parent != null && parent.isGetProp() && parent.getSecondChild() == n) {
+        return false;
+      }
+
+      return true;
+    }
+
     /** Returns if the current comment is directly adjacent to a line. */
     private boolean isCommentAdjacentToLine(int line) {
       int commentLine = getLastLineOfCurrentComment();
@@ -203,6 +257,7 @@ public final class CommentLinkingPass implements CompilerPass {
         return true;
       }
 
+      boolean outputCommentAfterLine = false;
       while (hasRemainingComments() && !isCommentAdjacentToLine(line)) {
         // Comment is AFTER this line
         if (getLastLineOfCurrentComment() > line) {
@@ -212,9 +267,10 @@ public final class CommentLinkingPass implements CompilerPass {
         // If the new comment is separated from the current one by at least a line,
         // output the current group of comments.
         if (getFirstLineOfNextComment() - getLastLineOfCurrentComment() > 1) {
-          parent.addChildBefore(newFloatingCommentFromBuffer(), n);
+          outputFloatingCommentFromBuffer(n);
         }
         addNextCommentToBuffer();
+        outputCommentAfterLine = true;
       }
 
       if (getLastLineOfCurrentComment() == line) {
@@ -223,12 +279,14 @@ public final class CommentLinkingPass implements CompilerPass {
       } else if (getLastLineOfCurrentComment() == line - 1) {
         // Comment ends just before code
         linkCommentBufferToNode(n);
-      } else if (!hasRemainingComments()) {
-        // Exhausted all comments, output floating comment before current node
-        parent.addChildBefore(newFloatingCommentFromBuffer(), n);
+      } else if (!hasRemainingComments() && !outputCommentAfterLine) {
+        // Exhausted all comments, output floating comment.
+        outputFloatingCommentFromBuffer(n);
       }
 
-      addNextCommentToBuffer();
+      if (!outputCommentAfterLine) {
+        addNextCommentToBuffer();
+      }
       return true;
     }
 
