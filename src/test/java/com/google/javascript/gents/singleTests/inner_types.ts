@@ -24,6 +24,17 @@ export interface InnerTypedefWithAssignment {
   b: number;
 }
 
+export interface InnerTypedefNonNullable {
+  a: number;
+  b: number;
+}
+
+export interface InnerTypedefNullable {
+//!! Intentionally loose the nullability.
+  a: number;
+  b: number;
+}
+
 export interface InnerTypedef { a: number; }
 
 export interface InnerTypedefWithNestedTypes {
@@ -31,6 +42,17 @@ export interface InnerTypedefWithNestedTypes {
   d: string;
   e: (p1: string, p2: number) => number;
 }
+type InnerMyStringType = string;
+type InnerMyStringTypeNonNullable = string;
+type InnerMyStringTypeNullable = string|null;
+type InnerMyAny1 = any;
+type InnerMyAny2 = any;
+type InnerUnionType = boolean|number|string;
+type InnerNumberArrayType = number[];
 type Typedef = {
   a: {b: {c: number}}
 };
+type MyStringType = string;
+type MyStringTypeNonNullable = string;
+type MyStringTypeNullable = string|null;
+type MyAny = any;
