@@ -213,8 +213,19 @@ public final class TypeConversionPass implements CompilerPass {
           @Nullable JSDocInfo constructorJsDoc = NodeUtil.getBestJSDocInfo(fnNode);
 
           for (Node param : params.children()) {
-            String paramName =
-                param.isDefaultValue() ? param.getFirstChild().getString() : param.getString();
+            Node nodeAfterDefault = param.isDefaultValue() ? param.getFirstChild() : param;
+            // If not a Name node, it is potentially a destructuring arg, for which we cannot
+            // use the public/private shorthand.
+            if (!nodeAfterDefault.isName()) {
+              continue;
+            }
+            // It appears that adding ACCESS_MODIFIERs to Default params do not come out though
+            // the CodeGenerator, thus not safe to remove the declaration.
+            // TODO(rado): fix in emitting code and remove this line.
+            if (param.isDefaultValue()) {
+              continue;
+            }
+            String paramName = nodeAfterDefault.getString();
             @Nullable
             JSTypeExpression paramType =
                 constructorJsDoc == null ? null : constructorJsDoc.getParameterType(paramName);
