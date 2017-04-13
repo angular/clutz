@@ -39,3 +39,26 @@ class X extends A {}
 
 /** @export */
 let m: number = 4;
+
+// comment at the bottom of if block
+
+// head comment
+if (m) {
+} else {
+}
+
+// comment at the bottom of else block
+let a = function() {
+  return {b: function() {}};
+};
+let c = function() {};
+
+// comment before GETPROP
+
+// comment in GETPROP
+a().b();
+
+// comment after GETPROP
+c();
+
+// comment in the end

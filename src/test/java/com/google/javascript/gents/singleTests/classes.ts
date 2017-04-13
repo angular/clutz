@@ -60,8 +60,6 @@ nested.klass = class {};
 
 class F {
   // inline comment
-
-
   /**
    * block comment
    */

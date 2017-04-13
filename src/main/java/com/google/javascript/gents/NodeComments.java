@@ -9,6 +9,9 @@ public class NodeComments {
   final Map<Node, String> nodeToComment = new HashMap<>();
 
   void putComment(Node n, String comment) {
+    if (hasComment(n)) {
+      comment = getComment(n) + comment;
+    }
     nodeToComment.put(n, comment);
   }
 

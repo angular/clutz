@@ -52,3 +52,28 @@ var X = function() {}
 
 /** @export {number} */
 let m = 4;
+
+// head comment
+if (m) {
+  // comment at the bottom of if block
+}
+else {
+  // comment at the bottom of else block
+}
+
+var a = function() {
+  return {
+    b: function() {}
+  }
+};
+var c = function() {};
+
+// comment before GETPROP
+a(
+// comment in GETPROP
+).
+b();
+
+// comment after GETPROP
+c();
+// comment in the end
