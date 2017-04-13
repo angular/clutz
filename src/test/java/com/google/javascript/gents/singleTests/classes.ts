@@ -78,6 +78,28 @@ class F {
   }
 }
 
+/**
+ * goog.defineClass with annotation
+ */
+class GoogDefinedClassWithConstructorAnnotation {}
+
+/**
+ * goog.defineClass with deeply nested annotation
+ */
+class GoogDefinedClassWithDeeplyNestedConstructorAnnotation {
+  foo() {
+    return new class Klass {}
+    ();
+  }
+}
+
+/**
+ * goog.defineClass with annotation and parameters
+ */
+class GoogDefinedClassWithConstructorAnnotationAndParameters {
+  constructor(a: number) {}
+}
+
 class G {
   /**
    * ES6 method short hand.

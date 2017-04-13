@@ -75,6 +75,39 @@ const F = goog.defineClass(null, {
   }
 });
 
+/**
+ * goog.defineClass with @constructor annotation
+ */
+var GoogDefinedClassWithConstructorAnnotation = goog.defineClass(null, {
+  /**
+   * @constructor
+   */
+  constructor: function() {
+  },
+});
+
+/**
+ * goog.defineClass with deeply nested @constructor annotation
+ */
+var GoogDefinedClassWithDeeplyNestedConstructorAnnotation = goog.defineClass(null, {
+  constructor: function() {},
+  foo: function() {
+    return new (/** @constructor */ function Klass() {})();
+  },
+});
+
+/**
+ * goog.defineClass with @constructor annotation and parameters
+ */
+var GoogDefinedClassWithConstructorAnnotationAndParameters = goog.defineClass(null, {
+  /**
+   * @param {number} a
+   * @constructor
+   */
+  constructor: function(a) {
+  },
+});
+
 const G = goog.defineClass(null, {
   /**
    * ES6 method short hand.
