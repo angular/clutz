@@ -7,7 +7,7 @@ class C {
   /**
    * @param c with default
    */
-  constructor({a}, {b} = {}, c = 0, private d: number) {
+  constructor({a}, {b} = {b: 1}, c = 0, private d: number) {
     this.a = a;
     this.b = b;
     //!! Due to a closure bug this one stays behind even though it is possible

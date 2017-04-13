@@ -37,9 +37,9 @@ var partiallyTyped = function(n, u1, b, u2) {};
  * @param {boolean} b
  * @param {string} s
  * @param {?} x
- * @return {string}
+ * @return {?string}
  */
-var complex = function(b, s, x) { if (b) { return s; }};
+var complex = function(b, s, x) { if (b) { return s; } return null;};
 
 // Undefined params
 

@@ -14,7 +14,6 @@ import java.io.InputStreamReader;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
@@ -55,7 +54,7 @@ public class DeclarationSyntaxTest {
         }
       };
 
-  static final Path TSC =
+  public static final Path TSC =
       FileSystems.getDefault().getPath("node_modules", "typescript", "bin", "tsc");
 
   private static final ImmutableList<String> TSC_FLAGS =
@@ -119,11 +118,7 @@ public class DeclarationSyntaxTest {
     runChecked(tscCommand);
   }
 
-  private static void runChecked(String... command) throws Exception {
-    runChecked(Arrays.asList(command));
-  }
-
-  private static void runChecked(final List<String> command) throws Exception {
+  public static void runChecked(final List<String> command) throws Exception {
     final Process tsc = new ProcessBuilder().command(command).redirectErrorStream(true).start();
     if (!tsc.waitFor(2, TimeUnit.SECONDS)) {
       tsc.destroyForcibly();
