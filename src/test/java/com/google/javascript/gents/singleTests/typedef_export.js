@@ -4,4 +4,4 @@ goog.provide('ns.NamespacedTypedef');
 ns.NamespacedTypedef;
 
 /** @type {ns.NamespacedTypedef} */
-var y = 'x';
+var y = {'x': 'foo'};
