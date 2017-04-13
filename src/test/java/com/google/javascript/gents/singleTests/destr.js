@@ -5,7 +5,7 @@ class C {
    * @param {number} c with default
    * @param {number} d
    */
-  constructor({a}, {b} = {}, c = 0, d) {
+  constructor({a}, {b} = {b : 1}, c = 0, d) {
     /** @private {number} */
     this.a = a;
 
