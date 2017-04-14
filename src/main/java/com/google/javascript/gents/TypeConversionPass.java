@@ -77,7 +77,8 @@ public final class TypeConversionPass implements CompilerPass {
         case FUNCTION:
           bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
           if (bestJSDocInfo != null
-              && (bestJSDocInfo.isConstructor() || bestJSDocInfo.isInterface())) {
+              && bestJSDocInfo.isConstructorOrInterface()
+              && !isConstructorInGoogDefineClass(n)) {
             convertConstructorToClass(n, bestJSDocInfo);
           }
           break;
@@ -465,6 +466,39 @@ public final class TypeConversionPass implements CompilerPass {
     compiler.reportCodeChange();
   }
 
+  /** return if node n is a @constructor annotated function inside goog.defineClass */
+  boolean isConstructorInGoogDefineClass(Node n) {
+    // CALL
+    //     GETPROP
+    //         NAME goog
+    //         STRING defineClass
+    //     NULL|super class node
+    //     OBJECTLIT
+    //         STRING_KEY constructor
+    //             FUNCTION <- n
+    if (n == null) {
+      return false;
+    }
+
+    @Nullable Node stringKey = n.getParent();
+    if (stringKey == null
+        || !stringKey.isStringKey()
+        || !"constructor".equals(stringKey.getString())) {
+      return false;
+    }
+
+    @Nullable Node objectlit = stringKey.getParent();
+    if (objectlit == null) {
+      return false;
+    }
+
+    @Nullable Node call = objectlit.getParent();
+    if (call == null || !"goog.defineClass".equals(call.getFirstChild().getQualifiedName())) {
+      return false;
+    }
+
+    return true;
+  }
   /**
    * Converts functions and variables declared in object literals into member method and field
    * definitions
