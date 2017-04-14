@@ -97,7 +97,7 @@ public class TypeScriptGenerator {
     compiler.disableThreads();
     setErrorStream(System.err);
 
-    this.pathUtil = new PathUtil(opts.root);
+    this.pathUtil = new PathUtil(opts.root, opts.absolutePathPrefix);
     this.nameUtil = new NameUtil(compiler);
   }
 

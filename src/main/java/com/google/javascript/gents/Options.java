@@ -34,7 +34,7 @@ public class Options {
   String output = "-";
 
   @Option(name = "--root", usage = "root directory of imports", metaVar = "ROOT")
-  String root = null;
+  String root = ".";
 
   @Option(name = "--debug", usage = "run in debug mode (prints compiler warnings)")
   boolean debug = false;
@@ -77,6 +77,13 @@ public class Options {
     metaVar = "ALREADY_CONVERTED_PREFIX"
   )
   String alreadyConvertedPrefix = "google3";
+
+  @Option(
+    name = "--absolutePathPrefix",
+    usage = "Prefix for emitting absolute module references in import statements.",
+    metaVar = "ABSOLUTE_PATH_PREFIX"
+  )
+  String absolutePathPrefix = "google3";
 
   @Argument List<String> arguments = new ArrayList<>();
 
