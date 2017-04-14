@@ -504,8 +504,7 @@ public final class TypeAnnotationPass implements CompilerPass {
           importFile = Node.newString("goog:" + importedNamespace);
         } else {
           importSpec = new Node(Token.IMPORT_SPECS, new Node(Token.IMPORT_SPEC, IR.name(symbol)));
-          String referencedFile = pathUtil.getImportPath(sourceFile, module.file);
-          importFile = Node.newString(referencedFile);
+          importFile = Node.newString(pathUtil.getImportPath(sourceFile, module.file));
         }
         Node importNode = new Node(Token.IMPORT, IR.empty(), importSpec, importFile);
         importsNeeded.put(sourceFile, importNode);

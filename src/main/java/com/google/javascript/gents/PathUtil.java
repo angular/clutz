@@ -6,10 +6,12 @@ import java.nio.file.Paths;
 
 /** Utility methods for file path resolution. */
 public class PathUtil {
-  private String rootpath = null;
+  private final String rootpath;
+  private final String absolutePrefix;
 
-  public PathUtil(String root) {
+  public PathUtil(String root, String absolutePrefix) {
     this.rootpath = root;
+    this.absolutePrefix = absolutePrefix;
   }
 
   /**
@@ -29,12 +31,15 @@ public class PathUtil {
   /**
    * Returns the proper import path for a referenced file. Defaults to an absolute path if the
    * referenced file is more than 2 directories above the current source file.
+   *
+   * <p>NOTE: the string returned from this is not really a root-based path on disk. It only makes
+   * sense as an input to a 'from '...'' clause.
    */
   String getImportPath(String sourceFile, String referencedFile) {
     referencedFile = removeExtension(referencedFile);
     String relativePath = getRelativePath(sourceFile + "/..", referencedFile);
-    if (rootpath != null && relativePath.startsWith("../..")) {
-      return getRelativePath(rootpath, referencedFile);
+    if (relativePath.startsWith("../..")) {
+      return absolutePrefix + "/" + getRelativePath(rootpath, referencedFile);
     } else {
       return relativePath.startsWith(".") ? relativePath : "./" + relativePath;
     }

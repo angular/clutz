@@ -306,25 +306,25 @@ public final class ModuleConversionPass implements CompilerPass {
     String moduleSuffix = nameUtil.lastStepOfName(requiredNamespace);
     // Avoid name collisions
     String backupName = moduleSuffix.equals(localName) ? moduleSuffix + "Exports" : moduleSuffix;
-    String referencedFile = pathUtil.getImportPath(n.getSourceFileName(), module.file);
 
     if (alreadyConverted) {
-      // we cannot user referencedFile here, because usually it points to the ES5 js file that is
+      // we cannot use referencedFile here, because usually it points to the ES5 js file that is
       // the output of TS, and not the original source TS file.
       // However, we can reverse map the goog.module name to a file name.
       // TODO(rado): sync this better with the mapping done in tsickle.
-      referencedFile =
-          pathUtil.getImportPath(
-              n.getSourceFileName(),
-              requiredNamespace.replace(alreadyConvertedPrefix + ".", "").replace(".", "/"));
+      String originalPath =
+          requiredNamespace.replace(alreadyConvertedPrefix + ".", "").replace(".", "/");
       // requiredNamespace is not always precisely the string inside "goog.require(...)", we
       // have to strip suffixes added earlier.
       if (moduleSuffix.equals(localName) && !fullLocalName.equals(requiredNamespace)) {
-        referencedFile = referencedFile.replaceAll("/" + localName + "$", "");
+        originalPath = originalPath.replaceAll("/" + localName + "$", "");
       }
-      convertRequireForAlreadyConverted(n, fullLocalName, referencedFile);
+      convertRequireForAlreadyConverted(
+          n, fullLocalName, pathUtil.getImportPath(n.getSourceFileName(), originalPath));
       return;
     }
+
+    String referencedFile = pathUtil.getImportPath(n.getSourceFileName(), module.file);
 
     // Uses default import syntax as this is a javascript namespace
     if (module.shouldUseOldSyntax()) {
