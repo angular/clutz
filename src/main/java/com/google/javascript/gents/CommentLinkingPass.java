@@ -274,8 +274,11 @@ public final class CommentLinkingPass implements CompilerPass {
       }
 
       if (getLastLineOfCurrentComment() == line) {
-        // Comment on same line as code
-        linkCommentBufferToNode(n);
+        // Comment on same line as code -- we have to make sure this is the node we should attach
+        // it to. It will be the first node after the comment.
+        if (getCurrentComment().getAbsolutePosition() < n.getSourceOffset()) {
+          linkCommentBufferToNode(n);
+        }
       } else if (getLastLineOfCurrentComment() == line - 1) {
         // Comment ends just before code
         linkCommentBufferToNode(n);

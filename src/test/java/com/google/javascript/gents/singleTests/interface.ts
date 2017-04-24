@@ -23,9 +23,8 @@ class Y implements Interface2, Interface3 {
 }
 
 export interface StructuralInterface { bar(a: string): number; }
-
-/** !ns.StructuralInterface */
 const structInterfaceImpl: StructuralInterface = {
+  /** !ns.StructuralInterface */
   bar: function(a: string): number {
     return 1;
   }

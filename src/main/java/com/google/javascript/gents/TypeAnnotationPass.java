@@ -147,37 +147,42 @@ public final class TypeAnnotationPass implements CompilerPass {
             break;
           }
           if (NodeUtil.isNameDeclaration(parent)) { // Variable declaration
-            if (bestJSDocInfo != null) {
-              setTypeExpression(n, bestJSDocInfo.getType(), false);
-            }
+            maybeSetTypeExpression(n, bestJSDocInfo, false);
           } else if (parent.isParamList()) { // Function parameters
             JSDocInfo parentDocInfo = NodeUtil.getBestJSDocInfo(parent.getParent());
-            if (parentDocInfo == null) {
-              break;
-            }
-            JSTypeExpression parameterType = parentDocInfo.getParameterType(n.getString());
-            if (parameterType != null) {
-              Node attachTypeExpr = n;
-              // Modify the primary AST to represent a function parameter as a
-              // REST node, if the type indicates it is a rest parameter.
-              if (parameterType.getRoot().getToken() == Token.ELLIPSIS) {
-                attachTypeExpr = IR.rest(n.getString());
-                nodeComments.replaceWithComment(n, attachTypeExpr);
-                compiler.reportCodeChange();
+            if (parentDocInfo != null) {
+              JSTypeExpression parameterType = parentDocInfo.getParameterType(n.getString());
+              if (parameterType != null) {
+                // Parameter is declared using verbose @param syntax before the function definition.
+                Node attachTypeExpr = n;
+                // Modify the primary AST to represent a function parameter as a
+                // REST node, if the type indicates it is a rest parameter.
+                if (parameterType.getRoot().getToken() == Token.ELLIPSIS) {
+                  attachTypeExpr = IR.rest(n.getString());
+                  nodeComments.replaceWithComment(n, attachTypeExpr);
+                  compiler.reportCodeChange();
+                }
+                // Modify the AST to represent an optional parameter
+                if (parameterType.getRoot().getToken() == Token.EQUALS) {
+                  attachTypeExpr = IR.name(n.getString());
+                  attachTypeExpr.putBooleanProp(Node.OPT_ES6_TYPED, true);
+                  nodeComments.replaceWithComment(n, attachTypeExpr);
+                  compiler.reportCodeChange();
+                }
+                setTypeExpression(attachTypeExpr, parameterType, false);
+                break;
               }
-              // Modify the AST to represent an optional parameter
-              if (parameterType.getRoot().getToken() == Token.EQUALS) {
-                attachTypeExpr = IR.name(n.getString());
-                attachTypeExpr.putBooleanProp(Node.OPT_ES6_TYPED, true);
-                nodeComments.replaceWithComment(n, attachTypeExpr);
-                compiler.reportCodeChange();
-              }
-              setTypeExpression(attachTypeExpr, parameterType, false);
             }
+            // If we didn't break, then maybe the type is inlined just before the parameter?
+            maybeSetTypeExpression(n, bestJSDocInfo, false);
+          } else if (parent.getToken() == Token.FUNCTION && n.getJSDocInfo() == bestJSDocInfo) {
+            // If this is a name of the function and the JsDoc is just before this name,
+            // then it may be an inline return type of this function.
+            maybeSetTypeExpression(parent, bestJSDocInfo, true);
           }
           break;
         case CAST:
-          setTypeExpression(n, n.getJSDocInfo().getType(), false);
+          maybeSetTypeExpression(n, n.getJSDocInfo(), false);
           break;
         case INTERFACE_MEMBERS:
           // Closure code generator expects the form:
@@ -223,6 +228,13 @@ public final class TypeAnnotationPass implements CompilerPass {
           break;
         default:
           break;
+      }
+    }
+
+    private void maybeSetTypeExpression(
+        Node nodeToType, JSDocInfo jsDocInfo, boolean isReturnType) {
+      if (jsDocInfo != null) {
+        setTypeExpression(nodeToType, jsDocInfo.getType(), isReturnType);
       }
     }
   }
@@ -273,7 +285,7 @@ public final class TypeAnnotationPass implements CompilerPass {
   }
 
   /** Sets the annotated type expression corresponding to Node {@code n}. */
-  private void setTypeExpression(Node n, JSTypeExpression type, boolean isReturnType) {
+  private void setTypeExpression(Node n, @Nullable JSTypeExpression type, boolean isReturnType) {
     TypeDeclarationNode node = convert(type, isReturnType);
     if (node != null) {
       n.setDeclaredTypeExpression(node);
