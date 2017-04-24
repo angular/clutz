@@ -41,6 +41,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 /**
@@ -147,42 +148,22 @@ public final class TypeAnnotationPass implements CompilerPass {
             break;
           }
           if (NodeUtil.isNameDeclaration(parent)) { // Variable declaration
-            maybeSetTypeExpression(n, bestJSDocInfo, false);
+            maybeSetInlineTypeExpression(n, n, bestJSDocInfo, false);
           } else if (parent.isParamList()) { // Function parameters
-            JSDocInfo parentDocInfo = NodeUtil.getBestJSDocInfo(parent.getParent());
-            if (parentDocInfo != null) {
-              JSTypeExpression parameterType = parentDocInfo.getParameterType(n.getString());
-              if (parameterType != null) {
-                // Parameter is declared using verbose @param syntax before the function definition.
-                Node attachTypeExpr = n;
-                // Modify the primary AST to represent a function parameter as a
-                // REST node, if the type indicates it is a rest parameter.
-                if (parameterType.getRoot().getToken() == Token.ELLIPSIS) {
-                  attachTypeExpr = IR.rest(n.getString());
-                  nodeComments.replaceWithComment(n, attachTypeExpr);
-                  compiler.reportCodeChange();
-                }
-                // Modify the AST to represent an optional parameter
-                if (parameterType.getRoot().getToken() == Token.EQUALS) {
-                  attachTypeExpr = IR.name(n.getString());
-                  attachTypeExpr.putBooleanProp(Node.OPT_ES6_TYPED, true);
-                  nodeComments.replaceWithComment(n, attachTypeExpr);
-                  compiler.reportCodeChange();
-                }
-                setTypeExpression(attachTypeExpr, parameterType, false);
-                break;
-              }
+            boolean wasSetFromParentDoc = setFunctionParameterTypeFromParentDoc(n, parent);
+            if (!wasSetFromParentDoc) {
+              // If we didn't set the parameter type from parent's JsDoc, then maybe the type
+              // is inlined just before the parameter?
+              maybeSetInlineTypeExpression(n, n, bestJSDocInfo, false);
             }
-            // If we didn't break, then maybe the type is inlined just before the parameter?
-            maybeSetTypeExpression(n, bestJSDocInfo, false);
           } else if (parent.getToken() == Token.FUNCTION && n.getJSDocInfo() == bestJSDocInfo) {
             // If this is a name of the function and the JsDoc is just before this name,
             // then it may be an inline return type of this function.
-            maybeSetTypeExpression(parent, bestJSDocInfo, true);
+            maybeSetInlineTypeExpression(parent, n, bestJSDocInfo, true);
           }
           break;
         case CAST:
-          maybeSetTypeExpression(n, n.getJSDocInfo(), false);
+          setTypeExpression(n, n.getJSDocInfo().getType(), false);
           break;
         case INTERFACE_MEMBERS:
           // Closure code generator expects the form:
@@ -231,11 +212,55 @@ public final class TypeAnnotationPass implements CompilerPass {
       }
     }
 
-    private void maybeSetTypeExpression(
-        Node nodeToType, JSDocInfo jsDocInfo, boolean isReturnType) {
-      if (jsDocInfo != null) {
-        setTypeExpression(nodeToType, jsDocInfo.getType(), isReturnType);
+    private void maybeSetInlineTypeExpression(
+        Node nameNode, Node commentNode, JSDocInfo docInfo, boolean isReturnType) {
+      if (docInfo == null) {
+        return;
       }
+      JSTypeExpression type = docInfo.getType();
+      if (type == null) {
+        return;
+      }
+      setTypeExpression(nameNode, type, isReturnType);
+      // Remove the part of comment that sets the inline type.
+      String toRemove = docInfo.getOriginalCommentString();
+      String nodeComment = nodeComments.getComment(commentNode);
+      if (nodeComment == null) {
+        return;
+      }
+      nodeComment = nodeComment.replaceFirst("\\n?" + Pattern.quote(toRemove), "");
+      nodeComments.clearComment(commentNode);
+      nodeComments.putComment(commentNode, nodeComment);
+      compiler.reportCodeChange();
+    }
+
+    private boolean setFunctionParameterTypeFromParentDoc(Node n, Node parent) {
+      JSDocInfo parentDocInfo = NodeUtil.getBestJSDocInfo(parent.getParent());
+      if (parentDocInfo == null) {
+        return false;
+      }
+      JSTypeExpression parameterType = parentDocInfo.getParameterType(n.getString());
+      if (parameterType == null) {
+        return false;
+      }
+      // Parameter is declared using verbose @param syntax before the function definition.
+      Node attachTypeExpr = n;
+      // Modify the primary AST to represent a function parameter as a
+      // REST node, if the type indicates it is a rest parameter.
+      if (parameterType.getRoot().getToken() == Token.ELLIPSIS) {
+        attachTypeExpr = IR.rest(n.getString());
+        nodeComments.replaceWithComment(n, attachTypeExpr);
+        compiler.reportCodeChange();
+      }
+      // Modify the AST to represent an optional parameter
+      if (parameterType.getRoot().getToken() == Token.EQUALS) {
+        attachTypeExpr = IR.name(n.getString());
+        attachTypeExpr.putBooleanProp(Node.OPT_ES6_TYPED, true);
+        nodeComments.replaceWithComment(n, attachTypeExpr);
+        compiler.reportCodeChange();
+      }
+      setTypeExpression(attachTypeExpr, parameterType, false);
+      return true;
     }
   }
 
