@@ -166,7 +166,7 @@ public final class CommentLinkingPass implements CompilerPass {
 
       String comment = sb.toString();
       if (!comment.isEmpty()) {
-        nodeComments.putComment(n, comment);
+        nodeComments.addComment(n, comment);
       }
       commentBuffer.clear();
     }

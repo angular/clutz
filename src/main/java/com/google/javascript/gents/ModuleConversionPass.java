@@ -101,7 +101,7 @@ public final class ModuleConversionPass implements CompilerPass {
             // export {};
             Node commentNode = new Node(Token.EMPTY);
             commentNode.useSourceInfoFrom(n);
-            nodeComments.putComment(
+            nodeComments.addComment(
                 commentNode,
                 "\n// gents: force this file to be an ES6 module (no imports or exports)");
 
