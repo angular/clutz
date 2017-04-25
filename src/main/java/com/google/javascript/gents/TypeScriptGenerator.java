@@ -90,6 +90,7 @@ public class TypeScriptGenerator {
 
   final PathUtil pathUtil;
   final NameUtil nameUtil;
+  private GentsErrorManager errorManager;
 
   TypeScriptGenerator(Options opts) {
     this.opts = opts;
@@ -102,7 +103,7 @@ public class TypeScriptGenerator {
   }
 
   void setErrorStream(PrintStream errStream) {
-    GentsErrorManager errorManager =
+    errorManager =
         new GentsErrorManager(
             errStream, ErrorFormat.MULTILINE.toFormatter(compiler, true), opts.debug);
     compiler.setErrorManager(errorManager);
@@ -234,7 +235,7 @@ public class TypeScriptGenerator {
     result.moduleRewriteLog =
         new ModuleRenameLogger()
             .generateModuleRewriteLog(filesToConvert, modulePrePass.getNamespaceMap());
-    ((GentsErrorManager) compiler.getErrorManager()).doGenerateReport();
+    errorManager.doGenerateReport();
     return result;
   }
 
