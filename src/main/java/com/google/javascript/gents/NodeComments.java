@@ -8,10 +8,14 @@ import java.util.Map;
 public class NodeComments {
   final Map<Node, String> nodeToComment = new HashMap<>();
 
-  void putComment(Node n, String comment) {
+  void addComment(Node n, String comment) {
     if (hasComment(n)) {
       comment = getComment(n) + comment;
     }
+    setComment(n, comment);
+  }
+
+  void setComment(Node n, String comment) {
     nodeToComment.put(n, comment);
   }
 
@@ -29,7 +33,7 @@ public class NodeComments {
 
   void moveComment(Node from, Node to) {
     if (getComment(from) != null) {
-      putComment(to, getComment(from));
+      addComment(to, getComment(from));
       clearComment(from);
     }
   }

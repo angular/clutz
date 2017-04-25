@@ -64,7 +64,7 @@ public final class CommentLinkingPass implements CompilerPass {
    */
   // TODO(bowenni): More nodes missing here?
   private static final ImmutableSet<Token> TOKENS_IGNORE_COMMENTS =
-      ImmutableSet.of(Token.LABEL_NAME, Token.NAME, Token.GENERIC_TYPE, Token.BLOCK);
+      ImmutableSet.of(Token.LABEL_NAME, Token.GENERIC_TYPE, Token.BLOCK);
 
   private final Compiler compiler;
   private final NodeComments nodeComments;
@@ -166,7 +166,7 @@ public final class CommentLinkingPass implements CompilerPass {
 
       String comment = sb.toString();
       if (!comment.isEmpty()) {
-        nodeComments.putComment(n, comment);
+        nodeComments.addComment(n, comment);
       }
       commentBuffer.clear();
     }
@@ -274,8 +274,13 @@ public final class CommentLinkingPass implements CompilerPass {
       }
 
       if (getLastLineOfCurrentComment() == line) {
-        // Comment on same line as code
-        linkCommentBufferToNode(n);
+        // Comment on same line as code -- we have to make sure this is the node we should attach
+        // it to. It will be the first node after the comment.
+        if (getCurrentComment().location.end.column < n.getCharno()) {
+          linkCommentBufferToNode(n);
+        } else {
+          return true;
+        }
       } else if (getLastLineOfCurrentComment() == line - 1) {
         // Comment ends just before code
         linkCommentBufferToNode(n);
