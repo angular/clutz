@@ -249,26 +249,6 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class IDBDatabaseException extends IDBDatabaseException_Instance {
-    static ABORT_ERR : number ;
-    static CONSTRAINT_ERR : number ;
-    static DATA_ERR : number ;
-    static NON_TRANSIENT_ERR : number ;
-    static NOT_ALLOWED_ERR : number ;
-    static NOT_FOUND_ERR : number ;
-    static QUOTA_ERR : number ;
-    static READ_ONLY_ERR : number ;
-    static TIMEOUT_ERR : number ;
-    static TRANSACTION_INACTIVE_ERR : number ;
-    static UNKNOWN_ERR : number ;
-  }
-  class IDBDatabaseException_Instance {
-    private noStructuralTyping_: any;
-    code : number ;
-    message : string ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
   class Image extends Image_Instance {
   }
   class Image_Instance extends HTMLImageElement {
@@ -315,9 +295,9 @@ declare namespace ಠ_ಠ.clutz {
 }
 declare namespace ಠ_ಠ.clutz {
   interface PipeOptions {
-    preventAbort : boolean ;
-    preventCancel : boolean ;
-    preventClose : boolean ;
+    preventAbort ? : boolean ;
+    preventCancel ? : boolean ;
+    preventClose ? : boolean ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
