@@ -16,7 +16,6 @@ import com.google.javascript.jscomp.DiagnosticType;
 import com.google.javascript.jscomp.ErrorFormat;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.SourceFile;
-import com.google.javascript.jscomp.ThreadSafeDelegatingErrorManager;
 import com.google.javascript.rhino.Node;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -106,7 +105,7 @@ public class TypeScriptGenerator {
     GentsErrorManager errorManager =
         new GentsErrorManager(
             errStream, ErrorFormat.MULTILINE.toFormatter(compiler, true), opts.debug);
-    compiler.setErrorManager(new ThreadSafeDelegatingErrorManager(errorManager));
+    compiler.setErrorManager(errorManager);
   }
 
   public boolean hasErrors() {
@@ -235,7 +234,7 @@ public class TypeScriptGenerator {
     result.moduleRewriteLog =
         new ModuleRenameLogger()
             .generateModuleRewriteLog(filesToConvert, modulePrePass.getNamespaceMap());
-    ((ThreadSafeDelegatingErrorManager) compiler.getErrorManager()).generateReport();
+    ((GentsErrorManager) compiler.getErrorManager()).doGenerateReport();
     return result;
   }
 
