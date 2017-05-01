@@ -15,7 +15,7 @@ auto-complete) as if the imported code was written in TypeScript.
 
 We don't offer a binary distribution, so first you need to build:
 ```shell
-$ npm install 
+$ npm install
 $ gradle build installDist
 ...
 BUILD SUCCESSFUL
@@ -53,3 +53,112 @@ version of TypeScript
 [2.1.6](https://github.com/Microsoft/TypeScript/tree/v2.1.6). The current test
 suite runs against the version of `typescript` in `npm-shrinkwrap.json`, so that is
 always a good choice.
+
+
+# Gents - Closure to TypeScript converter
+
+This repository also hosts `gents` - tool that generates TypeScript code out of
+Closure annotated `.js`. We host it in this repo together with `clutz` because
+they both wrap Closure Compiler to get the type information. As such `gents`
+shares `clutz` restriction that it only accepts code that is valid well-typed
+Closure JavaScript.
+
+Details about some specific conversions follow:
+
+### Module Conversion
+
+`gents` converts Closure `goog.module` and `goog.provide` module/namespaces into
+TypeScript modules. On the exporting side, it converts export assignments into
+TypeScript export statements. On the importing side, it converts `goog.require`
+statements into TypeScript imports. Due to naming issues, this may result in the
+renaming of the imported symbols.
+
+```javascript {.good}
+// file a.js
+goog.module('mod.A');
+exports = function(n) { return n; };
+
+// file b.js
+goog.provide('provided.B');
+provided.B.val = 4;
+
+// file c.js
+goog.module('importer.C');
+var A = goog.require('mod.A');
+var B = goog.require('provided.B');
+
+/** @type {number} */
+var num = A(B.val);
+```
+
+Is converted to:
+
+```javascript {.good}
+// file a.ts
+export const A = function(n) { return n; };
+
+// file b.ts
+export const val = 4;
+
+// file c.ts
+export {};
+import {A} from "./a";
+import * as B from "./b";
+
+let num: number = A(B.val);
+```
+
+### Class Conversion
+
+`gents` converts `@constructor` annotated functions and `goog.defineClass` into
+ES6 class declarations. Additionally, it moves all prototype and static
+method/field declarations into the class.
+
+```javascript {.good}
+/**
+ * @param {number} n
+ * @constructor
+ */
+function A(n) {
+  /** @type {number} */
+  this.num = n;
+}
+
+/** @return {number} */
+A.prototype.foo = function() { return 4; };
+/** @return {boolean} */
+A.bar = function() { return false; };
+/** @type {boolean} */
+A.x = true;
+```
+
+Is converted to:
+
+```javascript {.good}
+class A {
+  num: number;
+  static x: boolean = true;
+
+  constructor(n: number) {
+    this.num = n;
+  }
+  foo(): number {
+    return 4;
+  }
+  static bar(): boolean {
+    return false;
+  }
+}
+```
+
+### Type Conversion
+
+`gents` converts JSDoc annotated JavaScript into the proper TypeScript
+declaration. Note that just like with classes, `gents` only converts explicitly
+annotated types. This is to make sure `gents` doesn't accidentally aggressively
+infer the types of every variable and generate giant type declarations.
+
+### Known Issues and TODOs
+
+[Github
+issues](https://github.com/angular/clutz/issues?q=is%3Aopen+is%3Aissue+label%3Agents)
