@@ -1,4 +1,5 @@
 plugins {
+  // test
   id 'java'
   id 'eclipse'
 
