@@ -1,4 +1,12 @@
 # Clutz - Closure to TypeScript Declarations (`.d.ts`) generator.
+
+
+
+
+
+
+
+
 [![Build Status](https://travis-ci.org/angular/clutz.svg?branch=master)](https://travis-ci.org/angular/clutz)
 
 This project uses the
