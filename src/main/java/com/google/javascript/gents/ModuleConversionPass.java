@@ -440,7 +440,7 @@ public final class ModuleConversionPass implements CompilerPass {
       Node assign, String exportedNamespace, String exportedSymbol, String fileName) {
     checkState(assign.isAssign());
     checkState(assign.getParent().isExprResult());
-    Node grandParent = assign.getParent().getParent();
+    Node grandParent = assign.getGrandparent();
     checkState(
         grandParent.isScript() || grandParent.isModuleBody(),
         "export assignment must be in top level script or module body");

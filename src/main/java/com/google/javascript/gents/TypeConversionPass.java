@@ -546,7 +546,7 @@ public final class TypeConversionPass implements CompilerPass {
     if (declaration.classNode.getToken() == Token.INTERFACE) {
       Node body = declaration.rhs.getLastChild();
       Preconditions.checkState(body.isNormalBlock());
-      if (body.getChildCount() != 0) {
+      if (body.hasChildren()) {
         compiler.report(
             JSError.make(
                 declaration.rhs,
