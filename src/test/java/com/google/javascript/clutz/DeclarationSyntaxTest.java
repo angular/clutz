@@ -120,7 +120,7 @@ public class DeclarationSyntaxTest {
 
   public static void runChecked(final List<String> command) throws Exception {
     final Process tsc = new ProcessBuilder().command(command).redirectErrorStream(true).start();
-    if (!tsc.waitFor(2, TimeUnit.SECONDS)) {
+    if (!tsc.waitFor(5, TimeUnit.SECONDS)) {
       tsc.destroyForcibly();
     }
     if (tsc.exitValue() != 0) {
