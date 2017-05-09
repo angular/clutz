@@ -234,6 +234,8 @@ class DeclarationGenerator {
   private static final ImmutableSet<String> GLOBAL_SYMBOL_ALIASES =
       ImmutableSet.of("Error", "Event", "EventTarget");
 
+  private static final String MODULE_PREFIX = "module$exports$";
+
   private final JSType UNKNOWN_TYPE;
   private final JSType NUMBER_TYPE;
 
@@ -431,7 +433,7 @@ class DeclarationGenerator {
     for (String provide : provides) {
       TypedVar symbol = topScope.getOwnSlot(provide);
       String emitName = provide;
-      String rewritenProvide = "module$exports$" + provide.replace('.', '$');
+      String rewritenProvide = MODULE_PREFIX + provide.replace('.', '$');
       TypedVar moduleTypeVar = topScope.getOwnSlot(rewritenProvide);
       if (moduleTypeVar != null) {
         // The provide came from a goog.module.
@@ -877,6 +879,22 @@ class DeclarationGenerator {
             // Do not throw DeclarationGeneratorException - this is an unexpected runtime error.
             throw new RuntimeException("Failed to emit for " + propertySymbol, e);
           }
+          desiredSymbols.remove(propertyName);
+        }
+      }
+
+      ObjectType oType = symbol.getType().toMaybeObjectType();
+      // TODO(radokirov): investigate dropping the goog.module requirement here.
+      // Currently, without that check, clutz picks up some extra fields on externs objects like
+      // /** @const */ var angular = {};
+      if (oType != null && symbol.getName().startsWith(MODULE_PREFIX)) {
+        // For inferred symbols there is no matching symbol, so the best we can do is pull the
+        // type from the module object type map.
+        for (String desiredSymbol : desiredSymbols) {
+          String[] parts = desiredSymbol.split("\\.");
+          String propName = parts[parts.length - 1];
+          emit("var");
+          treeWalker.visitProperty(propName, oType, false, false, Collections.<String>emptySet());
         }
       }
     }
