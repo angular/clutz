@@ -81,7 +81,7 @@ public class GentsCodeGenerator extends CodeGenerator {
       return false;
     }
     Node prev = n.getPrevious();
-    return prev != null && prev.getToken() == Token.EMPTY && nodeComments.hasComment(prev);
+    return prev != null && prev.isEmpty() && nodeComments.hasComment(prev);
   }
 
   /**
@@ -147,7 +147,8 @@ public class GentsCodeGenerator extends CodeGenerator {
         }
         return false;
       case EXPORT:
-        // When a type alias is exported, closure code generator will add two semi-colons, one for type alias and one for export
+        // When a type alias is exported, closure code generator will add two semi-colons, one for
+        // type alias and one for export
         // For example: export type T = {key: string};;
         if (!n.hasOneChild()) {
           return false;

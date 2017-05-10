@@ -8,7 +8,6 @@ import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.rhino.IR;
 import com.google.javascript.rhino.Node;
-import com.google.javascript.rhino.Token;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -39,7 +38,7 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
   @Override
   public void visit(NodeTraversal t, Node n, Node parent) {
     Node maybeCallNode = n.getFirstChild();
-    if (maybeCallNode == null || maybeCallNode.getToken() != Token.CALL) {
+    if (maybeCallNode == null || !maybeCallNode.isCall()) {
       return;
     }
 
@@ -65,7 +64,7 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
   private void rewriteGoogScope(Node n) {
     // Extract the goog.scope contents, and add them to module being constructed.
     Node blockOfScopeContents = n.getLastChild().getLastChild().getLastChild();
-    blockOfScopeContents.detachFromParent();
+    blockOfScopeContents.detach();
 
     // Rewrite the AST, moving each node in the contents of the scope after the node.
 
@@ -87,7 +86,7 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
       // and stillAttached sentinel is returned. nodeToMove needs to be moved out of goog.scope
       // Store the next node in a temp variable since detaching the node breaks the chain.
       Node nextNodeToMove = nodeToMove.getNext();
-      nodeToMove.detachFromParent();
+      nodeToMove.detach();
 
       n.getParent().addChildAfter(nodeToMove, insertAfterThisNode);
 
@@ -95,7 +94,7 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
       nodeToMove = nextNodeToMove;
     }
 
-    n.detachFromParent();
+    n.detach();
     compiler.reportCodeChange();
   }
 
@@ -145,7 +144,7 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
     if (isInProvidedNamespace(rhs)) {
       aliasToProvidedNamespace.put(lhs.getString(), rhs.getQualifiedName());
       Node next = assign.getParent().getNext();
-      assign.detachFromParent();
+      assign.detach();
       compiler.reportCodeChange();
       return new RewriteStatus(next);
     }

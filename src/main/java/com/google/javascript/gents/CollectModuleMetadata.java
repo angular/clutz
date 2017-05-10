@@ -74,9 +74,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     // const A = goog.require('path.to.A');
     if (module != null && (n.isConst() || n.isLet() || n.isVar())) {
       @Nullable Node rhs = n.getFirstChild().getLastChild();
-      if (rhs != null
-          && rhs.isCall()
-          && "goog.require".equals(rhs.getFirstChild().getQualifiedName())) {
+      if (rhs != null && rhs.isCall() && rhs.getFirstChild().matchesQualifiedName("goog.require")) {
         module.reportImport();
       }
     }
@@ -294,13 +292,13 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
 
     private void maybeAddGoogExport(Node exportsName) {
       String fullname = providesObjectChildren.keySet().iterator().next();
-      if ("exports".equals(exportsName.getQualifiedName())) {
+      if (exportsName.matchesQualifiedName("exports")) {
         String identifier =
             firstNonNull(
                 exportsName.getNext().getQualifiedName(), nameUtil.lastStepOfName(fullname));
         addExport(exportsName.getQualifiedName(), fullname, identifier);
       } else if (exportsName.isGetProp()
-          && "exports".equals(exportsName.getFirstChild().getQualifiedName())) {
+          && exportsName.getFirstChild().matchesQualifiedName("exports")) {
         String identifier = exportsName.getLastChild().getString();
         String importName = fullname + "." + identifier;
         addExport(exportsName.getQualifiedName(), importName, identifier);

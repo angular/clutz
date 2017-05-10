@@ -156,7 +156,7 @@ public final class TypeAnnotationPass implements CompilerPass {
               // is inlined just before the parameter?
               maybeSetInlineTypeExpression(n, n, bestJSDocInfo, false);
             }
-          } else if (parent.getToken() == Token.FUNCTION && n.getJSDocInfo() == bestJSDocInfo) {
+          } else if (parent.isFunction() && n.getJSDocInfo() == bestJSDocInfo) {
             // If this is a name of the function and the JsDoc is just before this name,
             // then it may be an inline return type of this function.
             maybeSetInlineTypeExpression(parent, n, bestJSDocInfo, true);

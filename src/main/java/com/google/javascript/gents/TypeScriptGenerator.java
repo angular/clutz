@@ -291,7 +291,7 @@ public class TypeScriptGenerator {
   private static void stripNonCompiledNodes(Node n, Set<String> filesToCompile) {
     for (Node child : n.children()) {
       if (!filesToCompile.contains(child.getSourceFileName())) {
-        child.detachFromParent();
+        child.detach();
       }
     }
   }
