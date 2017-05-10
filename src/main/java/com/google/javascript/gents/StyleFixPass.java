@@ -71,14 +71,14 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
             // Annotate constant function return type and parameters
             Node newNode = type.getFirstChild();
             Node nextNode = newNode.getNext();
-            newNode.detachFromParent();
+            newNode.detach();
 
             rhs.setDeclaredTypeExpression((TypeDeclarationNode) newNode);
             for (Node param : rhs.getSecondChild().children()) {
               // Replace params with their corresponding type
               newNode = nextNode;
               nextNode = nextNode.getNext();
-              newNode.detachFromParent();
+              newNode.detach();
 
               if (newNode.isRest()) {
                 newNode.getFirstChild().setString(param.getString());
@@ -105,7 +105,7 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
           String comment = nodeComments.getComment(n);
 
           if (!params.hasChildren() && !block.hasChildren() && comment == null) {
-            n.detachFromParent();
+            n.detach();
             compiler.reportCodeChange();
           }
         }
@@ -134,8 +134,8 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
     Node newName = n.getFirstChild();
 
     // Replace name node with declared name
-    rhs.detachFromParent();
-    newName.detachFromParent();
+    rhs.detach();
+    newName.detach();
     nodeComments.replaceWithComment(oldName, newName);
     nodeComments.replaceWithComment(n, rhs);
   }

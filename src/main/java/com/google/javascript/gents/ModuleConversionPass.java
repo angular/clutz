@@ -118,9 +118,7 @@ public final class ModuleConversionPass implements CompilerPass {
       }
 
       if (!n.isExprResult()) {
-        if (n.getToken() == Token.CONST
-            || n.getToken() == Token.CLASS
-            || n.getToken() == Token.FUNCTION) {
+        if (n.isConst() || n.isClass() || n.isFunction()) {
           collectMetdataForExports(n, fileName);
         }
         return;
@@ -135,7 +133,7 @@ public final class ModuleConversionPass implements CompilerPass {
             if (nodeComments.hasComment(n)) {
               nodeComments.replaceWithComment(n, new Node(Token.EMPTY));
             } else {
-              n.detachFromParent();
+              n.detach();
             }
             compiler.reportCodeChange();
           }
@@ -219,7 +217,7 @@ public final class ModuleConversionPass implements CompilerPass {
         }
 
         // var x = goog.require(...);
-        if (node.isCall() && "goog.require".equals(node.getFirstChild().getQualifiedName())) {
+        if (node.isCall() && node.getFirstChild().matchesQualifiedName("goog.require")) {
           Node callNode = node;
           String requiredNamespace = callNode.getLastChild().getString();
           String localName = n.getFirstChild().getQualifiedName();
@@ -230,7 +228,7 @@ public final class ModuleConversionPass implements CompilerPass {
         // var {foo} = goog.require(...);
         if (node.isObjectPattern()
             && node.getNext().getFirstChild() != null
-            && "goog.require".equals(node.getNext().getFirstChild().getQualifiedName())) {
+            && node.getNext().getFirstChild().matchesQualifiedName("goog.require")) {
           // TODO(#392): Support multiple destructured import values here.
           //     Currently, this only allows for a single destructured import value.
           String namedExport = node.getFirstChild().getString();
@@ -245,7 +243,7 @@ public final class ModuleConversionPass implements CompilerPass {
         if (callNode == null || !callNode.isCall()) {
           return;
         }
-        if ("goog.require".equals(callNode.getFirstChild().getQualifiedName())) {
+        if (callNode.getFirstChild().matchesQualifiedName("goog.require")) {
           String requiredNamespace = callNode.getLastChild().getString();
           convertRequireToImportStatements(n, requiredNamespace, requiredNamespace);
           return;
@@ -400,7 +398,7 @@ public final class ModuleConversionPass implements CompilerPass {
       nodeComments.moveComment(n, importNode);
     }
 
-    n.getParent().removeChild(n);
+    n.detach();
     compiler.reportCodeChange();
   }
 
@@ -453,8 +451,8 @@ public final class ModuleConversionPass implements CompilerPass {
     ExportedSymbol symbolToExport =
         ExportedSymbol.fromExportAssignment(rhs, exportedNamespace, exportedSymbol, fileName);
 
-    if (exportedNamespace.equals(lhs.getQualifiedName())) {
-      rhs.detachFromParent();
+    if (lhs.matchesQualifiedName(exportedNamespace)) {
+      rhs.detach();
       Node exportSpecNode;
       if (rhs.isName() && exportsToNodes.containsKey(symbolToExport)) {
         // Rewrite the AST to export the symbol directly using information from the export
@@ -462,14 +460,14 @@ public final class ModuleConversionPass implements CompilerPass {
         Node namedNode = exportsToNodes.get(symbolToExport);
         Node next = namedNode.getNext();
         Node parent = namedNode.getParent();
-        namedNode.detachFromParent();
+        namedNode.detach();
 
         Node export = new Node(Token.EXPORT, namedNode);
         export.useSourceInfoFromForTree(assign);
 
         nodeComments.moveComment(namedNode, export);
         parent.addChildBefore(export, next);
-        exprNode.detachFromParent();
+        exprNode.detach();
 
         compiler.reportCodeChange();
         return;

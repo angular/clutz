@@ -83,7 +83,7 @@ public final class TypeConversionPass implements CompilerPass {
           }
           break;
         case CALL:
-          if ("goog.defineClass".equals(n.getFirstChild().getQualifiedName())) {
+          if (n.getFirstChild().matchesQualifiedName("goog.defineClass")) {
             convertDefineClassToClass(n);
           }
           break;
@@ -169,7 +169,7 @@ public final class TypeConversionPass implements CompilerPass {
     }
 
     private void replaceExpressionOrAssignment(Node n, Node parent, Node newNode) {
-      if (parent.getToken() == Token.EXPR_RESULT) {
+      if (parent.isExprResult()) {
         // Handles case: Myclass.Type;
         // AST:
         // EXPR_RESULT
@@ -177,7 +177,7 @@ public final class TypeConversionPass implements CompilerPass {
         //         NAME MyClass
         //         STRING Type
         parent.getParent().replaceChild(parent, newNode);
-      } else if (parent.getToken() == Token.ASSIGN) {
+      } else if (parent.isAssign()) {
         // Handles case: Myclass.Type = {};
         // AST:
         // ASSIGN
@@ -274,7 +274,7 @@ public final class TypeConversionPass implements CompilerPass {
               // Add visibility directly to param if possible
               moveAccessModifier(declaration, param);
               markAsConst(declaration, param);
-              n.detachFromParent();
+              n.detach();
               compiler.reportCodeChange();
               return;
             }
@@ -438,7 +438,7 @@ public final class TypeConversionPass implements CompilerPass {
     if (superClass.isNull()) {
       superClass = IR.empty();
     } else {
-      superClass.detachFromParent();
+      superClass.detach();
     }
 
     Node classMembers = new Node(Token.CLASS_MEMBERS);
@@ -455,7 +455,7 @@ public final class TypeConversionPass implements CompilerPass {
         }
       } else {
         // Add all other members, such as EMPTY comment nodes, as is.
-        child.detachFromParent();
+        child.detach();
         classMembers.addChildToBack(child);
       }
     }
@@ -493,7 +493,7 @@ public final class TypeConversionPass implements CompilerPass {
     }
 
     @Nullable Node call = objectlit.getParent();
-    if (call == null || !"goog.defineClass".equals(call.getFirstChild().getQualifiedName())) {
+    if (call == null || !call.getFirstChild().matchesQualifiedName("goog.defineClass")) {
       return false;
     }
 
@@ -508,7 +508,7 @@ public final class TypeConversionPass implements CompilerPass {
         objectLiteralMember.isStringKey() || objectLiteralMember.isMemberFunctionDef());
 
     Node value = objectLiteralMember.getFirstChild();
-    value.detachFromParent();
+    value.detach();
 
     if (value.isFunction()) {
       Node n = IR.memberFunctionDef(objectLiteralMember.getString(), value);
@@ -537,8 +537,8 @@ public final class TypeConversionPass implements CompilerPass {
     String fieldName = declaration.memberName;
 
     // Detach nodes in order to move them around in the AST.
-    declaration.exprRoot.detachFromParent();
-    declaration.rhs.detachFromParent();
+    declaration.exprRoot.detach();
+    declaration.rhs.detach();
 
     Node memberFunc = IR.memberFunctionDef(fieldName, declaration.rhs);
     memberFunc.setStaticMember(declaration.isStatic);
@@ -576,10 +576,10 @@ public final class TypeConversionPass implements CompilerPass {
     nodeComments.moveComment(declaration.exprRoot, fieldNode);
 
     if (declaration.rhs == null) {
-      declaration.exprRoot.detachFromParent();
+      declaration.exprRoot.detach();
     } else if (canPromoteFieldInitializer(declaration)) {
-      declaration.exprRoot.detachFromParent();
-      declaration.rhs.detachFromParent();
+      declaration.exprRoot.detach();
+      declaration.rhs.detach();
       fieldNode.addChildToBack(declaration.rhs);
     } else {
       nodeComments.clearComment(declaration.exprRoot);
@@ -620,7 +620,7 @@ public final class TypeConversionPass implements CompilerPass {
     if (exprNode.getFirstChild().isCall()) {
       Node callNode = exprNode.getFirstChild();
       // Remove goog.inherits calls
-      if (!"goog.inherits".equals(callNode.getFirstChild().getQualifiedName())) {
+      if (!callNode.getFirstChild().matchesQualifiedName("goog.inherits")) {
         return;
       }
       String className = callNode.getSecondChild().getQualifiedName();
@@ -648,7 +648,7 @@ public final class TypeConversionPass implements CompilerPass {
         return;
       }
 
-      exprNode.detachFromParent();
+      exprNode.detach();
       compiler.reportCodeChange();
     } else if (exprNode.getFirstChild().isAssign()) {
       Node assignNode = exprNode.getFirstChild();
@@ -735,12 +735,12 @@ public final class TypeConversionPass implements CompilerPass {
     if (callName.startsWith(superClassName + ".prototype.") && callName.endsWith(".call")) {
       if (callNode.getSecondChild().isThis()) {
         // Determine name of method being called
-        Node nameNode = callNode.getFirstChild().getFirstChild();
+        Node nameNode = callNode.getFirstFirstChild();
         Node n = nameNode;
         while (!n.getLastChild().getString().equals("prototype")) {
           n = n.getFirstChild();
         }
-        nameNode.detachFromParent();
+        nameNode.detach();
 
         nodeComments.replaceWithComment(n, IR.superNode());
         nodeComments.replaceWithComment(callNode.getFirstChild(), nameNode);
@@ -825,7 +825,7 @@ public final class TypeConversionPass implements CompilerPass {
 
     /** Returns whether the rhs is the same as the method name being declared eg. this.a = a; */
     boolean rhsEqualToField() {
-      return rhs != null && memberName.equals(rhs.getQualifiedName());
+      return rhs != null && rhs.matchesQualifiedName(memberName);
     }
 
     /**

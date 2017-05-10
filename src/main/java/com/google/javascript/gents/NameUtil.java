@@ -66,7 +66,7 @@ public class NameUtil {
    * exist.
    */
   void replacePrefixInName(Node name, String prefix, String newPrefix) {
-    if (prefix.equals(name.getQualifiedName())) {
+    if (name.matchesQualifiedName(prefix)) {
       Node newName = NodeUtil.newQName(compiler, newPrefix);
       JSDocInfo jsdoc = NodeUtil.getBestJSDocInfo(name);
       newName.setJSDocInfo(jsdoc);
