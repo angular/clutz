@@ -391,9 +391,13 @@ class DeclarationGenerator {
       List<SourceFile> sourceFiles, List<SourceFile> externs, Depgraph depgraph)
       throws AssertionError {
     compiler.compile(externs, sourceFiles, opts.getCompilerOptions());
-    precomputeChildLists();
-    collectTypedefs();
-    String dts = produceDts(depgraph);
+    String dts = "";
+    // If there is an error top scope is null.
+    if (compiler.getTopScope() != null) {
+      precomputeChildLists();
+      collectTypedefs();
+      dts = produceDts(depgraph);
+    }
     errorManager.doGenerateReport();
     return dts;
   }
