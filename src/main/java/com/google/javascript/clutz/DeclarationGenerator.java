@@ -831,7 +831,7 @@ class DeclarationGenerator {
       ObjectType objType = symbol.getType().toMaybeObjectType();
       // Can be null if the symbol is provided, but not defined.
       Set<String> propertyNames =
-          objType != null ? objType.getPropertyNames() : Collections.<String>emptySet();
+          objType != null ? objType.getOwnPropertyNames() : Collections.<String>emptySet();
       for (String property : propertyNames) {
         // When parsing externs namespaces are explicitly declared with a var of Object type
         // Do not emit the var declaration, as it will conflict with the namespace.
