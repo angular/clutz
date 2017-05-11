@@ -13,8 +13,7 @@ declare module 'goog:aliasT.I2' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.aliasT {
-  //!! TODO(rado): investigate why this is not I<string>.
-  var iboom : ಠ_ಠ.clutz.$jscomp.scope.I < any > | null ;
+  var iboom : ಠ_ಠ.clutz.$jscomp.scope.I < string > | null ;
 }
 declare namespace goog {
   function require(name: 'aliasT.iboom'): typeof ಠ_ಠ.clutz.aliasT.iboom;

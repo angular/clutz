@@ -5,6 +5,7 @@ import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DependencyOptions;
 import com.google.javascript.jscomp.DiagnosticGroups;
+import com.google.javascript.jscomp.parsing.Config;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -100,13 +101,12 @@ public class Options {
     options.setLanguageOut(CompilerOptions.LanguageMode.ECMASCRIPT5);
     options.setCheckTypes(true);
     options.setInferTypes(true);
-    setIdeMode(options);
+    // turns off optimizations.
+    options.setChecksOnly(true);
+    options.setContinueAfterErrors(true);
+    options.setPreserveDetailedSourceInfo(true);
+    options.setParseJsDocDocumentation(Config.JsDocParsing.INCLUDE_DESCRIPTIONS_NO_WHITESPACE);
     return options;
-  }
-
-  @SuppressWarnings("deprecation")
-  private void setIdeMode(final CompilerOptions options) {
-    options.setIdeMode(true); // So that we can query types after compilation.
   }
 
   Options(String[] args) throws CmdLineException {

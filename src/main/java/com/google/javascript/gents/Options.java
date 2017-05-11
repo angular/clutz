@@ -9,6 +9,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DiagnosticGroups;
+import com.google.javascript.jscomp.parsing.Config;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
@@ -109,15 +110,13 @@ public class Options {
 
     // Compiler passes must be disabled to disable down-transpilation to ES5.
     options.skipAllCompilerPasses();
-    setIdeMode(options);
+    // turns off optimizations.
+    options.setChecksOnly(true);
+    options.setContinueAfterErrors(true);
+    options.setPreserveDetailedSourceInfo(true);
+    options.setParseJsDocDocumentation(Config.JsDocParsing.INCLUDE_DESCRIPTIONS_NO_WHITESPACE);
 
     return options;
-  }
-
-  @SuppressWarnings("deprecation")
-  private void setIdeMode(final CompilerOptions options) {
-    // So that we can query types after compilation.
-    options.setIdeMode(true);
   }
 
   private Map<String, String> getExternsMap() throws IOException {
