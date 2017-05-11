@@ -112,7 +112,6 @@ public class Options {
     options.skipAllCompilerPasses();
     // turns off optimizations.
     options.setChecksOnly(true);
-    options.setContinueAfterErrors(true);
     options.setPreserveDetailedSourceInfo(true);
     options.setParseJsDocDocumentation(Config.JsDocParsing.INCLUDE_DESCRIPTIONS_NO_WHITESPACE);
 
