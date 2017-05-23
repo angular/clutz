@@ -2195,27 +2195,38 @@ class DeclarationGenerator {
             + classTemplatizedType
             + " ;";
       }
-      return null;
+      if (propName.equals("when")) {
+        return "when < RESULT, T > (value: T, successCallback: (promiseValue: T) => "
+            + classTemplatizedType
+            + "|RESULT, errorCallback: null | undefined | "
+            + " ((reason: any) => any), notifyCallback?: (state: any) => any): "
+            + classTemplatizedType
+            + ";";
+      }
+      String promiseName = className + ".Promise";
+      return getPromiseMethod(propName, promiseName);
     }
 
     private String getSignatureForStaticTTEFn(String propName, FunctionType ftype) {
       // If ftype is foo.bar.Promise.all, extract className as Promise.
       String className = getUnqualifiedName(getNamespace(ftype.getDisplayName()));
+      String maybePromiseMethod = getPromiseMethod(propName, className);
+      if (maybePromiseMethod != null) {
+        return "static " + maybePromiseMethod;
+      }
+      return null;
+    }
+
+    private String getPromiseMethod(String propName, String className) {
       switch (propName) {
         case "resolve":
-          return "static resolve < T >(value: "
-              + className
-              + " < T > | T): "
-              + className
-              + " < T >;";
+          return "resolve < T >(value: " + className + " < T > | T): " + className + " < T >;";
         case "race":
-          return "static race < T > (values : T [] ) : " + className + " < T > ;";
+          return "race < T > (values : T [] ) : " + className + " < T > ;";
+        // TODO(rado): angular.d.ts has improved types for .all, replace with all overrides from
+        // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/angular/index.d.ts#L1014
         case "all":
-          return "static all(promises : "
-              + className
-              + " < any > [] ) : "
-              + className
-              + " < any [] > ;";
+          return "all(promises : " + className + " < any > [] ) : " + className + " < any [] > ;";
         default:
       }
       return null;
