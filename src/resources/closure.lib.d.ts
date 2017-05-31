@@ -37,3 +37,11 @@ declare namespace ಠ_ಠ.clutz.goog {
  * means it has to be explcitly declared here, similar to `goog` itself above.
  */
 declare var COMPILED: boolean;
+
+/**
+ * During migration from Closure to TypeScript, it's useful to suppress the
+ * --noImplicitAny check. This type is written by migrants/fix_implicit_any.sh
+ * and may be allowed in place of `any` to allow code to type-check, but should
+ * be fixed later.
+ */
+type AnyDuringMigration = any;
