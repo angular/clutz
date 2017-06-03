@@ -50,6 +50,32 @@ var xConst = 1;
  */
 var X = function() {}
 
+class B {
+  constructor() {
+
+    /**
+     * @type {{param1: (string|undefined)
+     * }}
+     */
+    this.twoLines = {param1: "param1"};
+
+    /**
+     * @type {{
+     *   param2: (string|undefined)
+     * }}
+     */
+    this.multipleLines = {param2: "param2"};
+
+    /**
+     * @type {{
+     *   param3: (string|undefined),
+     *   param4: (string|undefined),
+     * }}
+     */
+    this.twoParams = {param3: "param3", param4: "param4"};
+  }
+}
+
 /** @export {number} */
 let m = 4;
 
