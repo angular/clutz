@@ -19,7 +19,7 @@ public class ClutzErrorManagerTest {
     // Useful
     assertThatProgram("/** @type {number} */ var x = 1;", "/** @type {number} */ var x = 2;")
         .diagnosticStream()
-        .containsMatch("ERROR.*Variable x first declared in");
+        .containsMatch("ERROR.*Variable x declared more than once");
   }
 
   @Test
