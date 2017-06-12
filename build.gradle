@@ -43,6 +43,9 @@ createScript(project, 'com.google.javascript.gents.TypeScriptGenerator', 'gents'
 
 repositories {
   mavenCentral()
+  maven {
+    url "https://oss.sonatype.org/content/repositories/snapshots/"
+  }
 }
 
 dependencies {
@@ -51,9 +54,11 @@ dependencies {
   // https://github.com/google/closure-compiler/blob/master/pom-main.xml
   runtime 'args4j:args4j:2.0.26'
   runtime 'com.google.code.gson:gson:2.7'
-
-  compile 'com.google.javascript:closure-compiler:v20170409'
-
+  if (System.getenv().get('CI_MODE') == 'Nightly') {
+    compile 'com.google.javascript:closure-compiler:1.0-SNAPSHOT'
+  } else {
+    compile 'com.google.javascript:closure-compiler:v20170521'
+  }
 
   compile 'com.google.code.findbugs:jsr305:3.0.1'
   compile 'com.google.guava:guava:20.0'
