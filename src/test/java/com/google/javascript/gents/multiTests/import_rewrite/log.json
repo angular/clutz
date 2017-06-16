@@ -1,37 +1,37 @@
 [
   {
     "originalName": "sideeffect.A",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
     "defaultRename": ""
   },
   {
     "originalName": "value.B",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
     "defaultRename": ""
   },
   {
     "originalName": "obj.C",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
     "defaultRename": ""
   },
   {
     "originalName": "both.D",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
     "defaultRename": ""
   },
   {
     "originalName": "nested.E",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
     "defaultRename": ""
   },
   {
     "originalName": "nested.E.F",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
     "defaultRename": ""
   },
   {
     "originalName": "nested.E.F.Z",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
     "defaultRename": ""
   }
 ]

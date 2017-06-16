@@ -26,12 +26,12 @@ import java.util.Set;
 class ModuleRenameLogger {
   static class LogItem {
     String originalName;
-    String tsFile;
+    String jsFile;
     String defaultRename;
 
-    LogItem(String originalName, String tsFile, String defaultRename) {
+    LogItem(String originalName, String jsFile, String defaultRename) {
       this.originalName = originalName;
-      this.tsFile = tsFile;
+      this.jsFile = jsFile;
       this.defaultRename = defaultRename;
     }
 
@@ -40,7 +40,7 @@ class ModuleRenameLogger {
       if (!(obj instanceof LogItem)) return false;
       LogItem o = (LogItem) obj;
       return this.originalName.equals(o.originalName)
-          && this.tsFile.equals(o.tsFile)
+          && this.jsFile.equals(o.jsFile)
           && this.defaultRename.equals(o.defaultRename);
     }
 
@@ -49,8 +49,8 @@ class ModuleRenameLogger {
       return "{originalName: "
           + this.originalName
           + ",\n"
-          + "{tsFile: "
-          + this.tsFile
+          + "{jsFile: "
+          + this.jsFile
           + ",\n"
           + "{defaultRename: "
           + this.defaultRename
@@ -59,7 +59,7 @@ class ModuleRenameLogger {
 
     @Override
     public int hashCode() {
-      return Objects.hash(this.originalName, this.tsFile, this.defaultRename);
+      return Objects.hash(this.originalName, this.jsFile, this.defaultRename);
     }
   }
 

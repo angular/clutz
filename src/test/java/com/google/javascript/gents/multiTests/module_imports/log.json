@@ -1,47 +1,47 @@
 [
   {
     "originalName": "both.A.B.C.D",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_both.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_both.js",
     "defaultRename": "D"
   },
   {
     "originalName": "both.A.B.C.D.x",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_both.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_both.js",
     "defaultRename": "D"
   },
   {
     "originalName": "both.A.B.C.D.bar",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_both.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_both.js",
     "defaultRename": "D"
   },
   {
     "originalName": "default.A",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_default.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_default.js",
     "defaultRename": "A"
   },
   {
     "originalName": "named.A.B",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_named.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_named.js",
     "defaultRename": ""
   },
   {
     "originalName": "named.A.B.x",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_named.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_named.js",
     "defaultRename": ""
   },
   {
     "originalName": "named.A.B.foo",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_named.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_named.js",
     "defaultRename": ""
   },
   {
     "originalName": "named.A.B.bar",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_named.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_named.js",
     "defaultRename": ""
   },
   {
     "originalName": "namespace.A.B",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_namespace.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_namespace.js",
     "defaultRename": ""
   },
   //!! It appears that gents considers the inner goog.module symbols as "namespaces"
@@ -49,32 +49,32 @@
   //!! namespace.A.B.x, so these fake modules will not match any real goog.requires.
   {
     "originalName": "namespace.A.B.x",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_namespace.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_namespace.js",
     "defaultRename": ""
   },
   {
     "originalName": "namespace.A.B.foo",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_namespace.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_namespace.js",
     "defaultRename": ""
   },
   {
     "originalName": "namespace.A.B.bar",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_namespace.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_namespace.js",
     "defaultRename": ""
   },
   {
     "originalName": "sideeffect.A.B.C",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_sideeffect.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_sideeffect.js",
     "defaultRename": ""
   },
   {
     "originalName": "no.empty.export.with.import",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/import_assignment.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/import_assignment.js",
     "defaultRename": ""
   },
   {
     "originalName": "import.binding.barrel",
-    "tsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/import_binding.js",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/import_binding.js",
     "defaultRename": ""
   }
 ]
