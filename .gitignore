@@ -11,8 +11,9 @@ bin/
 .settings
 
 # IntelliJ
-.idea
-.iml
+out/
+*.idea
+*.iml
 
 # Installed node_modules for tsc.
 node_modules/
