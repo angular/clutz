@@ -34,7 +34,7 @@ declare namespace ಠ_ಠ.clutz.static_inherit {
   class Parent extends Parent_Instance {
     static privateChildOverrideField : number ;
     static static_fn (a : string ) : void ;
-    static subTypeField : Object ;
+    static subTypeField : GlobalObject ;
     static subTypeFieldMirrorType : ಠ_ಠ.clutz.static_inherit.Parent ;
   }
   class Parent_Instance {

@@ -232,7 +232,7 @@ class DeclarationGenerator {
    * by replacing the second Error with GlobalError.
    */
   private static final ImmutableSet<String> GLOBAL_SYMBOL_ALIASES =
-      ImmutableSet.of("Error", "Event", "EventTarget");
+      ImmutableSet.of("Error", "Event", "EventTarget", "Object");
 
   private static final String MODULE_PREFIX = "module$exports$";
 
@@ -2451,7 +2451,7 @@ class DeclarationGenerator {
           typesUsed.add(type.getDisplayName());
         }
       } else {
-        emit("Object");
+        emit("GlobalObject");
       }
       return null;
     }

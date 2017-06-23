@@ -1,5 +1,5 @@
 declare namespace ಠ_ಠ.clutz.undefined.nested {
-  var provide : Object ;
+  var provide : GlobalObject ;
 }
 declare namespace goog {
   function require(name: 'undefined.nested.provide'): typeof ಠ_ಠ.clutz.undefined.nested.provide;
@@ -9,7 +9,7 @@ declare module 'goog:undefined.nested.provide' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz {
-  var undefined_provide : Object ;
+  var undefined_provide : GlobalObject ;
 }
 declare namespace goog {
   function require(name: 'undefined_provide'): typeof ಠ_ಠ.clutz.undefined_provide;

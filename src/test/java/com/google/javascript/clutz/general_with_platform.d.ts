@@ -54,10 +54,10 @@ declare namespace ಠ_ಠ.clutz {
   }
   class ChromeObjectEvent_Instance {
     private noStructuralTyping_: any;
-    addListener (callback : (a : Object ) => void ) : void ;
-    hasListener (callback : (a : Object ) => void ) : boolean ;
+    addListener (callback : (a : GlobalObject ) => void ) : void ;
+    hasListener (callback : (a : GlobalObject ) => void ) : boolean ;
     hasListeners ( ) : boolean ;
-    removeListener (callback : (a : Object ) => void ) : void ;
+    removeListener (callback : (a : GlobalObject ) => void ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {

@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.union {
   var fn : ( ( ) => string ) | ( ( ) => number ) [] ;
-  var nullableUnion : Object | number ;
+  var nullableUnion : GlobalObject | number ;
   var x : boolean | string ;
 }
 declare namespace goog {
