@@ -1,5 +1,6 @@
 let goog: any = {};
 goog.A = class {
+  static B: any = {};
   a: any;
 
   constructor(a: number) {
@@ -20,7 +21,6 @@ goog.A = class {
     return n > 0;
   }
 };
-goog.A.B = {};
 
 /**
  * Unconverted method

@@ -208,8 +208,10 @@ public final class TypeConversionPass implements CompilerPass {
           if (declaration.rhs != null && declaration.rhs.isFunction()) {
             moveMethodsIntoClasses(declaration);
           } else {
-            // Ignore field declarations without a type annotation
-            if (declaration.jsDoc != null && declaration.jsDoc.getType() != null) {
+            // Ignore field declarations that are enums or classes
+            String comment = nodeComments.getComment(n);
+            if (!(declaration.rhs != null && declaration.rhs.isClass())
+                && (comment == null || comment.indexOf("@enum") < 0)) {
               moveFieldsIntoClasses(declaration);
             }
           }
