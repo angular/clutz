@@ -236,8 +236,8 @@ class DeclarationGenerator {
 
   private static final String MODULE_PREFIX = "module$exports$";
 
-  private final JSType UNKNOWN_TYPE;
-  private final JSType NUMBER_TYPE;
+  private JSType unknownType;
+  private JSType numberType;
 
   public static void main(String[] args) {
     Options options = null;
@@ -302,8 +302,9 @@ class DeclarationGenerator {
         new ClutzErrorManager(
             System.err, ErrorFormat.MULTILINE.toFormatter(compiler, true), opts.debug);
     compiler.setErrorManager(errorManager);
-    UNKNOWN_TYPE = compiler.getTypeRegistry().getNativeType(JSTypeNative.UNKNOWN_TYPE);
-    NUMBER_TYPE = compiler.getTypeRegistry().getNativeType(JSTypeNative.NUMBER_TYPE);
+    // Calling compiler.getTypeRegistry() is not safe here,
+    // because it initializes some internal compiler structures.
+    // We should pass the correct CompilerOptions, before that.
   }
 
   boolean hasErrors() {
@@ -390,7 +391,10 @@ class DeclarationGenerator {
   String generateDeclarations(
       List<SourceFile> sourceFiles, List<SourceFile> externs, Depgraph depgraph)
       throws AssertionError {
+    // Compile should always be first here, because it sets internal state.
     compiler.compile(externs, sourceFiles, opts.getCompilerOptions());
+    unknownType = compiler.getTypeRegistry().getNativeType(JSTypeNative.UNKNOWN_TYPE);
+    numberType = compiler.getTypeRegistry().getNativeType(JSTypeNative.NUMBER_TYPE);
     // TODO(rado): replace with null and do not emit file when errors.
     String dts = "";
     // If there is an error top scope is null.
@@ -1938,13 +1942,13 @@ class DeclarationGenerator {
           if (templateTypes != null && templateTypes.size() > 1) {
             emitIndexSignature(iObjectTemplateTypes.get(0), iObjectTemplateTypes.get(1), true);
           } else {
-            emitIndexSignature(UNKNOWN_TYPE, UNKNOWN_TYPE, true);
+            emitIndexSignature(unknownType, unknownType, true);
           }
         } else if ("IArrayLike".equals(displayName)) {
           if (templateTypes != null && templateTypes.size() > 0) {
-            emitIndexSignature(NUMBER_TYPE, templateTypes.get(0), true);
+            emitIndexSignature(numberType, templateTypes.get(0), true);
           } else {
-            emitIndexSignature(NUMBER_TYPE, UNKNOWN_TYPE, true);
+            emitIndexSignature(numberType, unknownType, true);
           }
         }
       }
