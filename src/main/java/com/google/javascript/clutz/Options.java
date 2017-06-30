@@ -3,6 +3,7 @@ package com.google.javascript.clutz;
 import com.google.common.collect.Sets;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import com.google.javascript.jscomp.DependencyOptions;
 import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.parsing.Config;
@@ -97,8 +98,8 @@ public class Options {
     // Late Provides are errors by default, but they do not prevent clutz from transpiling.
     options.setWarningLevel(DiagnosticGroups.LATE_PROVIDE, CheckLevel.OFF);
 
-    options.setLanguage(CompilerOptions.LanguageMode.ECMASCRIPT_2015);
-    options.setLanguageOut(CompilerOptions.LanguageMode.ECMASCRIPT5);
+    options.setLanguage(LanguageMode.ECMASCRIPT_NEXT);
+    options.setLanguageOut(LanguageMode.ECMASCRIPT5);
     options.setCheckTypes(true);
     options.setInferTypes(true);
     // turns off optimizations.
