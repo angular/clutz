@@ -165,11 +165,18 @@ class DeclarationGenerator {
           "whatwg_encoding.js",
           "window.js");
 
-  /** Reserved words in ES6.1. Thanks to https://mathiasbynens.be/notes/reserved-keywords. */
+  /**
+   * Words for which we cannot generate 'namespace foo.Word {}'; Instead clutz tries to roll them up
+   * into properties of the parent namespace, but that can be lossy.
+   *
+   * <p>To regenerate this list use the following script with a list of candidates.
+   *
+   * <pre>$ for k in $(cat /tmp/keywords); do echo "namespace foo.$k {};" > /tmp/test.ts; \
+   * tsc /tmp/test.ts >/dev/null || echo \"$k\",; done;
+   * </pre>
+   */
   private static final ImmutableSet<String> RESERVED_JS_WORDS =
       ImmutableSet.of(
-          "arguments",
-          "await",
           "break",
           "case",
           "catch",
@@ -182,7 +189,6 @@ class DeclarationGenerator {
           "do",
           "else",
           "enum",
-          "eval",
           "export",
           "extends",
           "false",
@@ -190,20 +196,12 @@ class DeclarationGenerator {
           "for",
           "function",
           "if",
-          "implements",
           "import",
           "in",
           "instanceof",
-          "interface",
-          "let",
           "new",
           "null",
-          "package",
-          "private",
-          "protected",
-          "public",
           "return",
-          "static",
           "super",
           "switch",
           "this",
@@ -214,8 +212,7 @@ class DeclarationGenerator {
           "var",
           "void",
           "while",
-          "with",
-          "yield");
+          "with");
 
   private static final String GOOG_BASE_NAMESPACE = "goog";
 
