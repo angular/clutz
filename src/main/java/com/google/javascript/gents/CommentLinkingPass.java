@@ -33,8 +33,11 @@ public final class CommentLinkingPass implements CompilerPass {
    */
   private static final Pattern[] JSDOC_REPLACEMENTS = {
     Pattern.compile(
-        BEGIN_JSDOC_LINE + "@(extends|implements|type)[ \t]*(\\{[^@]*\\})[ \t]*(?<keep>)" + EOL,
+        BEGIN_JSDOC_LINE + "@(implements|type)[ \t]*(\\{[^@]*\\})[ \t]*(?<keep>)" + EOL,
         Pattern.DOTALL),
+    //keep generic extends for post processing
+    Pattern.compile(
+        BEGIN_JSDOC_LINE + "@extends[ \t]*(\\{[^@<>]*\\})[ \t]*(?<keep>)" + EOL, Pattern.DOTALL),
     Pattern.compile(BEGIN_JSDOC_LINE + "@(constructor|interface|record)[ \t]*(?<keep>)" + EOL),
     Pattern.compile(
         BEGIN_JSDOC_LINE
