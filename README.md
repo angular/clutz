@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/angular/clutz.svg?branch=master)](https://travis-ci.org/angular/clutz)
 
 This project uses the
-[Closure Compiler](https://developers.google.com/closure/compiler/docs/js-for-compiler)
+[Closure Compiler](https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler)
 to parse Closure-style JSDoc type annotations from ES5/ES2015 code, and generates a suitable
 TypeScript type definition file (`.d.ts`) for the exported API.
 
