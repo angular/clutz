@@ -125,6 +125,7 @@ class DeclarationGenerator {
           "ResponseInit",
           "ReferrerPolicy",
           "Iterable",
+          "IteratorIterable",
           "WritableStreamSink",
           "PipeOptions",
           "WritableStreamDefaultWriter",
