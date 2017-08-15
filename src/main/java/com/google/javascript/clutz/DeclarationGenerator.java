@@ -86,7 +86,6 @@ class DeclarationGenerator {
           "Headers",
           "RequestMode",
           "WorkerLocation",
-          "Promise",
           "RequestContext",
           "Response",
           "ReadableByteStream",

@@ -314,20 +314,6 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class Promise < TYPE > extends Promise_Instance < TYPE > {
-    static all(promises : Promise < any > [] ) : Promise < any [] > ;
-    static race < T > (values : T [] ) : Promise < T > ;
-    static reject (opt_error ? : any ) : Promise < any > ;
-    static resolve < T >(value: Promise < T > | T): Promise < T >;
-  }
-  class Promise_Instance < TYPE > implements PromiseLike < TYPE > {
-    private noStructuralTyping_: any;
-    constructor (resolver : (a : (a ? : TYPE | PromiseLike < TYPE > | null | { then : any } ) => any , b : (a ? : any ) => any ) => any ) ;
-    catch < RESULT > (onRejected : (a : any ) => RESULT ) : Promise < RESULT > ;
-    then < RESULT > (opt_onFulfilled ? : ( (a : TYPE ) => Promise < RESULT > | RESULT ) | null , opt_onRejected ? : ( (a : any ) => any ) | null) : Promise < RESULT > ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
   /**
    * The ReadableByteStreamController constructor cannot be used directly;
    * it only works on a ReadableStream that is in the middle of being constructed.
