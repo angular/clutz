@@ -239,7 +239,7 @@ declare namespace ಠ_ಠ.clutz {
     constructor (opt_headersInit ? : Headers | string [] [] | IObject < string , string > ) ;
     append (name : string , value : string ) : void ;
     delete (name : string ) : void ;
-    entries ( ) : Iterator < string [] > ;
+    entries ( ) : IteratorIterable < string [] > ;
     get (name : string ) : string | null ;
     getAll (name : string ) : string [] ;
     has (name : string ) : boolean ;
@@ -257,6 +257,13 @@ declare namespace ಠ_ಠ.clutz {
 }
 declare namespace ಠ_ಠ.clutz {
   interface Iterable < VALUE > {
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * Use this to indicate a type is both an Iterator and an Iterable.
+   */
+  interface IteratorIterable < T > extends Iterator < T > , Iterable < T > {
   }
 }
 declare namespace ಠ_ಠ.clutz {
