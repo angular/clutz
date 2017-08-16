@@ -3,6 +3,7 @@ package com.google.javascript.clutz;
 import static com.google.javascript.clutz.ProgramSubject.assertThatProgram;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -73,6 +74,9 @@ public class DeclarationGeneratorTests {
       if (input.getName().contains("_emit_platform_externs")) {
         subject.emitPlatformExterns = true;
       }
+      if (input.getParentFile().getName().equals("partial")) {
+        subject.partialInput = true;
+      }
       subject.extraExternFile = getExternFileNameOrNull(input.getName());
       suite.addTest(new DeclarationTest(input.getName(), goldenText, subject));
     }
@@ -91,7 +95,11 @@ public class DeclarationGeneratorTests {
 
   public static List<File> getTestInputFiles(FilenameFilter filter) {
     File[] testFiles = getPackagePath().toFile().listFiles(filter);
-    return Arrays.asList(testFiles);
+    // Partial files live in 'partial' dir and run implicitly with the --partialInput option on.
+    File[] testPartialFiles = getPackagePath().resolve("partial").toFile().listFiles(filter);
+    List<File> filesList = Lists.newArrayList(testFiles);
+    filesList.addAll(Arrays.asList(testPartialFiles));
+    return filesList;
   }
 
   static Path getTestInputFile(String fileName) {
