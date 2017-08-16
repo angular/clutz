@@ -30,6 +30,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       SourceFile.fromFile("src/test/java/com/google/javascript/clutz/base.js", UTF_8);
 
   public boolean withPlatform = false;
+  public boolean partialInput = false;
   public String extraExternFile = null;
   public boolean emitPlatformExterns;
 
@@ -77,6 +78,9 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
 
   private String[] parse() throws AssertionError {
     Options opts = new Options();
+    if (partialInput) {
+      opts.partialInput = true;
+    }
     opts.debug = true;
     opts.emitPlatformExterns = emitPlatformExterns;
     List<SourceFile> sourceFiles = new ArrayList<>();
@@ -105,7 +109,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       roots.add("main.js");
     }
 
-    List<SourceFile> externFiles = new ArrayList<>();
+    List<SourceFile> externFiles;
     if (withPlatform) {
       externFiles = DeclarationGenerator.getDefaultExterns(opts);
     } else {

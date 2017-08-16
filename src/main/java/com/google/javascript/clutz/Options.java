@@ -71,6 +71,14 @@ public class Options {
   )
   List<String> entryPoints = new ArrayList<>();
 
+  @Option(
+    name = "--partialInput",
+    usage =
+        "allow input of incomplete programs. All unknown types will be treated as forward"
+            + " declared."
+  )
+  boolean partialInput;
+
   @Argument List<String> arguments = new ArrayList<>();
 
   Depgraph depgraph;
@@ -106,6 +114,10 @@ public class Options {
     options.setChecksOnly(true);
     options.setPreserveDetailedSourceInfo(true);
     options.setParseJsDocDocumentation(Config.JsDocParsing.INCLUDE_DESCRIPTIONS_NO_WHITESPACE);
+    if (partialInput) {
+      options.setAssumeForwardDeclaredForMissingTypes(true);
+      options.setWarningLevel(DiagnosticGroups.MISSING_SOURCES_WARNINGS, CheckLevel.OFF);
+    }
     return options;
   }
 
