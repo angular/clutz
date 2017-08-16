@@ -75,7 +75,7 @@ public class Options {
     name = "--partialInput",
     usage =
         "allow input of incomplete programs. All unknown types will be treated as forward"
-            + "declared."
+            + " declared."
   )
   boolean partialInput;
 
