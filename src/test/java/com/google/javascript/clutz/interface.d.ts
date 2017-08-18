@@ -17,11 +17,10 @@ declare module 'goog:interface_exp' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.interface_exp {
-  type SomeEnum = number ;
-  var SomeEnum : {
-    A : SomeEnum ,
-    B : SomeEnum ,
-  };
+  enum SomeEnum {
+    A ,
+    B ,
+  }
 }
 declare module 'goog:interface_exp.SomeEnum' {
   import alias = ಠ_ಠ.clutz.interface_exp.SomeEnum;

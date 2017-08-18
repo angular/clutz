@@ -6,10 +6,9 @@ declare module 'goog:nested_typedef_enum.Bar' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.nested_typedef_enum.Bar {
-  type Baz = number ;
-  var Baz : {
-    A : Baz ,
-  };
+  enum Baz {
+    A ,
+  }
 }
 declare module 'goog:nested_typedef_enum.Bar.Baz' {
   import alias = ಠ_ಠ.clutz.nested_typedef_enum.Bar.Baz;

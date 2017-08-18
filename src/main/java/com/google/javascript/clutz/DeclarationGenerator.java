@@ -1205,7 +1205,7 @@ class DeclarationGenerator {
       } else {
         maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
         if (type.isEnumType()) {
-          visitEnumType(emitName, (EnumType) type);
+          visitEnumType(emitName, emitName, (EnumType) type);
           return;
         }
         if (isTypedef(type)) {
@@ -1443,46 +1443,87 @@ class DeclarationGenerator {
     }
 
     private void visitTypeAlias(JSType registryType, TypedVar symbol) {
-      visitTypeAlias(registryType, getUnqualifiedName(symbol));
+      visitTypeAlias(registryType, getUnqualifiedName(symbol), false);
     }
 
-    private void visitTypeAlias(JSType registryType, String unqualifiedName) {
+    private void visitTypeAlias(
+        JSType registryType, String unqualifiedName, boolean emitNeverBrand) {
       emit("type");
       emit(unqualifiedName);
       emit("=");
       visitType(registryType, true, false);
+      // emit a brand to prevent accidental compatibility of values with an enum.
+      if (emitNeverBrand) emit("&{brand: never}");
       emit(";");
       emitBreak();
     }
 
-    private void visitEnumType(String symbolName, EnumType type) {
+    private void visitEnumType(String symbolName, String qualifiedName, EnumType type) {
       // Enums are top level vars, but also declare a corresponding type:
       // <pre>
       // /** @enum {ValueType} */ var MyEnum = {A: ..., B: ...};
       // type MyEnum = EnumValueType;
       // var MyEnum: {A: MyEnum, B: MyEnum, ...};
       // </pre>
-      // TODO(martinprobst): Special case number enums to map to plain TS enums?
-      String unqualifiedName = getUnqualifiedName(symbolName);
+      // We special case "number" enums (and for TS 2.4 should include 'string' enums)
+
       // TS `type` declarations accept only unqualified names.
-      visitTypeAlias(type.getElementsType().getPrimitiveType(), unqualifiedName);
-      emit("var");
-      emit(unqualifiedName);
-      emit(": {");
-      emitBreak();
-      indent();
-      for (String elem : sorted(type.getElements())) {
-        emit(elem);
-        emit(":");
-        // No need to use type.getMembersType(), this must match the type alias we just declared.
+      String unqualifiedName = getUnqualifiedName(symbolName);
+
+      // @enums can be aliased by assignment. Emit a type alias + value alias for the situation.
+      String elementsTypeName = type.getElementsType().getReferenceName();
+      if (!qualifiedName.equals(elementsTypeName)) {
+        emitComment(symbolName + " aliases enum " + elementsTypeName);
+        emit("type");
         emit(unqualifiedName);
-        emit(",");
+        emit("=");
+        emit(elementsTypeName);
+        emit(";");
+        emitBreak();
+        emit("const");
+        emit(unqualifiedName);
+        emit(": typeof");
+        emit(elementsTypeName);
+        emit(";");
+        emitBreak();
+        return;
+      }
+
+      boolean isNumericEnum = type.getElementsType().getPrimitiveType().equals(numberType);
+      if (isNumericEnum) {
+        emit("enum");
+        emit(unqualifiedName);
+        emit("{");
+        emitBreak();
+        indent();
+        for (String elem : sorted(type.getElements())) {
+          emit(elem);
+          emit(",");
+          emitBreak();
+        }
+        unindent();
+        emit("}");
+        emitBreak();
+      } else {
+        visitTypeAlias(type.getElementsType().getPrimitiveType(), unqualifiedName, true);
+        emit("var");
+        emit(unqualifiedName);
+        emit(": {");
+        emitBreak();
+        indent();
+        for (String elem : sorted(type.getElements())) {
+          emit(elem);
+          emit(":");
+          // No need to use type.getMembersType(), this must match the type alias we just declared.
+          emit(unqualifiedName);
+          emit(",");
+          emitBreak();
+        }
+        unindent();
+        emit("}");
+        emitNoSpace(";");
         emitBreak();
       }
-      unindent();
-      emit("}");
-      emitNoSpace(";");
-      emitBreak();
     }
 
     private void visitTypeDeclaration(JSType type, boolean isVarArgs, boolean isOptionalPosition) {
@@ -2422,7 +2463,7 @@ class DeclarationGenerator {
             emitNamespaceBegin(innerNamespace);
             foundNamespaceMembers = true;
           }
-          visitEnumType(propName, (EnumType) pType);
+          visitEnumType(propName, qualifiedName, (EnumType) pType);
         } else if (isClassLike(pType)) {
           if (!foundNamespaceMembers) {
             emitNamespaceBegin(innerNamespace);
@@ -2436,7 +2477,7 @@ class DeclarationGenerator {
           }
           JSType registryType = typeRegistry.getType(qualifiedName);
           if (registryType != null) {
-            visitTypeAlias(registryType, propName);
+            visitTypeAlias(registryType, propName, false);
           } else {
             emitComment(
                 "Intended to visit type alias '"

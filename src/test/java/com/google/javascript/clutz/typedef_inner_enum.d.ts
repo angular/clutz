@@ -2,7 +2,7 @@ declare namespace ಠ_ಠ.clutz.ns {
   type typedef = { foo : ಠ_ಠ.clutz.ns.typedef.E } ;
 }
 declare namespace ಠ_ಠ.clutz.ns.typedef {
-  type E = string ;
+  type E = string &{brand: never} ;
   var E : {
     Foo : E ,
   };

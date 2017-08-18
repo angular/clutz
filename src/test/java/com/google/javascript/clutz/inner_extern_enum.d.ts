@@ -4,7 +4,7 @@ declare namespace ಠ_ಠ.clutz.innerEnumNs {
   }
 }
 declare namespace ಠ_ಠ.clutz.innerEnumNs.Foo {
-  type Bar = string ;
+  type Bar = string &{brand: never} ;
   var Bar : {
     BAZ : Bar ,
   };

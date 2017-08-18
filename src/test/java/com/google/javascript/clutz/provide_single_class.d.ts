@@ -17,11 +17,10 @@ declare namespace ಠ_ಠ.clutz.foo.bar.Baz {
   class NestedClass_Instance {
     private noStructuralTyping_: any;
   }
-  type NestedEnum = number ;
-  var NestedEnum : {
-    A : NestedEnum ,
-    B : NestedEnum ,
-  };
+  enum NestedEnum {
+    A ,
+    B ,
+  }
 }
 declare module 'goog:foo.bar.Baz' {
   import alias = ಠ_ಠ.clutz.foo.bar.Baz;

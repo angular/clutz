@@ -5,20 +5,18 @@ declare namespace ಠ_ಠ.clutz.sim_nested {
   }
 }
 declare namespace ಠ_ಠ.clutz.sim_nested.Child {
-  type Nested = number ;
-  var Nested : {
-    B : Nested ,
-  };
+  enum Nested {
+    B ,
+  }
 }
 declare module 'goog:sim_nested.Child' {
   import alias = ಠ_ಠ.clutz.sim_nested.Child;
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.sim_nested.Child {
-  type NestedAndProvided = number ;
-  var NestedAndProvided : {
-    B : NestedAndProvided ,
-  };
+  enum NestedAndProvided {
+    B ,
+  }
 }
 declare module 'goog:sim_nested.Child.NestedAndProvided' {
   import alias = ಠ_ಠ.clutz.sim_nested.Child.NestedAndProvided;
@@ -32,7 +30,7 @@ declare namespace ಠ_ಠ.clutz.sim_nested {
   }
 }
 declare namespace ಠ_ಠ.clutz.sim_nested.Parent {
-  type Nested = string ;
+  type Nested = string &{brand: never} ;
   var Nested : {
     A : Nested ,
   };
@@ -42,7 +40,7 @@ declare module 'goog:sim_nested.Parent' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.sim_nested.Parent {
-  type NestedAndProvided = string ;
+  type NestedAndProvided = string &{brand: never} ;
   var NestedAndProvided : {
     A : NestedAndProvided ,
   };

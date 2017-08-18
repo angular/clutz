@@ -10,11 +10,10 @@ declare module 'goog:a.b.StaticHolder' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.a.b.StaticHolder {
-  type AnEnum = number ;
-  var AnEnum : {
-    X : AnEnum ,
-    Y : AnEnum ,
-  };
+  enum AnEnum {
+    X ,
+    Y ,
+  }
 }
 declare module 'goog:a.b.StaticHolder.AnEnum' {
   import alias = ಠ_ಠ.clutz.a.b.StaticHolder.AnEnum;

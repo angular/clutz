@@ -1,16 +1,14 @@
 declare namespace ಠ_ಠ.clutz.nested {
-  type NotNested = number ;
-  var NotNested : {
-  };
+  enum NotNested {
+  }
 }
 declare module 'goog:nested.NotNested' {
   import alias = ಠ_ಠ.clutz.nested.NotNested;
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.nested {
-  type NotNestedEither = number ;
-  var NotNestedEither : {
-  };
+  enum NotNestedEither {
+  }
 }
 declare module 'goog:nested.NotNestedEither' {
   import alias = ಠ_ಠ.clutz.nested.NotNestedEither;
@@ -28,9 +26,8 @@ declare module 'goog:nested.PrivateC' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.nested.PrivateC {
-  type Enum = number ;
-  var Enum : {
-  };
+  enum Enum {
+  }
 }
 declare module 'goog:nested.PrivateC.Enum' {
   import alias = ಠ_ಠ.clutz.nested.PrivateC.Enum;
