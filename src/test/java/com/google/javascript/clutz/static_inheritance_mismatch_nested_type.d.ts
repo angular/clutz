@@ -30,7 +30,7 @@ declare namespace ಠ_ಠ.clutz.sim_nested {
   }
 }
 declare namespace ಠ_ಠ.clutz.sim_nested.Parent {
-  type Nested = string &{brand: never} ;
+  type Nested = string &{clutzEnumBrand: never} ;
   var Nested : {
     A : Nested ,
   };
@@ -40,7 +40,7 @@ declare module 'goog:sim_nested.Parent' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.sim_nested.Parent {
-  type NestedAndProvided = string &{brand: never} ;
+  type NestedAndProvided = string &{clutzEnumBrand: never} ;
   var NestedAndProvided : {
     A : NestedAndProvided ,
   };

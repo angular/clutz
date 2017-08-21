@@ -1,5 +1,5 @@
 declare namespace ಠ_ಠ.clutz.some {
-  type ObjectValuedEnum = X &{brand: never} ;
+  type ObjectValuedEnum = X &{clutzEnumBrand: never} ;
   var ObjectValuedEnum : {
     A : ObjectValuedEnum ,
     B : ObjectValuedEnum ,

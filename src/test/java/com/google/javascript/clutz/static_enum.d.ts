@@ -7,7 +7,7 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz.module$exports$foo$C {
-  type Enum = string &{brand: never} ;
+  type Enum = string &{clutzEnumBrand: never} ;
   var Enum : {
     A : Enum ,
   };

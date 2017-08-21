@@ -1453,7 +1453,7 @@ class DeclarationGenerator {
       emit("=");
       visitType(registryType, true, false);
       // emit a brand to prevent accidental compatibility of values with an enum.
-      if (emitNeverBrand) emit("&{brand: never}");
+      if (emitNeverBrand) emit("&{clutzEnumBrand: never}");
       emit(";");
       emitBreak();
     }
