@@ -47,6 +47,7 @@ import com.google.javascript.rhino.jstype.ObjectType;
 import com.google.javascript.rhino.jstype.ProxyObjectType;
 import com.google.javascript.rhino.jstype.RecordType;
 import com.google.javascript.rhino.jstype.TemplateType;
+import com.google.javascript.rhino.jstype.TemplateTypeMap;
 import com.google.javascript.rhino.jstype.TemplatizedType;
 import com.google.javascript.rhino.jstype.UnionType;
 import com.google.javascript.rhino.jstype.Visitor;
@@ -124,8 +125,6 @@ class DeclarationGenerator {
           "RefererrerPolicy",
           "ResponseInit",
           "ReferrerPolicy",
-          "Iterable",
-          "IteratorIterable",
           "WritableStreamSink",
           "PipeOptions",
           "WritableStreamDefaultWriter",
@@ -235,6 +234,8 @@ class DeclarationGenerator {
 
   private JSType unknownType;
   private JSType numberType;
+  @Nullable private JSType iterableType;
+  @Nullable private JSType iteratorIterableType;
 
   public static void main(String[] args) {
     Options options = null;
@@ -392,6 +393,8 @@ class DeclarationGenerator {
     compiler.compile(externs, sourceFiles, opts.getCompilerOptions());
     unknownType = compiler.getTypeRegistry().getNativeType(JSTypeNative.UNKNOWN_TYPE);
     numberType = compiler.getTypeRegistry().getNativeType(JSTypeNative.NUMBER_TYPE);
+    iterableType = compiler.getTypeRegistry().getType("Iterable");
+    iteratorIterableType = compiler.getTypeRegistry().getType("IteratorIterable");
     // TODO(rado): replace with null and do not emit file when errors.
     String dts = "";
     // If there is an error top scope is null.
@@ -1660,7 +1663,8 @@ class DeclarationGenerator {
               // inhabited only by the value undefined.
               // In TS emitting "undefined" is more ideomatic in a general type position.
               // For function return types clutz emits "void" in visitFunctionDeclaration.
-              // see: https://github.com/google/closure-compiler/blob/caec92d5f62e745d20a0b4b8edb757d43b06baa0/src/com/google/javascript/rhino/jstype/JSTypeRegistry.java#L1011
+              // see:
+              // https://github.com/google/closure-compiler/blob/caec92d5f62e745d20a0b4b8edb757d43b06baa0/src/com/google/javascript/rhino/jstype/JSTypeRegistry.java#L1011
               emit("undefined");
               return null;
             }
@@ -1686,9 +1690,11 @@ class DeclarationGenerator {
               JSType returnType = type.getReturnType();
               if (returnType != null) {
                 emit("=>");
-                // Closure conflates 'undefined' and 'void', and in general visitType always emits `undefined`
+                // Closure conflates 'undefined' and 'void', and in general visitType always emits
+                // `undefined`
                 // for that type.
-                // In idiomatic TypeScript, `void` is used for function return types, and the "void",
+                // In idiomatic TypeScript, `void` is used for function return types, and the
+                // "void",
                 // "undefined" types are not the same.
                 if (returnType.isVoidType()) {
                   emit("void");
@@ -1754,6 +1760,12 @@ class DeclarationGenerator {
             break;
           case "IArrayLike":
             templateTypeName = "ArrayLike";
+            break;
+          case "IteratorIterable":
+            templateTypeName = "IterableIterator";
+            break;
+          case "IIterableResult":
+            templateTypeName = "IteratorResult";
             break;
           default:
             break;
@@ -1949,6 +1961,7 @@ class DeclarationGenerator {
           }
         }
       }
+      maybeEmitSymbolIterator(instanceType);
 
       // Prototype fields (mostly methods).
       visitProperties(
@@ -2038,6 +2051,47 @@ class DeclarationGenerator {
     }
 
     /**
+     * Emits a [Symbol.iterator] property on the class if it extends Iterator.
+     *
+     * <p>JSCompiler does not understand nor represent Symbol properties, so we cannot just emit the
+     * property in the loop above, and must guess on the actual return type of the iterator method.
+     */
+    private void maybeEmitSymbolIterator(JSType instanceType) {
+      if (instanceType == null) {
+        return;
+      }
+      // iteratorIterableType and iterableType can be null if they were not found in the current
+      // run's externs definitions.
+      JSType implemented;
+      String returnType;
+      if (iteratorIterableType != null && instanceType.isSubtype(iteratorIterableType)) {
+        implemented = iteratorIterableType;
+        returnType = "IterableIterator";
+      } else if (iterableType != null && instanceType.isSubtype(iterableType)) {
+        implemented = iterableType;
+        returnType = "Iterator";
+      } else {
+        return;
+      }
+      emit("// Symbol.iterator inserted by Clutz for Iterable subtype");
+      emitBreak();
+      emit("[Symbol.iterator](): ");
+      // The actual implementation of iterator could be an arbitrary subtype of Iterable. Emit
+      // the type of the interface as the next best thing.
+      emit(returnType);
+      emit("<");
+      TemplateType templateType = implemented.getTemplateTypeMap().getTemplateKeys().get(0);
+      TemplateTypeMap ttMap = instanceType.getTemplateTypeMap();
+      // Known issue: ttMap does not expose getUnresolvedTemplateType, which would be required
+      // to correctly emit unbound template parameters, e.g. "<T>".
+      JSType resolvedTemplateType = ttMap.getResolvedTemplateType(templateType);
+      visitType(resolvedTemplateType, false, false);
+      emit(">");
+      emit(";");
+      emitBreak();
+    }
+
+    /**
      * Returns the names of props that would be output as fields (not methods) on superclasses of
      * the given class.
      */
@@ -2065,7 +2119,8 @@ class DeclarationGenerator {
           && superType.getConstructor().getPrototype() != null
           && superType.getConstructor().getPrototype().getOwnPropertyNames() != null) {
         for (String field : superType.getConstructor().getPrototype().getOwnPropertyNames()) {
-          // getPropertyType works with non-owned property names, i.e. names from the prototype chain.
+          // getPropertyType works with non-owned property names, i.e. names from the prototype
+          // chain.
           if (!superType.getPropertyType(field).isFunctionType()) {
             fields.add(field);
           }

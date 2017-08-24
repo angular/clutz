@@ -61,6 +61,7 @@ public class DeclarationSyntaxTest {
       ImmutableList.of(
           "--noEmit",
           "--skipDefaultLibCheck",
+          "--downlevelIteration",
           "--lib",
           "es5,dom,es2015.iterable",
           "--noImplicitAny",
@@ -126,7 +127,7 @@ public class DeclarationSyntaxTest {
     if (tsc.exitValue() != 0) {
       InputStreamReader isr = new InputStreamReader(tsc.getInputStream(), Charsets.UTF_8);
       String consoleOut = CharStreams.toString(isr);
-      fail(command + ": exited abnormally with code " + tsc.exitValue() + "\n" + consoleOut);
+      fail("tsc exited abnormally with code " + tsc.exitValue() + "\n" + consoleOut);
     }
   }
 }

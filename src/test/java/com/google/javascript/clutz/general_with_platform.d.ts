@@ -237,9 +237,11 @@ declare namespace ಠ_ಠ.clutz {
   class Headers_Instance implements Iterable < string [] > {
     private noStructuralTyping_: any;
     constructor (opt_headersInit ? : Headers | string [] [] | IObject < string , string > ) ;
+    // Symbol.iterator inserted by Clutz for Iterable subtype
+    [Symbol.iterator]():  Iterator < string [] > ;
     append (name : string , value : string ) : void ;
     delete (name : string ) : void ;
-    entries ( ) : IteratorIterable < string [] > ;
+    entries ( ) : IterableIterator < string [] > ;
     get (name : string ) : string | null ;
     getAll (name : string ) : string [] ;
     has (name : string ) : boolean ;
@@ -253,17 +255,6 @@ declare namespace ಠ_ಠ.clutz {
   }
   class Image_Instance extends HTMLImageElement {
     constructor (opt_width ? : number , opt_height ? : number ) ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  interface Iterable < VALUE > {
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  /**
-   * Use this to indicate a type is both an Iterator and an Iterable.
-   */
-  interface IteratorIterable < T > extends Iterator < T > , Iterable < T > {
   }
 }
 declare namespace ಠ_ಠ.clutz {
