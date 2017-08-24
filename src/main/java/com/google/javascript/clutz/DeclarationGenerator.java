@@ -2170,6 +2170,9 @@ class DeclarationGenerator {
         visitTypeDeclaration(propertyType, false, isOptionalProperty);
       } else {
         FunctionType ftype = (FunctionType) propertyType;
+        if (specialCaseMapEntries(propName, ftype)) {
+          return;
+        }
         // Avoid re-emitting template variables defined on the class level if method is not static.
         Set<String> skipTemplateParams =
             isStatic ? Collections.<String>emptySet() : classTemplateTypeNames;
@@ -2188,6 +2191,46 @@ class DeclarationGenerator {
       }
       emit(";");
       emitBreak();
+    }
+
+    /**
+     * Closure Compiler does not support tuple types, and thus cannot express the proper type for
+     * "Map<K, V>.entries()", which is an IterableIterator of a [K, V] tuple.
+     *
+     * <p>Given that maps are very common, as are for loops over them, this special cases methods
+     * called "entries" that have the right return type.
+     */
+    private boolean specialCaseMapEntries(String propName, FunctionType propertyType) {
+      if (propertyType.getMaxArity() != 0
+          || !propName.equals("entries")
+          || !propertyType.getReturnType().isTemplatizedType()) {
+        return false;
+      }
+      TemplatizedType ttType = propertyType.getReturnType().toMaybeTemplatizedType();
+      ImmutableList<JSType> ttypes = ttType.getTemplateTypes();
+      if (!isTemplateOf(ttType, "IteratorIterable")
+          || ttypes.size() != 1
+          || !isTemplateOf(ttypes.get(0), "Array")) {
+        return false;
+      }
+      JSType arrayMembers = ttypes.get(0).toMaybeTemplatizedType().getTemplateTypes().get(0);
+      if (!arrayMembers.isUnionType()
+          || arrayMembers.toMaybeUnionType().getAlternates().size() != 2) {
+        return false;
+      }
+      emit("(): IterableIterator<[");
+      Iterator<JSType> it = arrayMembers.toMaybeUnionType().getAlternates().iterator();
+      visitType(it.next());
+      emit(",");
+      visitType(it.next());
+      emit("]>;");
+      emitBreak();
+      return true;
+    }
+
+    private boolean isTemplateOf(JSType type, String typeName) {
+      return type.isTemplatizedType()
+          && type.toMaybeTemplatizedType().getReferenceName().equals(typeName);
     }
 
     /**
