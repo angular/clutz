@@ -11,9 +11,6 @@ declare namespace ಠ_ಠ.clutz.def.ctor {
     constructor ( ) ;
   }
 }
-declare namespace goog {
-  function require(name: 'def.ctor'): typeof ಠ_ಠ.clutz.def.ctor;
-}
 declare module 'goog:def.ctor' {
   import alias = ಠ_ಠ.clutz.def.ctor;
   export = alias;

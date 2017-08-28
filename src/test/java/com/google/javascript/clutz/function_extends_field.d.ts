@@ -25,9 +25,6 @@ declare namespace ಠ_ಠ.clutz.fn.field {
     pg : ( ) => number ;
   }
 }
-declare namespace goog {
-  function require(name: 'fn.field'): typeof ಠ_ಠ.clutz.fn.field;
-}
 declare module 'goog:fn.field' {
   import alias = ಠ_ಠ.clutz.fn.field;
   export = alias;

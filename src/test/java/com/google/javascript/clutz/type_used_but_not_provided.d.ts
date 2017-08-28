@@ -1,9 +1,6 @@
 declare namespace ಠ_ಠ.clutz.used.not.provided {
   var a : ಠ_ಠ.clutz.used.not.provided.C ;
 }
-declare namespace goog {
-  function require(name: 'used.not.provided.a'): typeof ಠ_ಠ.clutz.used.not.provided.a;
-}
 declare module 'goog:used.not.provided.a' {
   import alias = ಠ_ಠ.clutz.used.not.provided.a;
   export default alias;

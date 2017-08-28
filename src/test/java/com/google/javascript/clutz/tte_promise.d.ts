@@ -10,9 +10,6 @@ declare namespace ಠ_ಠ.clutz.tte {
     when < RESULT, T > (value: T, successCallback: (promiseValue: T) => Promise < RESULT >|RESULT, errorCallback: null | undefined |  ((reason: any) => any), notifyCallback?: (state: any) => any): Promise < RESULT >;
   }
 }
-declare namespace goog {
-  function require(name: 'tte.Promise'): typeof ಠ_ಠ.clutz.tte.Promise;
-}
 declare module 'goog:tte.Promise' {
   import alias = ಠ_ಠ.clutz.tte.Promise;
   export default alias;
@@ -28,9 +25,6 @@ declare namespace ಠ_ಠ.clutz.tte {
 declare namespace ಠ_ಠ.clutz.tte.PromiseService {
   interface Promise < T > {
   }
-}
-declare namespace goog {
-  function require(name: 'tte.PromiseService'): typeof ಠ_ಠ.clutz.tte.PromiseService;
 }
 declare module 'goog:tte.PromiseService' {
   import alias = ಠ_ಠ.clutz.tte.PromiseService;

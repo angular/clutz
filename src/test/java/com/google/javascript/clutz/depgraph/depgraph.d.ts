@@ -7,9 +7,6 @@ declare namespace ಠ_ಠ.clutz.root {
     useTransitiveNamespaced ( ) : ಠ_ಠ.clutz.transitive.ns.Z | null ;
   }
 }
-declare namespace goog {
-  function require(name: 'root.Z'): typeof ಠ_ಠ.clutz.root.Z;
-}
 declare module 'goog:root.Z' {
   import alias = ಠ_ಠ.clutz.root.Z;
   export default alias;

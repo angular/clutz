@@ -6,9 +6,6 @@ declare namespace ಠ_ಠ.clutz.namedType {
     fn (a : ಠ_ಠ.clutz.namedType.D < any > ) : any ;
   }
 }
-declare namespace goog {
-  function require(name: 'namedType.A'): typeof ಠ_ಠ.clutz.namedType.A;
-}
 declare module 'goog:namedType.A' {
   import alias = ಠ_ಠ.clutz.namedType.A;
   export default alias;
@@ -19,9 +16,6 @@ declare namespace ಠ_ಠ.clutz.namedType {
   class D_Instance < T > {
     private noStructuralTyping_: any;
   }
-}
-declare namespace goog {
-  function require(name: 'namedType.D'): typeof ಠ_ಠ.clutz.namedType.D;
 }
 declare module 'goog:namedType.D' {
   import alias = ಠ_ಠ.clutz.namedType.D;

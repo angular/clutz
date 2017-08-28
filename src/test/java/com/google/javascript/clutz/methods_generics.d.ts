@@ -25,9 +25,6 @@ declare namespace ಠ_ಠ.clutz.method_generics {
     push (value : T ) : void ;
   }
 }
-declare namespace goog {
-  function require(name: 'method_generics'): typeof ಠ_ಠ.clutz.method_generics;
-}
 declare module 'goog:method_generics' {
   import alias = ಠ_ಠ.clutz.method_generics;
   export = alias;

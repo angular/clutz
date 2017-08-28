@@ -7,9 +7,6 @@ declare namespace ಠ_ಠ.clutz {
     foo ( ) : any ;
   }
 }
-declare namespace goog {
-  function require(name: 'module$exports$asyncawait'): typeof ಠ_ಠ.clutz.module$exports$asyncawait;
-}
 declare module 'goog:asyncawait' {
   import alias = ಠ_ಠ.clutz.module$exports$asyncawait;
   export default alias;

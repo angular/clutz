@@ -29,9 +29,6 @@ declare namespace ಠ_ಠ.clutz.generics {
   function identity < T > (a : T ) : T ;
   function objectWithGenericKeyType < K , V > (obj : { [ /* warning: coerced from K */ key: string ]: V } ) : void ;
 }
-declare namespace goog {
-  function require(name: 'generics'): typeof ಠ_ಠ.clutz.generics;
-}
 declare module 'goog:generics' {
   import alias = ಠ_ಠ.clutz.generics;
   export = alias;

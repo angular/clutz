@@ -12,9 +12,6 @@ declare namespace ಠ_ಠ.clutz.module$exports$foo$C {
     A : Enum ,
   };
 }
-declare namespace goog {
-  function require(name: 'module$exports$foo$C'): typeof ಠ_ಠ.clutz.module$exports$foo$C;
-}
 declare module 'goog:foo.C' {
   import alias = ಠ_ಠ.clutz.module$exports$foo$C;
   export default alias;

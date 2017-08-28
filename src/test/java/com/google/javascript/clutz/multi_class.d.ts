@@ -28,9 +28,6 @@ declare namespace ಠ_ಠ.clutz.multi_class {
   interface I2 extends ಠ_ಠ.clutz.multi_class.I {
   }
 }
-declare namespace goog {
-  function require(name: 'multi_class'): typeof ಠ_ಠ.clutz.multi_class;
-}
 declare module 'goog:multi_class' {
   import alias = ಠ_ಠ.clutz.multi_class;
   export = alias;

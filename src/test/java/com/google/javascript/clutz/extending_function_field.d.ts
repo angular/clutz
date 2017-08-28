@@ -1,9 +1,6 @@
 declare namespace ಠ_ಠ.clutz.a {
   function messesWithB (b : ಠ_ಠ.clutz.ns.B ) : void ;
 }
-declare namespace goog {
-  function require(name: 'a.messesWithB'): typeof ಠ_ಠ.clutz.a.messesWithB;
-}
 declare module 'goog:a.messesWithB' {
   import alias = ಠ_ಠ.clutz.a.messesWithB;
   export default alias;
@@ -15,9 +12,6 @@ declare namespace ಠ_ಠ.clutz.ns {
     private noStructuralTyping_: any;
     fn ( ) : void ;
   }
-}
-declare namespace goog {
-  function require(name: 'ns.A'): typeof ಠ_ಠ.clutz.ns.A;
 }
 declare module 'goog:ns.A' {
   import alias = ಠ_ಠ.clutz.ns.A;
@@ -32,9 +26,6 @@ declare namespace ಠ_ಠ.clutz.ns {
     //!! the super type.
     fn ( ) : void ;
   }
-}
-declare namespace goog {
-  function require(name: 'ns.B'): typeof ಠ_ಠ.clutz.ns.B;
 }
 declare module 'goog:ns.B' {
   import alias = ಠ_ಠ.clutz.ns.B;

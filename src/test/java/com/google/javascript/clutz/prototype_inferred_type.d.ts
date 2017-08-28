@@ -9,9 +9,6 @@ declare namespace ಠ_ಠ.clutz.foo {
     private noStructuralTyping_: any;
   }
 }
-declare namespace goog {
-  function require(name: 'foo.Klass'): typeof ಠ_ಠ.clutz.foo.Klass;
-}
 declare module 'goog:foo.Klass' {
   import alias = ಠ_ಠ.clutz.foo.Klass;
   export default alias;

@@ -9,9 +9,6 @@ declare namespace ಠ_ಠ.clutz.forward {
     fn (a : any ) : any ;
   }
 }
-declare namespace goog {
-  function require(name: 'forward.A'): typeof ಠ_ಠ.clutz.forward.A;
-}
 declare module 'goog:forward.A' {
   import alias = ಠ_ಠ.clutz.forward.A;
   export default alias;

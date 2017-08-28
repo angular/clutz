@@ -17,9 +17,6 @@ declare namespace ಠ_ಠ.clutz.dict {
   var typed : { a : Function | null } ;
   var untyped : {[key: string]: any} ;
 }
-declare namespace goog {
-  function require(name: 'dict'): typeof ಠ_ಠ.clutz.dict;
-}
 declare module 'goog:dict' {
   import alias = ಠ_ಠ.clutz.dict;
   export = alias;

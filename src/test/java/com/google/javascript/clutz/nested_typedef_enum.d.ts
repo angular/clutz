@@ -11,9 +11,6 @@ declare namespace ಠ_ಠ.clutz.nested_typedef_enum.Bar {
     A : Baz ,
   };
 }
-declare namespace goog {
-  function require(name: 'nested_typedef_enum.Bar.Baz'): typeof ಠ_ಠ.clutz.nested_typedef_enum.Bar.Baz;
-}
 declare module 'goog:nested_typedef_enum.Bar.Baz' {
   import alias = ಠ_ಠ.clutz.nested_typedef_enum.Bar.Baz;
   export default alias;

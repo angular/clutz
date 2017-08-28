@@ -8,9 +8,6 @@ declare namespace ಠ_ಠ.clutz.static_inherit {
   class Child_Instance extends ಠ_ಠ.clutz.static_inherit.Parent_Instance {
   }
 }
-declare namespace goog {
-  function require(name: 'static_inherit.Child'): typeof ಠ_ಠ.clutz.static_inherit.Child;
-}
 declare module 'goog:static_inherit.Child' {
   import alias = ಠ_ಠ.clutz.static_inherit.Child;
   export default alias;
@@ -22,9 +19,6 @@ declare namespace ಠ_ಠ.clutz.static_inherit {
   }
   class GrandChild_Instance extends ಠ_ಠ.clutz.static_inherit.Child_Instance {
   }
-}
-declare namespace goog {
-  function require(name: 'static_inherit.GrandChild'): typeof ಠ_ಠ.clutz.static_inherit.GrandChild;
 }
 declare module 'goog:static_inherit.GrandChild' {
   import alias = ಠ_ಠ.clutz.static_inherit.GrandChild;
@@ -40,9 +34,6 @@ declare namespace ಠ_ಠ.clutz.static_inherit {
   class Parent_Instance {
     private noStructuralTyping_: any;
   }
-}
-declare namespace goog {
-  function require(name: 'static_inherit.Parent'): typeof ಠ_ಠ.clutz.static_inherit.Parent;
 }
 declare module 'goog:static_inherit.Parent' {
   import alias = ಠ_ಠ.clutz.static_inherit.Parent;

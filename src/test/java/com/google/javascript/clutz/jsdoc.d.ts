@@ -26,9 +26,6 @@ declare namespace ಠ_ಠ.clutz.x {
     method (foo : string ) : void ;
   }
 }
-declare namespace goog {
-  function require(name: 'x.Y'): typeof ಠ_ಠ.clutz.x.Y;
-}
 declare module 'goog:x.Y' {
   import alias = ಠ_ಠ.clutz.x.Y;
   export default alias;

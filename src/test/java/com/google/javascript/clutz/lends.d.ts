@@ -14,9 +14,6 @@ declare namespace ಠ_ಠ.clutz.lends {
     c : boolean ;
   }
 }
-declare namespace goog {
-  function require(name: 'lends.A'): typeof ಠ_ಠ.clutz.lends.A;
-}
 declare module 'goog:lends.A' {
   import alias = ಠ_ಠ.clutz.lends.A;
   export default alias;

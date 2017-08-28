@@ -8,9 +8,6 @@ declare namespace ಠ_ಠ.clutz {
 declare namespace ಠ_ಠ.clutz.module$exports$nested$typedef$mod {
   type T = { a : string } ;
 }
-declare namespace goog {
-  function require(name: 'module$exports$nested$typedef$mod'): typeof ಠ_ಠ.clutz.module$exports$nested$typedef$mod;
-}
 declare module 'goog:nested.typedef.mod' {
   import alias = ಠ_ಠ.clutz.module$exports$nested$typedef$mod;
   export default alias;

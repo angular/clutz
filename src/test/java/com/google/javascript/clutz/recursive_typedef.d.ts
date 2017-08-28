@@ -6,9 +6,6 @@ declare namespace ಠ_ಠ.clutz.rec {
     foo : ಠ_ಠ.clutz.rec.ns.Arr ;
   }
 }
-declare namespace goog {
-  function require(name: 'rec.Aclass'): typeof ಠ_ಠ.clutz.rec.Aclass;
-}
 declare module 'goog:rec.Aclass' {
   import alias = ಠ_ಠ.clutz.rec.Aclass;
   export default alias;
@@ -20,9 +17,6 @@ declare namespace ಠ_ಠ.clutz.rec.ns {
   var foo : ಠ_ಠ.clutz.rec.ns.Arr ;
   var foo2 : ಠ_ಠ.clutz.rec.ns.El ;
   var tvar : ಠ_ಠ.clutz.rec.ns.T ;
-}
-declare namespace goog {
-  function require(name: 'rec.ns'): typeof ಠ_ಠ.clutz.rec.ns;
 }
 declare module 'goog:rec.ns' {
   import alias = ಠ_ಠ.clutz.rec.ns;

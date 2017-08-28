@@ -19,9 +19,6 @@ declare namespace ಠ_ಠ.clutz.types {
   var recordType : { a : string , b : any } ;
   var recordTypeOptional : { a : string , optional ? : string } ;
 }
-declare namespace goog {
-  function require(name: 'types'): typeof ಠ_ಠ.clutz.types;
-}
 declare module 'goog:types' {
   import alias = ಠ_ಠ.clutz.types;
   export = alias;

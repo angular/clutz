@@ -485,15 +485,7 @@ class DeclarationGenerator {
       if (isDefault) {
         namespace = getNamespace(symbol.getName());
       }
-      int valueSymbolsWalked =
-          declareNamespace(namespace, symbol, emitName, isDefault, transitiveProvides, false);
-
-      // skip emitting goog.require declarations for value empty namespaces, as calling typeof
-      // does not work for them.
-      if (valueSymbolsWalked > 0) {
-        emitGoogRequireSupport(
-            namespace, isDefault ? symbol.getName() : namespace, isDefault ? emitName : namespace);
-      }
+      declareNamespace(namespace, symbol, emitName, isDefault, transitiveProvides, false);
       declareModule(provide, isDefault, emitName);
     }
     // In order to typecheck in the presence of third-party externs, emit all extern symbols.
@@ -802,11 +794,7 @@ class DeclarationGenerator {
         || fileName.startsWith("webkit_");
   }
 
-  /**
-   * @return the number of value symbols emitted. If this number is greater than zero, the namespace
-   *     can be used in a value position, for example `typeof foo`.
-   */
-  private int declareNamespace(
+  private void declareNamespace(
       String namespace,
       TypedVar symbol,
       String emitName,
@@ -815,7 +803,7 @@ class DeclarationGenerator {
       boolean isExtern) {
     if (!isValidJSProperty(getUnqualifiedName(symbol))) {
       emitComment("skipping property " + symbol.getName() + " because it is not a valid symbol.");
-      return 0;
+      return;
     }
     if (GOOG_BASE_NAMESPACE.equals(namespace) && GOOG_BASE_NAMESPACE.equals(symbol.getName())) {
       // Emitting the 'goog' namespace itself (but not e.g. 'goog.Uri').
@@ -870,10 +858,8 @@ class DeclarationGenerator {
             continue;
           }
           // For safety we need to special case goog.require to return the empty interface by
-          // default
-          // For existing namespaces we emit a goog.require string override that has the proper
-          // type.
-          // See emitGoogRequireSupport method.
+          // default. For existing namespaces we emit a goog.require string override that has the
+          // proper type. See emitGoogRequireSupport method.
           if (propertyName.equals("goog.require")) {
             emit(
                 "function require (name : string ) : "
@@ -918,7 +904,6 @@ class DeclarationGenerator {
     if (isDefault && !isExtern && otype != null && !isAliasedClassOrInterface(symbol, otype)) {
       treeWalker.walkInnerSymbols(otype, symbol.getName());
     }
-    return treeWalker.valueSymbolsWalked;
   }
 
   private boolean isValidJSProperty(String name) {
@@ -976,23 +961,6 @@ class DeclarationGenerator {
   // needed here.
   private boolean isTypedef(JSType type) {
     return type.isNoType();
-  }
-
-  private void emitGoogRequireSupport(String namespace, String nameToBeRequired, String emitName) {
-    // goog namespace doesn't need to be goog.required.
-    if (namespace.equals(GOOG_BASE_NAMESPACE)) return;
-    emitTopLevelNamespaceBegin(GOOG_BASE_NAMESPACE);
-    // TS supports overloading the require declaration with a fixed string argument.
-    emit(
-        "function require(name: '"
-            + nameToBeRequired
-            + "'): typeof "
-            + Constants.INTERNAL_NAMESPACE
-            + "."
-            + emitName
-            + ";");
-    emitBreak();
-    emitNamespaceEnd();
   }
 
   private void emitNamespaceBegin(String namespace) {
@@ -1195,8 +1163,6 @@ class DeclarationGenerator {
     /** Whether the symbol we are walking was defined in an extern file */
     private final boolean isExtern;
 
-    private int valueSymbolsWalked = 0;
-
     private TreeWalker(JSTypeRegistry typeRegistry, Set<String> provides, boolean isExtern) {
       this.typeRegistry = typeRegistry;
       this.provides = provides;
@@ -1217,7 +1183,6 @@ class DeclarationGenerator {
 
     private void walk(TypedVar symbol, String emitName) {
       JSType type = symbol.getType();
-      if (!type.isInterface() && !isTypedef(type)) valueSymbolsWalked++;
       if (type.isFunctionType() && !isNewableFunctionType((FunctionType) type)) {
         FunctionType ftype = (FunctionType) type;
 

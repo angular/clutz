@@ -14,9 +14,6 @@ declare namespace ಠ_ಠ.clutz.typedef {
 declare namespace ಠ_ಠ.clutz.typedef.C {
   type T = (a : any ) => any ;
 }
-declare namespace goog {
-  function require(name: 'typedef.C'): typeof ಠ_ಠ.clutz.typedef.C;
-}
 declare module 'goog:typedef.C' {
   import alias = ಠ_ಠ.clutz.typedef.C;
   export default alias;

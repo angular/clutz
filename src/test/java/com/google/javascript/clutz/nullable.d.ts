@@ -13,9 +13,6 @@ declare namespace ಠ_ಠ.clutz.nullable {
    */
   var z : GlobalObject | null ;
 }
-declare namespace goog {
-  function require(name: 'nullable'): typeof ಠ_ಠ.clutz.nullable;
-}
 declare module 'goog:nullable' {
   import alias = ಠ_ಠ.clutz.nullable;
   export = alias;

@@ -13,9 +13,6 @@ declare namespace ಠ_ಠ.clutz.empty_type_args {
     private noStructuralTyping_: any;
   }
 }
-declare namespace goog {
-  function require(name: 'empty_type_args.NoMoreTemplateArgs'): typeof ಠ_ಠ.clutz.empty_type_args.NoMoreTemplateArgs;
-}
 declare module 'goog:empty_type_args.NoMoreTemplateArgs' {
   import alias = ಠ_ಠ.clutz.empty_type_args.NoMoreTemplateArgs;
   export default alias;
@@ -27,9 +24,6 @@ declare namespace ಠ_ಠ.clutz.empty_type_args {
     private noStructuralTyping_: any;
     constructor (a : ಠ_ಠ.clutz.empty_type_args.NoMoreTemplateArgs ) ;
   }
-}
-declare namespace goog {
-  function require(name: 'empty_type_args.X'): typeof ಠ_ಠ.clutz.empty_type_args.X;
 }
 declare module 'goog:empty_type_args.X' {
   import alias = ಠ_ಠ.clutz.empty_type_args.X;

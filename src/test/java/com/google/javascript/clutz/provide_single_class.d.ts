@@ -23,9 +23,6 @@ declare namespace ಠ_ಠ.clutz.foo.bar.Baz {
     B : NestedEnum ,
   };
 }
-declare namespace goog {
-  function require(name: 'foo.bar.Baz'): typeof ಠ_ಠ.clutz.foo.bar.Baz;
-}
 declare module 'goog:foo.bar.Baz' {
   import alias = ಠ_ಠ.clutz.foo.bar.Baz;
   export default alias;

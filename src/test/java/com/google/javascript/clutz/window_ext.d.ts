@@ -1,9 +1,6 @@
 declare namespace ಠ_ಠ.clutz.nswindow {
   var c : ಠ_ಠ.clutz.window.C ;
 }
-declare namespace goog {
-  function require(name: 'nswindow.c'): typeof ಠ_ಠ.clutz.nswindow.c;
-}
 declare module 'goog:nswindow.c' {
   import alias = ಠ_ಠ.clutz.nswindow.c;
   export default alias;
