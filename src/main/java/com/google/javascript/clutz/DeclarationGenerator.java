@@ -2194,7 +2194,9 @@ class DeclarationGenerator {
 
     /**
      * Closure Compiler does not support tuple types, and thus cannot express the proper type for
-     * "Map<K, V>.entries()", which is an IterableIterator of a [K, V] tuple.
+     * "Map<K, V>.entries()", which is an IterableIterator of a [K, V] tuple. The tighter tuple type
+     * [K, V] allows destructuring loops "for (const [x, y] of ...)" with the tuple values getting
+     * the right types assigned.
      *
      * <p>Given that maps are very common, as are for loops over them, this special cases methods
      * called "entries" that have the right return type.
