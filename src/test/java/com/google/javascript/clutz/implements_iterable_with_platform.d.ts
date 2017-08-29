@@ -3,7 +3,6 @@ declare namespace ಠ_ಠ.clutz.implements_iterable {
   }
   class ImplIterable_Instance implements Iterable < string > {
     private noStructuralTyping_: any;
-    // Symbol.iterator inserted by Clutz for Iterable subtype
     [Symbol.iterator]():  Iterator < string > ;
   }
 }
@@ -19,7 +18,6 @@ declare namespace ಠ_ಠ.clutz.implements_iterable {
   }
   class ImplIterableGeneric_Instance < T > implements Iterable < T > {
     private noStructuralTyping_: any;
-    // Symbol.iterator inserted by Clutz for Iterable subtype
     [Symbol.iterator]():  Iterator < any > ;
   }
 }
@@ -35,7 +33,6 @@ declare namespace ಠ_ಠ.clutz.implements_iterable {
   }
   class ImplIterableIterator_Instance implements IterableIterator < string > {
     private noStructuralTyping_: any;
-    // Symbol.iterator inserted by Clutz for Iterable subtype
     [Symbol.iterator]():  IterableIterator < string > ;
     next (a ? : string ) : IteratorResult < string > ;
   }

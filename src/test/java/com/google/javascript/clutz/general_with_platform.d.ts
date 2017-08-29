@@ -237,7 +237,6 @@ declare namespace ಠ_ಠ.clutz {
   class Headers_Instance implements Iterable < string [] > {
     private noStructuralTyping_: any;
     constructor (opt_headersInit ? : Headers | string [] [] | IObject < string , string > ) ;
-    // Symbol.iterator inserted by Clutz for Iterable subtype
     [Symbol.iterator]():  Iterator < string [] > ;
     append (name : string , value : string ) : void ;
     delete (name : string ) : void ;

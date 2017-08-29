@@ -2073,8 +2073,7 @@ class DeclarationGenerator {
       } else {
         return;
       }
-      emit("// Symbol.iterator inserted by Clutz for Iterable subtype");
-      emitBreak();
+      emitComment("Symbol.iterator inserted by Clutz for Iterable subtype");
       emit("[Symbol.iterator](): ");
       // The actual implementation of iterator could be an arbitrary subtype of Iterable. Emit
       // the type of the interface as the next best thing.
