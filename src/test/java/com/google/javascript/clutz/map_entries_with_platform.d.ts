@@ -9,9 +9,6 @@ declare namespace ಠ_ಠ.clutz {
     entries (): IterableIterator<[ K , V ]>;
   }
 }
-declare namespace goog {
-  function require(name: 'module$exports$map_entries$Map'): typeof ಠ_ಠ.clutz.module$exports$map_entries$Map;
-}
 declare module 'goog:map_entries.Map' {
   import alias = ಠ_ಠ.clutz.module$exports$map_entries$Map;
   export default alias;
