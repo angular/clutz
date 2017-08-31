@@ -82,7 +82,7 @@ public class DeclarationSyntaxTest {
     // This currently runs *all* test files as one test case. This gives less insight into errors,
     // but improves runtime as TypeScript only has to read its lib.d.ts once, amortizing the cost
     // across test cases.
-    List<File> inputs = DeclarationGeneratorTests.getTestInputFiles(filenameFilter);
+    List<File> inputs = DeclarationGeneratorTests.getTestInputFilesNoPartial(filenameFilter);
     List<String> goldenFilePaths = new ArrayList<>();
     for (File input : inputs) {
       goldenFilePaths.add(DeclarationGeneratorTests.getGoldenFile(input, ".d.ts").getPath());
@@ -107,7 +107,7 @@ public class DeclarationSyntaxTest {
   }
 
   private void doTestDeclarationUsage(FilenameFilter filenameFilter) throws Exception {
-    List<File> inputs = DeclarationGeneratorTests.getTestInputFiles(filenameFilter);
+    List<File> inputs = DeclarationGeneratorTests.getTestInputFilesNoPartial(filenameFilter);
     final List<String> tscCommand = Lists.newArrayList(TSC.toString(), "-m", "commonjs");
     tscCommand.addAll(TSC_FLAGS);
 

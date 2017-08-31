@@ -102,6 +102,11 @@ public class DeclarationGeneratorTests {
     return filesList;
   }
 
+  public static List<File> getTestInputFilesNoPartial(FilenameFilter filter) {
+    File[] testFiles = getPackagePath().toFile().listFiles(filter);
+    return Arrays.asList(testFiles);
+  }
+
   static Path getTestInputFile(String fileName) {
     return getPackagePath().resolve(fileName);
   }
