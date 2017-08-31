@@ -1543,6 +1543,34 @@ class DeclarationGenerator {
     }
 
     /**
+     * Emits a type that is not resolved by closure. Depending on compilation options (whether we
+     * are assuming forward declarations or not) we either emit the defaultEmit string passed, or
+     * the literal string that was in the original code. Special care is taken for templatized
+     * types.
+     */
+    private void emitNoResolvedType(NoType type, String defaultEmit) {
+      if (!opts.partialInput || !type.isNoResolvedType()) {
+        emit(defaultEmit);
+        return;
+      }
+      // When processing partial inputs, this case handles implicitly forward declared types
+      // for which we just emit the literal type written along with any type parameters.
+      NoResolvedType nType = (NoResolvedType) type;
+      // TODO(rado): Find a case where this happens for extends/implements and add
+      // a test for it.
+      if (nType.getReferenceName() == null) {
+        emit(defaultEmit);
+        return;
+      }
+      String displayName = type.getDisplayName();
+      emit(Constants.INTERNAL_NAMESPACE + "." + displayName);
+      List<JSType> templateTypes = nType.getTemplateTypes();
+      if (templateTypes != null && templateTypes.size() > 0) {
+        emitGenericTypeArguments(type.getTemplateTypes().iterator());
+      }
+    }
+
+    /**
      * Adds parentheses to turn a Type grammar production into a PrimaryType. See
      * https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#a-grammar
      *
@@ -1636,23 +1664,7 @@ class DeclarationGenerator {
 
             @Override
             public Void caseNoType(NoType type) {
-              if (!opts.partialInput || !type.isNoResolvedType()) {
-                emit("any");
-                return null;
-              }
-              // When processing partial inputs, this case handles implicitly forward declared types
-              // for which we just emit the literal type written along with any type parameters.
-              NoResolvedType nType = (NoResolvedType) type;
-              if (nType.getReferenceName() != null) {
-                String displayName = type.getDisplayName();
-                emit(Constants.INTERNAL_NAMESPACE + "." + displayName);
-                List<JSType> templateTypes = nType.getTemplateTypes();
-                if (templateTypes != null && templateTypes.size() > 0) {
-                  emitGenericTypeArguments(type.getTemplateTypes().iterator());
-                }
-              } else {
-                emit("any");
-              }
+              emitNoResolvedType(type, "any");
               return null;
             }
 
@@ -2655,6 +2667,7 @@ class DeclarationGenerator {
 
       @Override
       public Void caseNoType(NoType type) {
+        emitNoResolvedType(type, "ClutzMissingBase");
         return null;
       }
 

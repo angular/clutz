@@ -27,6 +27,11 @@ declare namespace ಠ_ಠ.clutz {
   interface PrivateInterface {}
 
   interface IObject<KEY1, VALUE> {}
+
+  /**
+   * A base class that can be used for extends/implement clauses when the used value is missing.
+   */
+  class ClutzMissingBase {}
 }
 
 // Will be extended if base.js is a dependency.
