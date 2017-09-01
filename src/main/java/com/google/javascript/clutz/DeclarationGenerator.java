@@ -42,6 +42,7 @@ import com.google.javascript.rhino.jstype.JSType;
 import com.google.javascript.rhino.jstype.JSTypeNative;
 import com.google.javascript.rhino.jstype.JSTypeRegistry;
 import com.google.javascript.rhino.jstype.NamedType;
+import com.google.javascript.rhino.jstype.NoResolvedType;
 import com.google.javascript.rhino.jstype.NoType;
 import com.google.javascript.rhino.jstype.ObjectType;
 import com.google.javascript.rhino.jstype.ProxyObjectType;
@@ -1635,7 +1636,23 @@ class DeclarationGenerator {
 
             @Override
             public Void caseNoType(NoType type) {
-              emit("any");
+              if (!opts.partialInput || !type.isNoResolvedType()) {
+                emit("any");
+                return null;
+              }
+              // When processing partial inputs, this case handles implicitly forward declared types
+              // for which we just emit the literal type written along with any type parameters.
+              NoResolvedType nType = (NoResolvedType) type;
+              if (nType.getReferenceName() != null) {
+                String displayName = type.getDisplayName();
+                emit(Constants.INTERNAL_NAMESPACE + "." + displayName);
+                List<JSType> templateTypes = nType.getTemplateTypes();
+                if (templateTypes != null && templateTypes.size() > 0) {
+                  emitGenericTypeArguments(type.getTemplateTypes().iterator());
+                }
+              } else {
+                emit("any");
+              }
               return null;
             }
 
@@ -1794,6 +1811,11 @@ class DeclarationGenerator {
       }
       emit(templateTypeName);
       typesUsed.add(type.getDisplayName());
+      emitGenericTypeArguments(it);
+      return null;
+    }
+
+    private void emitGenericTypeArguments(Iterator<JSType> it) {
       emit("<");
       while (it.hasNext()) {
         visitType(it.next());
@@ -1802,7 +1824,6 @@ class DeclarationGenerator {
         }
       }
       emit(">");
-      return null;
     }
 
     private void emitIndexSignature(JSType keyType, JSType returnType, boolean emitBreak) {
