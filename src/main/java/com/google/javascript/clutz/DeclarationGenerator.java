@@ -1262,7 +1262,7 @@ class DeclarationGenerator {
       visitTemplateTypes(ftype);
       emit("=");
       emit(typeName);
-      visitTemplateTypes(ftype);
+      visitTemplateTypes(ftype, Collections.emptySet(), false);
       emit(";");
       emitBreak();
       if (!ftype.isInterface()) {
@@ -1325,7 +1325,7 @@ class DeclarationGenerator {
         visitTemplateTypes(ftype);
         emit("extends");
         emit(name + INSTANCE_CLASS_SUFFIX);
-        visitTemplateTypes(ftype);
+        visitTemplateTypes(ftype, Collections.emptySet(), false);
         emit("{");
         indent();
         emitBreak();
@@ -1398,10 +1398,22 @@ class DeclarationGenerator {
     }
 
     private void visitTemplateTypes(ObjectType type) {
-      visitTemplateTypes(type, Collections.<String>emptySet());
+      visitTemplateTypes(type, Collections.<String>emptySet(), true);
     }
 
-    private void visitTemplateTypes(ObjectType type, Set<String> alreadyEmittedTemplateType) {
+    /**
+     * Emits template types for a given type. For example for <code>T<A,B></code>, this method will
+     * emit <code><A,B></code>.
+     *
+     * @param type the type in question
+     * @param alreadyEmittedTemplateType when visiting methods the class template types will be
+     *     reported by closure, but should not be emitted.
+     * @param isDeclaration isDeclaration {@pre true} if this type declares the template types,
+     *     {@pre false} if it instantiates a generic type. In the former case, Clutz emits defaults
+     *     for the template parameters.
+     */
+    private void visitTemplateTypes(
+        ObjectType type, Set<String> alreadyEmittedTemplateType, boolean isDeclaration) {
       if (type.hasAnyTemplateTypes() && !type.getTemplateTypeMap().isEmpty()) {
         List<String> realTemplateType = new ArrayList<>();
 
@@ -1411,13 +1423,20 @@ class DeclarationGenerator {
           // Some template variables can be already defined at the class definition.
           // Closure and TypeScript disagree in that case, in closure redeclaring a class template
           // variable at a method does nothing, but in Typescript it introduces a new variable.
-          // To perserve the sementics from closure we skip emitting redeclared variables.
+          // To preserve the semantics from closure we skip emitting redeclared variables.
           if (alreadyEmittedTemplateType.contains(displayName)) {
             continue;
           }
 
           if (displayName.contains("IObject#")) {
             displayName = normalizeIObjectTemplateName(type, displayName);
+          }
+          // When we emit partial programs, we cannot differentiate whether Foo
+          // is a plain type or a generic type for which closure infers '?' as
+          // all type arguments.
+          // To support this usecase we emit ' = any' for all generic args.
+          if (opts.partialInput && isDeclaration) {
+            displayName += " = any";
           }
 
           if (displayName != null) {
@@ -2437,7 +2456,7 @@ class DeclarationGenerator {
     private void visitFunctionParameters(
         FunctionType ftype, boolean emitTemplatizedTypes, Set<String> alreadyEmittedTemplateType) {
       if (emitTemplatizedTypes) {
-        visitTemplateTypes(ftype, alreadyEmittedTemplateType);
+        visitTemplateTypes(ftype, alreadyEmittedTemplateType, true);
       }
       emit("(");
       Iterator<Node> parameters = ftype.getParameters().iterator();
