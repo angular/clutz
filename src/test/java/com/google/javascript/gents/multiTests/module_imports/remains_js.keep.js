@@ -1,3 +1,4 @@
 goog.module('b');
 
-exports.J = 3;
+/** @enum {number} */
+exports.J = {A:0};
