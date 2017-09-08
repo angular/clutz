@@ -7,6 +7,10 @@ const {foo} = goog.require("named.A.B");
 var namespace = goog.require("namespace.A.B");
 const D = goog.require("both.A.B.C.D");
 const {bar} = goog.require("both.A.B.C.D");
+const {J} = goog.require('b');
+
+// Use properties still in JS.
+const JJ = J.A;
 
 // Use imports from a namespace.
 namespace.foo();

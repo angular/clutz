@@ -233,7 +233,6 @@ public final class ModuleConversionPass implements CompilerPass {
           //     Currently, this only allows for a single destructured import value.
           String namedExport = node.getFirstChild().getString();
           String requiredNamespace = node.getNext().getFirstChild().getNext().getString();
-          requiredNamespace += "." + namedExport;
           convertRequireToImportStatements(n, namedExport, requiredNamespace);
           return;
         }
@@ -286,6 +285,11 @@ public final class ModuleConversionPass implements CompilerPass {
    * </pre>
    */
   void convertRequireToImportStatements(Node n, String fullLocalName, String requiredNamespace) {
+    String convertedNamespace = requiredNamespace + "." + fullLocalName;
+    // This may not exist if the required module still lives in JS.
+    if (namespaceToModule.containsKey(convertedNamespace)) {
+      requiredNamespace = convertedNamespace;
+    }
     boolean alreadyConverted = requiredNamespace.startsWith(this.alreadyConvertedPrefix + ".");
     if (!namespaceToModule.containsKey(requiredNamespace) && !alreadyConverted) {
       compiler.report(
