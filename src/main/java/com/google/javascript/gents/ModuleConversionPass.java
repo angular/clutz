@@ -285,10 +285,10 @@ public final class ModuleConversionPass implements CompilerPass {
    * </pre>
    */
   void convertRequireToImportStatements(Node n, String fullLocalName, String requiredNamespace) {
-    String fullNamespace = requiredNamespace + "." + fullLocalName;
+    String convertedNamespace = requiredNamespace + "." + fullLocalName;
     // This may not exist if the required module still lives in JS.
-    if (namespaceToModule.containsKey(requiredNamespace)) {
-      requiredNamespace = fullNamespace;
+    if (namespaceToModule.containsKey(convertedNamespace)) {
+      requiredNamespace = convertedNamespace;
     }
     boolean alreadyConverted = requiredNamespace.startsWith(this.alreadyConvertedPrefix + ".");
     if (!namespaceToModule.containsKey(requiredNamespace) && !alreadyConverted) {
