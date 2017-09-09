@@ -7,12 +7,12 @@ const {foo} = goog.require("named.A.B");
 var namespace = goog.require("namespace.A.B");
 const D = goog.require("both.A.B.C.D");
 const {bar} = goog.require("both.A.B.C.D");
-const {foobar} = goog.require("provides");
 const {R} = goog.require('module');
+const {foobar} = goog.require('provides');
 
 // Use code in JS.
-const baz = foobar.A;
-const bar = R.A;
+R();
+foobar();
 
 // Use imports from a namespace.
 namespace.foo();
