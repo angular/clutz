@@ -6,6 +6,12 @@ import * as namespace from './export_namespace';
 import {D} from './export_both';
 import * as DExports from './export_both';
 import {bar} from './export_both';
+import foobar from 'goog:provide';
+import {R} from 'goog:provide.R';
+
+
+// Use code in JS.
+const baz = foobar.A;
 
 // Use imports from a namespace.
 namespace.foo();
