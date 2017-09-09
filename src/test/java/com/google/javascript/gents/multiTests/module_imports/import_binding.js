@@ -8,11 +8,9 @@ var namespace = goog.require("namespace.A.B");
 const D = goog.require("both.A.B.C.D");
 const {bar} = goog.require("both.A.B.C.D");
 const {R} = goog.require('module');
-const {foobar} = goog.require('provides');
 
 // Use code in JS.
 R();
-foobar();
 
 // Use imports from a namespace.
 namespace.foo();

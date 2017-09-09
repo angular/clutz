@@ -7,11 +7,9 @@ import {D} from './export_both';
 import * as DExports from './export_both';
 import {bar} from './export_both';
 import R from 'goog:module.R';
-import foobar from 'goog:provides';
 
 // Use code in JS.
 R();
-foobar();
 
 // Use imports from a namespace.
 namespace.foo();
