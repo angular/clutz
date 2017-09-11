@@ -1647,7 +1647,22 @@ class DeclarationGenerator {
 
             @Override
             public Void caseNamedType(NamedType type) {
-              visitType(type.getReferencedType());
+              JSType refType = type.getReferencedType();
+              // When we dealing with partial inputs, we often end up with named type, without a
+              // corresponding referencedType. Instead of emitting 'any', we emit literally the
+              // name of the type as originally written.
+              // It appears that when one writes '@type {A<B>}' and both are missing from the compilation
+              // unit - A ends up as NoType, while B ends up as NamedType.
+              if (opts.partialInput && refType.isUnknownType()) {
+                String displayName = type.getDisplayName();
+                emit(Constants.INTERNAL_NAMESPACE + "." + displayName);
+                List<JSType> templateTypes = type.getTemplateTypes();
+                if (templateTypes != null && templateTypes.size() > 0) {
+                  emitGenericTypeArguments(type.getTemplateTypes().iterator());
+                }
+                return null;
+              }
+              visitType(refType);
               return null;
             }
 
