@@ -6,7 +6,7 @@ import * as namespace from './export_namespace';
 import {D} from './export_both';
 import * as DExports from './export_both';
 import {bar} from './export_both';
-import R from 'goog:module.R';
+import {R} from 'goog:module';
 
 // Use code in JS.
 R();
