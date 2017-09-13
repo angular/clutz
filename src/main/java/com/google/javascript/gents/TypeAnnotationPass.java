@@ -522,6 +522,9 @@ public final class TypeAnnotationPass implements CompilerPass {
     allTypes.addAll(symbolToModule.keySet());
 
     String importedNamespace = nameUtil.findLongestNamePrefix(typeName, allTypes);
+    // Closure compilation can be permissive to the point where there are missing types.
+    // Gents supports these usecases by syntactically emitting the type as written. The file emitted
+    // file might not work with TS compiler, but at least the type is not lost.
     if (importedNamespace == null) {
       return typeName;
     }
@@ -535,8 +538,11 @@ public final class TypeAnnotationPass implements CompilerPass {
       FileModule module = symbolToModule.get(importedNamespace);
       String symbol = module.importedNamespacesToSymbols.get(importedNamespace);
 
-      // Create a new import statement if the symbol to import isn't from the same file.
-      if (!sourceFile.equals(symbolToModule.get(typeName).file)) {
+      FileModule typeModule = symbolToModule.get(typeName);
+
+      // Create a new import statement if the symbol to import isn't from the same file or the type
+      // is not part of the compilation unit.
+      if (typeModule != null && !sourceFile.equals(typeModule.file)) {
         Node importSpec;
         Node importFile;
         if (module.shouldUseOldSyntax()) {
