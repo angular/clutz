@@ -1900,7 +1900,11 @@ class DeclarationGenerator {
         String propName = it.next();
         emit(propName);
         UnionType unionType = type.getPropertyType(propName).toMaybeUnionType();
-        if (unionType != null && unionType.getAlternates().stream().anyMatch(JSType::isVoidType)) {
+        if (unionType != null
+            && unionType
+                .getAlternatesWithoutStructuralTyping()
+                .stream()
+                .anyMatch(JSType::isVoidType)) {
           emit("?");
           visitTypeDeclaration(type.getPropertyType(propName), false, true);
         } else {
@@ -1927,7 +1931,15 @@ class DeclarationGenerator {
     }
 
     private void visitUnionType(UnionType ut, boolean inOptionalPosition) {
-      Collection<JSType> alts = ut.getAlternates();
+      // We intentionally use getAlternatesWithoutStructuralTyping instead of getAlternates because
+      // the former unifies some types like Function into supertypes. The rules are murky as usual
+      // but it appears that getAlternatesWithoutStructuralTyping does less collapsing, see
+      // all_optional_type test.
+      // This is very far from perfect, because Closure still unifies some type
+      // unions.
+      // For example, if one writes <code>{a: string|undefined} | {b:string}</code>, at this point
+      // we only see <code>{a: string|undefined}</code>.
+      Collection<JSType> alts = ut.getAlternatesWithoutStructuralTyping();
 
       // When visiting an optional function argument or optional field (`foo?` syntax),
       // TypeScript will augment the provided type with an union of undefined, i.e. `foo?: T` will
@@ -2235,7 +2247,11 @@ class DeclarationGenerator {
       if (!propertyType.isFunctionType() || forcePropDeclaration) {
         UnionType unionType = propertyType.toMaybeUnionType();
         boolean isOptionalProperty = false;
-        if (unionType != null && unionType.getAlternates().stream().anyMatch(JSType::isVoidType)) {
+        if (unionType != null
+            && unionType
+                .getAlternatesWithoutStructuralTyping()
+                .stream()
+                .anyMatch(JSType::isVoidType)) {
           emit("?");
           isOptionalProperty = true;
         }
@@ -2289,11 +2305,12 @@ class DeclarationGenerator {
       }
       JSType arrayMembers = ttypes.get(0).toMaybeTemplatizedType().getTemplateTypes().get(0);
       if (!arrayMembers.isUnionType()
-          || arrayMembers.toMaybeUnionType().getAlternates().size() != 2) {
+          || arrayMembers.toMaybeUnionType().getAlternatesWithoutStructuralTyping().size() != 2) {
         return false;
       }
       emit("(): IterableIterator<[");
-      Iterator<JSType> it = arrayMembers.toMaybeUnionType().getAlternates().iterator();
+      Iterator<JSType> it =
+          arrayMembers.toMaybeUnionType().getAlternatesWithoutStructuralTyping().iterator();
       visitType(it.next());
       emit(",");
       visitType(it.next());
