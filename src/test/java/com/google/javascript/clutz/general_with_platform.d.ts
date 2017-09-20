@@ -22,87 +22,6 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  /**
-   * Event whose listeners take a boolean parameter.
-   */
-  class ChromeBooleanEvent extends ChromeBooleanEvent_Instance {
-  }
-  class ChromeBooleanEvent_Instance {
-    private noStructuralTyping_: any;
-    addListener (callback : (a : boolean ) => void ) : void ;
-    hasListener (callback : (a : boolean ) => void ) : boolean ;
-    hasListeners ( ) : boolean ;
-    removeListener (callback : (a : boolean ) => void ) : void ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  class ChromeEvent extends ChromeEvent_Instance {
-  }
-  class ChromeEvent_Instance {
-    private noStructuralTyping_: any;
-    addListener (callback : Function ) : void ;
-    hasListener (callback : Function ) : boolean ;
-    hasListeners ( ) : boolean ;
-    removeListener (callback : Function ) : void ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  /**
-   * Event whose listeners take an Object parameter.
-   */
-  class ChromeObjectEvent extends ChromeObjectEvent_Instance {
-  }
-  class ChromeObjectEvent_Instance {
-    private noStructuralTyping_: any;
-    addListener (callback : (a : GlobalObject ) => void ) : void ;
-    hasListener (callback : (a : GlobalObject ) => void ) : boolean ;
-    hasListeners ( ) : boolean ;
-    removeListener (callback : (a : GlobalObject ) => void ) : void ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  /**
-   * Event whose listeners take a string array parameter.
-   */
-  class ChromeStringArrayEvent extends ChromeStringArrayEvent_Instance {
-  }
-  class ChromeStringArrayEvent_Instance {
-    private noStructuralTyping_: any;
-    addListener (callback : (a : string [] ) => void ) : void ;
-    hasListener (callback : (a : string [] ) => void ) : boolean ;
-    hasListeners ( ) : boolean ;
-    removeListener (callback : (a : string [] ) => void ) : void ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  /**
-   * Event whose listeners take a string parameter.
-   */
-  class ChromeStringEvent extends ChromeStringEvent_Instance {
-  }
-  class ChromeStringEvent_Instance {
-    private noStructuralTyping_: any;
-    addListener (callback : (a : string ) => void ) : void ;
-    hasListener (callback : (a : string ) => void ) : boolean ;
-    hasListeners ( ) : boolean ;
-    removeListener (callback : (a : string ) => void ) : void ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  /**
-   * Event whose listeners take two strings as parameters.
-   */
-  class ChromeStringStringEvent extends ChromeStringStringEvent_Instance {
-  }
-  class ChromeStringStringEvent_Instance {
-    private noStructuralTyping_: any;
-    addListener (callback : (a : string , b : string ) => void ) : void ;
-    hasListener (callback : (a : string , b : string ) => void ) : boolean ;
-    hasListeners ( ) : boolean ;
-    removeListener (callback : (a : string , b : string ) => void ) : void ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
   class CountQueuingStrategy extends CountQueuingStrategy_Instance {
   }
   class CountQueuingStrategy_Instance {
@@ -257,18 +176,6 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class MessageSender extends MessageSender_Instance {
-  }
-  class MessageSender_Instance {
-    private noStructuralTyping_: any;
-    frameId ? : number ;
-    id ? : string ;
-    tab ? : Tab ;
-    tlsChannelId ? : string ;
-    url ? : string ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
   /**
    * Metadata interface.
    */
@@ -281,33 +188,10 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class MutedInfo extends MutedInfo_Instance {
-  }
-  class MutedInfo_Instance {
-    private noStructuralTyping_: any;
-    extensionId ? : string ;
-    muted : boolean ;
-    reason ? : string ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
   interface PipeOptions {
     preventAbort ? : boolean ;
     preventCancel ? : boolean ;
     preventClose ? : boolean ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  class Port extends Port_Instance {
-  }
-  class Port_Instance {
-    private noStructuralTyping_: any;
-    disconnect ( ) : void ;
-    name : string ;
-    onDisconnect : ChromeEvent ;
-    onMessage : ChromeEvent ;
-    postMessage (obj : any ) : void ;
-    sender ? : MessageSender ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -461,32 +345,6 @@ declare namespace ಠ_ಠ.clutz {
     headers ? : Headers | string [] [] | IObject < string , string > ;
     status ? : number ;
     statusText ? : string ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  class Tab extends Tab_Instance {
-  }
-  class Tab_Instance {
-    private noStructuralTyping_: any;
-    active : boolean ;
-    audible ? : boolean ;
-    autoDiscardable : boolean ;
-    discarded : boolean ;
-    favIconUrl : string ;
-    height ? : number ;
-    highlighted : boolean ;
-    id : number ;
-    incognito : boolean ;
-    index : number ;
-    mutedInfo ? : MutedInfo ;
-    openerTabId : number ;
-    pinned : boolean ;
-    sessionId ? : string ;
-    status : string ;
-    title : string ;
-    url : string ;
-    width ? : number ;
-    windowId : number ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
