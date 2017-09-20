@@ -105,8 +105,8 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
           String comment = nodeComments.getComment(n);
 
           if (!params.hasChildren() && !block.hasChildren() && comment == null) {
+            compiler.reportChangeToEnclosingScope(n);
             n.detach();
-            compiler.reportCodeChange();
           }
         }
         break;

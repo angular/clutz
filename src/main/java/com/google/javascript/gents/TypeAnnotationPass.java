@@ -230,7 +230,7 @@ public final class TypeAnnotationPass implements CompilerPass {
       }
       nodeComment = nodeComment.replaceFirst("\\n?" + Pattern.quote(toRemove), "");
       nodeComments.setComment(commentNode, nodeComment);
-      compiler.reportCodeChange();
+      compiler.reportChangeToEnclosingScope(commentNode);
     }
 
     /**
@@ -253,14 +253,12 @@ public final class TypeAnnotationPass implements CompilerPass {
       if (parameterType.getRoot().getToken() == Token.ELLIPSIS) {
         attachTypeExpr = IR.rest(node.getString());
         nodeComments.replaceWithComment(node, attachTypeExpr);
-        compiler.reportCodeChange();
       }
       // Modify the AST to represent an optional parameter
       if (parameterType.getRoot().getToken() == Token.EQUALS) {
         attachTypeExpr = IR.name(node.getString());
         attachTypeExpr.putBooleanProp(Node.OPT_ES6_TYPED, true);
         nodeComments.replaceWithComment(node, attachTypeExpr);
-        compiler.reportCodeChange();
       }
       setTypeExpression(attachTypeExpr, parameterType, false);
       return true;
@@ -317,7 +315,7 @@ public final class TypeAnnotationPass implements CompilerPass {
     TypeDeclarationNode node = convert(type, isReturnType);
     if (node != null) {
       n.setDeclaredTypeExpression(node);
-      compiler.reportCodeChange();
+      compiler.reportChangeToEnclosingScope(n);
     }
   }
 
