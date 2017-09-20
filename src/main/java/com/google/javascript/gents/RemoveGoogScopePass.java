@@ -94,8 +94,8 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
       nodeToMove = nextNodeToMove;
     }
 
+    compiler.reportChangeToEnclosingScope(n);
     n.detach();
-    compiler.reportCodeChange();
   }
 
   /**
@@ -145,7 +145,6 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
       aliasToProvidedNamespace.put(lhs.getString(), rhs.getQualifiedName());
       Node next = assign.getParent().getNext();
       assign.detach();
-      compiler.reportCodeChange();
       return new RewriteStatus(next);
     }
     return stillAttached;
@@ -183,7 +182,6 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
       String suffix = lhs.getQualifiedName().substring(alias.length());
       Node fullName = NodeUtil.newQName(compiler, providedNamespace + suffix);
       assign.replaceChild(lhs, fullName);
-      compiler.reportCodeChange();
     }
     return;
   }

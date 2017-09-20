@@ -133,9 +133,9 @@ public final class ModuleConversionPass implements CompilerPass {
             if (nodeComments.hasComment(n)) {
               nodeComments.replaceWithComment(n, new Node(Token.EMPTY));
             } else {
+              compiler.reportChangeToEnclosingScope(n);
               n.detach();
             }
-            compiler.reportCodeChange();
           }
           break;
         case GETPROP:
@@ -333,7 +333,7 @@ public final class ModuleConversionPass implements CompilerPass {
               Node.newString(Token.NAME, localName),
               Node.newString("goog:" + requiredNamespace));
       nodeComments.replaceWithComment(n, importNode);
-      compiler.reportCodeChange();
+      compiler.reportChangeToEnclosingScope(importNode);
 
       registerLocalSymbol(n.getSourceFileName(), fullLocalName, requiredNamespace, localName);
       return;
@@ -398,8 +398,8 @@ public final class ModuleConversionPass implements CompilerPass {
       nodeComments.moveComment(n, importNode);
     }
 
+    compiler.reportChangeToEnclosingScope(n);
     n.detach();
-    compiler.reportCodeChange();
   }
 
   private void convertRequireForAlreadyConverted(
@@ -421,7 +421,7 @@ public final class ModuleConversionPass implements CompilerPass {
     Node importNode =
         new Node(Token.IMPORT, IR.empty(), importSpec, Node.newString(referencedFile));
     nodeComments.replaceWithComment(n, importNode);
-    compiler.reportCodeChange();
+    compiler.reportChangeToEnclosingScope(importNode);
   }
 
   /**
@@ -469,7 +469,7 @@ public final class ModuleConversionPass implements CompilerPass {
         parent.addChildBefore(export, next);
         exprNode.detach();
 
-        compiler.reportCodeChange();
+        compiler.reportChangeToEnclosingScope(parent);
         return;
       } else if (rhs.isName() && exportedSymbol.equals(rhs.getString())) {
         // Rewrite the export line to: <code>export {rhs}</code>.
@@ -488,8 +488,6 @@ public final class ModuleConversionPass implements CompilerPass {
       // Assume prefix has already been exported and just trim the prefix
       nameUtil.replacePrefixInName(lhs, exportedNamespace, exportedSymbol);
     }
-
-    compiler.reportCodeChange();
   }
 
   /** Saves the local name for imported symbols to be used for code rewriting later. */
