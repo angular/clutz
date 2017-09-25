@@ -127,7 +127,16 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
         if (module == null) {
           break;
         }
-        module.maybeAddExport(child.getFirstChild());
+        Node maybeExportNode = child.getFirstChild();
+        if (maybeExportNode != null) {
+          String maybeExportString = maybeExportNode.getQualifiedName();
+          if (maybeExportString != null
+              && (maybeExportString.equals("exports")
+                  || maybeExportString.equals(module.namespace))) {
+            module.hasDefaultExport = true;
+          }
+        }
+        module.maybeAddExport(maybeExportNode);
         break;
       default:
         break;
@@ -146,6 +155,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
       return;
     }
     FileModule module = new FileModule(file, true);
+    module.namespace = namespace;
     module.registerNamespaceToGlobalScope(namespace);
   }
 
@@ -164,6 +174,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
       module = fileToModule.get(file);
     } else {
       module = new FileModule(file, false);
+      module.namespace = namespace;
     }
     module.registerNamespaceToGlobalScope(namespace);
   }
@@ -179,6 +190,10 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
 
     /** {@code True}, if the module has any imports (e.g.{@code goog.require}). */
     private boolean hasImports = false;
+
+    private String namespace = "";
+    /** Module has a default export. */
+    boolean hasDefaultExport = false;
 
     /**
      * Map from each provided namespace to all exported subproperties. Note that only namespaces

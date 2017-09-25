@@ -324,14 +324,19 @@ public final class ModuleConversionPass implements CompilerPass {
 
     String referencedFile = pathUtil.getImportPath(n.getSourceFileName(), module.file);
 
-    // Uses default import syntax as this is a javascript namespace
+    // This is a javascript namespace
     if (module.shouldUseOldSyntax()) {
+      Node nodeToImport = null;
+      // If it has a default export then use `import foo from "goog:bar";`
+      if (module.hasDefaultExport) {
+        nodeToImport = Node.newString(Token.NAME, localName);
+      } else {
+        // If it doesn't have a default export then use `import * as foo from "goog:bar";`
+        nodeToImport = Node.newString(Token.IMPORT_STAR, localName);
+      }
       Node importNode =
           new Node(
-              Token.IMPORT,
-              IR.empty(),
-              Node.newString(Token.NAME, localName),
-              Node.newString("goog:" + requiredNamespace));
+              Token.IMPORT, IR.empty(), nodeToImport, Node.newString("goog:" + requiredNamespace));
       nodeComments.replaceWithComment(n, importNode);
       compiler.reportChangeToEnclosingScope(importNode);
 
