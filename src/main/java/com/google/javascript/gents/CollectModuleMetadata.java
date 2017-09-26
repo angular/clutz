@@ -132,7 +132,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
           String maybeExportString = maybeExportNode.getQualifiedName();
           if (maybeExportString != null
               && (maybeExportString.equals("exports")
-                  || maybeExportString.equals(module.namespace))) {
+                  || maybeExportString.equals(module.namespaceInJS))) {
             module.hasDefaultExport = true;
           }
         }
@@ -155,7 +155,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
       return;
     }
     FileModule module = new FileModule(file, true);
-    module.namespace = namespace;
+    module.namespaceInJS = namespace;
     module.registerNamespaceToGlobalScope(namespace);
   }
 
@@ -174,7 +174,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
       module = fileToModule.get(file);
     } else {
       module = new FileModule(file, false);
-      module.namespace = namespace;
+      module.namespaceInJS = namespace;
     }
     module.registerNamespaceToGlobalScope(namespace);
   }
@@ -191,8 +191,9 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     /** {@code True}, if the module has any imports (e.g.{@code goog.require}). */
     private boolean hasImports = false;
 
-    private String namespace = "";
-    /** Module has a default export. */
+    /** namespace of the module in the original closure javascript. */
+    private String namespaceInJS = "";
+    /** true if the module's clutz generated .d.ts will have a default export. */
     boolean hasDefaultExport = false;
 
     /**
