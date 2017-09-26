@@ -324,7 +324,7 @@ public final class ModuleConversionPass implements CompilerPass {
 
     String referencedFile = pathUtil.getImportPath(n.getSourceFileName(), module.file);
 
-    // This is a javascript namespace
+    // This is a namespace/module that is kept as JavaScript
     if (module.shouldUseOldSyntax()) {
       Node nodeToImport = null;
       // If it has a default export then use `import foo from "goog:bar";`
