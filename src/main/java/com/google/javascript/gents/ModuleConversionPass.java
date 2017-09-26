@@ -332,6 +332,8 @@ public final class ModuleConversionPass implements CompilerPass {
         nodeToImport = Node.newString(Token.NAME, localName);
       } else {
         // If it doesn't have a default export then use `import * as foo from "goog:bar";`
+        // TODO: For destructuring imports with no default exports, we should use named imports
+        // instead of star imports and trim 'localName' from 'requiredNamespace'.
         nodeToImport = Node.newString(Token.IMPORT_STAR, localName);
       }
       Node importNode =
