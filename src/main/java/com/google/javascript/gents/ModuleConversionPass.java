@@ -328,33 +328,23 @@ public final class ModuleConversionPass implements CompilerPass {
     // This is a namespace/module that is kept as JavaScript
     if (module.shouldUseOldSyntax()) {
       Node nodeToImport = null;
+      // For destructuring imports use `import {foo} from 'goog:bar';`
       if (isDestructuringImports) {
         nodeToImport = new Node(Token.OBJECTLIT);
         nodeToImport.addChildToBack(Node.newString(Token.STRING_KEY, localName));
       } else if (module.hasDefaultExport) {
-        // If it has a default export then use `import foo from "goog:bar";`
+        // If it has a default export then use `import foo from 'goog:bar';`
         nodeToImport = Node.newString(Token.NAME, localName);
       } else {
-        // If it doesn't have a default export then use `import * as foo from "goog:bar";`
+        // If it doesn't have a default export then use `import * as foo from 'goog:bar';`
         nodeToImport = Node.newString(Token.IMPORT_STAR, localName);
       }
-      Node importNode = null;
-      if (isDestructuringImports) {
-        importNode =
-            new Node(
-                Token.IMPORT,
-                IR.empty(),
-                nodeToImport,
-                Node.newString("goog:" + requiredNamespace.replaceAll("." + localName, "")));
-        ;
-      } else {
-        importNode =
-            new Node(
-                Token.IMPORT,
-                IR.empty(),
-                nodeToImport,
-                Node.newString("goog:" + requiredNamespace));
+      String importString = requiredNamespace;
+      if (isDestructuringImports && !module.hasDefaultExport) {
+        importString = requiredNamespace.replaceAll("." + localName, "");
       }
+      Node importNode =
+          new Node(Token.IMPORT, IR.empty(), nodeToImport, Node.newString("goog:" + importString));
       nodeComments.replaceWithComment(n, importNode);
       compiler.reportChangeToEnclosingScope(importNode);
 
