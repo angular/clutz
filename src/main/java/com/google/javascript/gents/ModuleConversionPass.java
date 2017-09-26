@@ -340,7 +340,7 @@ public final class ModuleConversionPass implements CompilerPass {
         nodeToImport = Node.newString(Token.IMPORT_STAR, localName);
       }
       String importString = requiredNamespace;
-      if (isDestructuringImports && !module.hasDefaultExport) {
+      if (isDestructuringImports) {
         importString = requiredNamespace.replaceAll("." + localName, "");
       }
       Node importNode =
