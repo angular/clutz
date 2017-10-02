@@ -1,4 +1,4 @@
 goog.module("module.exp.both");
 
 exports = function() {};
-exports.num = 4;
+exports.num2 = 4;

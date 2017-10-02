@@ -4,6 +4,6 @@ var Y = goog.require("module.exp.def");
 var Z = goog.require("module.exp.nodef");
 
 X();
-var n = X.num;
+var n = X.num2;
 Y();
 n += Z.num;

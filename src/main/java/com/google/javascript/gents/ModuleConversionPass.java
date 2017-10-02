@@ -221,7 +221,7 @@ public final class ModuleConversionPass implements CompilerPass {
           Node callNode = node;
           String requiredNamespace = callNode.getLastChild().getString();
           String localName = n.getFirstChild().getQualifiedName();
-          convertRequireToImportStatements(n, localName, requiredNamespace);
+          convertRequireToImportStatements(n, localName, requiredNamespace, false);
           return;
         }
 
@@ -234,7 +234,7 @@ public final class ModuleConversionPass implements CompilerPass {
           String namedExport = node.getFirstChild().getString();
           String requiredNamespace = node.getNext().getFirstChild().getNext().getString();
           requiredNamespace += "." + namedExport;
-          convertRequireToImportStatements(n, namedExport, requiredNamespace);
+          convertRequireToImportStatements(n, namedExport, requiredNamespace, true);
           return;
         }
       } else if (n.isExprResult()) {
@@ -245,7 +245,7 @@ public final class ModuleConversionPass implements CompilerPass {
         }
         if (callNode.getFirstChild().matchesQualifiedName("goog.require")) {
           String requiredNamespace = callNode.getLastChild().getString();
-          convertRequireToImportStatements(n, requiredNamespace, requiredNamespace);
+          convertRequireToImportStatements(n, requiredNamespace, requiredNamespace, false);
           return;
         }
       }
@@ -285,7 +285,8 @@ public final class ModuleConversionPass implements CompilerPass {
    * import "./sideEffectsOnly"
    * </pre>
    */
-  void convertRequireToImportStatements(Node n, String fullLocalName, String requiredNamespace) {
+  void convertRequireToImportStatements(
+      Node n, String fullLocalName, String requiredNamespace, boolean isDestructuringImports) {
     boolean alreadyConverted = requiredNamespace.startsWith(this.alreadyConvertedPrefix + ".");
     if (!namespaceToModule.containsKey(requiredNamespace) && !alreadyConverted) {
       compiler.report(
@@ -327,18 +328,23 @@ public final class ModuleConversionPass implements CompilerPass {
     // This is a namespace/module that is kept as JavaScript
     if (module.shouldUseOldSyntax()) {
       Node nodeToImport = null;
-      // If it has a default export then use `import foo from "goog:bar";`
-      if (module.hasDefaultExport) {
+      // For destructuring imports use `import {foo} from 'goog:bar';`
+      if (isDestructuringImports) {
+        nodeToImport = new Node(Token.OBJECTLIT);
+        nodeToImport.addChildToBack(Node.newString(Token.STRING_KEY, localName));
+      } else if (module.hasDefaultExport) {
+        // If it has a default export then use `import foo from 'goog:bar';`
         nodeToImport = Node.newString(Token.NAME, localName);
       } else {
-        // If it doesn't have a default export then use `import * as foo from "goog:bar";`
-        // TODO: For destructuring imports with no default exports, we should use named imports
-        // instead of star imports and trim 'localName' from 'requiredNamespace'.
+        // If it doesn't have a default export then use `import * as foo from 'goog:bar';`
         nodeToImport = Node.newString(Token.IMPORT_STAR, localName);
       }
+      String importString = requiredNamespace;
+      if (isDestructuringImports) {
+        importString = requiredNamespace.replaceAll("." + localName, "");
+      }
       Node importNode =
-          new Node(
-              Token.IMPORT, IR.empty(), nodeToImport, Node.newString("goog:" + requiredNamespace));
+          new Node(Token.IMPORT, IR.empty(), nodeToImport, Node.newString("goog:" + importString));
       nodeComments.replaceWithComment(n, importNode);
       compiler.reportChangeToEnclosingScope(importNode);
 
