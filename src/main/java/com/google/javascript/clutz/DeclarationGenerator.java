@@ -424,8 +424,10 @@ class DeclarationGenerator {
     out = new StringWriter();
 
     for (CompilerInput compilerInput : compiler.getInputsById().values()) {
+      String originalPath = compilerInput.getSourceFile().getOriginalPath();
+      if (opts.skipEmitSuffix != null && originalPath.endsWith(opts.skipEmitSuffix)) continue;
       transitiveProvides.addAll(compilerInput.getProvides());
-      if (depgraph.isRoot(compilerInput.getSourceFile().getOriginalPath())) {
+      if (depgraph.isRoot(originalPath)) {
         provides.addAll(compilerInput.getProvides());
         emitComment(
             String.format(
