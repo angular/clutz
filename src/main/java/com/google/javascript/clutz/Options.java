@@ -79,6 +79,14 @@ public class Options {
   )
   boolean partialInput;
 
+  @Option(
+    name = "--skipEmitSuffix",
+    usage =
+        "Symbols in files that end with this suffix will not be included in the emit. Note that"
+            + "the files would still be part of the internal compilation."
+  )
+  String skipEmitSuffix = null;
+
   @Argument List<String> arguments = new ArrayList<>();
 
   Depgraph depgraph;
