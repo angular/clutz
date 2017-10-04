@@ -467,7 +467,15 @@ class DeclarationGenerator {
         continue;
       }
       if (symbol.getType() == null) {
-        emitComment("Skipping symbol " + symbol.getName() + " due to missing type information.");
+        // A module that contains only typedefs will appear as null symbol. However, we can get the
+        // corresponding type from the type registry.
+        JSType moduleType = compiler.getTypeRegistry().getType(rewritenProvide);
+        if (moduleType != null) {
+          declareTypedefDefaultModule(
+              provides, provide, symbol.getName(), rewritenProvide, moduleType);
+        } else {
+          emitComment("Skipping symbol " + symbol.getName() + " due to missing type information.");
+        }
         continue;
       }
       // ArrayLike is defined in lib.d.ts, so we skip any type alias that
@@ -499,6 +507,30 @@ class DeclarationGenerator {
 
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
+  }
+
+  /** Special emit for goog modules that only emit a default export that is a typedef. */
+  private void declareTypedefDefaultModule(
+      TreeSet<String> provides,
+      String moduleName,
+      String typedefName,
+      String rewritenProvide,
+      JSType moduleType) {
+    String namespace = getNamespace(typedefName);
+
+    // Ideally we should be using declareNamespace here, but it cannot handle gluing the TypedVar
+    // symbol with the additional JSType moduleType.
+    emitNamespaceBegin(namespace);
+    emit("type");
+    emit(getUnqualifiedName(typedefName));
+    emit("=");
+
+    new TreeWalker(compiler.getTypeRegistry(), provides, false).visitType(moduleType);
+    emit(";");
+    emitBreak();
+    emitNamespaceEnd();
+
+    declareModule(moduleName, /* isDefault */ true, rewritenProvide);
   }
 
   /**
