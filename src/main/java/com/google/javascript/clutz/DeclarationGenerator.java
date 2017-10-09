@@ -661,6 +661,11 @@ class DeclarationGenerator {
         // skip extern symbols (they have a separate pass).
         CompilerInput symbolInput = this.compiler.getInput(new InputId(symbol.getInputName()));
         if (symbolInput != null && symbolInput.isExtern()) continue;
+
+        // skip types that come from files that we skip emit on.
+        if (opts.skipEmitSuffix != null && symbolInput.getName().endsWith(opts.skipEmitSuffix))
+          continue;
+
         declareNamespace(
             namespace,
             symbol,

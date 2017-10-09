@@ -65,6 +65,15 @@ public class MultiFileTest {
         .generatesDeclarations(expected);
   }
 
+  @Test
+  public void tsickle_emit() throws Exception {
+    String expected = DeclarationGeneratorTests.getTestFileText(input("tsickle_emit.d.ts"));
+    assertThatProgram(
+            ImmutableList.of(input("uses_tsickle_type.js")),
+            ImmutableList.of(input("tsickle_emit.skip.tsickle.js")))
+        .generatesDeclarations(expected);
+  }
+
   private File input(String filename) {
     Path testDir = FileSystems.getDefault().getPath("src", "test", "java");
     String packageName = ProgramSubject.class.getPackage().getName();
