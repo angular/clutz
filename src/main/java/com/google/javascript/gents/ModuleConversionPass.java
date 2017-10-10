@@ -240,7 +240,6 @@ public final class ModuleConversionPass implements CompilerPass {
             importedNode = importedNode.getNext();
           }
           String requiredNamespace = node.getNext().getFirstChild().getNext().getString();
-          requiredNamespace += "." + namedExports.get(0);
           convertRequireToImportStatements(n, namedExports, requiredNamespace, true);
           return;
         }
@@ -299,7 +298,7 @@ public final class ModuleConversionPass implements CompilerPass {
       String requiredNamespace,
       boolean isDestructuringImports) {
     // The rest of the functions assume that fullLocalNames contains one and only one element if
-    // this is a destructuring import.
+    // this is not a destructuring import.
     if (!isDestructuringImports && fullLocalNames.size() != 1) {
       compiler.report(
           JSError.make(
@@ -320,11 +319,18 @@ public final class ModuleConversionPass implements CompilerPass {
       return;
     }
 
+    if (isDestructuringImports) {
+      requiredNamespace = requiredNamespace + "." + fullLocalNames.get(0);
+    }
     FileModule module = namespaceToModule.get(requiredNamespace);
 
     String moduleSuffix = nameUtil.lastStepOfName(requiredNamespace);
 
-    // Local name is the shortened namespace symbol
+    // Local name is the imported symbol on the LHS of a goog.require statement. If there's nothing
+    // on the LHS then it's the suffix in namepsace!! For example:
+    // localnames = ['a', b'] given "var {a, b} = goog.require(...);"
+    // localnames = ['a'] given "var a = goog.require(...);"
+    // localnames = ['b'] given "goog.require("a.b);"
     List<String> localNames = new ArrayList();
     // Avoid name collisions
     List<String> backupNames = new ArrayList();
@@ -418,7 +424,7 @@ public final class ModuleConversionPass implements CompilerPass {
         registerLocalSymbol(
             n.getSourceFileName(), fullLocalNames.get(i), requiredNamespace, localNames.get(i));
         // Switch to back up name if necessary
-        localNames.set(i, backupNames.get(0));
+        localNames.set(i, backupNames.get(i));
       }
     }
 
