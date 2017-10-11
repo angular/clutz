@@ -319,6 +319,18 @@ public final class ModuleConversionPass implements CompilerPass {
       return;
     }
 
+    if (alreadyConverted) {
+      // we cannot use referencedFile here, because usually it points to the ES5 js file that is
+      // the output of TS, and not the original source TS file.
+      // However, we can reverse map the goog.module name to a file name.
+      // TODO(rado): sync this better with the mapping done in tsickle.
+      String originalPath =
+          requiredNamespace.replace(alreadyConvertedPrefix + ".", "").replace(".", "/");
+      convertRequireForAlreadyConverted(
+          n, fullLocalNames, pathUtil.getImportPath(n.getSourceFileName(), originalPath));
+      return;
+    }
+
     if (isDestructuringImports) {
       requiredNamespace = requiredNamespace + "." + fullLocalNames.get(0);
     }
@@ -339,28 +351,6 @@ public final class ModuleConversionPass implements CompilerPass {
       String localName = nameUtil.lastStepOfName(fullLocalName);
       localNames.add(localName);
       backupNames.add(moduleSuffix.equals(localName) ? moduleSuffix + "Exports" : moduleSuffix);
-    }
-
-    if (alreadyConverted) {
-      // we cannot use referencedFile here, because usually it points to the ES5 js file that is
-      // the output of TS, and not the original source TS file.
-      // However, we can reverse map the goog.module name to a file name.
-      // TODO(rado): sync this better with the mapping done in tsickle.
-      String originalPath =
-          requiredNamespace.replace(alreadyConvertedPrefix + ".", "").replace(".", "/");
-      // requiredNamespace is not always precisely the string inside "goog.require(...)", we
-      // have to strip suffixes added earlier.
-      for (int i = 0; i < fullLocalNames.size(); i++) {
-        String localName = localNames.get(i);
-        String fullLocalName = fullLocalNames.get(i);
-
-        if (moduleSuffix.equals(localName) && !fullLocalName.equals(requiredNamespace)) {
-          originalPath = originalPath.replaceAll("/" + localName + "$", "");
-        }
-        convertRequireForAlreadyConverted(
-            n, fullLocalName, pathUtil.getImportPath(n.getSourceFileName(), originalPath));
-      }
-      return;
     }
 
     String referencedFile = pathUtil.getImportPath(n.getSourceFileName(), module.file);
@@ -467,20 +457,20 @@ public final class ModuleConversionPass implements CompilerPass {
   }
 
   private void convertRequireForAlreadyConverted(
-      Node n, String fullLocalName, String referencedFile) {
+      Node n, List<String> fullLocalNames, String referencedFile) {
     // case of side-effectful imports.
     // goog.require('...'); -> import '...';
     Node importSpec = IR.empty();
     if (n.getFirstChild() != null && n.getFirstChild().isDestructuringLhs()) {
-      // case of destructuring imports.
-      // only single object is supported - https://github.com/angular/clutz/issues/392
-      // const {A} = goog.require('...'); -> import {A} from '...';
-      importSpec =
-          new Node(Token.IMPORT_SPECS, new Node(Token.IMPORT_SPEC, IR.name(fullLocalName)));
+      importSpec = new Node(Token.IMPORT_SPECS);
+      for (String fullLocalName : fullLocalNames) {
+        importSpec.addChildToBack(IR.name(fullLocalName));
+      }
     } else if (n.getFirstChild() != null && n.getFirstChild().isName()) {
       // case of full module import.
       // const A = goog.require('...'); -> import * as A from '...';
-      importSpec = Node.newString(Token.IMPORT_STAR, fullLocalName);
+      // It is safe to assume there's one full local name because this is validated before.
+      importSpec = Node.newString(Token.IMPORT_STAR, fullLocalNames.get(0));
     }
     Node importNode =
         new Node(Token.IMPORT, IR.empty(), importSpec, Node.newString(referencedFile));
