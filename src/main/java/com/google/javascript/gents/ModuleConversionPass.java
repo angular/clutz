@@ -258,7 +258,7 @@ public final class ModuleConversionPass implements CompilerPass {
         }
         if (callNode.getFirstChild().matchesQualifiedName("goog.require")) {
           String requiredNamespace = callNode.getLastChild().getString();
-          // For side effect imports, the full local name is just the required namespace/module.
+          // For goog.require(...) imports, the full local name is just the required namespace/module.
           // We use the suffix from the namespace as the local name, i.e. for
           // goog.require("a.b"), requiredNamespace = "a.b", fullLocalName = ["a.b"], localName = ["b"]
           ModuleImport moduleImport =
@@ -301,21 +301,21 @@ public final class ModuleConversionPass implements CompilerPass {
 
     /**
      * LHS of the requirement statement. If the require statement has no LHS, then local name is the
-     * suffix of the required namespace/module
+     * suffix of the required namespace/module.
      */
     private List<String> localNames;
 
     /**
      * Full local name is used for rewriting imported variables in the file later on. There's a one
-     * to one map between fullLocalNames and localNames.
+     * to one relationship between fullLocalNames and localNames.
      */
     private List<String> fullLocalNames;
 
     /**
-     * For {@code goog.require(...)} with no LHS, if this is not a side effect only import, then we
-     * use the required namespace/module's suffix as local name. The backup name is useful in this
-     * case to avoid conflicts when a named export is the same with the required namespace/module's
-     * suffix.
+     * For {@code goog.require(...)} with no LHS and no side effects, then we use the required
+     * namespace/module's suffix as the local name. The backup name is useful in this case to avoid
+     * conflicts when the required namespace/module's suffix is the same with a named exported from
+     * the same file.
      */
     private String backupName;
 
@@ -323,9 +323,9 @@ public final class ModuleConversionPass implements CompilerPass {
     private String requiredNamespace;
 
     /**
-     * {@code True}, if the original require statement is a destructuring import. For destructuring
-     * imports, there are one or more local names and full local names. For non destructuring
-     * imports, there is exactly one local name and one full local name
+     * {@code true}, if the original require statement contains destructuring imports. For
+     * destructuring imports, there are one or more local names and full local names. For non
+     * destructuring imports, there is exactly one local name and one full local name.
      */
     private boolean isDestructuringImport;
 
@@ -378,7 +378,7 @@ public final class ModuleConversionPass implements CompilerPass {
         return false;
       }
 
-      if (!moduleExists()) {
+      if (this.module == null && !isAlreadyConverted()) {
         compiler.report(
             JSError.make(
                 originalImportNode,
@@ -393,28 +393,18 @@ public final class ModuleConversionPass implements CompilerPass {
     private boolean isAlreadyConverted() {
       return requiredNamespace.startsWith(alreadyConvertedPrefix + ".");
     }
-
-    /** Returns {@code true} if the imported file has a corresponding module */
-    private boolean moduleExists() {
-      if (namespaceToModule.containsKey(requiredNamespace)) {
-        return true;
-      }
-
-      if (isAlreadyConverted()) {
-        return true;
-      }
-
-      return false;
-    }
   }
 
   /**
-   * Converts a destructuring Closure goog.require call into a TypeScript import statement.
+   * Converts a non destructuring Closure goog.require call into a TypeScript import statement.
    *
    * <p>The resulting node is dependent on the exports by the module being imported:
    *
    * <pre>
+   *   import localName from "goog:old.namespace.syntax";
    *   import {A as localName, B} from "./valueExports";
+   *   import * as localName from "./objectExports";
+   *   import "./sideEffectsOnly"
    * </pre>
    */
   void convertNonDestructuringRequireToImportStatements(Node n, ModuleImport moduleImport) {
@@ -486,8 +476,8 @@ public final class ModuleConversionPass implements CompilerPass {
     }
 
     if (!imported) {
-      // Convert the require to "import './sideEffectOnly'"
-      convertRequireToSideEffectOnlyImport(moduleImport);
+      // Convert the require to "import './sideEffectOnly';"
+      convertRequireForSideEffectOnlyImport(moduleImport);
     }
 
     compiler.reportChangeToEnclosingScope(n);
@@ -495,15 +485,12 @@ public final class ModuleConversionPass implements CompilerPass {
   }
 
   /**
-   * Converts a non destructuring Closure goog.require call into a TypeScript import statement.
+   * Converts a destructuring Closure goog.require call into a TypeScript import statement.
    *
    * <p>The resulting node is dependent on the exports by the module being imported:
    *
    * <pre>
-   *   import localName from "goog:old.namespace.syntax";
    *   import {A as localName, B} from "./valueExports";
-   *   import * as localName from "./objectExports";
-   *   import "./sideEffectsOnly"
    * </pre>
    */
   void convertDestructuringRequireToImportStatements(Node n, ModuleImport moduleImport) {
@@ -528,7 +515,6 @@ public final class ModuleConversionPass implements CompilerPass {
         importSpec.addChildToBack(IR.name(localName));
       }
     }
-
     Node importNode =
         new Node(
             Token.IMPORT,
@@ -549,7 +535,7 @@ public final class ModuleConversionPass implements CompilerPass {
     n.detach();
   }
 
-  /** If the imported file is in JS, then use the special "goog:namespace" syntax */
+  /** If the imported file is kept in JS, then use the special "goog:namespace" syntax */
   private void convertRequireToImportsIfImportedIsKeptInJs(ModuleImport moduleImport) {
     Node nodeToImport = null;
     // For destructuring imports use `import {foo} from 'goog:bar';`
@@ -598,7 +584,7 @@ public final class ModuleConversionPass implements CompilerPass {
     // goog.require('...'); -> import '...';
     Node importSpec = IR.empty();
     Node requireLHS = moduleImport.originalImportNode.getFirstChild();
-    if (requireLHS != null && requireLHS.isDestructuringLhs()) {
+    if (moduleImport.isDestructuringImport) {
       importSpec = new Node(Token.IMPORT_SPECS);
       for (String fullLocalName : moduleImport.fullLocalNames) {
         importSpec.addChildToBack(IR.name(fullLocalName));
@@ -615,8 +601,7 @@ public final class ModuleConversionPass implements CompilerPass {
     compiler.reportChangeToEnclosingScope(importNode);
   }
 
-  private void convertRequireToSideEffectOnlyImport(ModuleImport moduleImport) {
-    // side effects only
+  private void convertRequireForSideEffectOnlyImport(ModuleImport moduleImport) {
     Node importNode =
         new Node(Token.IMPORT, IR.empty(), IR.empty(), Node.newString(moduleImport.referencedFile));
     addImportNode(moduleImport.originalImportNode, importNode);
