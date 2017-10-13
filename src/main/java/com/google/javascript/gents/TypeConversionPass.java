@@ -63,6 +63,7 @@ public final class TypeConversionPass implements CompilerPass {
         NodeTraversal.traverseEs6(compiler, child, new TypeMemberConverter());
         NodeTraversal.traverseEs6(compiler, child, new FieldOnThisConverter());
         NodeTraversal.traverseEs6(compiler, child, new InheritanceConverter());
+        NodeTraversal.traverseEs6(compiler, child, new EnumConverter());
       }
     }
     convertTypeAlias();
@@ -311,6 +312,62 @@ public final class TypeConversionPass implements CompilerPass {
       if (declaration.jsDoc != null && declaration.jsDoc.isConstant()) {
         param.putBooleanProp(Node.IS_CONSTANT_NAME, true);
       }
+    }
+  }
+
+  /**
+   * Converts closure enums into TypeScript enum, whenever possible. Closure enums are more
+   * expressive supporting enums of arbitrary types, while TS only supports string and number.
+   */
+  private class EnumConverter extends AbstractPostOrderCallback {
+    @Override
+    public void visit(NodeTraversal t, Node n, Node parent) {
+      switch (n.getToken()) {
+        case VAR:
+        case LET:
+        case CONST:
+          if (n.getJSDocInfo() == null || n.getJSDocInfo().getEnumParameterType() == null) return;
+          JSTypeExpression enumExp = n.getJSDocInfo().getEnumParameterType();
+          if (!enumExp.getRoot().isString()) return;
+          String enumTypeStr = enumExp.getRoot().getString();
+          if (!enumTypeStr.equals("number") && !enumTypeStr.equals("string")) return;
+
+          Node name = n.getFirstChild().detach();
+          Node members = name.getFirstChild().detach();
+
+          Node enumMembers = transformMembers(members, enumTypeStr.equals("number"));
+          Node enumNode = new Node(Token.ENUM, name, enumMembers);
+          parent.replaceChild(n, enumNode);
+          compiler.reportChangeToEnclosingScope(parent);
+          break;
+        default:
+          break;
+      }
+    }
+
+    private Node transformMembers(Node members, boolean isNumber) {
+      assert members.isObjectLit();
+      int lastCount = -1;
+      Node enumMembers = new Node(Token.ENUM_MEMBERS);
+      for (Node child : members.children()) {
+        Node name = Node.newString(Token.NAME, child.getString());
+        Node value = child.getFirstChild().detach();
+        Node newMember;
+        // Check whether we can emit simply the name, and rely on the automatic numeric assignment
+        // in TypeScript. For example, enum E { A, B } is equivalent to enum E { A = 0, B = 1 }.
+        if (isNumber && value.getDouble() == lastCount + 1) {
+          newMember = name;
+        } else {
+          // We cannot reuse the STRING_KEY node here, because it pretty prints as a: 0, and we
+          // want a = 1. Instead we recreate an ASSIGN node with same contents as STRING_KEY
+          newMember = new Node(Token.ASSIGN, name, value);
+        }
+        if (isNumber) {
+          lastCount = (int) value.getDouble();
+        }
+        enumMembers.addChildToBack(newMember);
+      }
+      return enumMembers;
     }
   }
 
