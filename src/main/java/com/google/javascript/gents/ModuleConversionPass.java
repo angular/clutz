@@ -294,7 +294,7 @@ public final class ModuleConversionPass implements CompilerPass {
     }
   }
 
-  /** Encapsulates a {@code goog.require(...)} statement. */
+  /** A single statement containing {@code goog.require(...)}. */
   class ModuleImport {
     /** require statement Node. */
     private Node originalImportNode;
@@ -392,6 +392,12 @@ public final class ModuleConversionPass implements CompilerPass {
     /** Returns {@code true} if the imported file is already in TS */
     private boolean isAlreadyConverted() {
       return requiredNamespace.startsWith(alreadyConvertedPrefix + ".");
+    }
+
+    /** Returns {@code true} if is full module import, for example const x = goog.require(...) */
+    private boolean isFullModuleImport() {
+      Node requireLHS = this.originalImportNode.getFirstChild();
+      return requireLHS != null && requireLHS.isName();
     }
   }
 
@@ -580,17 +586,14 @@ public final class ModuleConversionPass implements CompilerPass {
         moduleImport.requiredNamespace.replace(alreadyConvertedPrefix + ".", "").replace(".", "/");
     String referencedFile =
         pathUtil.getImportPath(moduleImport.originalImportNode.getSourceFileName(), originalPath);
-    // case of side-effectful imports.
     // goog.require('...'); -> import '...';
     Node importSpec = IR.empty();
-    Node requireLHS = moduleImport.originalImportNode.getFirstChild();
     if (moduleImport.isDestructuringImport) {
       importSpec = new Node(Token.IMPORT_SPECS);
       for (String fullLocalName : moduleImport.fullLocalNames) {
         importSpec.addChildToBack(IR.name(fullLocalName));
       }
-    } else if (requireLHS != null && requireLHS.isName()) {
-      // case of full module import.
+    } else if (moduleImport.isFullModuleImport()) {
       // const A = goog.require('...'); -> import * as A from '...';
       // It is safe to assume there's one full local name because this is validated before.
       importSpec = Node.newString(Token.IMPORT_STAR, moduleImport.fullLocalNames.get(0));
