@@ -224,8 +224,11 @@ public final class ModuleConversionPass implements CompilerPass {
           Node callNode = node;
           String requiredNamespace = callNode.getLastChild().getString();
           String localName = n.getFirstChild().getQualifiedName();
-          convertRequireToImportStatements(
-              n, Collections.singletonList(localName), requiredNamespace, false);
+          ModuleImport moduleImport =
+              new ModuleImport(n, Collections.singletonList(localName), requiredNamespace, false);
+          if (moduleImport.validateImport()) {
+            convertNonDestructuringRequireToImportStatements(n, moduleImport);
+          }
           return;
         }
 
@@ -234,13 +237,17 @@ public final class ModuleConversionPass implements CompilerPass {
             && node.getNext().getFirstChild() != null
             && node.getNext().getFirstChild().matchesQualifiedName("goog.require")) {
           Node importedNode = node.getFirstChild();
-          List<String> namedExports = new ArrayList();
+          // For multiple destructuring imports, there are multiple full local names.
+          ArrayList<String> namedExports = new ArrayList<String>();
           while (importedNode != null) {
             namedExports.add(importedNode.getString());
             importedNode = importedNode.getNext();
           }
           String requiredNamespace = node.getNext().getFirstChild().getNext().getString();
-          convertRequireToImportStatements(n, namedExports, requiredNamespace, true);
+          ModuleImport moduleImport = new ModuleImport(n, namedExports, requiredNamespace, true);
+          if (moduleImport.validateImport()) {
+            convertDestructuringRequireToImportStatements(n, moduleImport);
+          }
           return;
         }
       } else if (n.isExprResult()) {
@@ -251,8 +258,15 @@ public final class ModuleConversionPass implements CompilerPass {
         }
         if (callNode.getFirstChild().matchesQualifiedName("goog.require")) {
           String requiredNamespace = callNode.getLastChild().getString();
-          convertRequireToImportStatements(
-              n, Collections.singletonList(requiredNamespace), requiredNamespace, false);
+          // For goog.require(...) imports, the full local name is just the required namespace/module.
+          // We use the suffix from the namespace as the local name, i.e. for
+          // goog.require("a.b"), requiredNamespace = "a.b", fullLocalName = ["a.b"], localName = ["b"]
+          ModuleImport moduleImport =
+              new ModuleImport(
+                  n, Collections.singletonList(requiredNamespace), requiredNamespace, false);
+          if (moduleImport.validateImport()) {
+            convertNonDestructuringRequireToImportStatements(n, moduleImport);
+          }
           return;
         }
       }
@@ -280,8 +294,115 @@ public final class ModuleConversionPass implements CompilerPass {
     }
   }
 
+  /** A single statement containing {@code goog.require(...)}. */
+  class ModuleImport {
+    /** require statement Node. */
+    private Node originalImportNode;
+
+    /**
+     * LHS of the requirement statement. If the require statement has no LHS, then local name is the
+     * suffix of the required namespace/module.
+     */
+    private List<String> localNames;
+
+    /**
+     * Full local name is used for rewriting imported variables in the file later on. There's a one
+     * to one relationship between fullLocalNames and localNames.
+     */
+    private List<String> fullLocalNames;
+
+    /**
+     * For {@code goog.require(...)} with no LHS and no side effects, then we use the required
+     * namespace/module's suffix as the local name. The backup name is useful in this case to avoid
+     * conflicts when the required namespace/module's suffix is the same with a named exported from
+     * the same file.
+     */
+    private String backupName;
+
+    /** The required namespace or module name */
+    private String requiredNamespace;
+
+    /**
+     * {@code true}, if the original require statement contains destructuring imports. For
+     * destructuring imports, there are one or more local names and full local names. For non
+     * destructuring imports, there is exactly one local name and one full local name.
+     */
+    private boolean isDestructuringImport;
+
+    /** FileModule for the imported file */
+    private FileModule module;
+
+    /** Referenced file */
+    private String referencedFile;
+
+    /**
+     * The last part of the required namespace and module, used to detect local name conflicts and
+     * calculate the backup name
+     */
+    private String moduleSuffix;
+
+    private ModuleImport(
+        Node originalImportNode,
+        List<String> fullLocalNames,
+        String requiredNamespace,
+        boolean isDestructuringImport) {
+      this.originalImportNode = originalImportNode;
+      this.fullLocalNames = fullLocalNames;
+      this.requiredNamespace = requiredNamespace;
+      this.isDestructuringImport = isDestructuringImport;
+      this.module = namespaceToModule.get(requiredNamespace);
+      this.referencedFile =
+          pathUtil.getImportPath(originalImportNode.getSourceFileName(), module.file);
+      this.moduleSuffix = nameUtil.lastStepOfName(requiredNamespace);
+      this.backupName = this.moduleSuffix;
+      this.localNames = new ArrayList<String>();
+      for (String fullLocalName : fullLocalNames) {
+        String localName = nameUtil.lastStepOfName(fullLocalName);
+        this.localNames.add(localName);
+        if (this.moduleSuffix.equals(localName)) {
+          this.backupName = this.moduleSuffix + "Exports";
+        }
+      }
+    }
+
+    /** Validate the module import assumptions */
+    private boolean validateImport() {
+      if (!isDestructuringImport && fullLocalNames.size() != 1) {
+        compiler.report(
+            JSError.make(
+                originalImportNode,
+                GentsErrorManager.GENTS_MODULE_PASS_ERROR,
+                String.format(
+                    "Non destructuring imports should have exactly one local name, got [%s]",
+                    String.join(", ", fullLocalNames))));
+        return false;
+      }
+
+      if (this.module == null && !isAlreadyConverted()) {
+        compiler.report(
+            JSError.make(
+                originalImportNode,
+                GentsErrorManager.GENTS_MODULE_PASS_ERROR,
+                String.format("Module %s does not exist.", requiredNamespace)));
+        return false;
+      }
+      return true;
+    }
+
+    /** Returns {@code true} if the imported file is already in TS */
+    private boolean isAlreadyConverted() {
+      return requiredNamespace.startsWith(alreadyConvertedPrefix + ".");
+    }
+
+    /** Returns {@code true} if is full module import, for example const x = goog.require(...) */
+    private boolean isFullModuleImport() {
+      Node requireLHS = this.originalImportNode.getFirstChild();
+      return requireLHS != null && requireLHS.isName();
+    }
+  }
+
   /**
-   * Converts a Closure goog.require call into a TypeScript import statement.
+   * Converts a non destructuring Closure goog.require call into a TypeScript import statement.
    *
    * <p>The resulting node is dependent on the exports by the module being imported:
    *
@@ -292,111 +413,33 @@ public final class ModuleConversionPass implements CompilerPass {
    *   import "./sideEffectsOnly"
    * </pre>
    */
-  void convertRequireToImportStatements(
-      Node n,
-      List<String> fullLocalNames,
-      String requiredNamespace,
-      boolean isDestructuringImports) {
-    // The rest of the functions assume that fullLocalNames contains one and only one element if
-    // this is not a destructuring import.
-    if (!isDestructuringImports && fullLocalNames.size() != 1) {
-      compiler.report(
-          JSError.make(
-              n,
-              GentsErrorManager.GENTS_MODULE_PASS_ERROR,
-              String.format(
-                  "Non destructuring imports should have only one local name, got [%s]",
-                  String.join(", ", fullLocalNames))));
-      return;
-    }
-    boolean alreadyConverted = requiredNamespace.startsWith(this.alreadyConvertedPrefix + ".");
-    if (!namespaceToModule.containsKey(requiredNamespace) && !alreadyConverted) {
-      compiler.report(
-          JSError.make(
-              n,
-              GentsErrorManager.GENTS_MODULE_PASS_ERROR,
-              String.format("Module %s does not exist.", requiredNamespace)));
+  void convertNonDestructuringRequireToImportStatements(Node n, ModuleImport moduleImport) {
+    // The imported file is already in TS
+    if (moduleImport.isAlreadyConverted()) {
+      convertRequireForAlreadyConverted(moduleImport);
       return;
     }
 
-    if (alreadyConverted) {
-      // we cannot use referencedFile here, because usually it points to the ES5 js file that is
-      // the output of TS, and not the original source TS file.
-      // However, we can reverse map the goog.module name to a file name.
-      // TODO(rado): sync this better with the mapping done in tsickle.
-      String originalPath =
-          requiredNamespace.replace(alreadyConvertedPrefix + ".", "").replace(".", "/");
-      convertRequireForAlreadyConverted(
-          n, fullLocalNames, pathUtil.getImportPath(n.getSourceFileName(), originalPath));
+    // The imported file is kept in JS
+    if (moduleImport.module.shouldUseOldSyntax()) {
+      convertRequireToImportsIfImportedIsKeptInJs(moduleImport);
       return;
     }
+    // For the rest of the function, the imported and importing files are migrating together
 
-    if (isDestructuringImports) {
-      requiredNamespace = requiredNamespace + "." + fullLocalNames.get(0);
-    }
-    FileModule module = namespaceToModule.get(requiredNamespace);
-
-    String moduleSuffix = nameUtil.lastStepOfName(requiredNamespace);
-
-    // Local name is the imported symbol on the LHS of a goog.require statement. If there's nothing
-    // on the LHS then it's the suffix in namepsace!! For example:
-    // localnames = ['a', b'] given "var {a, b} = goog.require(...);"
-    // localnames = ['a'] given "var a = goog.require(...);"
-    // localnames = ['b'] given "goog.require("a.b);"
-    List<String> localNames = new ArrayList();
-    // Avoid name collisions
-    List<String> backupNames = new ArrayList();
-
-    for (String fullLocalName : fullLocalNames) {
-      String localName = nameUtil.lastStepOfName(fullLocalName);
-      localNames.add(localName);
-      backupNames.add(moduleSuffix.equals(localName) ? moduleSuffix + "Exports" : moduleSuffix);
-    }
-
-    String referencedFile = pathUtil.getImportPath(n.getSourceFileName(), module.file);
-
-    // This is a namespace/module that is kept as JavaScript
-    if (module.shouldUseOldSyntax()) {
-      Node nodeToImport = null;
-      // For destructuring imports use `import {foo} from 'goog:bar';`
-      if (isDestructuringImports) {
-        nodeToImport = new Node(Token.OBJECTLIT);
-        for (String localName : localNames) {
-          nodeToImport.addChildToBack(Node.newString(Token.STRING_KEY, localName));
-        }
-        // For non destructuring imports, it is safe to assume there's only one localName
-      } else if (module.hasDefaultExport) {
-        // If it has a default export then use `import foo from 'goog:bar';`
-        nodeToImport = Node.newString(Token.NAME, localNames.get(0));
-      } else {
-        // If it doesn't have a default export then use `import * as foo from 'goog:bar';`
-        nodeToImport = Node.newString(Token.IMPORT_STAR, localNames.get(0));
-      }
-      String importString = requiredNamespace;
-      if (isDestructuringImports) {
-        importString = requiredNamespace.replaceAll("." + localNames.get(0), "");
-      }
-      Node importNode =
-          new Node(Token.IMPORT, IR.empty(), nodeToImport, Node.newString("goog:" + importString));
-      nodeComments.replaceWithComment(n, importNode);
-      compiler.reportChangeToEnclosingScope(importNode);
-
-      for (int i = 0; i < fullLocalNames.size(); i++) {
-        registerLocalSymbol(
-            n.getSourceFileName(), fullLocalNames.get(i), requiredNamespace, localNames.get(i));
-      }
-      return;
-    }
-
+    // For non destructuring imports, there is exactly one local name and full local name
+    String localName = moduleImport.localNames.get(0);
+    String fullLocalName = moduleImport.fullLocalNames.get(0);
+    // If not imported then this is a side effect only import.
     boolean imported = false;
-    if (module.importedNamespacesToSymbols.containsKey(requiredNamespace)) {
+
+    if (moduleImport.module.importedNamespacesToSymbols.containsKey(
+        moduleImport.requiredNamespace)) {
       // import {value as localName} from "./file"
-      Node importSpec = new Node(Token.IMPORT_SPEC, IR.name(moduleSuffix));
-      // import {a as b} only when a =/= b
-      for (String localName : localNames) {
-        if (!moduleSuffix.equals(localName)) {
-          importSpec.addChildToBack(IR.name(localName));
-        }
+      Node importSpec = new Node(Token.IMPORT_SPEC, IR.name(moduleImport.moduleSuffix));
+      // import {a as b} only when a != b
+      if (!moduleImport.moduleSuffix.equals(localName)) {
+        importSpec.addChildToBack(IR.name(localName));
       }
 
       Node importNode =
@@ -404,78 +447,167 @@ public final class ModuleConversionPass implements CompilerPass {
               Token.IMPORT,
               IR.empty(),
               new Node(Token.IMPORT_SPECS, importSpec),
-              Node.newString(referencedFile));
-      importNode.useSourceInfoFromForTree(n);
-      n.getParent().addChildBefore(importNode, n);
-      nodeComments.moveComment(n, importNode);
+              Node.newString(moduleImport.referencedFile));
+      addImportNode(n, importNode);
       imported = true;
 
-      for (int i = 0; i < fullLocalNames.size(); i++) {
-        registerLocalSymbol(
-            n.getSourceFileName(), fullLocalNames.get(i), requiredNamespace, localNames.get(i));
-        // Switch to back up name if necessary
-        localNames.set(i, backupNames.get(i));
-      }
+      registerLocalSymbol(
+          n.getSourceFileName(), fullLocalName, moduleImport.requiredNamespace, localName);
+      // Switch to back up name if necessary
+      localName = moduleImport.backupName;
     }
 
-    if (module.providesObjectChildren.get(requiredNamespace).size() > 0) {
+    if (moduleImport.module.providesObjectChildren.get(moduleImport.requiredNamespace).size() > 0) {
       // import * as var from "./file"
       Node importNode =
           new Node(
               Token.IMPORT,
               IR.empty(),
-              Node.newString(Token.IMPORT_STAR, localNames.get(0)),
-              Node.newString(referencedFile));
-      n.getParent().addChildBefore(importNode, n);
-      importNode.useSourceInfoFromForTree(n);
-      nodeComments.moveComment(n, importNode);
+              Node.newString(Token.IMPORT_STAR, localName),
+              Node.newString(moduleImport.referencedFile));
+      addImportNode(n, importNode);
       imported = true;
 
-      for (String child : module.providesObjectChildren.get(requiredNamespace)) {
+      for (String child :
+          moduleImport.module.providesObjectChildren.get(moduleImport.requiredNamespace)) {
         if (!valueRewrite.contains(n.getSourceFileName(), child)) {
           String fileName = n.getSourceFileName();
           registerLocalSymbol(
               fileName,
-              fullLocalNames.get(0) + '.' + child,
-              requiredNamespace + '.' + child,
-              localNames.get(0) + '.' + child);
+              fullLocalName + '.' + child,
+              moduleImport.requiredNamespace + '.' + child,
+              localName + '.' + child);
         }
       }
     }
 
     if (!imported) {
-      // side effects only
-      Node importNode =
-          new Node(Token.IMPORT, IR.empty(), IR.empty(), Node.newString(referencedFile));
-      importNode.useSourceInfoFromForTree(n);
-      n.getParent().addChildBefore(importNode, n);
-      nodeComments.moveComment(n, importNode);
+      // Convert the require to "import './sideEffectOnly';"
+      convertRequireForSideEffectOnlyImport(moduleImport);
     }
 
     compiler.reportChangeToEnclosingScope(n);
     n.detach();
   }
 
-  private void convertRequireForAlreadyConverted(
-      Node n, List<String> fullLocalNames, String referencedFile) {
-    // case of side-effectful imports.
+  /**
+   * Converts a destructuring Closure goog.require call into a TypeScript import statement.
+   *
+   * <p>The resulting node is dependent on the exports by the module being imported:
+   *
+   * <pre>
+   *   import {A as localName, B} from "./valueExports";
+   * </pre>
+   */
+  void convertDestructuringRequireToImportStatements(Node n, ModuleImport moduleImport) {
+    // The imported file is already in TS
+    if (moduleImport.isAlreadyConverted()) {
+      convertRequireForAlreadyConverted(moduleImport);
+      return;
+    }
+
+    // The imported file is kept in JS
+    if (moduleImport.module.shouldUseOldSyntax()) {
+      convertRequireToImportsIfImportedIsKeptInJs(moduleImport);
+      return;
+    }
+    // For the rest of the function, the imported and importing files are migrating together
+
+    // import {value as localName} from "./file"
+    Node importSpec = new Node(Token.IMPORT_SPEC);
+    // import {a as b} only when a != b
+    for (String localName : moduleImport.localNames) {
+      if (!moduleImport.moduleSuffix.equals(localName)) {
+        importSpec.addChildToBack(IR.name(localName));
+      }
+    }
+    Node importNode =
+        new Node(
+            Token.IMPORT,
+            IR.empty(),
+            new Node(Token.IMPORT_SPECS, importSpec),
+            Node.newString(moduleImport.referencedFile));
+    addImportNode(n, importNode);
+
+    for (int i = 0; i < moduleImport.fullLocalNames.size(); i++) {
+      registerLocalSymbol(
+          n.getSourceFileName(),
+          moduleImport.fullLocalNames.get(i),
+          moduleImport.requiredNamespace,
+          moduleImport.localNames.get(i));
+    }
+
+    compiler.reportChangeToEnclosingScope(n);
+    n.detach();
+  }
+
+  /** If the imported file is kept in JS, then use the special "goog:namespace" syntax */
+  private void convertRequireToImportsIfImportedIsKeptInJs(ModuleImport moduleImport) {
+    Node nodeToImport = null;
+    // For destructuring imports use `import {foo} from 'goog:bar';`
+    if (moduleImport.isDestructuringImport) {
+      nodeToImport = new Node(Token.OBJECTLIT);
+      for (String localName : moduleImport.localNames) {
+        nodeToImport.addChildToBack(Node.newString(Token.STRING_KEY, localName));
+      }
+      // For non destructuring imports, it is safe to assume there's only one localName
+    } else if (moduleImport.module.hasDefaultExport) {
+      // If it has a default export then use `import foo from 'goog:bar';`
+      nodeToImport = Node.newString(Token.NAME, moduleImport.localNames.get(0));
+    } else {
+      // If it doesn't have a default export then use `import * as foo from 'goog:bar';`
+      nodeToImport = Node.newString(Token.IMPORT_STAR, moduleImport.localNames.get(0));
+    }
+
+    Node importNode =
+        new Node(
+            Token.IMPORT,
+            IR.empty(),
+            nodeToImport,
+            Node.newString("goog:" + moduleImport.requiredNamespace));
+    nodeComments.replaceWithComment(moduleImport.originalImportNode, importNode);
+    compiler.reportChangeToEnclosingScope(importNode);
+
+    for (int i = 0; i < moduleImport.fullLocalNames.size(); i++) {
+      registerLocalSymbol(
+          moduleImport.originalImportNode.getSourceFileName(),
+          moduleImport.fullLocalNames.get(i),
+          moduleImport.requiredNamespace,
+          moduleImport.localNames.get(i));
+    }
+  }
+
+  private void convertRequireForAlreadyConverted(ModuleImport moduleImport) {
+    // we cannot use referencedFile here, because usually it points to the ES5 js file that is
+    // the output of TS, and not the original source TS file.
+    // However, we can reverse map the goog.module name to a file name.
+    // TODO(rado): sync this better with the mapping done in tsickle.
+    String originalPath =
+        moduleImport.requiredNamespace.replace(alreadyConvertedPrefix + ".", "").replace(".", "/");
+    String referencedFile =
+        pathUtil.getImportPath(moduleImport.originalImportNode.getSourceFileName(), originalPath);
     // goog.require('...'); -> import '...';
     Node importSpec = IR.empty();
-    if (n.getFirstChild() != null && n.getFirstChild().isDestructuringLhs()) {
+    if (moduleImport.isDestructuringImport) {
       importSpec = new Node(Token.IMPORT_SPECS);
-      for (String fullLocalName : fullLocalNames) {
+      for (String fullLocalName : moduleImport.fullLocalNames) {
         importSpec.addChildToBack(IR.name(fullLocalName));
       }
-    } else if (n.getFirstChild() != null && n.getFirstChild().isName()) {
-      // case of full module import.
+    } else if (moduleImport.isFullModuleImport()) {
       // const A = goog.require('...'); -> import * as A from '...';
       // It is safe to assume there's one full local name because this is validated before.
-      importSpec = Node.newString(Token.IMPORT_STAR, fullLocalNames.get(0));
+      importSpec = Node.newString(Token.IMPORT_STAR, moduleImport.fullLocalNames.get(0));
     }
     Node importNode =
         new Node(Token.IMPORT, IR.empty(), importSpec, Node.newString(referencedFile));
-    nodeComments.replaceWithComment(n, importNode);
+    nodeComments.replaceWithComment(moduleImport.originalImportNode, importNode);
     compiler.reportChangeToEnclosingScope(importNode);
+  }
+
+  private void convertRequireForSideEffectOnlyImport(ModuleImport moduleImport) {
+    Node importNode =
+        new Node(Token.IMPORT, IR.empty(), IR.empty(), Node.newString(moduleImport.referencedFile));
+    addImportNode(moduleImport.originalImportNode, importNode);
   }
 
   /**
@@ -550,6 +682,12 @@ public final class ModuleConversionPass implements CompilerPass {
     valueRewrite.put(sourceFile, fullLocalName, localName);
     typeRewrite.put(sourceFile, fullLocalName, localName);
     typeRewrite.put(sourceFile, requiredNamespace, localName);
+  }
+
+  private void addImportNode(Node n, Node importNode) {
+    importNode.useSourceInfoFromForTree(n);
+    n.getParent().addChildBefore(importNode, n);
+    nodeComments.moveComment(n, importNode);
   }
 
   /** Metadata about an exported symbol. */
