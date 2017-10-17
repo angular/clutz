@@ -83,7 +83,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
     }
     opts.debug = true;
     opts.emitPlatformExterns = emitPlatformExterns;
-    opts.skipEmitSuffix = ".skip.tsickle.js";
+    opts.skipEmitRegExp = ".*\\.skip\\.tsickle\\.js$";
     List<SourceFile> sourceFiles = new ArrayList<>();
 
     // base.js is needed for the type declaration of goog.require for

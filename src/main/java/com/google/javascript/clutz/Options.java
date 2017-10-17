@@ -80,12 +80,12 @@ public class Options {
   boolean partialInput;
 
   @Option(
-    name = "--skipEmitSuffix",
+    name = "--skipEmitRegExp",
     usage =
-        "Symbols in files that end with this suffix will not be included in the emit. Note that"
+        "Symbols in files that match this RegExp will not be included in the emit. Note that"
             + "the files would still be part of the internal compilation."
   )
-  String skipEmitSuffix = null;
+  String skipEmitRegExp = null;
 
   @Argument List<String> arguments = new ArrayList<>();
 
