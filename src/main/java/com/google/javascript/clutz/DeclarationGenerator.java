@@ -425,7 +425,8 @@ class DeclarationGenerator {
 
     for (CompilerInput compilerInput : compiler.getInputsById().values()) {
       String originalPath = compilerInput.getSourceFile().getOriginalPath();
-      if (opts.skipEmitSuffix != null && originalPath.endsWith(opts.skipEmitSuffix)) continue;
+      if (opts.skipEmitRegExp != null && Pattern.matches(opts.skipEmitRegExp, originalPath))
+        continue;
       transitiveProvides.addAll(compilerInput.getProvides());
       if (depgraph.isRoot(originalPath)) {
         provides.addAll(compilerInput.getProvides());
@@ -663,8 +664,8 @@ class DeclarationGenerator {
         if (symbolInput != null && symbolInput.isExtern()) continue;
 
         // skip types that come from files that we skip emit on.
-        if (opts.skipEmitSuffix != null && symbolInput.getName().endsWith(opts.skipEmitSuffix))
-          continue;
+        if (opts.skipEmitRegExp != null
+            && Pattern.matches(opts.skipEmitRegExp, symbolInput.getName())) continue;
 
         declareNamespace(
             namespace,
