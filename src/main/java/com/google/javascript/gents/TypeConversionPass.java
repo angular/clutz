@@ -485,7 +485,7 @@ public final class TypeConversionPass implements CompilerPass {
 
     typeNode.setJSDocInfo(n.getJSDocInfo());
     nodeComments.replaceWithComment(n, typeNode);
-    compiler.reportChangeToEnclosingScope(nodeComments);
+    compiler.reportChangeToEnclosingScope(n);
   }
 
   /** Converts goog.defineClass calls into class definitions. */
@@ -520,7 +520,7 @@ public final class TypeConversionPass implements CompilerPass {
     classNode.useSourceInfoFrom(n);
 
     nodeComments.replaceWithComment(n, classNode);
-    compiler.reportChangeToEnclosingScope(nodeComments);
+    compiler.reportChangeToEnclosingScope(n);
   }
 
   /** return if node n is a @constructor annotated function inside goog.defineClass */
@@ -616,7 +616,7 @@ public final class TypeConversionPass implements CompilerPass {
     // Append the new method to the class
     classMembers.addChildToBack(memberFunc);
     nodeComments.moveComment(declaration.exprRoot, memberFunc);
-    compiler.reportChangeToEnclosingScope(nodeComments);
+    compiler.reportChangeToEnclosingScope(memberFunc);
   }
 
   /**
