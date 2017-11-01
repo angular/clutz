@@ -275,8 +275,8 @@ public final class TypeConversionPass implements CompilerPass {
               // Add visibility directly to param if possible
               moveAccessModifier(declaration, param);
               markAsConst(declaration, param);
+              compiler.reportChangeToEnclosingScope(n);
               n.detach();
-              compiler.reportCodeChange();
               return;
             }
           }
@@ -485,7 +485,6 @@ public final class TypeConversionPass implements CompilerPass {
 
     typeNode.setJSDocInfo(n.getJSDocInfo());
     nodeComments.replaceWithComment(n, typeNode);
-    compiler.reportCodeChange();
   }
 
   /** Converts goog.defineClass calls into class definitions. */
@@ -520,7 +519,6 @@ public final class TypeConversionPass implements CompilerPass {
     classNode.useSourceInfoFrom(n);
 
     nodeComments.replaceWithComment(n, classNode);
-    compiler.reportCodeChange();
   }
 
   /** return if node n is a @constructor annotated function inside goog.defineClass */
@@ -616,7 +614,7 @@ public final class TypeConversionPass implements CompilerPass {
     // Append the new method to the class
     classMembers.addChildToBack(memberFunc);
     nodeComments.moveComment(declaration.exprRoot, memberFunc);
-    compiler.reportCodeChange();
+    compiler.reportChangeToEnclosingScope(memberFunc);
   }
 
   /**
@@ -643,7 +641,7 @@ public final class TypeConversionPass implements CompilerPass {
     }
 
     addFieldToClassMembers(classMembers, fieldNode);
-    compiler.reportCodeChange();
+    compiler.reportChangeToEnclosingScope(classMembers);
   }
 
   /**
@@ -705,8 +703,8 @@ public final class TypeConversionPass implements CompilerPass {
         return;
       }
 
+      compiler.reportChangeToEnclosingScope(exprNode);
       exprNode.detach();
-      compiler.reportCodeChange();
     } else if (exprNode.getFirstChild().isAssign()) {
       Node assignNode = exprNode.getFirstChild();
       // Report error if trying to assign to prototype directly
@@ -774,7 +772,7 @@ public final class TypeConversionPass implements CompilerPass {
       // Remove twice to get rid of "this" and the method name
       callNode.removeChild(callNode.getSecondChild());
       callNode.removeChild(callNode.getSecondChild());
-      compiler.reportCodeChange();
+      compiler.reportChangeToEnclosingScope(callNode);
       return;
     }
 
@@ -784,7 +782,7 @@ public final class TypeConversionPass implements CompilerPass {
       nodeComments.replaceWithComment(callNode.getFirstChild(), IR.superNode());
 
       callNode.removeChild(callNode.getSecondChild());
-      compiler.reportCodeChange();
+      compiler.reportChangeToEnclosingScope(callNode);
       return;
     }
 
@@ -802,7 +800,7 @@ public final class TypeConversionPass implements CompilerPass {
         nodeComments.replaceWithComment(n, IR.superNode());
         nodeComments.replaceWithComment(callNode.getFirstChild(), nameNode);
         callNode.removeChild(callNode.getSecondChild());
-        compiler.reportCodeChange();
+        compiler.reportChangeToEnclosingScope(callNode);
         return;
       }
     }
