@@ -427,9 +427,20 @@ class DeclarationGenerator {
       String originalPath = compilerInput.getSourceFile().getOriginalPath();
       if (opts.skipEmitRegExp != null && Pattern.matches(opts.skipEmitRegExp, originalPath))
         continue;
-      transitiveProvides.addAll(compilerInput.getProvides());
+      Collection<String> inputProvides = compilerInput.getProvides();
+      Collection<String> filteredProvides = new ArrayList<>();
+      // It appears closure reports 'module$src$...filepath...' provides
+      // for files that have no goog.provide or goog.module.
+      // Such files cannot be really imported by typescript, so we do not
+      // produce a .d.ts for them.
+      for (String p : inputProvides) {
+        if (!p.startsWith("module$src$")) {
+          filteredProvides.add(p);
+        }
+      }
+      transitiveProvides.addAll(filteredProvides);
       if (depgraph.isRoot(originalPath)) {
-        provides.addAll(compilerInput.getProvides());
+        provides.addAll(filteredProvides);
         emitComment(
             String.format(
                 "Processing provides %s from input %s",
