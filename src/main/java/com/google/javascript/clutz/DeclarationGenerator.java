@@ -35,7 +35,6 @@ import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.JSTypeExpression;
 import com.google.javascript.rhino.Node;
-import com.google.javascript.rhino.StaticSourceFile;
 import com.google.javascript.rhino.jstype.EnumElementType;
 import com.google.javascript.rhino.jstype.EnumType;
 import com.google.javascript.rhino.jstype.FunctionType;
@@ -1748,7 +1747,8 @@ class DeclarationGenerator {
               // When we dealing with partial inputs, we often end up with named type, without a
               // corresponding referencedType. Instead of emitting 'any', we emit literally the
               // name of the type as originally written.
-              // It appears that when one writes '@type {A<B>}' and both are missing from the compilation
+              // It appears that when one writes '@type {A<B>}' and both are missing from the
+              // compilation
               // unit - A ends up as NoType, while B ends up as NamedType.
               if (opts.partialInput && refType.isUnknownType()) {
                 String displayName = type.getDisplayName();
