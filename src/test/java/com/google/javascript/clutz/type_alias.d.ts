@@ -13,6 +13,7 @@ declare namespace ಠ_ಠ.clutz.typedefs {
   type arrayA = ಠ_ಠ.clutz.typedefs.Aclass [] ;
   //!! TODO(rado): fn should use the strToStr typedef.
   function fn (a : string ) : string ;
+  type otherArrayA = ಠ_ಠ.clutz.typedefs.Aclass [] ;
   type strOrFunc = string | ( ( ) => string ) ;
   type strToStr = (a : string ) => string ;
 }

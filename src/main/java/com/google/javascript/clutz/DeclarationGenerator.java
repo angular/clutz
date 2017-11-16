@@ -346,7 +346,9 @@ class DeclarationGenerator {
       }
 
       JSType realType = compiler.getTypeRegistry().getType(var.getName());
-      if (realType != null && shouldEmitTypedefByName(realType)) {
+      if (realType != null
+          && shouldEmitTypedefByName(realType)
+          && !typedefs.containsKey(realType)) {
         typedefs.put(realType, var.getName());
       }
     }
