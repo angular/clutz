@@ -66,7 +66,7 @@ public class MultiFileTest {
   }
 
   @Test
-  public void tsickle_emit() throws Exception {
+  public void tsickleEmit() throws Exception {
     String expected = DeclarationGeneratorTests.getTestFileText(input("tsickle_emit.d.ts"));
     assertThatProgram(
             ImmutableList.of(input("uses_tsickle_type.js")),
