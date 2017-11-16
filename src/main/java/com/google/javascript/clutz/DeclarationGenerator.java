@@ -35,6 +35,7 @@ import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.JSTypeExpression;
 import com.google.javascript.rhino.Node;
+import com.google.javascript.rhino.StaticSourceFile;
 import com.google.javascript.rhino.jstype.EnumElementType;
 import com.google.javascript.rhino.jstype.EnumType;
 import com.google.javascript.rhino.jstype.FunctionType;
@@ -330,6 +331,9 @@ class DeclarationGenerator {
    */
   void collectTypedefs() {
     for (TypedVar var : compiler.getTopScope().getAllSymbols()) {
+      if (shouldSkipVar(var)) {
+        continue;
+      }
       // In Closure, unlike TypeScript there is no pure type space. Thus even typedefs declare
       // symbols. The type of the symbol corresponding to the typedef is *not* the same as the type
       // declared by the typedef.
@@ -430,9 +434,7 @@ class DeclarationGenerator {
     out = new StringWriter();
 
     for (CompilerInput compilerInput : compiler.getInputsById().values()) {
-      String originalPath = compilerInput.getSourceFile().getOriginalPath();
-      if (opts.skipEmitPattern != null
-          && opts.skipEmitPattern.matcher(originalPath).matches()) {
+      if (shouldSkipSourceFile(compilerInput.getSourceFile())) {
         continue;
       }
       Collection<String> inputProvides = compilerInput.getProvides();
@@ -447,6 +449,7 @@ class DeclarationGenerator {
         }
       }
       transitiveProvides.addAll(filteredProvides);
+      String originalPath = compilerInput.getSourceFile().getOriginalPath();
       if (depgraph.isRoot(originalPath)) {
         provides.addAll(filteredProvides);
         emitComment(
@@ -529,6 +532,20 @@ class DeclarationGenerator {
 
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
+  }
+
+  /**
+   * Skip emit & use for variables that will not be emitted due to {@link Options#skipEmitPattern}.
+   */
+  private boolean shouldSkipVar(TypedVar var) {
+    return opts.skipEmitPattern != null
+        && opts.skipEmitPattern.matcher(var.getInputName()).matches();
+  }
+
+  /** Skip emit & use for all symbols in files matching {@link Options#skipEmitPattern}. */
+  private boolean shouldSkipSourceFile(SourceFile sourceFile) {
+    String path = sourceFile.getOriginalPath();
+    return opts.skipEmitPattern != null && opts.skipEmitPattern.matcher(path).matches();
   }
 
   /** Special emit for goog modules that only emit a default export that is a typedef. */
@@ -682,9 +699,7 @@ class DeclarationGenerator {
         CompilerInput symbolInput = this.compiler.getInput(new InputId(symbol.getInputName()));
         if (symbolInput != null && symbolInput.isExtern()) continue;
 
-        // skip types that come from files that we skip emit on.
-        if (opts.skipEmitPattern != null
-            && opts.skipEmitPattern.matcher(symbol.getInputName()).matches()) {
+        if (shouldSkipVar(symbol)) {
           continue;
         }
 

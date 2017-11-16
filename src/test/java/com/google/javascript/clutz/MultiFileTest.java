@@ -74,6 +74,15 @@ public class MultiFileTest {
         .generatesDeclarations(expected);
   }
 
+  @Test
+  public void skipEmitWithTypedefs() throws Exception {
+    String expected = DeclarationGeneratorTests.getTestFileText(input("skipped.d.ts"));
+    assertThatProgram(
+            ImmutableList.of(input("uses_type.js")),
+            ImmutableList.of(input("skipped_typedef.skip.tsickle.js")))
+        .generatesDeclarations(expected);
+  }
+
   private File input(String filename) {
     Path testDir = FileSystems.getDefault().getPath("src", "test", "java");
     String packageName = ProgramSubject.class.getPackage().getName();
