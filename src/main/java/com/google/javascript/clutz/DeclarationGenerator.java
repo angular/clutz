@@ -337,9 +337,11 @@ class DeclarationGenerator {
       if (type == null
           || !isTypedef(type)
           || var.getName().startsWith("window.")
-          || isPrivate(var.getJSDocInfo())) continue;
-      JSType realType = compiler.getTypeRegistry().getType(var.getName());
+          || isPrivate(var.getJSDocInfo())) {
+        continue;
+      }
 
+      JSType realType = compiler.getTypeRegistry().getType(var.getName());
       if (realType != null && shouldEmitTypedefByName(realType)) {
         typedefs.put(realType, var.getName());
       }
@@ -353,12 +355,16 @@ class DeclarationGenerator {
    * references of the type (through the typedef or direct). Thus it is undesirable to always emit
    * by name. For example:
    *
-   * @constructor A;
-   * @typedef {A} B;
-   * @const {A} var a; If we emit the name, we would emit `var a: B;`, which is undesirable
-   *     (consider A being string).
-   *     <p>For now, only emit by name typedefs that are unlikely to have more than one name
-   *     referring to them - record types, templatized types and function types.
+   * <pre>
+   * \@constructor A;
+   * \@typedef {A} B;
+   * \@const {A} var a;
+   * </pre>
+   *
+   * If we emit the name, we would emit `var a: B;`, which is undesirable (consider A being string).
+   *
+   * <p>For now, only emit by name typedefs that are unlikely to have more than one name referring
+   * to them - record types, templatized types and function types.
    */
   private boolean shouldEmitTypedefByName(JSType realType) {
     return realType.isRecordType() || realType.isTemplatizedType() || realType.isFunctionType();
