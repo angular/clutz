@@ -72,7 +72,12 @@ class Depgraph {
       try {
         String depgraph = Files.toString(new File(depgraphName), UTF_8);
         List<List<?>> list =
-            new Gson().fromJson(depgraph, new TypeToken<List<List<?>>>() {}.getType());
+            new Gson()
+                .fromJson(
+                    depgraph,
+                    new TypeToken<List<List<?>>>() {
+                      /* empty */
+                    }.getType());
 
         for (List<?> outer : list) {
           String key = (String) outer.get(0);
