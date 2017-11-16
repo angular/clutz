@@ -233,11 +233,6 @@ class DeclarationGenerator {
 
   private static final String MODULE_PREFIX = "module$exports$";
 
-  private JSType unknownType;
-  private JSType numberType;
-  @Nullable private JSType iterableType;
-  @Nullable private JSType iteratorIterableType;
-
   public static void main(String[] args) {
     Options options = null;
     try {
@@ -269,6 +264,11 @@ class DeclarationGenerator {
           "CLUTZ_MISSING_TYPES",
           "A dependency does not compile because it is missing some types. This is often caused by "
               + "the referenced code missing dependencies or by missing externs in your build rule.");
+
+  private JSType unknownType;
+  private JSType numberType;
+  @Nullable private JSType iterableType;
+  @Nullable private JSType iteratorIterableType;
 
   private final Options opts;
   private final Compiler compiler;
