@@ -51,9 +51,14 @@ repositories {
 dependencies {
 
   // Verify all versions match closure-compiler's deps to avoid version conflicts.
+  // Also make sure this matches internal Google usage, as closure-compiler is not always
+  // dilligent about using the correct versions.
   // https://github.com/google/closure-compiler/blob/master/pom-main.xml
-  runtime 'args4j:args4j:2.0.26'
-  runtime 'com.google.code.gson:gson:2.7'
+  compile('args4j:args4j:2.0.26') {
+    // Forced, as Closure Compiler depends on the wrong version.
+    force = true
+  }
+  compile 'com.google.code.gson:gson:2.7'
   if (System.getenv().get('CI_MODE') == 'Nightly') {
     compile 'com.google.javascript:closure-compiler:1.0-SNAPSHOT'
   } else {
