@@ -251,7 +251,7 @@ public final class TypeAnnotationPass implements CompilerPass {
       // Modify the primary AST to represent a function parameter as a
       // REST node, if the type indicates it is a rest parameter.
       if (parameterType.getRoot().getToken() == Token.ELLIPSIS) {
-        attachTypeExpr = IR.rest(node.getString());
+        attachTypeExpr = IR.rest(IR.name(node.getString()));
         nodeComments.replaceWithComment(node, attachTypeExpr);
       }
       // Modify the AST to represent an optional parameter
