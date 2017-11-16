@@ -15,5 +15,8 @@ out/
 *.idea
 *.iml
 
+# VS Code
+.vscode/
+
 # Installed node_modules for tsc.
 node_modules/
