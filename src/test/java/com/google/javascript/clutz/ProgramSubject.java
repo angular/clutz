@@ -94,14 +94,14 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
 
     Set<String> nonroots = new LinkedHashSet<>();
     for (File nonroot : actual().nonroots) {
-      sourceFiles.add(SourceFile.fromFile(nonroot, UTF_8));
+      sourceFiles.add(SourceFile.fromPath(nonroot.toPath(), UTF_8));
       nonroots.add(nonroot.getPath());
     }
 
     Set<String> roots = new LinkedHashSet<>();
 
     for (File root : actual().roots) {
-      sourceFiles.add(SourceFile.fromFile(root, UTF_8));
+      sourceFiles.add(SourceFile.fromPath(root.toPath(), UTF_8));
       roots.add(root.getPath());
     }
 
