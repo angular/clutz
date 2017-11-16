@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 /** A subject that supports assertions on {@link DeclarationGenerator}'s results. */
@@ -83,7 +84,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
     }
     opts.debug = true;
     opts.emitPlatformExterns = emitPlatformExterns;
-    opts.skipEmitRegExp = ".*\\.skip\\.tsickle\\.js$";
+    opts.skipEmitPattern = Pattern.compile(".*\\.skip\\.tsickle\\.js$");
     List<SourceFile> sourceFiles = new ArrayList<>();
 
     // base.js is needed for the type declaration of goog.require for

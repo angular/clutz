@@ -425,8 +425,10 @@ class DeclarationGenerator {
 
     for (CompilerInput compilerInput : compiler.getInputsById().values()) {
       String originalPath = compilerInput.getSourceFile().getOriginalPath();
-      if (opts.skipEmitRegExp != null && Pattern.matches(opts.skipEmitRegExp, originalPath))
+      if (opts.skipEmitPattern != null
+          && opts.skipEmitPattern.matcher(originalPath).matches()) {
         continue;
+      }
       Collection<String> inputProvides = compilerInput.getProvides();
       Collection<String> filteredProvides = new ArrayList<>();
       // It appears closure reports 'module$src$...filepath...' provides
@@ -675,8 +677,10 @@ class DeclarationGenerator {
         if (symbolInput != null && symbolInput.isExtern()) continue;
 
         // skip types that come from files that we skip emit on.
-        if (opts.skipEmitRegExp != null
-            && Pattern.matches(opts.skipEmitRegExp, symbolInput.getName())) continue;
+        if (opts.skipEmitPattern != null
+            && opts.skipEmitPattern.matcher(symbol.getInputName()).matches()) {
+          continue;
+        }
 
         declareNamespace(
             namespace,

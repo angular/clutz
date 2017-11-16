@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -90,6 +91,9 @@ public class Options {
   @Argument List<String> arguments = new ArrayList<>();
 
   Depgraph depgraph;
+  // TODO(martinprobst): Remove when internal Google is upgraded to a more recent args4j
+  // library that supports Pattern arguments.
+  Pattern skipEmitPattern;
 
   public CompilerOptions getCompilerOptions() {
     final CompilerOptions options = new CompilerOptions();
@@ -132,6 +136,9 @@ public class Options {
   Options(String[] args) throws CmdLineException {
     CmdLineParser parser = new CmdLineParser(this);
     parser.parseArgument(args);
+    if (skipEmitRegExp != null) {
+      skipEmitPattern = Pattern.compile(skipEmitRegExp);
+    }
     depgraph = Depgraph.parseFrom(depgraphFiles);
     if (filterSourcesWithDepgraphs) {
       // Clutz still takes the list of files to compile from the outside, because Closure depends
