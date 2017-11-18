@@ -16,9 +16,50 @@ import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
-import org.kohsuke.args4j.spi.StringArrayOptionHandler;
+import org.kohsuke.args4j.OptionDef;
+import org.kohsuke.args4j.spi.OptionHandler;
+import org.kohsuke.args4j.spi.Parameters;
+import org.kohsuke.args4j.spi.Setter;
 
 public class Options {
+  /**
+   * An {@link OptionHandler} the parses an array of strings as an option.
+   *
+   * <p>Whereas the builtin {@link org.kohsuke.args4j.spi.StringArrayOptionHandler} will split
+   * parameters with spaces in them into their space-delimited components (e.g. {@code "foo bar"}
+   * into {@code foo} and {@code bar}), this option handler does not:
+   *
+   * <pre>
+   *  java Example --foo bar baz 'bar baz'
+   *  // => Results in 'bar', 'baz', and 'bar baz'
+   * </pre>
+   *
+   * This approach follows the conventions of shell quoting to allow option values with spaces.
+   */
+  public static class StringArrayOptionHandler extends OptionHandler<String> {
+    public StringArrayOptionHandler(CmdLineParser parser, OptionDef option, Setter<String> setter) {
+      super(parser, option, setter);
+    }
+
+    @Override
+    public String getDefaultMetaVariable() {
+      return "ARG ...";
+    }
+
+    @Override
+    public int parseArguments(Parameters params) throws CmdLineException {
+      final int paramsSize = params.size();
+      for (int i = 0; i < paramsSize; i++) {
+        String param = params.getParameter(i);
+        if (param.startsWith("-")) {
+          return i;
+        }
+
+        setter.addValue(param);
+      }
+      return paramsSize;
+    }
+  }
 
   @Option(name = "-o", usage = "output to this file", metaVar = "OUTPUT")
   String output = "-";

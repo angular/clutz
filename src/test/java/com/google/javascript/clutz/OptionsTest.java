@@ -107,4 +107,15 @@ public class OptionsTest {
             });
     assertThat(opts.externs).containsExactly("javascript/common/dom.js");
   }
+
+  @Test
+  public void testShouldSupportFilePathsWithSpaces() throws Exception {
+    Options opts =
+        new Options(
+            new String[] {
+              "--externs", "dir with spaces/common/dom.js", "--externs", "common/browser api.js",
+            });
+    assertThat(opts.externs)
+        .containsExactly("dir with spaces/common/dom.js", "common/browser api.js");
+  }
 }
