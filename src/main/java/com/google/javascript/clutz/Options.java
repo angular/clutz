@@ -29,16 +29,14 @@ public class Options {
   @Option(
     name = "--externs",
     usage = "list of files to read externs definitions (as separate args)",
-    metaVar = "EXTERN...",
-    handler = StringArrayOptionHandler.class
+    metaVar = "EXTERN..."
   )
   List<String> externs = new ArrayList<>();
 
   @Option(
     name = "--depgraphs",
     usage = "only generate output for files listed as a root in the given depgraphs",
-    metaVar = "file.depgraph...",
-    handler = StringArrayOptionHandler.class
+    metaVar = "file.depgraph..."
   )
   List<String> depgraphFiles = new ArrayList<>();
 

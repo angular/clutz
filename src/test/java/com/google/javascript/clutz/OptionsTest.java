@@ -14,7 +14,9 @@ public class OptionsTest {
   public void testFullUsage() throws Exception {
     Options opts =
         new Options(
-            new String[] {"foo.js", "--externs", "extern1.js", "extern2.js", "-o", "output.d.ts"});
+            new String[] {
+              "foo.js", "--externs", "extern1.js", "--externs", "extern2.js", "-o", "output.d.ts"
+            });
     assertThat(opts.arguments).containsExactly("foo.js");
     assertThat(opts.externs).containsExactly("extern1.js", "extern2.js").inOrder();
     assertThat(opts.output).isEqualTo("output.d.ts");
@@ -30,6 +32,7 @@ public class OptionsTest {
               "blaze-out/blah/my/blaze-out-file.js",
               "--externs",
               "extern1.js",
+              "--externs",
               "extern2.js",
               "--depgraphs",
               DepgraphTest.DEPGRAPH_PATH.toFile().toString(),
@@ -59,6 +62,7 @@ public class OptionsTest {
               "ns.entryPoint2",
               "--externs",
               "extern1.js",
+              "--externs",
               "extern2.js",
               "-o",
               "output.d.ts"
@@ -90,7 +94,10 @@ public class OptionsTest {
   @Test
   public void testShouldPruneRepeatedExterns() throws Exception {
     Options opts =
-        new Options(new String[] {"a.js", "extern1.js", "--externs", "extern1.js", "extern2.js"});
+        new Options(
+            new String[] {
+              "a.js", "extern1.js", "--externs", "extern1.js", "--externs", "extern2.js"
+            });
     assertThat(opts.externs).containsExactly("extern1.js", "extern2.js");
     assertThat(opts.arguments).containsExactly("a.js");
   }
@@ -106,5 +113,11 @@ public class OptionsTest {
               DepgraphTest.DEPGRAPH_PATH.toFile().toString(),
             });
     assertThat(opts.externs).containsExactly("javascript/common/dom.js");
+  }
+
+  @Test
+  public void testShouldAllowFileNameWithSpaces() throws Exception {
+    Options opts = new Options(new String[] {"--externs", "extern 1.js"});
+    assertThat(opts.externs).containsExactly("extern 1.js");
   }
 }
