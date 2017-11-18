@@ -10,6 +10,7 @@ import static com.google.javascript.rhino.jstype.JSTypeNative.STRING_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toCollection;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -1207,8 +1208,12 @@ class DeclarationGenerator {
   // We use a syntax for comments that we can strip in unit tests
   private void emitComment(String s) {
     emit("//!!");
-    emit(s);
+    emit(stripLineTerminators(s));
     emitBreak();
+  }
+
+  private String stripLineTerminators(String s) {
+    return CharMatcher.anyOf("\n\r\u2028\u2029").removeFrom(s);
   }
 
   private ObjectType getSuperType(FunctionType type) {
