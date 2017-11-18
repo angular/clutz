@@ -114,4 +114,10 @@ public class OptionsTest {
             });
     assertThat(opts.externs).containsExactly("javascript/common/dom.js");
   }
+
+  @Test
+  public void testShouldAllowFileNameWithSpaces() throws Exception {
+    Options opts = new Options(new String[] {"--externs", "extern 1.js"});
+    assertThat(opts.externs).containsExactly("extern 1.js");
+  }
 }
