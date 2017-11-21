@@ -1205,15 +1205,20 @@ class DeclarationGenerator {
     startOfLine = true;
   }
 
-  // We use a syntax for comments that we can strip in unit tests
   private void emitComment(String s) {
-    emit("//!!");
+    emit("//!!"); // these comments are stripped in unit tests
     emit(stripLineTerminators(s));
     emitBreak();
   }
 
+  private static final CharMatcher LINE_TERMINATORS = CharMatcher.anyOf("\n\r\u2028\u2029");
+
+  /**
+   * Strips line terminators from the given string, so that they can be safely emitted in a single
+   * line comment.
+   */
   private String stripLineTerminators(String s) {
-    return CharMatcher.anyOf("\n\r\u2028\u2029").removeFrom(s);
+    return LINE_TERMINATORS.replaceFrom(s, '_');
   }
 
   private ObjectType getSuperType(FunctionType type) {
