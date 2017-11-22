@@ -24,7 +24,6 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.javascript.jscomp.AbstractCommandLineRunner;
-import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerInput;
 import com.google.javascript.jscomp.DiagnosticType;
 import com.google.javascript.jscomp.ErrorFormat;
@@ -272,7 +271,7 @@ class DeclarationGenerator {
   @Nullable private JSType iteratorIterableType;
 
   private final Options opts;
-  private final Compiler compiler;
+  private final InitialParseRetainingCompiler compiler;
   private final ClutzErrorManager errorManager;
   private StringWriter out = new StringWriter();
 
@@ -294,9 +293,15 @@ class DeclarationGenerator {
    */
   private final Set<String> typesUsed = new LinkedHashSet<>();
 
+  /**
+   * In partial mode, closure doesn't know the correct name of imported symbols, and importRenameMap
+   * is used to store the mappings from the closure supplied names to the correct names.
+   */
+  private Map<String, String> importRenameMap = Collections.emptyMap();
+
   DeclarationGenerator(Options opts) {
     this.opts = opts;
-    this.compiler = new Compiler();
+    this.compiler = new InitialParseRetainingCompiler();
     compiler.disableThreads();
     this.errorManager =
         new ClutzErrorManager(
@@ -404,6 +409,9 @@ class DeclarationGenerator {
       throws AssertionError {
     // Compile should always be first here, because it sets internal state.
     compiler.compile(externs, sourceFiles, opts.getCompilerOptions());
+    if (opts.partialInput) {
+      importRenameMap = ImportRenameMapBuilder.build(compiler.getParsedInputs());
+    }
     unknownType = compiler.getTypeRegistry().getNativeType(JSTypeNative.UNKNOWN_TYPE);
     numberType = compiler.getTypeRegistry().getNativeType(JSTypeNative.NUMBER_TYPE);
     iterableType = compiler.getTypeRegistry().getType("Iterable");
@@ -1669,6 +1677,11 @@ class DeclarationGenerator {
         return;
       }
       String displayName = type.getDisplayName();
+      // In partial mode, closure doesn't know the correct name of imported symbols, if the name
+      // matches one in the precomputed map, replace it with the original declared name
+      if (importRenameMap.containsKey(displayName)) {
+        displayName = importRenameMap.get(displayName);
+      }
       emit(Constants.INTERNAL_NAMESPACE + "." + displayName);
       List<JSType> templateTypes = nType.getTemplateTypes();
       if (templateTypes != null && templateTypes.size() > 0) {
