@@ -13,7 +13,7 @@ auto-complete) as if the imported code was written in TypeScript.
 
 ## Example usage
 
-We don't offer a binary distribution, so first you need to build:
+We don't offer a binary distribution, so first you need to build from source:
 ```shell
 $ npm install
 $ gradle build installDist
@@ -21,13 +21,14 @@ $ gradle build installDist
 BUILD SUCCESSFUL
 ```
 
-You can use Clutz as a library from a Java based build, or execute the wrapper script produced by Gradle.
+You can use Clutz from the command line using the wrapper script produced by Grade or
+by executing the JAR file in `build/libs/` yourself.
 Here is a sample execution:
 ```shell
 $ PATH=$PATH:./build/install/clutz/bin
 $ clutz path/to/my/source1.js path/to/my/source2.js ...
         --externs path/to/closure-compiler/externs/es3.js path/to/closure-compiler/externs/es5.js ...
-        -o out.d.ts \
+        -o out.d.ts
 ```
 
 This creates TypeScript type definitions in `out.d.ts` for all the closure types discovered in the inputs.
