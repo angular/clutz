@@ -1,4 +1,4 @@
-declare namespace ಠ_ಠ.clutz.module$exports$mising$extend {
+declare namespace ಠ_ಠ.clutz.module$exports$missing$extend {
   class B extends B_Instance {
   }
   class B_Instance extends ಠ_ಠ.clutz.direct.ref.A {
@@ -7,14 +7,22 @@ declare namespace ಠ_ಠ.clutz.module$exports$mising$extend {
   }
   class BTemplated_Instance extends ಠ_ಠ.clutz.direct.ref.ATemplated < string , number > {
   }
-  class D extends D_Instance {
+  class ClassExtendingMissingDestructuredRequire extends ClassExtendingMissingDestructuredRequire_Instance {
   }
-  //!! This emit is wrong and will be fixed with
-  //!! https://github.com/angular/clutz/issues/551.
-  class D_Instance extends ಠ_ಠ.clutz.module$contents$mising$extend_C {
+  class ClassExtendingMissingDestructuredRequire_Instance extends ಠ_ಠ.clutz.module$exports$missing$base_MissingDestructuredRequire {
   }
+  class ClassExtendingMissingRequire extends ClassExtendingMissingRequire_Instance {
+  }
+  class ClassExtendingMissingRequire_Instance extends ಠ_ಠ.clutz.module$exports$missing$base {
+  }
+  class ClassExtendingRenamedDestructuredRequire extends ClassExtendingRenamedDestructuredRequire_Instance {
+  }
+  class ClassExtendingRenamedDestructuredRequire_Instance extends ಠ_ಠ.clutz.module$exports$missing$base_OriginalName {
+  }
+  var DeclarationOfMissingRequire : ಠ_ಠ.clutz.module$exports$missing$base | null ;
+  function FuncWithMissingRequireParam (c : ಠ_ಠ.clutz.module$exports$missing$base | null ) : void ;
 }
-declare module 'goog:mising.extend' {
-  import alias = ಠ_ಠ.clutz.module$exports$mising$extend;
+declare module 'goog:missing.extend' {
+  import alias = ಠ_ಠ.clutz.module$exports$missing$extend;
   export = alias;
 }
