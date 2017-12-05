@@ -10,6 +10,8 @@ declare namespace ಠ_ಠ.clutz {
   var GlobalEventTarget: typeof EventTarget;
   var GlobalObject: typeof Object;
   type GlobalObject = Object;
+  var GlobalDate: typeof Date;
+  type GlobalDate = Date;
 
   /** Represents the type returned when goog.require-ing an unknown symbol */
   type ClosureSymbolNotGoogProvided = void;

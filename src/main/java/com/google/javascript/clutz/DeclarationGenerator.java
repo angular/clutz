@@ -227,9 +227,27 @@ class DeclarationGenerator {
    * </pre>
    *
    * by replacing the second Error with GlobalError.
+   *
+   * <p>Closure has internal "externs" for some global symbols:
+   * https://github.com/google/closure-compiler/blob/master/src/com/google/javascript/rhino/jstype/JSTypeRegistry.java
+   * Which will be emitted in each file that references them in partial mode. For example, using
+   * Date in a file results in:
+   *
+   * <pre>
+   * declare namespace ಠ_ಠ.clutz {
+   *   class Date extends Date_Instance {
+   *   }
+   *   class Date_Instance {
+   *     private noStructuralTyping_: any;
+   *     constructor (a ? : any , b ? : any , c ? : any , d ? : any , e ? : any , f ? : any , g ? : any ) ;
+   *   }
+   * }
+   * </pre>
+   *
+   * Adding a symbol to this list also suppresses the duplicate externs.
    */
   private static final ImmutableSet<String> GLOBAL_SYMBOL_ALIASES =
-      ImmutableSet.of("Error", "Event", "EventTarget", "Object");
+      ImmutableSet.of("Error", "Event", "EventTarget", "Object", "Date");
 
   private static final String MODULE_PREFIX = "module$exports$";
 

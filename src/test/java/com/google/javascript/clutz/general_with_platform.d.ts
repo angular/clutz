@@ -183,7 +183,7 @@ declare namespace ಠ_ಠ.clutz {
   }
   class Metadata_Instance {
     private noStructuralTyping_: any;
-    modificationTime : Date ;
+    modificationTime : GlobalDate ;
     size : number ;
   }
 }
