@@ -2446,7 +2446,23 @@ class DeclarationGenerator {
           break;
         }
       }
-      if (!hasTTE) return false;
+
+      // Horrible hack.  goog.async.Deferred has an @override of a TTE function, but when running
+      // in partialInput mode we can't see that.  Identify it by grabbing:
+      // 1) functions named .then()
+      // 2) that use @override
+      // 3) that have no declared parameters/return type.
+      boolean horribleHackForPartialModeWithOverrides = false;
+      JSDocInfo info = type.getJSDocInfo();
+      if (info != null) {
+        boolean isUntypedOverride =
+            info.isOverride() && info.getParameterCount() == 0 && info.getReturnType() == null;
+        if (opts.partialInput && isUntypedOverride && propName.equals("then")) {
+          horribleHackForPartialModeWithOverrides = true;
+        }
+      }
+
+      if (!horribleHackForPartialModeWithOverrides && !hasTTE) return false;
 
       // The same signature can be found in a number of classes - es6 Promise, angular.$q.Promise,
       // custom Thenable classes, etc. While the class names differ the implementations are close
