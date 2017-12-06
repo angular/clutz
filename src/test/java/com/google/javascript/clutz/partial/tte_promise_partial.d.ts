@@ -1,7 +1,7 @@
 declare namespace ಠ_ಠ.clutz.module$exports$tte$Promise$Partial {
   class PartialDeferred < VALUE = any > extends PartialDeferred_Instance < VALUE > {
   }
-  class PartialDeferred_Instance < VALUE = any > extends ಠ_ಠ.clutz.Base < VALUE > {
+  class PartialDeferred_Instance < VALUE = any > extends Base < VALUE > {
     then < RESULT > (opt_onFulfilled ? : ( (a : VALUE ) => PartialDeferred < RESULT > | RESULT ) | null , opt_onRejected ? : ( (a : any ) => any ) | null) : PartialDeferred < RESULT > ;
   }
 }
