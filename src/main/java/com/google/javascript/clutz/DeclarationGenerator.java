@@ -1682,7 +1682,7 @@ class DeclarationGenerator {
       if (importRenameMap.containsKey(displayName)) {
         displayName = importRenameMap.get(displayName);
       }
-      emit(Constants.INTERNAL_NAMESPACE + "." + displayName);
+      emit(displayName);
       List<JSType> templateTypes = nType.getTemplateTypes();
       if (templateTypes != null && templateTypes.size() > 0) {
         emitGenericTypeArguments(type.getTemplateTypes().iterator());
@@ -1775,7 +1775,7 @@ class DeclarationGenerator {
               // unit - A ends up as NoType, while B ends up as NamedType.
               if (opts.partialInput && refType.isUnknownType()) {
                 String displayName = type.getDisplayName();
-                emit(Constants.INTERNAL_NAMESPACE + "." + displayName);
+                emit(displayName);
                 List<JSType> templateTypes = type.getTemplateTypes();
                 if (templateTypes != null && templateTypes.size() > 0) {
                   emitGenericTypeArguments(type.getTemplateTypes().iterator());
