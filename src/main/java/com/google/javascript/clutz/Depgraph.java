@@ -40,7 +40,7 @@ class Depgraph {
     res.roots.addAll(roots);
     res.roots.addAll(nonroots);
     res.rootExterns.addAll(rootExterns);
-    res.nonrootExterns.addAll(nonrootExterns);
+    res.rootExterns.addAll(nonrootExterns);
     return res;
   }
 

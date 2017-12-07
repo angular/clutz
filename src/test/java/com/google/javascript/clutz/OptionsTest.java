@@ -118,4 +118,17 @@ public class OptionsTest {
     assertThat(opts.externs)
         .containsExactly("dir with spaces/common/dom.js", "common/browser api.js");
   }
+
+  @Test
+  public void testPartialInputIgnoresDepgraphNonRootExterns() throws Exception {
+    Options opts =
+        new Options(
+            new String[] {
+              "--partialInput",
+              "javascript/common/dom.js",
+              "--depgraphs",
+              DepgraphTest.DEPGRAPH_PATH.toFile().toString(),
+            });
+    assertThat(opts.externs).isEmpty();
+  }
 }

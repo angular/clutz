@@ -25,6 +25,7 @@ public class DepgraphTest {
     assertThat(depgraph.getNonroots())
         .containsExactly("javascript/closure/base.js", "javascript/closure/string/string.js")
         .inOrder();
+    assertThat(depgraph.getRootExterns()).isEmpty();
     assertThat(depgraph.getNonrootExterns()).containsExactly("javascript/common/dom.js").inOrder();
   }
 }
