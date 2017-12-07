@@ -1700,7 +1700,19 @@ class DeclarationGenerator {
       if (importRenameMap.containsKey(displayName)) {
         displayName = importRenameMap.get(displayName);
       }
-      emit(Constants.INTERNAL_NAMESPACE + "." + displayName);
+      // We have a choice whether to emit Foo or ಠ_ಠ.clutz.Foo here. Only the first option
+      // works in partial input mode, because it would work for both types within clutz's
+      // view and types that come from lib.d.ts.
+      // Note, that TypeScript allows implicit namespace fallback
+      // <pre>
+      // decalre namespace a.b {
+      //   class F {}
+      // }
+      // delcare namespace a.b.c.d {
+      //   export let x: F;  // F is looked up in a.b.c.d, then a.b.c, then a.b.
+      // }
+      // </pre>
+      emit(displayName);
       List<JSType> templateTypes = nType.getTemplateTypes();
       if (templateTypes != null && templateTypes.size() > 0) {
         emitGenericTypeArguments(type.getTemplateTypes().iterator());
@@ -1793,7 +1805,7 @@ class DeclarationGenerator {
               // unit - A ends up as NoType, while B ends up as NamedType.
               if (opts.partialInput && refType.isUnknownType()) {
                 String displayName = type.getDisplayName();
-                emit(Constants.INTERNAL_NAMESPACE + "." + displayName);
+                emit(displayName);
                 List<JSType> templateTypes = type.getTemplateTypes();
                 if (templateTypes != null && templateTypes.size() > 0) {
                   emitGenericTypeArguments(type.getTemplateTypes().iterator());
