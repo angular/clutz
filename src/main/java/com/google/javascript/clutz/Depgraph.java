@@ -25,7 +25,8 @@ class Depgraph {
 
   private final Set<String> roots = new LinkedHashSet<>();
   private final Set<String> nonroots = new LinkedHashSet<>();
-  private final Set<String> externs = new LinkedHashSet<>();
+  private final Set<String> rootExterns = new LinkedHashSet<>();
+  private final Set<String> nonrootExterns = new LinkedHashSet<>();
 
   private Depgraph() {}
 
@@ -38,7 +39,8 @@ class Depgraph {
     Depgraph res = new Depgraph();
     res.roots.addAll(roots);
     res.roots.addAll(nonroots);
-    res.externs.addAll(externs);
+    res.rootExterns.addAll(rootExterns);
+    res.rootExterns.addAll(nonrootExterns);
     return res;
   }
 
@@ -50,8 +52,12 @@ class Depgraph {
     return Collections.unmodifiableSet(nonroots);
   }
 
-  Set<String> getExterns() {
-    return Collections.unmodifiableSet(externs);
+  Set<String> getRootExterns() {
+    return Collections.unmodifiableSet(rootExterns);
+  }
+
+  Set<String> getNonrootExterns() {
+    return Collections.unmodifiableSet(nonrootExterns);
   }
 
   static Depgraph forRoots(Set<String> roots, Set<String> nonroots) {
@@ -93,7 +99,7 @@ class Depgraph {
         throw new RuntimeException("malformed depgraph: " + depgraphName, e);
       }
     }
-    if (result.roots.isEmpty() && result.externs.isEmpty()) {
+    if (result.roots.isEmpty() && result.rootExterns.isEmpty()) {
       throw new IllegalStateException("No roots were found in the provided depgraphs files");
     }
     return result;
@@ -120,8 +126,10 @@ class Depgraph {
         }
       }
       fileName = GENERATED_FILE.matcher(fileName).replaceAll("$1");
-      if (isExterns) {
-        externs.add(fileName);
+      if (isExterns && isRoots) {
+        rootExterns.add(fileName);
+      } else if (isExterns && !isRoots) {
+        nonrootExterns.add(fileName);
       } else if (isRoots) {
         roots.add(fileName);
       } else {

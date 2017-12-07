@@ -189,7 +189,11 @@ public class Options {
       arguments.retainAll(merged);
     }
     // set union command line externs and depgraph.externs.
-    Set<String> allExterns = new LinkedHashSet<>(depgraph.getExterns());
+    Set<String> allExterns = new LinkedHashSet<>();
+    allExterns.addAll(depgraph.getRootExterns());
+    if (!partialInput) {
+      allExterns.addAll(depgraph.getNonrootExterns());
+    }
     allExterns.addAll(externs);
     externs = new ArrayList<>(allExterns);
 
