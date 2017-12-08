@@ -74,7 +74,7 @@ public class DeclarationGeneratorTests {
       if (input.getName().contains("_emit_platform_externs")) {
         subject.emitPlatformExterns = true;
       }
-      if (input.getParentFile().getName().equals("partial")) {
+      if (Arrays.asList("partial", "multifilePartial").contains(input.getParentFile().getName())) {
         subject.partialInput = true;
       }
       subject.extraExternFile = getExternFileNameOrNull(input.getName());
@@ -97,8 +97,14 @@ public class DeclarationGeneratorTests {
     File[] testFiles = getPackagePath().toFile().listFiles(filter);
     // Partial files live in 'partial' dir and run implicitly with the --partialInput option on.
     File[] testPartialFiles = getPackagePath().resolve("partial").toFile().listFiles(filter);
+    // Test files that live in the 'multifilePartial' dir, and run with the --partialInput option
+    // The resulting .d.ts files are checked with a DeclarationSyntaxTest, and they're also
+    // compiled in a single run in MultiFileTest
+    File[] testMultifilePartailFiles =
+        getPackagePath().resolve("multifilePartial").toFile().listFiles(filter);
     List<File> filesList = Lists.newArrayList(testFiles);
     filesList.addAll(Arrays.asList(testPartialFiles));
+    filesList.addAll(Arrays.asList(testMultifilePartailFiles));
     return filesList;
   }
 

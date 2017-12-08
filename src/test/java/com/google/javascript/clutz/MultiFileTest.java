@@ -83,6 +83,15 @@ public class MultiFileTest {
         .generatesDeclarations(expected);
   }
 
+  @Test
+  public void multifilePartial() throws Exception {
+    String expected = DeclarationGeneratorTests.getTestFileText(input("total.d.ts"));
+    assertThatProgram(
+            ImmutableList.of(input("missing_imported_base.js")),
+            ImmutableList.of(input("named_base_exporter.js"), input("default_base_exporter.js")))
+        .generatesDeclarations(expected);
+  }
+
   private File input(String filename) {
     Path testDir = FileSystems.getDefault().getPath("src", "test", "java");
     String packageName = ProgramSubject.class.getPackage().getName();
