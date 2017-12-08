@@ -152,7 +152,7 @@ public class ImportRenameMapBuilder {
    * https://github.com/angular/clutz/issues/596
    */
   private static String buildNamedExportSymbolName(String importedModuleId, String originalName) {
-    return "module$exports$" + importedModuleId.replace(".", "$") + "_" + originalName;
+    return "module$exports$" + importedModuleId.replace(".", "$") + "." + originalName;
   }
 
   private static String buildLocalSymbolName(String importingModuleId, String variableName) {

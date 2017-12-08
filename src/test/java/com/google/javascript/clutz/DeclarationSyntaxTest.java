@@ -54,6 +54,14 @@ public class DeclarationSyntaxTest {
         }
       };
 
+  private static final FilenameFilter JS_MULTIFILE_PARTIAL =
+      new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+          return JS_NO_EXTERNS.accept(dir, name) && dir.getName().equals("multifilePartial");
+        }
+      };
+
   public static final Path TSC =
       FileSystems.getDefault().getPath("node_modules", "typescript", "bin", "tsc");
 
@@ -69,20 +77,29 @@ public class DeclarationSyntaxTest {
 
   @Test
   public void testDeclarationSyntax() throws Exception {
-    doTestDeclarationSyntaxWithPlatformExterns(JS_NO_EXTERNS_WITHOUT_PLATFORM_EXTERNS);
+    List<File> inputs =
+        DeclarationGeneratorTests.getTestInputFilesNoPartial(
+            JS_NO_EXTERNS_WITHOUT_PLATFORM_EXTERNS);
+    doTestDeclarationSyntax(inputs);
   }
 
   @Test
   public void testDeclarationSyntaxWithPlatformExterns() throws Exception {
-    doTestDeclarationSyntaxWithPlatformExterns(JS_NO_EXTERNS_WITH_PLATFORM_EXTERNS);
+    List<File> inputs =
+        DeclarationGeneratorTests.getTestInputFilesNoPartial(JS_NO_EXTERNS_WITH_PLATFORM_EXTERNS);
+    doTestDeclarationSyntax(inputs);
   }
 
-  private void doTestDeclarationSyntaxWithPlatformExterns(FilenameFilter filenameFilter)
-      throws Exception {
+  @Test
+  public void testMultiFilePartialDeclarationSyntax() throws Exception {
+    List<File> inputs = DeclarationGeneratorTests.getTestInputFiles(JS_MULTIFILE_PARTIAL);
+    doTestDeclarationSyntax(inputs);
+  }
+
+  private void doTestDeclarationSyntax(List<File> inputs) throws Exception {
     // This currently runs *all* test files as one test case. This gives less insight into errors,
     // but improves runtime as TypeScript only has to read its lib.d.ts once, amortizing the cost
     // across test cases.
-    List<File> inputs = DeclarationGeneratorTests.getTestInputFilesNoPartial(filenameFilter);
     List<String> goldenFilePaths = new ArrayList<>();
     for (File input : inputs) {
       goldenFilePaths.add(DeclarationGeneratorTests.getGoldenFile(input, ".d.ts").getPath());

@@ -1,34 +1,6 @@
-goog.module('missing.extend');
+goog.module("missing.imported.base");
 
-//!! Using class syntax requires default externs but the test runs faster
-//!! without them. Just use @constructor instead.
-
-/**
- * @constructor
- * @extends {direct.ref.A}
- */
-function ClassExtendingMissing() {
-
-}
-
-/**
- * @constructor
- * @extends {direct.ref.ATemplated<string, number>}
- */
-function ClassExtendingMissingTemplated() {
-
-}
-
-/**
- * @param {number} x
- * @constructor
- * @extends {direct.ref.A}
- */
-function ClassExtendingMissingWithParam(x) {
-
-}
-
-const MissingGoogRequire = goog.require('missing.base');
+const MissingGoogRequire = goog.require('default.base.exporter');
 /**
  * @constructor
  * @extends {MissingGoogRequire}
@@ -47,7 +19,7 @@ function FuncWithMissingRequireParam(c) {
 /** @type {MissingGoogRequire} */
 const DeclarationOfMissingRequire = null;
 
-const {MissingDestructuredRequire, OriginalName: RenamedDestructuredRequire} = goog.require('missing.base');
+const {MissingDestructuredRequire, OriginalName: RenamedDestructuredRequire} = goog.require('named.base.exporter');
 
 /**
  * @constructor
@@ -65,9 +37,6 @@ function ClassExtendingRenamedDestructuredRequire() {
 
 }
 
-exports.ClassExtendingMissing = ClassExtendingMissing;
-exports.ClassExtendingMissingTemplated = ClassExtendingMissingTemplated;
-exports.ClassExtendingMissingWithParam = ClassExtendingMissingWithParam;
 exports.ClassExtendingMissingRequire = ClassExtendingMissingRequire;
 exports.FuncWithMissingRequireParam = FuncWithMissingRequireParam;
 exports.DeclarationOfMissingRequire = DeclarationOfMissingRequire;
