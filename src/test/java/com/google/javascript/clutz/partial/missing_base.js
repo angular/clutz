@@ -7,7 +7,7 @@ goog.module('missing.extend');
  * @constructor
  * @extends {direct.ref.A}
  */
-function B() {
+function ClassExtendingMissing() {
 
 }
 
@@ -15,7 +15,16 @@ function B() {
  * @constructor
  * @extends {direct.ref.ATemplated<string, number>}
  */
-function BTemplated() {
+function ClassExtendingMissingTemplated() {
+
+}
+
+/**
+ * @param {number} x
+ * @constructor
+ * @extends {direct.ref.A}
+ */
+function ClassExtendingMissingWithParam(x) {
 
 }
 
@@ -56,8 +65,9 @@ function ClassExtendingRenamedDestructuredRequire() {
 
 }
 
-exports.B = B;
-exports.BTemplated = BTemplated;
+exports.ClassExtendingMissing = ClassExtendingMissing;
+exports.ClassExtendingMissingTemplated = ClassExtendingMissingTemplated;
+exports.ClassExtendingMissingWithParam = ClassExtendingMissingWithParam;
 exports.ClassExtendingMissingRequire = ClassExtendingMissingRequire;
 exports.FuncWithMissingRequireParam = FuncWithMissingRequireParam;
 exports.DeclarationOfMissingRequire = DeclarationOfMissingRequire;

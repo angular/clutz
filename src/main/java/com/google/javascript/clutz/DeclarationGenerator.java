@@ -2197,13 +2197,16 @@ class DeclarationGenerator {
      * no body (default ctor) for base classes, or the constructor of the superclass.
      *
      * <p>Omitting the constructor is correct only if the closure class and *all* its superclasses
-     * have zero argument constructors.
+     * have zero argument constructors. If the supertype is NoResolvedType we cannot know whether
+     * that's the case so we must return true.
      */
     private boolean mustEmitConstructor(FunctionType type) {
       while (type != null) {
         if (type.getParameters().iterator().hasNext()) return true;
         ObjectType oType = getSuperType(type);
-        type = oType != null ? oType.getConstructor() : null;
+        if (oType == null) return false;
+        if (oType.isNoResolvedType()) return true;
+        type = oType.getConstructor();
       }
       return false;
     }
