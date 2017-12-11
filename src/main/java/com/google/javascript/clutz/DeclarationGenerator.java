@@ -1685,6 +1685,7 @@ class DeclarationGenerator {
         emit(defaultEmit);
         return;
       }
+      if (maybeEmitGlobalAlias(type)) return;
       // When processing partial inputs, this case handles implicitly forward declared types
       // for which we just emit the literal type written along with any type parameters.
       NoResolvedType nType = (NoResolvedType) type;
@@ -2762,10 +2763,7 @@ class DeclarationGenerator {
 
     public Void emitObjectType(
         ObjectType type, boolean extendingInstanceClass, boolean inExtendsImplementsPosition) {
-      if (type.getDisplayName() != null && GLOBAL_SYMBOL_ALIASES.contains(type.getDisplayName())) {
-        emit("Global" + type.getDisplayName());
-        return null;
-      }
+      if (maybeEmitGlobalAlias(type)) return null;
       // Closure doesn't require that all the type params be declared, but TS does
       if (!type.getTemplateTypeMap().isEmpty()
           && !typeRegistry.getNativeType(OBJECT_TYPE).equals(type)) {
@@ -2794,6 +2792,15 @@ class DeclarationGenerator {
         emit("GlobalObject");
       }
       return null;
+    }
+
+    /** See comment on GLOBAL_SYMBOL_ALIASES. */
+    private boolean maybeEmitGlobalAlias(ObjectType type) {
+      if (type.getDisplayName() != null && GLOBAL_SYMBOL_ALIASES.contains(type.getDisplayName())) {
+        emit("Global" + type.getDisplayName());
+        return true;
+      }
+      return false;
     }
 
     /**
