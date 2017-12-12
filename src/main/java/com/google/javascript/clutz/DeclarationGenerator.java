@@ -970,6 +970,7 @@ class DeclarationGenerator {
                 "function require (name : string ) : "
                     + Constants.INTERNAL_NAMESPACE
                     + ".ClosureSymbolNotGoogProvided;");
+            desiredSymbols.remove(propertyName);
             emitBreak();
             continue;
           }
@@ -984,16 +985,22 @@ class DeclarationGenerator {
       }
 
       ObjectType oType = symbol.getType().toMaybeObjectType();
-      // TODO(radokirov): investigate dropping the goog.module requirement here.
-      // Currently, without that check, clutz picks up some extra fields on externs objects like
-      // /** @const */ var angular = {};
-      if (oType != null && symbol.getName().startsWith(MODULE_PREFIX)) {
+
+      if (oType != null) {
         // For inferred symbols there is no matching symbol, so the best we can do is pull the
         // type from the module object type map.
         for (String desiredSymbol : desiredSymbols) {
           String[] parts = desiredSymbol.split("\\.");
           String propName = parts[parts.length - 1];
-          emit("var");
+          if (!isValidJSProperty(propName)) {
+            emitComment("skipping property " + propName + " because it is not a valid symbol.");
+            continue;
+          }
+          if (oType.getPropertyType(propName).toMaybeFunctionType() == null) {
+            emit("var");
+          } else {
+            emit("function");
+          }
           treeWalker.visitProperty(propName, oType, false, false, Collections.<String>emptySet());
         }
       }
