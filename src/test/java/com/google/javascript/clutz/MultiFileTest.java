@@ -88,7 +88,10 @@ public class MultiFileTest {
     String expected = DeclarationGeneratorTests.getTestFileText(input("total.d.ts"));
     assertThatProgram(
             ImmutableList.of(input("missing_imported_base.js")),
-            ImmutableList.of(input("named_base_exporter.js"), input("default_base_exporter.js")))
+            ImmutableList.of(
+                input("named_base_exporter.js"),
+                input("default_base_exporter.js"),
+                input("default_object_exporter.js")))
         .generatesDeclarations(expected);
   }
 

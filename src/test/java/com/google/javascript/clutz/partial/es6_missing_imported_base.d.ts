@@ -2,22 +2,22 @@ declare namespace ಠ_ಠ.clutz.module$exports$missing$imported$base {
   class ClassExtendingDefaultObjectExporterBaseClass extends ClassExtendingDefaultObjectExporterBaseClass_Instance {
   }
   class ClassExtendingDefaultObjectExporterBaseClass_Instance extends module$exports$default$object$exporter.BaseClass {
-    constructor ( ) ;
+    constructor ( ...var_args : any [] ) ;
   }
   class ClassExtendingMissingDestructuredRequire extends ClassExtendingMissingDestructuredRequire_Instance {
   }
   class ClassExtendingMissingDestructuredRequire_Instance extends module$exports$named$base$exporter.MissingDestructuredRequire {
-    constructor ( ) ;
+    constructor ( ...var_args : any [] ) ;
   }
   class ClassExtendingMissingRequire extends ClassExtendingMissingRequire_Instance {
   }
   class ClassExtendingMissingRequire_Instance extends module$exports$default$base$exporter {
-    constructor ( ) ;
+    constructor ( ...var_args : any [] ) ;
   }
   class ClassExtendingRenamedDestructuredRequire extends ClassExtendingRenamedDestructuredRequire_Instance {
   }
   class ClassExtendingRenamedDestructuredRequire_Instance extends module$exports$named$base$exporter.OriginalName {
-    constructor ( ) ;
+    constructor ( ...var_args : any [] ) ;
   }
   var DeclarationOfMissingRequire : module$exports$default$base$exporter | null ;
   function FuncWithMissingRequireParam (c : module$exports$default$base$exporter | null ) : void ;

@@ -79,12 +79,13 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
 
   private String[] parse() throws AssertionError {
     Options opts = new Options();
-    if (partialInput) {
-      opts.partialInput = true;
-    }
     opts.debug = true;
     opts.emitPlatformExterns = emitPlatformExterns;
     opts.skipEmitPattern = Pattern.compile(".*\\.skip\\.tsickle\\.js$");
+    if (partialInput) {
+      opts.partialInput = true;
+      opts.debug = false;
+    }
     List<SourceFile> sourceFiles = new ArrayList<>();
 
     // base.js is needed for the type declaration of goog.require for

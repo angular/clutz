@@ -1698,8 +1698,11 @@ class DeclarationGenerator {
       String displayName = type.getDisplayName();
       // In partial mode, closure doesn't know the correct name of imported symbols, if the name
       // matches one in the precomputed map, replace it with the original declared name
-      if (importRenameMap.containsKey(displayName)) {
-        displayName = importRenameMap.get(displayName);
+      // The displayName can be of the form foo.bar, but the symbol that was goog required was just
+      // foo, so just replace the part of the display name before the first period
+      String baseDisplayName = displayName.split("\\.")[0];
+      if (importRenameMap.containsKey(baseDisplayName)) {
+        displayName = displayName.replace(baseDisplayName, importRenameMap.get(baseDisplayName));
       }
       // We have a choice whether to emit Foo or ಠ_ಠ.clutz.Foo here. Only the first option
       // works in partial input mode, because it would work for both types within clutz's

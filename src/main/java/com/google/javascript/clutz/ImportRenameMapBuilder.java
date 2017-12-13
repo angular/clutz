@@ -104,6 +104,7 @@ public class ImportRenameMapBuilder {
         String localSymbolName = buildLocalSymbolName(localModuleId, variableName);
         String exportedSymbolName = buildWholeModuleExportSymbolName(importedModuleId);
         importRenameMap.put(localSymbolName, exportedSymbolName);
+        importRenameMap.put(variableName, exportedSymbolName);
       } else if (isGoogRequireDestructuringAssignment(statement)) {
         // `const {C, Clazz: RenamedClazz} = goog.require()`
         String importedModuleId =
@@ -123,6 +124,7 @@ public class ImportRenameMapBuilder {
           String localSymbolName = buildLocalSymbolName(localModuleId, variableName);
           String exportedSymbolName = buildNamedExportSymbolName(importedModuleId, originalName);
           importRenameMap.put(localSymbolName, exportedSymbolName);
+          importRenameMap.put(variableName, exportedSymbolName);
         }
       }
     }
