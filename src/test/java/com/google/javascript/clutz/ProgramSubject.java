@@ -26,9 +26,20 @@ import javax.annotation.Nullable;
 /** A subject that supports assertions on {@link DeclarationGenerator}'s results. */
 class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
 
-  /** A stripped down version of Closure's base.js for Clutz tests. */
-  private static final SourceFile CLUTZ_GOOG_BASE =
+  /**
+   * A stripped down version of Closure's base.js for Clutz tests. In real total clutz runs we
+   * always pass the real closure's base.js.
+   */
+  private static final SourceFile CLUTZ_GOOG_BASE_TOTAL =
       SourceFile.fromFile("src/test/java/com/google/javascript/clutz/base.js", UTF_8);
+
+  /**
+   * A even more stripped down version of Closure's base.js for incremental Clutz tests. In
+   * production we also use this file for every incremental run, because the original base.js is not
+   * passed in.
+   */
+  private static final SourceFile CLUTZ_GOOG_BASE_INCR =
+      SourceFile.fromFile("src/resources/partial_goog_base.js", UTF_8);
 
   public boolean withPlatform = false;
   public boolean partialInput = false;
@@ -88,9 +99,16 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
     List<SourceFile> sourceFiles = new ArrayList<>();
 
     // base.js is needed for the type declaration of goog.require for
-    // all tests, except the base.js one itself.
-    if (actual().roots.isEmpty() || !actual().roots.get(0).getName().equals("base.js")) {
-      sourceFiles.add(CLUTZ_GOOG_BASE);
+    // all total tests, except the base.js one itself.
+    if (actual().roots.isEmpty()) {
+      sourceFiles.add(CLUTZ_GOOG_BASE_TOTAL);
+    } else {
+      File firstFile = actual().roots.get(0);
+      if (firstFile.getParentFile().getName().equals("partial")) {
+        sourceFiles.add(CLUTZ_GOOG_BASE_INCR);
+      } else if (!firstFile.getName().equals("base.js")) {
+        sourceFiles.add(CLUTZ_GOOG_BASE_TOTAL);
+      }
     }
 
     Set<String> nonroots = new LinkedHashSet<>();

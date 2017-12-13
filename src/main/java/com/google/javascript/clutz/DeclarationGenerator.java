@@ -2676,7 +2676,8 @@ class DeclarationGenerator {
           emitNoSpace("" + pName);
           paramCount++;
         }
-        if (param.isOptionalArg() || makeAllParametersOptional) {
+        // In TypeScript ...a?: any[] is illegal, so we can only make non-varargs optional.
+        if ((param.isOptionalArg() || makeAllParametersOptional) && !param.isVarArgs()) {
           emit("?");
           visitTypeDeclaration(param.getJSType(), param.isVarArgs(), true);
         } else {
