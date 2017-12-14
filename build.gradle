@@ -62,7 +62,7 @@ dependencies {
   if (System.getenv().get('CI_MODE') == 'Nightly') {
     compile 'com.google.javascript:closure-compiler:1.0-SNAPSHOT'
   } else {
-    compile 'com.google.javascript:closure-compiler:v20171023'
+    compile 'com.google.javascript:closure-compiler:v20171203'
   }
 
   compile 'com.google.code.findbugs:jsr305:3.0.1'

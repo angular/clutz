@@ -22,6 +22,7 @@ public class InitialParseRetainingCompiler extends Compiler {
    * Copied verbatim from com.google.javascript.jscomp.Compiler, except using getter methods instead
    * of private fields and running cloneParsedInputs() at the appropriate time.
    */
+  @Override
   public <T1 extends SourceFile, T2 extends SourceFile> Result compile(
       List<T1> externs, List<T2> inputs, CompilerOptions options) {
     // The compile method should only be called once.
