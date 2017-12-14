@@ -2,6 +2,10 @@
 //!! the multifilePartial directory, so that the total and partial compilations
 //!! can be compared
 declare namespace ಠ_ಠ.clutz.module$exports$missing$imported$base {
+  class ClassExtendingDefaultObjectExporterBaseClass extends ClassExtendingDefaultObjectExporterBaseClass_Instance {
+  }
+  class ClassExtendingDefaultObjectExporterBaseClass_Instance extends module$contents$default$object$exporter_BaseClass_Instance {
+  }
   class ClassExtendingMissingDestructuredRequire extends ClassExtendingMissingDestructuredRequire_Instance {
   }
   class ClassExtendingMissingDestructuredRequire_Instance extends ಠ_ಠ.clutz.module$exports$named$base$exporter.MissingDestructuredRequire_Instance {
@@ -39,6 +43,13 @@ declare namespace ಠ_ಠ.clutz {
   class module$exports$default$base$exporter extends module$exports$default$base$exporter_Instance {
   }
   class module$exports$default$base$exporter_Instance {
+    private noStructuralTyping_: any;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class module$contents$default$object$exporter_BaseClass extends module$contents$default$object$exporter_BaseClass_Instance {
+  }
+  class module$contents$default$object$exporter_BaseClass_Instance {
     private noStructuralTyping_: any;
   }
 }

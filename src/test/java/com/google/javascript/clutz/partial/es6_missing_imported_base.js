@@ -1,13 +1,8 @@
 goog.module("missing.imported.base");
 
 const MissingGoogRequire = goog.require('default.base.exporter');
-/**
- * @constructor
- * @extends {MissingGoogRequire}
- */
-function ClassExtendingMissingRequire() {
 
-}
+class ClassExtendingMissingRequire extends MissingGoogRequire {}
 
 /**
  * @param {MissingGoogRequire} c
@@ -21,31 +16,13 @@ const DeclarationOfMissingRequire = null;
 
 const {MissingDestructuredRequire, OriginalName: RenamedDestructuredRequire} = goog.require('named.base.exporter');
 
-/**
- * @constructor
- * @extends {MissingDestructuredRequire}
- */
-function ClassExtendingMissingDestructuredRequire() {
+class ClassExtendingMissingDestructuredRequire extends MissingDestructuredRequire {}
 
-}
-
-/**
- * @constructor
- * @extends {RenamedDestructuredRequire}
- */
-function ClassExtendingRenamedDestructuredRequire() {
-
-}
+class ClassExtendingRenamedDestructuredRequire extends RenamedDestructuredRequire {}
 
 const DefaultObjectExporter = goog.require('default.object.exporter');
 
-/**
- * @constructor
- * @extends {DefaultObjectExporter.BaseClass}
- */
-function ClassExtendingDefaultObjectExporterBaseClass() {
-
-}
+class ClassExtendingDefaultObjectExporterBaseClass extends DefaultObjectExporter.BaseClass {}
 
 exports.ClassExtendingMissingRequire = ClassExtendingMissingRequire;
 exports.FuncWithMissingRequireParam = FuncWithMissingRequireParam;
