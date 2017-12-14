@@ -2624,6 +2624,16 @@ class DeclarationGenerator {
       emit("}");
     }
 
+    private boolean allParametersUnknown(FunctionType ftype) {
+      for (Node param : ftype.getParameters()) {
+        JSType type = param.getJSType();
+        // Note: template types (e.g. the T in Array<T>) return true for isUnknownType,
+        // so we check that first.
+        if (type.isTemplateType() || !type.isUnknownType()) return false;
+      }
+      return true;
+    }
+
     private void visitFunctionParameters(FunctionType ftype) {
       visitFunctionParameters(ftype, true, Collections.<String>emptySet());
     }
@@ -2633,6 +2643,12 @@ class DeclarationGenerator {
       if (emitTemplatizedTypes) {
         visitTemplateTypes(ftype, alreadyEmittedTemplateType, true);
       }
+      // In partial mode when all the parameters to the function are unknown, it might be the
+      // case that the function is overriding/implementing a superclass or interface that is in an
+      // unseen input.
+      // If so, we can't know whether the parameters are optional or not, so mark them optional.
+      // This is too broad (we also affect callback types) but we can fix that if it's a problem.
+      boolean makeAllParametersOptional = opts.partialInput && allParametersUnknown(ftype);
       emit("(");
       Iterator<Node> parameters = ftype.getParameters().iterator();
       Iterator<String> names = null;
@@ -2660,7 +2676,7 @@ class DeclarationGenerator {
           emitNoSpace("" + pName);
           paramCount++;
         }
-        if (param.isOptionalArg()) {
+        if (param.isOptionalArg() || makeAllParametersOptional) {
           emit("?");
           visitTypeDeclaration(param.getJSType(), param.isVarArgs(), true);
         } else {
