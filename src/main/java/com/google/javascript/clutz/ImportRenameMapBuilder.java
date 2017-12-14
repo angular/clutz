@@ -31,9 +31,9 @@ public class ImportRenameMapBuilder {
         importRenameMap.putAll(build(moduleId, ast.getFirstChild()));
       }
 
-      // Or symbols can be imported into a variable in a goog.scope() block, so look for imports in
-      // the bodies of any goog scopes.
-      List<Node> googScopes = getGoogScopes(ast);
+      // Or symbols can be imported into a variable in a top-level goog.scope() block, so look for
+      // imports in the bodies of any goog scopes.
+      List<Node> googScopes = getTopLevelGoogScopes(ast);
       if (!googScopes.isEmpty()) {
         for (Node googScope : googScopes) {
           importRenameMap.putAll(build(null, googScope));
@@ -43,7 +43,7 @@ public class ImportRenameMapBuilder {
     return importRenameMap;
   }
 
-  private static List<Node> getGoogScopes(Node astRoot) {
+  private static List<Node> getTopLevelGoogScopes(Node astRoot) {
     List<Node> googScopes = new ArrayList<>();
     for (Node statement : astRoot.children()) {
       if (isGoogScopeCall(statement)) {
@@ -71,6 +71,10 @@ public class ImportRenameMapBuilder {
     return expression.isCall() && expression.getFirstChild().matchesQualifiedName("goog.module");
   }
 
+  /**
+   * Matches either `const foo = goog.require()` or `const foo = goog.module.get()` depending on if
+   * statement is in a goog.module or a goog.scope.
+   */
   private static boolean isImportAssignment(Node statement) {
     if (!(statement.isConst() || statement.isVar() || statement.isLet())) {
       return false;
@@ -84,6 +88,10 @@ public class ImportRenameMapBuilder {
             || rightHandSide.getFirstChild().matchesQualifiedName("goog.module.get"));
   }
 
+  /**
+   * Matches either `const {foo} = goog.require()` or `const {foo} = goog.module.get()` depending on
+   * if statement is in a goog.module or a goog.scope.
+   */
   private static boolean isImportDestructuringAssignment(Node statement) {
     if (!(statement.isConst() || statement.isVar() || statement.isLet())) {
       return false;
