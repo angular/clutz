@@ -1,34 +1,65 @@
 package com.google.javascript.clutz;
 
 import com.google.javascript.rhino.Node;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * If Clutz is running in incremental mode, closure can't resolve imported symbols, so it gives them
- * names in the current namespace (ie `module$contents$current$file`), instead of names that
- * reference the original namespace (ie `module$exports$imported$file`). ImportRenameMapBuilder
- * builds a map from the local name to the exported name so the original names can be substituted.
+ * names based on the symbol that the import was assigned to (either
+ * `module$contents$current$file_symbol` or just `symbol`) instead of names that reference the
+ * original namespace (ie `module$exports$imported$file`). ImportRenameMapBuilder builds a map from
+ * the local name to the exported name so the original names can be substituted.
  */
 public class ImportRenameMapBuilder {
 
   /**
-   * Build takes a collection of source files, parses them with the compiler, and walks the ast to
-   * find any `const variable = goog.require()` statements to build a map from the name closure
-   * generates in incremental mode to the exported name of the import.
+   * Build takes a collection of parsed inputs and walks the ast to find any imports into local
+   * variables to build a map from the name closure generates in incremental mode to the exported
+   * name of the import.
    */
   public static Map<String, String> build(Collection<Node> parsedInputs) {
     Map<String, String> importRenameMap = new HashMap<>();
     for (Node ast : parsedInputs) {
+      // Symbols can be imported into a variable in a goog.module() file, so look for imports in the
+      // body of the goog module.
       String moduleId = getGoogModuleId(ast);
-      // Closure can only put the symbol name into the current module's namespace, if the source
-      // file is a module, so if it isn't a module, just bail
       if (moduleId != null) {
-        importRenameMap.putAll(build(moduleId, ast));
+        importRenameMap.putAll(build(moduleId, ast.getFirstChild()));
+      }
+
+      // Or symbols can be imported into a variable in a goog.scope() block, so look for imports in
+      // the bodies of any goog scopes.
+      List<Node> googScopes = getGoogScopes(ast);
+      if (!googScopes.isEmpty()) {
+        for (Node googScope : googScopes) {
+          importRenameMap.putAll(build(null, googScope));
+        }
       }
     }
     return importRenameMap;
+  }
+
+  private static List<Node> getGoogScopes(Node astRoot) {
+    List<Node> googScopes = new ArrayList<>();
+    for (Node statement : astRoot.children()) {
+      if (isGoogScopeCall(statement)) {
+        googScopes.add(statement.getFirstChild().getChildAtIndex(1).getChildAtIndex(2));
+      }
+    }
+    return googScopes;
+  }
+
+  private static boolean isGoogScopeCall(Node statement) {
+    if (!statement.isExprResult()) {
+      return false;
+    }
+
+    Node expression = statement.getFirstChild();
+    return expression.isCall() && expression.getFirstChild().matchesQualifiedName("goog.scope");
   }
 
   private static boolean isGoogModuleCall(Node statement) {
@@ -40,7 +71,7 @@ public class ImportRenameMapBuilder {
     return expression.isCall() && expression.getFirstChild().matchesQualifiedName("goog.module");
   }
 
-  private static boolean isGoogRequireAssignment(Node statement) {
+  private static boolean isImportAssignment(Node statement) {
     if (!(statement.isConst() || statement.isVar() || statement.isLet())) {
       return false;
     }
@@ -49,10 +80,11 @@ public class ImportRenameMapBuilder {
 
     return rightHandSide != null
         && rightHandSide.isCall()
-        && rightHandSide.getFirstChild().matchesQualifiedName("goog.require");
+        && (rightHandSide.getFirstChild().matchesQualifiedName("goog.require")
+            || rightHandSide.getFirstChild().matchesQualifiedName("goog.module.get"));
   }
 
-  private static boolean isGoogRequireDestructuringAssignment(Node statement) {
+  private static boolean isImportDestructuringAssignment(Node statement) {
     if (!(statement.isConst() || statement.isVar() || statement.isLet())) {
       return false;
     }
@@ -66,7 +98,8 @@ public class ImportRenameMapBuilder {
     Node rightHandSide = destructuringAssignment.getChildAtIndex(1);
 
     return rightHandSide.isCall()
-        && rightHandSide.getFirstChild().matchesQualifiedName("goog.require");
+        && (rightHandSide.getFirstChild().matchesQualifiedName("goog.require")
+            || rightHandSide.getFirstChild().matchesQualifiedName("goog.module.get"));
   }
 
   private static String getGoogModuleId(Node astRoot) {
@@ -84,29 +117,30 @@ public class ImportRenameMapBuilder {
   }
 
   /**
-   * Build does the actual work of walking over the AST, finding any goog.require() assignments or
-   * destructuring assignments, parsing them, and generating the mappings from local symbol names to
-   * exported symbol names.
+   * Build does the actual work of walking over the AST, finding any goog.require() or
+   * goog.module.get() assignments or destructuring assignments, parsing them, and generating the
+   * mappings from local symbol names to exported symbol names.
    */
-  private static Map<String, String> build(String localModuleId, Node astRoot) {
+  private static Map<String, String> build(String localModuleId, Node moduleBody) {
     Map<String, String> importRenameMap = new HashMap<>();
-    if (astRoot.getFirstChild() == null || !astRoot.getFirstChild().isModuleBody()) {
-      return importRenameMap;
-    }
 
-    Node moduleBody = astRoot.getFirstChild();
     for (Node statement : moduleBody.children()) {
-      if (isGoogRequireAssignment(statement)) {
-        // `const C = goog.require()`
+      if (isImportAssignment(statement)) {
+        // `const C = goog.require()` or
+        // `const C = goog.module.get()`
         String importedModuleId = statement.getFirstFirstChild().getChildAtIndex(1).getString();
         String variableName = statement.getFirstChild().getString();
 
-        String localSymbolName = buildLocalSymbolName(localModuleId, variableName);
         String exportedSymbolName = buildWholeModuleExportSymbolName(importedModuleId);
-        importRenameMap.put(localSymbolName, exportedSymbolName);
         importRenameMap.put(variableName, exportedSymbolName);
-      } else if (isGoogRequireDestructuringAssignment(statement)) {
-        // `const {C, Clazz: RenamedClazz} = goog.require()`
+        // If we're in a goog scope, there isn't a module id
+        if (localModuleId != null) {
+          String localSymbolName = buildLocalSymbolName(localModuleId, variableName);
+          importRenameMap.put(localSymbolName, exportedSymbolName);
+        }
+      } else if (isImportDestructuringAssignment(statement)) {
+        // `const {C, Clazz: RenamedClazz} = goog.require()` or
+        // `const {C, Clazz: RenamedClazz} = goog.module.get()`
         String importedModuleId =
             statement.getFirstChild().getChildAtIndex(1).getChildAtIndex(1).getString();
         for (Node destructured : statement.getFirstFirstChild().children()) {
@@ -121,10 +155,13 @@ public class ImportRenameMapBuilder {
             variableName = originalName;
           }
 
-          String localSymbolName = buildLocalSymbolName(localModuleId, variableName);
           String exportedSymbolName = buildNamedExportSymbolName(importedModuleId, originalName);
-          importRenameMap.put(localSymbolName, exportedSymbolName);
           importRenameMap.put(variableName, exportedSymbolName);
+          // If we're in a goog scope, there isn't a module id
+          if (localModuleId != null) {
+            String localSymbolName = buildLocalSymbolName(localModuleId, variableName);
+            importRenameMap.put(localSymbolName, exportedSymbolName);
+          }
         }
       }
     }
