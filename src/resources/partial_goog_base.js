@@ -5,6 +5,9 @@
  * Note is should be partially matching closure's base.js.
  */
 
+/** @const */
+var goog = {} || goog;
+
 /**
  * @type {!Function}
  */
