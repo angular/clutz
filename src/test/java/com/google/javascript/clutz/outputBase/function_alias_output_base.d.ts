@@ -23,7 +23,7 @@ declare namespace goog {
    * @param symbol Object the name should point to.
    */
   function exportProperty (object : ಠ_ಠ.clutz.GlobalObject | null , publicName : string , symbol : any ) : void ;
-  function inherits (childCtor : Function , parentCtor : Function ) : void ;
+  function inherits (childCtor : ಠ_ಠ.clutz.partial.FunctionAlias , parentCtor : ಠ_ಠ.clutz.partial.FunctionAlias ) : void ;
   function isDef (val : any ) : boolean ;
   function require (name : string ) : ಠ_ಠ.clutz.ClosureSymbolNotGoogProvided;
   var /**
@@ -40,5 +40,12 @@ declare namespace ಠ_ಠ.clutz.goog {
 }
 declare module 'goog:goog.Uri' {
   import alias = ಠ_ಠ.clutz.goog.Uri;
+  export default alias;
+}
+declare namespace ಠ_ಠ.clutz.partial {
+  type FunctionAlias = Function ;
+}
+declare module 'goog:partial.FunctionAlias' {
+  import alias = ಠ_ಠ.clutz.partial.FunctionAlias;
   export default alias;
 }

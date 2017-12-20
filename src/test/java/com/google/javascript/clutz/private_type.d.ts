@@ -10,11 +10,11 @@ declare namespace ಠ_ಠ.clutz.privatetype {
   class Foo_Instance {
     private noStructuralTyping_: any;
     constructor (a : any ) ;
-    foo ( ) : ಠ_ಠ.clutz.PrivateType ;
+    foo ( ) : PrivateType ;
   }
 }
 declare namespace ಠ_ಠ.clutz.privatetype.Foo {
-  type typedef = { a : ಠ_ಠ.clutz.PrivateType } ;
+  type typedef = { a : PrivateType } ;
 }
 declare module 'goog:privatetype.Foo' {
   import alias = ಠ_ಠ.clutz.privatetype.Foo;
@@ -34,7 +34,7 @@ declare module 'goog:privatetype.X_' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.privatetype {
-  var enumUser : ಠ_ಠ.clutz.PrivateType ;
+  var enumUser : PrivateType ;
 }
 declare module 'goog:privatetype.enumUser' {
   import alias = ಠ_ಠ.clutz.privatetype.enumUser;

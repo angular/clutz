@@ -74,6 +74,9 @@ public class DeclarationGeneratorTests {
       if (input.getName().contains("_emit_platform_externs")) {
         subject.emitPlatformExterns = true;
       }
+      if (input.getName().contains("_output_base")) {
+        subject.emitBase = true;
+      }
       if (Arrays.asList("partial", "multifilePartial").contains(input.getParentFile().getName())) {
         subject.partialInput = true;
       }
@@ -102,9 +105,12 @@ public class DeclarationGeneratorTests {
     // compiled in a single run in MultiFileTest
     File[] testMultifilePartailFiles =
         getPackagePath().resolve("multifilePartial").toFile().listFiles(filter);
+    // Output base files live in the 'outputBase' dir and impilicitly have base.js in their roots
+    File[] testOutputBaseFiles = getPackagePath().resolve("outputBase").toFile().listFiles(filter);
     List<File> filesList = Lists.newArrayList(testFiles);
     filesList.addAll(Arrays.asList(testPartialFiles));
     filesList.addAll(Arrays.asList(testMultifilePartailFiles));
+    filesList.addAll(Arrays.asList(testOutputBaseFiles));
     return filesList;
   }
 

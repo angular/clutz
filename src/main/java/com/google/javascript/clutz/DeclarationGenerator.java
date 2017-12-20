@@ -595,7 +595,7 @@ class DeclarationGenerator {
     emit(getUnqualifiedName(typedefName));
     emit("=");
 
-    new TreeWalker(compiler.getTypeRegistry(), provides, false).visitType(moduleType);
+    new TreeWalker(compiler.getTypeRegistry(), provides, false, false).visitType(moduleType);
     emit(";");
     emitBreak();
     emitNamespaceEnd();
@@ -650,7 +650,7 @@ class DeclarationGenerator {
           emit(":");
           TypedVar var = topScope.getOwnSlot(reservedProvide);
           if (var != null) {
-            TreeWalker walker = new TreeWalker(compiler.getTypeRegistry(), provides, false);
+            TreeWalker walker = new TreeWalker(compiler.getTypeRegistry(), provides, false, false);
             walker.visitType(var.getType());
           } else {
             emit("any");
@@ -913,13 +913,16 @@ class DeclarationGenerator {
       emitComment("skipping property " + symbol.getName() + " because it is not a valid symbol.");
       return;
     }
-    if (GOOG_BASE_NAMESPACE.equals(namespace) && GOOG_BASE_NAMESPACE.equals(symbol.getName())) {
+    boolean isGoogNamespace =
+        GOOG_BASE_NAMESPACE.equals(namespace) && GOOG_BASE_NAMESPACE.equals(symbol.getName());
+    if (isGoogNamespace) {
       // Emitting the 'goog' namespace itself (but not e.g. 'goog.Uri').
       emitTopLevelNamespaceBegin(namespace);
     } else {
       emitNamespaceBegin(namespace);
     }
-    TreeWalker treeWalker = new TreeWalker(compiler.getTypeRegistry(), provides, isExtern);
+    TreeWalker treeWalker =
+        new TreeWalker(compiler.getTypeRegistry(), provides, isExtern, isGoogNamespace);
     if (isDefault) {
       if (isPrivate(symbol.getJSDocInfo()) && !isConstructor(symbol.getJSDocInfo())) {
         treeWalker.emitPrivateValue(emitName);
@@ -1287,10 +1290,23 @@ class DeclarationGenerator {
     /** Whether the symbol we are walking was defined in an extern file */
     private final boolean isExtern;
 
-    private TreeWalker(JSTypeRegistry typeRegistry, Set<String> provides, boolean isExtern) {
+    /**
+     * Every clutz produced namespace is under the ಠ_ಠ.clutz except for goog, which is special cased
+     * to allow users to use eg goog.require() without an import. Because it isn't under the
+     * ಠ_ಠ.clutz namespace, symbols from outside goog (ie types in closure.lib.d.ts) have to be
+     * special cased.
+     */
+    private final boolean isGoogNamespace;
+
+    private TreeWalker(
+        JSTypeRegistry typeRegistry,
+        Set<String> provides,
+        boolean isExtern,
+        boolean isGoogNamespace) {
       this.typeRegistry = typeRegistry;
       this.provides = provides;
       this.isExtern = isExtern;
+      this.isGoogNamespace = isGoogNamespace;
     }
 
     private String getAbsoluteName(ObjectType objectType) {
@@ -1302,6 +1318,7 @@ class DeclarationGenerator {
       // code goog.provide's `Element`.
       // TODO(martinprobst): Consider aliasing all global symbols into the clutz namespace.
       if (name.indexOf('.') == -1) return name;
+      if (this.isGoogNamespace && name.startsWith("goog.")) return name;
       return Constants.INTERNAL_NAMESPACE + "." + name;
     }
 
@@ -1501,7 +1518,7 @@ class DeclarationGenerator {
         ObjectType type = it.next();
         if (isPrivate(type.getJSDocInfo()) && !isConstructor(type.getJSDocInfo())) {
           // TypeScript does not allow public APIs that expose non-exported/private types.
-          emit(Constants.INTERNAL_NAMESPACE + ".PrivateInterface");
+          emit(getGlobalSymbolNamespacePrefix() + "PrivateInterface");
         } else {
           ExtendsImplementsTypeVisitor visitor = new ExtendsImplementsTypeVisitor(false);
           type.visit(visitor);
@@ -1757,6 +1774,15 @@ class DeclarationGenerator {
       visitType(typeToVisit, false, false);
     }
 
+    /** The namespace prefix for symbols in closure.lib.d.ts. */
+    private String getGlobalSymbolNamespacePrefix() {
+      if (this.isGoogNamespace) {
+        return Constants.INTERNAL_NAMESPACE + ".";
+      } else {
+        return "";
+      }
+    }
+
     private void visitType(
         JSType typeToVisit, boolean skipDefCheck, final boolean inOptionalPosition) {
       // Known typedefs will be emitted symbolically instead of expanded.
@@ -1773,7 +1799,7 @@ class DeclarationGenerator {
         // TypeScript does not allow public APIs that expose non-exported/private types. Just emit
         // an empty object literal type for those, i.e. something that cannot be used for anything,
         // except being passed around.
-        emit(Constants.INTERNAL_NAMESPACE + ".PrivateType");
+        emit(getGlobalSymbolNamespacePrefix() + "PrivateType");
         return;
       }
       Visitor<Void> visitor =
@@ -2787,7 +2813,7 @@ class DeclarationGenerator {
       emit("var");
       emit(getUnqualifiedName(emitName));
       emit(":");
-      emit(Constants.INTERNAL_NAMESPACE + ".PrivateType;");
+      emit(getGlobalSymbolNamespacePrefix() + "PrivateType;");
       emitBreak();
     }
 
@@ -2814,6 +2840,10 @@ class DeclarationGenerator {
           emit("any");
           return null;
         }
+        if (this.isGoogNamespace && name.equals("global this")) {
+          emit("any");
+          return null;
+        }
         emit(extendingInstanceClass ? name + INSTANCE_CLASS_SUFFIX : name);
         if (!type.getDisplayName().equals("Object")) {
           typesUsed.add(type.getDisplayName());
@@ -2827,7 +2857,7 @@ class DeclarationGenerator {
     /** See comment on GLOBAL_SYMBOL_ALIASES. */
     private boolean maybeEmitGlobalAlias(ObjectType type) {
       if (type.getDisplayName() != null && GLOBAL_SYMBOL_ALIASES.contains(type.getDisplayName())) {
-        emit("Global" + type.getDisplayName());
+        emit(getGlobalSymbolNamespacePrefix() + "Global" + type.getDisplayName());
         return true;
       }
       return false;
