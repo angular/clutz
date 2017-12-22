@@ -74,6 +74,9 @@ public class DeclarationGeneratorTests {
       if (input.getName().contains("_emit_platform_externs")) {
         subject.emitPlatformExterns = true;
       }
+      if (input.getName().contains("_output_base")) {
+        subject.emitBase = true;
+      }
       if (Arrays.asList("partial", "multifilePartial").contains(input.getParentFile().getName())) {
         subject.partialInput = true;
       }
