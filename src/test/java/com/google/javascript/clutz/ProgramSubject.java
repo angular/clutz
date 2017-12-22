@@ -45,6 +45,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
   public boolean partialInput = false;
   public String extraExternFile = null;
   public boolean emitPlatformExterns;
+  public boolean emitBase = false;
 
   static ProgramSubject assertThatProgram(String... sourceLines) {
     String sourceText = Joiner.on('\n').join(sourceLines);
@@ -128,6 +129,10 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
     if (actual().sourceText != null) {
       sourceFiles.add(SourceFile.fromCode("main.js", actual().sourceText));
       roots.add("main.js");
+    }
+
+    if (emitBase) {
+      roots.add(CLUTZ_GOOG_BASE_TOTAL.getName());
     }
 
     List<SourceFile> externFiles;
