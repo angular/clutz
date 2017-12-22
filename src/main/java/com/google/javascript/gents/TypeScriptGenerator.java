@@ -144,7 +144,9 @@ public class TypeScriptGenerator {
       }
     }
     try {
-      Files.write(result.moduleRewriteLog, new File(opts.moduleRewriteLog), UTF_8);
+      if (opts.moduleRewriteLog != null) {
+        Files.write(result.moduleRewriteLog, new File(opts.moduleRewriteLog), UTF_8);
+      }
     } catch (IOException e) {
       throw new IllegalArgumentException("Unable to write to file " + opts.moduleRewriteLog, e);
     }
