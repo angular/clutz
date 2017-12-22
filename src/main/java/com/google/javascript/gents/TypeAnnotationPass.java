@@ -490,6 +490,8 @@ public final class TypeAnnotationPass implements CompilerPass {
         // remains the same.
       case EQUALS:
         return convertTypeNodeAST(n.getFirstChild());
+      case NAME:
+        return namedType(n.getString());
       default:
         throw new IllegalArgumentException("Unsupported node type:\n" + n.toStringTree());
     }

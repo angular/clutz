@@ -126,9 +126,59 @@ public final class TypeConversionPass implements CompilerPass {
         case CONST:
           createTypeAlias(n, parent);
           break;
+        case CLASS:
+          JSDocInfo jsDoc = n.getJSDocInfo();
+          // If a class has the @interface or @record annotation we will respect that and turn it into an interface.
+          if (jsDoc != null && jsDoc.isInterface()) {
+            Node className = n.getFirstChild();
+            Node classExtends = n.getSecondChild();
+            Node classMembers = n.getLastChild();
+            // Change CLASS_EXTENDS to INTERFACE_EXTENDS
+            Node interfaceExtends =
+                classExtends.isEmpty()
+                    ? classExtends.detach()
+                    : new Node(Token.INTERFACE_EXTENDS, classExtends.detach());
+            // Also merge with any @extends if present.
+            for (JSTypeExpression extendedInterface : jsDoc.getExtendedInterfaces()) {
+              if (interfaceExtends.isEmpty()) {
+                interfaceExtends = new Node(Token.INTERFACE_EXTENDS);
+              }
+              interfaceExtends.addChildToBack(extendedInterface.getRoot());
+            }
+
+            Node interfaceMembers = new Node(Token.INTERFACE_MEMBERS);
+            for (Node member : classMembers.detach().children()) {
+              // TODO(rado): handle ctor better. Right now, ctor fields disappear (see class_interface.js test).
+              if (member.isMemberFunctionDef() && member.getFirstChild().isFunction()) {
+                stripFunctionBody(member);
+              }
+              interfaceMembers.addChildToBack(member.detach());
+            }
+
+            Node newNode =
+                new Node(Token.INTERFACE, className.detach(), interfaceExtends, interfaceMembers);
+            addTypeToScope(newNode, className.getString());
+            newNode.useSourceInfoFrom(n);
+            nodeComments.replaceWithComment(n, newNode);
+          }
         default:
           break;
       }
+    }
+
+    private void stripFunctionBody(Node member) {
+      Node functionNode = member.getFirstChild();
+      Node functionName = functionNode.getFirstChild();
+      Node functionParams = functionNode.getSecondChild();
+      // Strip body from function definitions.
+      Node newFunction =
+          new Node(
+              Token.FUNCTION,
+              functionName.detach(),
+              functionParams.detach(),
+              new Node(Token.EMPTY));
+      newFunction.useSourceInfoFrom(functionNode);
+      nodeComments.replaceWithComment(functionNode, newFunction);
     }
 
     private boolean containsObject(Node typedefNode) {
