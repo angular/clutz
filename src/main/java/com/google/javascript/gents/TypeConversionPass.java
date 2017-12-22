@@ -345,7 +345,7 @@ public final class TypeConversionPass implements CompilerPass {
       }
     }
 
-    private Node transformMembers(Node members, boolean isNumber) {
+    private Node transformMembers(Node members, boolean enumIsOfNumberType) {
       assert members.isObjectLit();
       int lastCount = -1;
       Node enumMembers = new Node(Token.ENUM_MEMBERS);
@@ -355,14 +355,14 @@ public final class TypeConversionPass implements CompilerPass {
         Node newMember;
         // Check whether we can emit simply the name, and rely on the automatic numeric assignment
         // in TypeScript. For example, enum E { A, B } is equivalent to enum E { A = 0, B = 1 }.
-        if (isNumber && value.getDouble() == lastCount + 1) {
+        if (enumIsOfNumberType && value.isNumber() && value.getDouble() == lastCount + 1) {
           newMember = name;
         } else {
           // We cannot reuse the STRING_KEY node here, because it pretty prints as a: 0, and we
           // want a = 1. Instead we recreate an ASSIGN node with same contents as STRING_KEY
           newMember = new Node(Token.ASSIGN, name, value);
         }
-        if (isNumber) {
+        if (enumIsOfNumberType && value.isNumber()) {
           lastCount = (int) value.getDouble();
         }
         enumMembers.addChildToBack(newMember);
