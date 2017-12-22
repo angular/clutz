@@ -26,6 +26,11 @@ const RepeatedNumEnum = {
   D: 2
 };
 
+/** @enum {number} */
+const EnumWithArithmetics = {
+    A: 10 * 10 + 2,
+    B: 2
+};
 
 /** @enum {string} */
 const StrEnum = {
@@ -57,5 +62,6 @@ exports.C = C;
 exports.NumEnum = NumEnum;
 exports.NonConseqNumEnum = NonConseqNumEnum;
 exports.RepeatedNumEnum = RepeatedNumEnum;
+exports.EnumWithArithmetics = EnumWithArithmetics;
 exports.StrEnum = StrEnum;
 exports.OtherEnum = OtherEnum;
