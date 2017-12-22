@@ -6,7 +6,7 @@
  */
 
 /** @const */
-var goog = {} || goog;
+var goog = goog || {};
 
 /**
  * @type {!Function}
