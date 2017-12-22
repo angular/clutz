@@ -351,8 +351,10 @@ public final class ModuleConversionPass implements CompilerPass {
       this.requiredNamespace = requiredNamespace;
       this.isDestructuringImport = isDestructuringImport;
       this.module = namespaceToModule.get(requiredNamespace);
-      this.referencedFile =
-          pathUtil.getImportPath(originalImportNode.getSourceFileName(), module.file);
+      if (this.module != null) {
+        this.referencedFile =
+            pathUtil.getImportPath(originalImportNode.getSourceFileName(), module.file);
+      }
       this.moduleSuffix = nameUtil.lastStepOfName(requiredNamespace);
       this.backupName = this.moduleSuffix;
       this.localNames = new ArrayList<String>();
