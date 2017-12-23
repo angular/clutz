@@ -161,6 +161,7 @@ public final class TypeConversionPass implements CompilerPass {
             newNode.useSourceInfoFrom(n);
             nodeComments.replaceWithComment(n, newNode);
           }
+          break;
         default:
           break;
       }
