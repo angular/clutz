@@ -734,6 +734,11 @@ class DeclarationGenerator {
           continue;
         }
 
+        // Symbols in partial_goog_base.js are just stand ins for the real symbols, so don't emit
+        if (symbol.getInputName().endsWith("partial_goog_base.js")) {
+          continue;
+        }
+
         declareNamespace(
             namespace,
             symbol,
