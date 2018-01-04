@@ -1211,8 +1211,8 @@ class DeclarationGenerator {
       // goog:goog cannot be imported.
       return;
     }
-    // In partial mode, emit clutz emits goog.provided symbols in goog.module/dollar style, so the
-    // alias has to match
+    // In partial mode, clutz emits goog.provided symbols in goog.module/dollar style, so the alias
+    // has to match
     if (opts.partialInput && isDefault && emitName.contains(".")) {
       emitName = "module$exports$" + emitName.replace(".", "$");
     }
@@ -1791,15 +1791,18 @@ class DeclarationGenerator {
 
     private String getDisplayNameFromType(JSType type) {
       String displayName = type.getDisplayName();
-      // In partial mode, closure doesn't know the correct name of imported symbols, if the name
+      // In partial mode, closure doesn't know the correct name of imported symbols.  If the name
       // matches one in the precomputed map, replace it with the original declared name
-      // The displayName can be of the form foo.bar, but the symbol that was goog required was just
-      // foo, so just replace the part of the display name before the first period
+      // The displayName can be of the form foo.bar.baz, but the import could be
+      // `goog.require(foo.bar)`, so clutz needs to rewrite as eg `module$exports$foo$bar.baz`,
+      // replacing the first two dotted parts.
       List<String> displayNameParts = new ArrayList<>(Arrays.asList(displayName.split("\\.")));
       for (int i = 1; i <= displayNameParts.size(); i++) {
         List<String> displayNamePrefix = displayNameParts.subList(0, i);
         String baseDisplayName = Joiner.on(".").join(displayNamePrefix);
         if (importRenameMap.containsKey(baseDisplayName)) {
+          // displayNamePrefix is a sublist of displayNameParts, modifications to it are reflected
+          // in displayNameParts - in this case all the prefix parts are replaced with the rename
           displayNamePrefix.clear();
           displayNamePrefix.add(importRenameMap.get(baseDisplayName));
           displayName = Joiner.on(".").join(displayNameParts);

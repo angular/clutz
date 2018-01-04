@@ -66,7 +66,8 @@ public class DeclarationSyntaxTest {
       new FilenameFilter() {
         @Override
         public boolean accept(File dir, String name) {
-          return JS_NO_EXTERNS.accept(dir, name) && dir.getName().equals("crossModuleImports");
+          return JS_NO_EXTERNS.accept(dir, name)
+              && dir.getName().equals("partialCrossModuleImports");
         }
       };
 

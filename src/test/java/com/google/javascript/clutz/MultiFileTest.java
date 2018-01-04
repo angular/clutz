@@ -96,7 +96,7 @@ public class MultiFileTest {
   }
 
   @Test
-  public void crossModuleImports() throws Exception {
+  public void partialCrossModuleImports() throws Exception {
     String expected = DeclarationGeneratorTests.getTestFileText(input("total.d.ts"));
     assertThatProgram(
             ImmutableList.of(input("goog_module_importer.js"), input("goog_provide_importer.js")),

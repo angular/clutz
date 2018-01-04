@@ -30,7 +30,7 @@ public class ImportRenameMapBuilder {
         // body of the goog module.
         importRenameMap.putAll(build(moduleId, ast.getFirstChild()));
       } else {
-        // Also get renames for symbols that are required, but not into a variable
+        // Also get renames goog.require() symbols in a goog.provide() file
         importRenameMap.putAll(build(null, ast));
       }
 
@@ -81,10 +81,6 @@ public class ImportRenameMapBuilder {
     }
 
     if (!statement.isExprResult()) {
-      return false;
-    }
-
-    if (statement.getFirstChild() == null) {
       return false;
     }
 
