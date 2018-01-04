@@ -95,6 +95,19 @@ public class MultiFileTest {
         .generatesDeclarations(expected);
   }
 
+  @Test
+  public void crossModuleImports() throws Exception {
+    String expected = DeclarationGeneratorTests.getTestFileText(input("total.d.ts"));
+    assertThatProgram(
+            ImmutableList.of(input("goog_module_importer.js"), input("goog_provide_importer.js")),
+            ImmutableList.of(
+                input("goog_module_default_exporter.js"),
+                input("goog_module_named_exporter.js"),
+                input("goog_provide_exporter.js"),
+                input("goog_multi_provide_exporter.js")))
+        .generatesDeclarations(expected);
+  }
+
   private File input(String filename) {
     Path testDir = FileSystems.getDefault().getPath("src", "test", "java");
     String packageName = ProgramSubject.class.getPackage().getName();
