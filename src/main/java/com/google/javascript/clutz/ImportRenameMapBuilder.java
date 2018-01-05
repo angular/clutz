@@ -30,7 +30,7 @@ public class ImportRenameMapBuilder {
         // body of the goog module.
         importRenameMap.putAll(build(moduleId, ast.getFirstChild()));
       } else {
-        // Also get renames goog.require() symbols in a goog.provide() file
+        // Also get renames for goog.require() symbols in goog.provide() files
         importRenameMap.putAll(build(null, ast));
       }
 
