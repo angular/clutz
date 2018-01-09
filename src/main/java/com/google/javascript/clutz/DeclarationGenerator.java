@@ -545,12 +545,7 @@ class DeclarationGenerator {
         emitBreak();
         continue;
       }
-      String namespace = symbol.getName();
       boolean isDefault = isDefaultExport(symbol);
-      // These goog.provide's have only one symbol, so users expect to use default import
-      if (isDefault) {
-        namespace = getNamespace(symbol.getName());
-      }
       declareNamespace(symbol, emitName, isDefault, transitiveProvides, false);
       declareModule(provide, isDefault, emitName);
     }
@@ -948,7 +943,9 @@ class DeclarationGenerator {
     boolean rewroteGoogProvide = false;
     if (opts.partialInput && isDefault && emitName.contains(".")) {
       namespace = "";
-      emitName = "module$exports$" + emitName.replace(".", "$");
+      String googModuleEmitName = "module$exports$" + emitName.replace(".", "$");
+      importRenameMap.put(emitName, googModuleEmitName);
+      emitName = googModuleEmitName;
       rewroteGoogProvide = true;
     }
     boolean isGoogNamespace =
@@ -1357,7 +1354,7 @@ class DeclarationGenerator {
     }
 
     private String getAbsoluteName(ObjectType objectType) {
-      String name = objectType.getDisplayName();
+      String name = getDisplayNameFromType(objectType);
       // Names that do not have a namespace '.' are either platform names in the top level
       // namespace like `Object` or `Element`, or they are unqualified `goog.provide`s, e.g.
       // `goog.provide('Toplevel')`. In both cases they will be found with the naked name.
@@ -1906,7 +1903,7 @@ class DeclarationGenerator {
               // compilation
               // unit - A ends up as NoType, while B ends up as NamedType.
               if (opts.partialInput && refType.isUnknownType()) {
-                String displayName = type.getDisplayName();
+                String displayName = getDisplayNameFromType(type);
                 emit(displayName);
                 List<JSType> templateTypes = type.getTemplateTypes();
                 if (templateTypes != null && templateTypes.size() > 0) {
