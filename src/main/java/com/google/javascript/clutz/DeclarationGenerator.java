@@ -1042,7 +1042,7 @@ class DeclarationGenerator {
           } else {
             emit("function");
           }
-          treeWalker.visitProperty(propName, oType, false, false, Collections.<String>emptySet());
+          treeWalker.visitProperty(propName, oType, false, false, Collections.<String>emptyList());
         }
       }
     }
@@ -1446,7 +1446,7 @@ class DeclarationGenerator {
       visitTemplateTypes(ftype);
       emit("=");
       emit(typeName);
-      visitTemplateTypes(ftype, Collections.emptySet(), false);
+      visitTemplateTypes(ftype, Collections.emptyList(), false);
       emit(";");
       emitBreak();
       if (!ftype.isInterface()) {
@@ -1509,7 +1509,7 @@ class DeclarationGenerator {
         visitTemplateTypes(ftype);
         emit("extends");
         emit(name + INSTANCE_CLASS_SUFFIX);
-        visitTemplateTypes(ftype, Collections.emptySet(), false);
+        visitTemplateTypes(ftype, Collections.emptyList(), false);
         emit("{");
         indent();
         emitBreak();
@@ -1582,7 +1582,7 @@ class DeclarationGenerator {
     }
 
     private void visitTemplateTypes(ObjectType type) {
-      visitTemplateTypes(type, Collections.<String>emptySet(), true);
+      visitTemplateTypes(type, Collections.<String>emptyList(), true);
     }
 
     /**
@@ -1597,7 +1597,7 @@ class DeclarationGenerator {
      *     for the template parameters.
      */
     private void visitTemplateTypes(
-        ObjectType type, Set<String> alreadyEmittedTemplateType, boolean isDeclaration) {
+        ObjectType type, List<String> alreadyEmittedTemplateType, boolean isDeclaration) {
       if (type.hasAnyTemplateTypes() && !type.getTemplateTypeMap().isEmpty()) {
         List<String> realTemplateType = new ArrayList<>();
 
@@ -2200,7 +2200,7 @@ class DeclarationGenerator {
     }
 
     private void visitObjectType(
-        FunctionType type, ObjectType prototype, Set<String> classTemplateTypeNames) {
+        FunctionType type, ObjectType prototype, List<String> classTemplateTypeNames) {
       emit("{");
       indent();
       emitBreak();
@@ -2233,12 +2233,16 @@ class DeclarationGenerator {
               + instanceType
               + " which is a "
               + instanceType.getClass().getSimpleName());
+      // TODO(evanm): investigate passing superClassFields in as skipNames.
+      // We were accidentally passing it in for the wrong param, so
+      // I "fixed" it by removing it, but maybe we should restore the
+      // original intent.
       visitProperties(
           (ObjectType) instanceType,
           false,
           Collections.<String>emptySet(),
           Collections.<String>emptySet(),
-          superClassFields);
+          Collections.<String>emptyList());
 
       // Bracket-style property access for dictionnary...
       if (type.isDict()) {
@@ -2340,7 +2344,7 @@ class DeclarationGenerator {
           isStatic,
           Collections.<String>emptySet(),
           Collections.<String>emptySet(),
-          Collections.<String>emptySet());
+          Collections.<String>emptyList());
     }
 
     private void visitProperties(
@@ -2348,7 +2352,7 @@ class DeclarationGenerator {
         boolean isStatic,
         Set<String> skipNames,
         Set<String> forceProps,
-        Set<String> classTemplateTypeNames) {
+        List<String> classTemplateTypeNames) {
       for (String propName : getSortedPropertyNamesToEmit(objType)) {
         // Extern processing goes through all known symbols, thus statics that are representable as
         // a namespace, are skipped here and emitted as namespaces only.
@@ -2450,7 +2454,7 @@ class DeclarationGenerator {
         ObjectType objType,
         boolean isStatic,
         boolean forcePropDeclaration,
-        Set<String> classTemplateTypeNames) {
+        List<String> classTemplateTypeNames) {
       JSType propertyType = objType.getPropertyType(propName);
       // Some symbols might be emitted as provides, so don't duplicate them
       String qualifiedName = objType.getDisplayName() + "." + propName;
@@ -2471,7 +2475,7 @@ class DeclarationGenerator {
         JSType propertyType,
         boolean isStatic,
         boolean forcePropDeclaration,
-        Set<String> classTemplateTypeNames) {
+        List<String> classTemplateTypeNames) {
       if (handleSpecialTTEFunctions(propertyType, propName, isStatic, classTemplateTypeNames))
         return;
 
@@ -2495,8 +2499,8 @@ class DeclarationGenerator {
           return;
         }
         // Avoid re-emitting template variables defined on the class level if method is not static.
-        Set<String> skipTemplateParams =
-            isStatic ? Collections.<String>emptySet() : classTemplateTypeNames;
+        List<String> skipTemplateParams =
+            isStatic ? Collections.<String>emptyList() : classTemplateTypeNames;
         JSType typeOfThis = ftype.getTypeOfThis();
         // If a method returns the 'this' object, it needs to be typed to match the type of the
         // instance it is invoked on. That way when called on the subclass it should return the
@@ -2567,7 +2571,7 @@ class DeclarationGenerator {
      * <p>Returns whether this was a TTE function and handled specially.
      */
     private boolean handleSpecialTTEFunctions(
-        JSType type, String propName, boolean isStatic, Set<String> classTemplateTypeNames) {
+        JSType type, String propName, boolean isStatic, List<String> classTemplateTypeNames) {
       FunctionType ftype = type.toMaybeFunctionType();
       if (ftype == null) return false;
 
@@ -2615,7 +2619,7 @@ class DeclarationGenerator {
     }
 
     private String getSignatureForInstanceTTEFn(
-        String propName, Set<String> classTemplateTypeNames, FunctionType ftype) {
+        String propName, List<String> classTemplateTypeNames, FunctionType ftype) {
       // If ftype is foo.bar.Promise.prototype.then, extract className as Promise.
       String className = getUnqualifiedName(getNamespace(getNamespace(ftype.getDisplayName())));
       Iterator<String> templateTypeNames = classTemplateTypeNames.iterator();
@@ -2671,19 +2675,19 @@ class DeclarationGenerator {
       return null;
     }
 
-    private Set<String> getTemplateTypeNames(ObjectType objType) {
+    private List<String> getTemplateTypeNames(ObjectType objType) {
       if (objType.getTemplateTypeMap() == null) {
-        return Collections.emptySet();
+        return Collections.emptyList();
       }
       return objType
           .getTemplateTypeMap()
           .getTemplateKeys()
           .stream()
           .map(jsType -> jsType != null ? jsType.getDisplayName() : "")
-          .collect(toCollection(HashSet::new));
+          .collect(toCollection(ArrayList::new));
     }
 
-    private void visitFunctionDeclaration(FunctionType ftype, Set<String> skipTemplateParams) {
+    private void visitFunctionDeclaration(FunctionType ftype, List<String> skipTemplateParams) {
       visitFunctionParameters(ftype, true, skipTemplateParams);
       JSType type = ftype.getReturnType();
       JSType typeOfThis = ftype.getTypeOfThis();
@@ -2726,11 +2730,11 @@ class DeclarationGenerator {
     }
 
     private void visitFunctionParameters(FunctionType ftype) {
-      visitFunctionParameters(ftype, true, Collections.<String>emptySet());
+      visitFunctionParameters(ftype, true, Collections.<String>emptyList());
     }
 
     private void visitFunctionParameters(
-        FunctionType ftype, boolean emitTemplatizedTypes, Set<String> alreadyEmittedTemplateType) {
+        FunctionType ftype, boolean emitTemplatizedTypes, List<String> alreadyEmittedTemplateType) {
       if (emitTemplatizedTypes) {
         visitTemplateTypes(ftype, alreadyEmittedTemplateType, true);
       }
@@ -2863,7 +2867,7 @@ class DeclarationGenerator {
     private void visitFunctionExpression(String propName, FunctionType ftype) {
       emit("function");
       emit(propName);
-      visitFunctionDeclaration(ftype, Collections.<String>emptySet());
+      visitFunctionDeclaration(ftype, Collections.<String>emptyList());
       emit(";");
       emitBreak();
     }
