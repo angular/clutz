@@ -238,6 +238,9 @@ public final class ModuleConversionPass implements CompilerPass {
             && node.getNext().getFirstChild().matchesQualifiedName("goog.require")) {
           Node importedNode = node.getFirstChild();
           // For multiple destructuring imports, there are multiple full local names.
+          // This does not support renaming imports of the sort
+          // const {a: b} = goog.require
+          // TODO(rado): add support for that pattern.
           ArrayList<String> namedExports = new ArrayList<String>();
           while (importedNode != null) {
             namedExports.add(importedNode.getString());
@@ -515,20 +518,16 @@ public final class ModuleConversionPass implements CompilerPass {
     }
     // For the rest of the function, the imported and importing files are migrating together
 
-    // import {value as localName} from "./file"
-    Node importSpec = new Node(Token.IMPORT_SPEC);
-    // import {a as b} only when a != b
+    // import {localName} from "./file"
+    Node importSpecs = new Node(Token.IMPORT_SPECS);
     for (String localName : moduleImport.localNames) {
-      if (!moduleImport.moduleSuffix.equals(localName)) {
-        importSpec.addChildToBack(IR.name(localName));
-      }
+      Node importSpec = new Node(Token.IMPORT_SPEC);
+      importSpec.addChildToBack(IR.name(localName));
+      importSpecs.addChildToBack(importSpec);
     }
     Node importNode =
         new Node(
-            Token.IMPORT,
-            IR.empty(),
-            new Node(Token.IMPORT_SPECS, importSpec),
-            Node.newString(moduleImport.referencedFile));
+            Token.IMPORT, IR.empty(), importSpecs, Node.newString(moduleImport.referencedFile));
     addImportNode(n, importNode);
 
     for (int i = 0; i < moduleImport.fullLocalNames.size(); i++) {
