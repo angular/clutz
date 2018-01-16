@@ -149,6 +149,10 @@ class DeclarationGenerator {
   private static final ImmutableSet<String> PLATFORM_EXTERNS_FILENAMES =
       ImmutableSet.of(
           "chrome.js",
+           // This file is needed by all typed tsickle emit, for types that are in lib.d.ts but not
+           // in closure externs. Clutz should not emit any symbols from it, because they are already
+           // provided by lib.d.ts.
+          "closure_externs.js",
           "deprecated.js",
           "fetchapi.js",
           "fileapi.js",
@@ -892,7 +896,7 @@ class DeclarationGenerator {
     // This matches our test setup.
     if (filePath.startsWith("externs.zip//")) return true;
     String fileName = new File(filePath).getName();
-    // This loosly matches the filenames from
+    // This loosely matches the filenames from
     // https://github.com/google/closure-compiler/tree/master/externs
     return PLATFORM_EXTERNS_FILENAMES.contains(fileName)
         || fileName.startsWith("es")
