@@ -149,9 +149,9 @@ class DeclarationGenerator {
   private static final ImmutableSet<String> PLATFORM_EXTERNS_FILENAMES =
       ImmutableSet.of(
           "chrome.js",
-           // This file is needed by all typed tsickle emit, for types that are in lib.d.ts but not
-           // in closure externs. Clutz should not emit any symbols from it, because they are already
-           // provided by lib.d.ts.
+          // This file is needed by all typed tsickle emit, for types that are in lib.d.ts but not
+          // in closure externs. Clutz should not emit any symbols from it, because they are already
+          // provided by lib.d.ts.
           "closure_externs.js",
           "deprecated.js",
           "fetchapi.js",
