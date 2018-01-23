@@ -31,14 +31,17 @@ declare namespace goog {
    */
   global : any ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
-  class Uri extends Uri_Instance {
+declare namespace ಠ_ಠ.clutz {
+  class module$exports$goog$Uri extends module$exports$goog$Uri_Instance {
   }
-  class Uri_Instance {
+  class module$exports$goog$Uri_Instance {
     private noStructuralTyping_: any;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$goog {
+  export import Uri = ಠ_ಠ.clutz.module$exports$goog$Uri;
+}
 declare module 'goog:goog.Uri' {
-  import alias = ಠ_ಠ.clutz.goog.Uri;
+  import alias = ಠ_ಠ.clutz.module$exports$goog$Uri;
   export default alias;
 }

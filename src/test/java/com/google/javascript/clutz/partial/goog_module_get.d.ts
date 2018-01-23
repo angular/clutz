@@ -1,7 +1,7 @@
 declare namespace ಠ_ಠ.clutz {
   class module$exports$goog$scope$ClassExtendingMissingDestructuredRequire extends module$exports$goog$scope$ClassExtendingMissingDestructuredRequire_Instance {
   }
-  class module$exports$goog$scope$ClassExtendingMissingDestructuredRequire_Instance extends module$exports$goog$module$named$exports.MissingDestructuredRequire {
+  class module$exports$goog$scope$ClassExtendingMissingDestructuredRequire_Instance extends ಠ_ಠ.clutz.module$exports$goog$module$named$exports.MissingDestructuredRequire {
     constructor ( ) ;
   }
 }
@@ -18,7 +18,7 @@ declare module 'goog:goog.scope.ClassExtendingMissingDestructuredRequire' {
 declare namespace ಠ_ಠ.clutz {
   class module$exports$goog$scope$ClassExtendingMissingGoogModuleGet extends module$exports$goog$scope$ClassExtendingMissingGoogModuleGet_Instance {
   }
-  class module$exports$goog$scope$ClassExtendingMissingGoogModuleGet_Instance extends module$exports$goog$module$default$exports {
+  class module$exports$goog$scope$ClassExtendingMissingGoogModuleGet_Instance extends ಠ_ಠ.clutz.module$exports$goog$module$default$exports {
     constructor ( ) ;
   }
 }
@@ -35,7 +35,7 @@ declare module 'goog:goog.scope.ClassExtendingMissingGoogModuleGet' {
 declare namespace ಠ_ಠ.clutz {
   class module$exports$goog$scope$ClassExtendingRenamedDestructuredRequire extends module$exports$goog$scope$ClassExtendingRenamedDestructuredRequire_Instance {
   }
-  class module$exports$goog$scope$ClassExtendingRenamedDestructuredRequire_Instance extends module$exports$goog$module$named$exports.OriginalName {
+  class module$exports$goog$scope$ClassExtendingRenamedDestructuredRequire_Instance extends ಠ_ಠ.clutz.module$exports$goog$module$named$exports.OriginalName {
     constructor ( ) ;
   }
 }

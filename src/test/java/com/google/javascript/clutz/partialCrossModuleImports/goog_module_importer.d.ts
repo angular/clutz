@@ -1,17 +1,17 @@
 declare namespace ಠ_ಠ.clutz.module$exports$goog$module$importer {
   class DClass extends DClass_Instance {
   }
-  class DClass_Instance extends module$exports$goog$provide$exporter$ProvideClass {
+  class DClass_Instance extends ಠ_ಠ.clutz.module$exports$goog$provide$exporter$ProvideClass {
     constructor ( ) ;
   }
   class EClass extends EClass_Instance {
   }
-  class EClass_Instance extends module$exports$goog$module$default$exporter {
+  class EClass_Instance extends ಠ_ಠ.clutz.module$exports$goog$module$default$exporter {
     constructor ( ) ;
   }
   class FClass extends FClass_Instance {
   }
-  class FClass_Instance extends module$exports$goog$module$named$exporter.NamedClass {
+  class FClass_Instance extends ಠ_ಠ.clutz.module$exports$goog$module$named$exporter.NamedClass {
     constructor ( ) ;
   }
 }

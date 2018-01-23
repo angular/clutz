@@ -23,7 +23,7 @@ declare namespace goog {
    * @param symbol Object the name should point to.
    */
   function exportProperty (object : ಠ_ಠ.clutz.GlobalObject | null , publicName : string , symbol : any ) : void ;
-  function inherits (childCtor : ಠ_ಠ.clutz.partial.FunctionAlias , parentCtor : ಠ_ಠ.clutz.partial.FunctionAlias ) : void ;
+  function inherits (childCtor : ಠ_ಠ.clutz.module$exports$partial$FunctionAlias , parentCtor : ಠ_ಠ.clutz.module$exports$partial$FunctionAlias ) : void ;
   function isDef (val : any ) : boolean ;
   function require (name : string ) : ಠ_ಠ.clutz.ClosureSymbolNotGoogProvided;
   var /**
@@ -31,21 +31,27 @@ declare namespace goog {
    */
   global : any ;
 }
-declare namespace ಠ_ಠ.clutz.goog {
-  class Uri extends Uri_Instance {
+declare namespace ಠ_ಠ.clutz {
+  class module$exports$goog$Uri extends module$exports$goog$Uri_Instance {
   }
-  class Uri_Instance {
+  class module$exports$goog$Uri_Instance {
     private noStructuralTyping_: any;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$goog {
+  export import Uri = ಠ_ಠ.clutz.module$exports$goog$Uri;
+}
 declare module 'goog:goog.Uri' {
-  import alias = ಠ_ಠ.clutz.goog.Uri;
+  import alias = ಠ_ಠ.clutz.module$exports$goog$Uri;
   export default alias;
 }
-declare namespace ಠ_ಠ.clutz.partial {
-  type FunctionAlias = Function ;
+declare namespace ಠ_ಠ.clutz {
+  type module$exports$partial$FunctionAlias = Function ;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$partial {
+  export import FunctionAlias = ಠ_ಠ.clutz.module$exports$partial$FunctionAlias;
 }
 declare module 'goog:partial.FunctionAlias' {
-  import alias = ಠ_ಠ.clutz.partial.FunctionAlias;
+  import alias = ಠ_ಠ.clutz.module$exports$partial$FunctionAlias;
   export default alias;
 }

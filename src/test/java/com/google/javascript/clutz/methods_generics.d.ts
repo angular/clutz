@@ -1,11 +1,11 @@
-declare namespace ಠ_ಠ.clutz.method_generics {
-  class Foo < T > extends Foo_Instance < T > {
+declare namespace ಠ_ಠ.clutz {
+  class module$exports$method_generics$Foo < T > extends module$exports$method_generics$Foo_Instance < T > {
     /**
      * Static method: T and R must be defined on the method in the resulting typescript code
      */
     static staticBar < T , R > (bar : R ) : T ;
   }
-  class Foo_Instance < T > {
+  class module$exports$method_generics$Foo_Instance < T > {
     private noStructuralTyping_: any;
     constructor (a : T ) ;
     /**
@@ -25,7 +25,10 @@ declare namespace ಠ_ಠ.clutz.method_generics {
     push (value : T ) : void ;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$method_generics {
+  export import Foo = ಠ_ಠ.clutz.module$exports$method_generics$Foo;
+}
 declare module 'goog:method_generics' {
-  import alias = ಠ_ಠ.clutz.method_generics;
+  import alias = ಠ_ಠ.clutz.module$exports$method_generics;
   export = alias;
 }

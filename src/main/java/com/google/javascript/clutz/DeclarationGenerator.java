@@ -144,6 +144,25 @@ class DeclarationGenerator {
           "MutedInfo");
 
   /**
+   * Contains symbols in lib.d.ts that we don't want to emit in the clutz namespace.
+   */
+  private static final ImmutableSet<String> PLATFORM_SYMBOLS_IN_TYPESCRIPT =
+      ImmutableSet.of(
+          "Node",
+          "Promise",
+          "ArrayBuffer",
+          "Blob",
+          "FormData",
+          "File",
+          "DOMError",
+          "ProgressEvent",
+          "Iterable",
+          "IObject",
+          "Iterator",
+          "HTMLImageElement",
+          "ArrayBufferView");
+
+  /**
    * List of files that are part of closures platform externs. Not exhaustive, see isPlatformExtern
    * for the rest.
    */
@@ -325,6 +344,11 @@ class DeclarationGenerator {
    */
   private Map<String, String> importRenameMap = Collections.emptyMap();
 
+  /**
+   * TODO(lucassloan): add a real comment
+   */
+  private Set<String> allProvides = new HashSet<>();
+
   DeclarationGenerator(Options opts) {
     this.opts = opts;
     this.compiler = new InitialParseRetainingCompiler();
@@ -435,9 +459,9 @@ class DeclarationGenerator {
       throws AssertionError {
     // Compile should always be first here, because it sets internal state.
     compiler.compile(externs, sourceFiles, opts.getCompilerOptions());
-    if (opts.partialInput) {
+    // if (opts.partialInput) {
       importRenameMap = ImportRenameMapBuilder.build(compiler.getParsedInputs());
-    }
+    // }
     unknownType = compiler.getTypeRegistry().getNativeType(JSTypeNative.UNKNOWN_TYPE);
     numberType = compiler.getTypeRegistry().getNativeType(JSTypeNative.NUMBER_TYPE);
     iterableType = compiler.getTypeRegistry().getType("Iterable");
@@ -495,11 +519,13 @@ class DeclarationGenerator {
       }
     }
 
+    allProvides = provides;
+
     Set<String> shadowedProvides = getShadowedProvides(provides);
 
     TypedScope topScope = compiler.getTopScope();
 
-    processReservedSymbols(provides, topScope);
+    // processReservedSymbols(provides, topScope);
 
     for (String provide : provides) {
       TypedVar symbol = topScope.getOwnSlot(provide);
@@ -512,18 +538,19 @@ class DeclarationGenerator {
         emitName = rewritenProvide;
         rewrittenProvides.add(rewritenProvide);
       }
-      if (needsAlias(shadowedProvides, provide, symbol)) {
-        emitName += Constants.SYMBOL_ALIAS_POSTFIX;
-      }
+      // if (needsAlias(shadowedProvides, provide, symbol)) {
+      //   emitName += Constants.SYMBOL_ALIAS_POSTFIX;
+      // }
       if (symbol == null) {
         // Sometimes goog.provide statements are used as pure markers for dependency management, or
         // the defined provides do not get a symbol because they don't have a proper type.
-        emitNamespaceBegin(getNamespace(emitName));
+        emitNamespaceBegin("");
         emit("var");
-        emit(getUnqualifiedName(emitName));
+        emitDisplayName(emitName);
         emit(": any;");
         emitBreak();
         emitNamespaceEnd();
+        declareGoogProvideSupplementalNamespaces(Arrays.asList(emitName));
         declareModule(provide, true, emitName);
         continue;
       }
@@ -586,13 +613,18 @@ class DeclarationGenerator {
       String typedefName,
       String rewritenProvide,
       JSType moduleType) {
-    String namespace = getNamespace(typedefName);
+    String namespace = "";//getNamespace(typedefName);
 
     // Ideally we should be using declareNamespace here, but it cannot handle gluing the TypedVar
     // symbol with the additional JSType moduleType.
     emitNamespaceBegin(namespace);
     emit("type");
-    emit(getUnqualifiedName(typedefName));
+    // if (!isGoogModuleStyleName(typedefName)) {
+    //   typedefName = rewriteGoogProvideName(typedefName);
+    // }
+    // typedefName = getDisplayName(typedefName);
+    // emit(getUnqualifiedName(typedefName));
+    emitDisplayName(typedefName);
     emit("=");
 
     new TreeWalker(compiler.getTypeRegistry(), provides, false, false).visitType(moduleType);
@@ -633,6 +665,7 @@ class DeclarationGenerator {
    * invariant that generated namespaces are 1-1 with getNamespace of goog.provides.
    */
   private void processReservedSymbols(TreeSet<String> provides, TypedScope topScope) {
+    // TODO(lucassloan): figure out how this interacts with name rewriting
     Set<String> collapsedNamespaces = new TreeSet<>();
     for (String reservedProvide : provides) {
       if (RESERVED_JS_WORDS.contains(getUnqualifiedName(reservedProvide))) {
@@ -786,6 +819,8 @@ class DeclarationGenerator {
       externSymbolNames.add(symbol.getName());
     }
 
+    allProvides.addAll(externSymbolNames);
+
     Iterator<TypedVar> it = externSymbols.iterator();
 
     while (it.hasNext()) {
@@ -814,9 +849,9 @@ class DeclarationGenerator {
       String parentPath = getNamespace(symbol.getName());
       boolean isDefault = isDefaultExport(symbol);
       String emitName = symbol.getName();
-      if (needsAlias(shadowedSymbols, symbol.getName(), symbol)) {
-        emitName += Constants.SYMBOL_ALIAS_POSTFIX;
-      }
+      // if (needsAlias(shadowedSymbols, symbol.getName(), symbol)) {
+      //   emitName += Constants.SYMBOL_ALIAS_POSTFIX;
+      // }
 
       // There is nothing to emit for a namespace, because all its symbols will be visited later,
       // thus implicitly defining the namespace.
@@ -905,33 +940,41 @@ class DeclarationGenerator {
    * was just `goog.require('foo')`. To match that ability with goog.module/dollar style symbol
    * names, goog.provided symbols need to declare multiple namespaces that they're in.
    */
-  private void declareGoogProvideSupplementalNamespaces(String emitName) {
-    emitName = emitName.replace("module$exports$", "");
+  private void declareGoogProvideSupplementalNamespaces(List<String> emitNames) {
+    for (String emitName: emitNames) {
+      // emitName = rewriteGoogProvideName(emitName);
+      // emitName = emitName.replace("module$exports$", "");
 
-    List<String> nameParts = Arrays.asList(emitName.split("\\$"));
-    String unqualifiedName = nameParts.get(nameParts.size() - 1);
-    List<String> qualifyingNameParts = nameParts.subList(0, nameParts.size() - 1);
-    for (int i = 1; i <= qualifyingNameParts.size(); i++) {
-      List<String> dollarNameParts = qualifyingNameParts.subList(0, i);
-      String dollarNamePart = Joiner.on("$").join(dollarNameParts);
+      List<String> nameParts = Arrays.asList(emitName.split("\\."));
+      String unqualifiedName = nameParts.get(nameParts.size() - 1);
+      if (RESERVED_JS_WORDS.contains(unqualifiedName)) {
+        emitComment("skipping property " + unqualifiedName + " because it's a reserved word.");
+        continue;
+      }
 
-      List<String> dotNameParts =
-          new ArrayList<>(qualifyingNameParts.subList(i, qualifyingNameParts.size()));
-      dotNameParts.add(0, dollarNamePart);
+      List<String> qualifyingNameParts = nameParts.subList(0, nameParts.size() - 1);
+      for (int i = 1; i <= qualifyingNameParts.size(); i++) {
+        List<String> dollarNameParts = qualifyingNameParts.subList(0, i);
+        String dollarNamePart = Joiner.on("$").join(dollarNameParts);
 
-      String namespace = "module$exports$" + Joiner.on(".").join(dotNameParts);
-      emitNamespaceBegin(namespace);
+        List<String> dotNameParts =
+            new ArrayList<>(qualifyingNameParts.subList(i, qualifyingNameParts.size()));
+        dotNameParts.add(0, dollarNamePart);
 
-      emit("export import ");
-      emitNoSpace(unqualifiedName);
-      emitNoSpace(" = ");
-      emitNoSpace(Constants.INTERNAL_NAMESPACE);
-      emitNoSpace(".module$exports$");
-      emitNoSpace(emitName);
-      emitNoSpace(";");
-      emitBreak();
+        String namespace = "module$exports$" + Joiner.on(".").join(dotNameParts);
+        emitNamespaceBegin(namespace);
 
-      emitNamespaceEnd();
+        emit("export import ");
+        emitNoSpace(unqualifiedName);
+        emitNoSpace(" = ");
+        emitNoSpace(Constants.INTERNAL_NAMESPACE);
+        emitNoSpace(".");
+        emitNoSpace(rewriteGoogProvideName(emitName));
+        emitNoSpace(";");
+        emitBreak();
+
+        emitNamespaceEnd();
+      }
     }
   }
 
@@ -942,18 +985,18 @@ class DeclarationGenerator {
       emitComment("skipping property " + symbol.getName() + " because it is not a valid symbol.");
       return;
     }
+    boolean isGoogNamespace =
+        GOOG_BASE_NAMESPACE.equals(namespace) && GOOG_BASE_NAMESPACE.equals(symbol.getName());
     // In partial mode, emit goog.provided symbols in goog.module/dollar style, since goog.module
     // code can't tell if its import came from a goog.provide or a goog.module style file
     boolean rewroteGoogProvide = false;
-    if (opts.partialInput && isDefault && emitName.contains(".")) {
+    List<String> emittedSymbols = new ArrayList<>();
+    if (!isGoogNamespace && !isGoogModuleStyleName(emitName)) {
       namespace = "";
-      String googModuleEmitName = "module$exports$" + emitName.replace(".", "$");
-      importRenameMap.put(emitName, googModuleEmitName);
-      emitName = googModuleEmitName;
+      // String googModuleEmitName = rewriteGoogProvideName(emitName);
+      // emitName = googModuleEmitName;
       rewroteGoogProvide = true;
     }
-    boolean isGoogNamespace =
-        GOOG_BASE_NAMESPACE.equals(namespace) && GOOG_BASE_NAMESPACE.equals(symbol.getName());
     if (isGoogNamespace) {
       // Emitting the 'goog' namespace itself (but not e.g. 'goog.Uri').
       emitTopLevelNamespaceBegin(namespace);
@@ -965,8 +1008,10 @@ class DeclarationGenerator {
     if (isDefault) {
       if (isPrivate(symbol.getJSDocInfo()) && !isConstructor(symbol.getJSDocInfo())) {
         treeWalker.emitPrivateValue(emitName);
+        emittedSymbols.add(emitName);
       } else {
         treeWalker.walk(symbol, emitName);
+        emittedSymbols.add(emitName);
       }
     } else {
       // JSCompiler treats "foo.x" as one variable name, so collect all provides that start with
@@ -1021,6 +1066,7 @@ class DeclarationGenerator {
           }
           try {
             treeWalker.walk(propertySymbol, propertyName);
+            emittedSymbols.add(propertyName);
           } catch (RuntimeException e) {
             // Do not throw DeclarationGeneratorException - this is an unexpected runtime error.
             throw new RuntimeException("Failed to emit for " + propertySymbol, e);
@@ -1046,11 +1092,16 @@ class DeclarationGenerator {
           } else {
             emit("function");
           }
-          treeWalker.visitProperty(propName, oType, false, false, Collections.<String>emptyList());
+          treeWalker.visitProperty(propName, getDisplayName(desiredSymbol, false), oType, false, false, Collections.<String>emptyList());
+          emittedSymbols.add(desiredSymbol);
         }
       }
     }
     emitNamespaceEnd();
+
+    if (rewroteGoogProvide) {
+      declareGoogProvideSupplementalNamespaces(emittedSymbols);
+    }
 
     // extra walk required for inner classes and inner enums. They are allowed in closure,
     // but not in TS, so we have to generate a namespace-class pair in TS.
@@ -1061,10 +1112,15 @@ class DeclarationGenerator {
     if (isDefault && !isExtern && otype != null && !isAliasedClassOrInterface(symbol, otype)) {
       treeWalker.walkInnerSymbols(otype, symbol.getName());
     }
+  }
 
-    if (rewroteGoogProvide) {
-      declareGoogProvideSupplementalNamespaces(emitName);
-    }
+  private boolean isGoogModuleStyleName(String emitName) {
+    return emitName.contains("module$exports$") || emitName.contains("module$contents$");
+  }
+
+  private boolean isInBaseGoogNamespace(String name) {
+    String[] parts = name.split("\\.");
+    return parts.length == 2 && parts[0].equals("goog");
   }
 
   private boolean isValidJSProperty(String name) {
@@ -1214,8 +1270,8 @@ class DeclarationGenerator {
     }
     // In partial mode, clutz emits goog.provided symbols in goog.module/dollar style, so the alias
     // has to match
-    if (opts.partialInput && isDefault && emitName.contains(".")) {
-      emitName = "module$exports$" + emitName.replace(".", "$");
+    if (!isGoogModuleStyleName(emitName)) {
+      emitName = rewriteGoogProvideName(emitName);
     }
     emitNoSpace("declare module '");
     emitNoSpace("goog:" + name);
@@ -1242,6 +1298,109 @@ class DeclarationGenerator {
     emitBreak();
   }
 
+  private String rewriteGoogProvideName(String emitName) {
+    if (!isGoogModuleStyleName(emitName)) {
+      return "module$exports$" + emitName.replace(".", "$");
+    }
+    return emitName;
+  }
+
+  private String getAbsoluteName(String name) {
+    // String name = getDisplayName(objectType.getDisplayName());
+    // Names that do not have a namespace '.' are either platform names in the top level
+    // namespace like `Object` or `Element`, or they are unqualified `goog.provide`s, e.g.
+    // `goog.provide('Toplevel')`. In both cases they will be found with the naked name.
+    // However a goog.provide'd name can collide with a re-declared top-level symbol, e.g. if some
+    // code goog.provide's `Element`.
+    // TODO(martinprobst): Consider aliasing all global symbols into the clutz namespace.
+    if (name.indexOf('.') == -1) return name;
+    if (name.startsWith("goog.")) return name;
+    return Constants.INTERNAL_NAMESPACE + "." + name;
+  }
+
+  private void emitAbsoluteName(String name) {
+    // if (name.indexOf('.') == -1 || (this.isGoogNamespace && name.startsWith("goog."))) {
+    //   emitDisplayName(name);
+    // }
+    // emit(Constants.INTERNAL_NAMESPACE + ".");
+    // emitDisplayNameNoSpace(name);
+    // emit(getAbsoluteName(getDisplayName(name, false)));
+    emit(getDisplayName(name, true));
+  }
+
+
+
+  private String getDisplayName(String displayName, boolean emitAbsolute) {
+    if (PLATFORM_SYMBOLS_IN_TYPESCRIPT.contains(displayName)) {
+      return displayName;
+    }
+    if (emitAbsolute && isInBaseGoogNamespace(displayName)) {
+      return displayName;
+    }
+    // In partial mode, closure doesn't know the correct name of imported symbols.  If the name
+    // matches one in the precomputed map, replace it with the original declared name
+    // The displayName can be of the form foo.bar.baz, but the import could be
+    // `goog.require(foo.bar)`, so clutz needs to rewrite as eg `module$exports$foo$bar.baz`,
+    // replacing the first two dotted parts.
+    List<String> displayNameParts = new ArrayList<>(Arrays.asList(displayName.split("\\.")));
+    for (int i = 1; i <= displayNameParts.size(); i++) {
+      List<String> displayNamePrefix = displayNameParts.subList(0, i);
+      String baseDisplayName = Joiner.on(".").join(displayNamePrefix);
+      if (importRenameMap.containsKey(baseDisplayName)) {
+        if (emitAbsolute) {
+          // displayNamePrefix is a sublist of displayNameParts, modifications to it are reflected
+          // in displayNameParts - in this case all the prefix parts are replaced with the rename
+          displayNamePrefix.clear();
+          displayNamePrefix.add(importRenameMap.get(baseDisplayName));
+          displayName = Joiner.on(".").join(displayNameParts);
+          return Constants.INTERNAL_NAMESPACE + "." + rewriteGoogProvideName(displayName);
+        } else {
+          return rewriteGoogProvideName(displayName);
+        }
+      }
+    }
+    // If a symbol has a goog.provide style name, and is an exported symbol, rewrite it to use
+    // goog.module syntax
+    for (TypedVar symbol : compiler.getTopScope().getAllSymbols()) {
+      if (symbol.getName().equals(displayName)) {
+        if (!isGoogModuleStyleName(displayName) && !isInBaseGoogNamespace(displayName)) {
+          displayName = rewriteGoogProvideName(displayName);
+          return emitAbsolute ? Constants.INTERNAL_NAMESPACE + "." + displayName : displayName;
+        }
+      }
+    }
+    // If a symbol has a goog.provide style name, and is an exported symbol, rewrite it to use
+    // goog.module syntax
+    if (!emitAbsolute) {
+      // for (TypedVar symbol : compiler.getTopScope().getAllSymbols()) {
+      //   if (symbol.getName().equals(displayName)) {
+          return getUnqualifiedName(displayName);
+      //   }
+      // }
+    }
+    return emitAbsolute ? Constants.INTERNAL_NAMESPACE + "." + rewriteGoogProvideName(displayName) : displayName;
+    // return emitAbsolute ? Constants.INTERNAL_NAMESPACE + "." + displayName : displayName;
+  }
+
+  private Set<String> getProvideNames(String symbolName) {
+    if (symbolName.contains("module$exports$")) {
+      String moduleName = symbolName.split("\\.")[0];
+      moduleName = moduleName.replace("module$exports$", "");
+      return ImmutableSet.of(moduleName.replace("$", "."));
+    } else if (symbolName.contains("module$contents$")) {
+      String moduleName = symbolName.split("\\.")[0];
+      moduleName = moduleName.replace("module$contents$", "");
+      return ImmutableSet.of(moduleName.replace("$", "."));
+    } else {
+      Set<String> provideNames = new HashSet<>();
+      List<String> symbolNameParts = Arrays.asList(symbolName.split("\\."));
+      for (int i = 1; i <= symbolNameParts.size(); i++) {
+        provideNames.add(Joiner.on('.').join(symbolNameParts.subList(0, i)));
+      }
+      return provideNames;
+    }
+  }
+
   static List<SourceFile> getDefaultExterns(Options opts) {
     try {
       return AbstractCommandLineRunner.getBuiltinExterns(
@@ -1261,6 +1420,10 @@ class DeclarationGenerator {
   private void unindent() {
     indent--;
     checkState(indent >= 0, "indentation level below zero");
+  }
+
+  private void emitDisplayName(String name) {
+    emit(getDisplayName(name, false));
   }
 
   private void emitNoSpace(String str) {
@@ -1357,19 +1520,6 @@ class DeclarationGenerator {
       this.isGoogNamespace = isGoogNamespace;
     }
 
-    private String getAbsoluteName(ObjectType objectType) {
-      String name = getDisplayNameFromType(objectType);
-      // Names that do not have a namespace '.' are either platform names in the top level
-      // namespace like `Object` or `Element`, or they are unqualified `goog.provide`s, e.g.
-      // `goog.provide('Toplevel')`. In both cases they will be found with the naked name.
-      // However a goog.provide'd name can collide with a re-declared top-level symbol, e.g. if some
-      // code goog.provide's `Element`.
-      // TODO(martinprobst): Consider aliasing all global symbols into the clutz namespace.
-      if (name.indexOf('.') == -1) return name;
-      if (this.isGoogNamespace && name.startsWith("goog.")) return name;
-      return Constants.INTERNAL_NAMESPACE + "." + name;
-    }
-
     private void walk(TypedVar symbol, String emitName) {
       JSType type = symbol.getType();
       if (type.isFunctionType() && !isNewableFunctionType((FunctionType) type)) {
@@ -1377,7 +1527,7 @@ class DeclarationGenerator {
 
         if (isOrdinaryFunction(ftype)) {
           maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
-          visitFunctionExpression(getUnqualifiedName(emitName), ftype);
+          visitFunctionExpression(symbol.getName(), ftype);
           return;
         }
 
@@ -1387,14 +1537,14 @@ class DeclarationGenerator {
         // Since closure inlines all aliases before this step, check against
         // the type name.
         if (!isAliasedClassOrInterface(symbol, ftype)) {
-          visitClassOrInterface(getUnqualifiedName(emitName), ftype);
+          visitClassOrInterface(symbol.getName(), ftype);
         } else {
-          visitClassOrInterfaceAlias(getUnqualifiedName(emitName), ftype);
+          visitClassOrInterfaceAlias(symbol.getName(), ftype);
         }
       } else {
         maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
         if (type.isEnumType()) {
-          visitEnumType(emitName, emitName, (EnumType) type);
+          visitEnumType(symbol.getName(), emitName, (EnumType) type);
           return;
         }
         if (isTypedef(type)) {
@@ -1420,7 +1570,7 @@ class DeclarationGenerator {
                     + " but type not found in Closure type registry.");
           }
         }
-        visitVarDeclaration(getUnqualifiedName(emitName), type);
+        visitVarDeclaration(symbol.getName(), type);
       }
     }
 
@@ -1444,22 +1594,26 @@ class DeclarationGenerator {
     }
 
     private void visitClassOrInterfaceAlias(String unqualifiedName, FunctionType ftype) {
-      String typeName = Constants.INTERNAL_NAMESPACE + "." + getDisplayNameFromType(ftype);
       emit("type");
-      emit(unqualifiedName);
+      emitDisplayName(unqualifiedName);
       visitTemplateTypes(ftype);
       emit("=");
-      emit(typeName);
+      emitAbsoluteName(ftype.getDisplayName());
+      // emit(Constants.INTERNAL_NAMESPACE + ".");
+      // emitDisplayNameNoSpace(ftype.getDisplayName());
       visitTemplateTypes(ftype, Collections.emptyList(), false);
       emit(";");
       emitBreak();
       if (!ftype.isInterface()) {
         // TS type aliases are only useful in type positions.
         // To emulate closure alias semantics, introduce also an aliased constructor
-        emit("var " + unqualifiedName);
+        emit("var");
+        emitDisplayName(unqualifiedName);
         emit(":");
         emit("typeof");
-        emit(typeName);
+        // emit(Constants.INTERNAL_NAMESPACE + ".");
+        // emitDisplayNameNoSpace(ftype.getDisplayName());
+        emitAbsoluteName(ftype.getDisplayName());
         emit(";");
         emitBreak();
       }
@@ -1509,10 +1663,11 @@ class DeclarationGenerator {
       final boolean emitInstance = !ftype.isInterface();
       if (emitInstance) {
         emit("class");
-        emit(name);
+        emitDisplayName(name);
         visitTemplateTypes(ftype);
         emit("extends");
-        emit(name + INSTANCE_CLASS_SUFFIX);
+        emitDisplayName(name);
+        emitNoSpace(INSTANCE_CLASS_SUFFIX);
         visitTemplateTypes(ftype, Collections.emptyList(), false);
         emit("{");
         indent();
@@ -1532,7 +1687,10 @@ class DeclarationGenerator {
       } else {
         checkState(false, "Unexpected function type " + ftype);
       }
-      emit(emitInstance ? name + INSTANCE_CLASS_SUFFIX : name);
+      emitDisplayName(name);
+      if (emitInstance) {
+        emitNoSpace(INSTANCE_CLASS_SUFFIX);
+      }
 
       visitTemplateTypes(ftype);
 
@@ -1579,7 +1737,7 @@ class DeclarationGenerator {
 
     private void visitVarDeclaration(String name, JSType type) {
       emit("var");
-      emit(name);
+      emitDisplayName(name);
       visitTypeDeclaration(type, false, false);
       emit(";");
       emitBreak();
@@ -1606,13 +1764,13 @@ class DeclarationGenerator {
         List<String> realTemplateType = new ArrayList<>();
 
         for (TemplateType templateType : type.getTemplateTypeMap().getTemplateKeys()) {
-          String displayName = templateType.getDisplayName();
+          String displayName = getDisplayName(templateType.getDisplayName(), false);
 
           // Some template variables can be already defined at the class definition.
           // Closure and TypeScript disagree in that case, in closure redeclaring a class template
           // variable at a method does nothing, but in Typescript it introduces a new variable.
           // To preserve the semantics from closure we skip emitting redeclared variables.
-          if (alreadyEmittedTemplateType.contains(displayName)) {
+          if (alreadyEmittedTemplateType.contains(templateType.getDisplayName())) {
             continue;
           }
 
@@ -1651,13 +1809,13 @@ class DeclarationGenerator {
     }
 
     private void visitTypeAlias(JSType registryType, TypedVar symbol) {
-      visitTypeAlias(registryType, getUnqualifiedName(symbol), false);
+      visitTypeAlias(registryType, symbol.getName(), false);
     }
 
     private void visitTypeAlias(
         JSType registryType, String unqualifiedName, boolean emitNeverBrand) {
       emit("type");
-      emit(unqualifiedName);
+      emitDisplayName(unqualifiedName);
       emit("=");
       visitType(registryType, true, false);
       // emit a brand to prevent accidental compatibility of values with an enum.
@@ -1676,22 +1834,22 @@ class DeclarationGenerator {
       // We special case "number" enums (and for TS 2.4 should include 'string' enums)
 
       // TS `type` declarations accept only unqualified names.
-      String unqualifiedName = getUnqualifiedName(symbolName);
+      String unqualifiedName = symbolName;
 
       // @enums can be aliased by assignment. Emit a type alias + value alias for the situation.
       String elementsTypeName = type.getElementsType().getReferenceName();
       if (!qualifiedName.equals(elementsTypeName)) {
         emitComment(symbolName + " aliases enum " + elementsTypeName);
         emit("type");
-        emit(unqualifiedName);
+        emitDisplayName(unqualifiedName);
         emit("=");
-        emit(elementsTypeName);
+        emitDisplayName(elementsTypeName);
         emit(";");
         emitBreak();
         emit("const");
-        emit(unqualifiedName);
+        emitDisplayName(unqualifiedName);
         emit(": typeof");
-        emit(elementsTypeName);
+        emitDisplayName(elementsTypeName);
         emit(";");
         emitBreak();
         return;
@@ -1700,7 +1858,7 @@ class DeclarationGenerator {
       boolean isNumericEnum = type.getElementsType().getPrimitiveType().equals(numberType);
       if (isNumericEnum) {
         emit("enum");
-        emit(unqualifiedName);
+        emitDisplayName(unqualifiedName);
         emit("{");
         emitBreak();
         indent();
@@ -1715,7 +1873,7 @@ class DeclarationGenerator {
       } else {
         visitTypeAlias(type.getElementsType().getPrimitiveType(), unqualifiedName, true);
         emit("var");
-        emit(unqualifiedName);
+        emitDisplayName(unqualifiedName);
         emit(": {");
         emitBreak();
         indent();
@@ -1723,7 +1881,7 @@ class DeclarationGenerator {
           emit(elem);
           emit(":");
           // No need to use type.getMembersType(), this must match the type alias we just declared.
-          emit(unqualifiedName);
+          emitDisplayName(unqualifiedName);
           emit(",");
           emitBreak();
         }
@@ -1770,7 +1928,6 @@ class DeclarationGenerator {
         emit(defaultEmit);
         return;
       }
-      String displayName = getDisplayNameFromType(type);
       // We have a choice whether to emit Foo or ಠ_ಠ.clutz.Foo here. Only the first option
       // works in partial input mode, because it would work for both types within clutz's
       // view and types that come from lib.d.ts.
@@ -1783,34 +1940,11 @@ class DeclarationGenerator {
       //   export let x: F;  // F is looked up in a.b.c.d, then a.b.c, then a.b.
       // }
       // </pre>
-      emit(displayName);
+      emitAbsoluteName(type.getDisplayName());
       List<JSType> templateTypes = nType.getTemplateTypes();
       if (templateTypes != null && templateTypes.size() > 0) {
         emitGenericTypeArguments(type.getTemplateTypes().iterator());
       }
-    }
-
-    private String getDisplayNameFromType(JSType type) {
-      String displayName = type.getDisplayName();
-      // In partial mode, closure doesn't know the correct name of imported symbols.  If the name
-      // matches one in the precomputed map, replace it with the original declared name
-      // The displayName can be of the form foo.bar.baz, but the import could be
-      // `goog.require(foo.bar)`, so clutz needs to rewrite as eg `module$exports$foo$bar.baz`,
-      // replacing the first two dotted parts.
-      List<String> displayNameParts = new ArrayList<>(Arrays.asList(displayName.split("\\.")));
-      for (int i = 1; i <= displayNameParts.size(); i++) {
-        List<String> displayNamePrefix = displayNameParts.subList(0, i);
-        String baseDisplayName = Joiner.on(".").join(displayNamePrefix);
-        if (importRenameMap.containsKey(baseDisplayName)) {
-          // displayNamePrefix is a sublist of displayNameParts, modifications to it are reflected
-          // in displayNameParts - in this case all the prefix parts are replaced with the rename
-          displayNamePrefix.clear();
-          displayNamePrefix.add(importRenameMap.get(baseDisplayName));
-          displayName = Joiner.on(".").join(displayNameParts);
-          break;
-        }
-      }
-      return displayName;
     }
 
     /**
@@ -1851,7 +1985,12 @@ class DeclarationGenerator {
       // Known typedefs will be emitted symbolically instead of expanded.
       if (!skipDefCheck && typedefs.containsKey(typeToVisit)) {
         String typedefName = typedefs.get(typeToVisit);
-        emit(Constants.INTERNAL_NAMESPACE + "." + typedefName);
+        // if (!isGoogModuleStyleName(typedefName)) {
+        //   typedefName = rewriteGoogProvideName(typedefName);
+        // }
+        // emit(Constants.INTERNAL_NAMESPACE + ".");
+        // emitDisplayNameNoSpace(typedefName);
+        emitAbsoluteName(typedefName);
         typesUsed.add(typedefName);
         return;
       }
@@ -1907,8 +2046,7 @@ class DeclarationGenerator {
               // compilation
               // unit - A ends up as NoType, while B ends up as NamedType.
               if (opts.partialInput && refType.isUnknownType()) {
-                String displayName = getDisplayNameFromType(type);
-                emit(displayName);
+                emitAbsoluteName(type.getDisplayName());
                 List<JSType> templateTypes = type.getTemplateTypes();
                 if (templateTypes != null && templateTypes.size() > 0) {
                   emitGenericTypeArguments(type.getTemplateTypes().iterator());
@@ -1926,7 +2064,7 @@ class DeclarationGenerator {
 
             @Override
             public Void caseTemplateType(TemplateType templateType) {
-              emit(templateType.getReferenceName());
+              emitDisplayName(templateType.getDisplayName());
               return null;
             }
 
@@ -1974,7 +2112,7 @@ class DeclarationGenerator {
 
             @Override
             public Void caseEnumElementType(EnumElementType type) {
-              emit(getAbsoluteName(type));
+              emitAbsoluteName(type.getDisplayName());
               typesUsed.add(type.getDisplayName());
               return null;
             }
@@ -2031,8 +2169,8 @@ class DeclarationGenerator {
       ObjectType referencedType = type.getReferencedType();
       String templateTypeName =
           extendingInstanceClass
-              ? getAbsoluteName(type) + INSTANCE_CLASS_SUFFIX
-              : getAbsoluteName(type);
+              ? getDisplayName(type.getDisplayName(), true) + INSTANCE_CLASS_SUFFIX
+              : getDisplayName(type.getDisplayName(), true);
       if (typeRegistry.getNativeType(ARRAY_TYPE).equals(referencedType)
           && type.getTemplateTypes().size() == 1) {
         // As per TS type grammar, array types require primary types.
@@ -2372,7 +2510,7 @@ class DeclarationGenerator {
           continue;
         }
         visitProperty(
-            propName, objType, isStatic, forceProps.contains(propName), classTemplateTypeNames);
+            propName, propName, objType, isStatic, forceProps.contains(propName), classTemplateTypeNames);
       }
     }
 
@@ -2455,6 +2593,7 @@ class DeclarationGenerator {
 
     private void visitProperty(
         String propName,
+        String emitName,
         ObjectType objType,
         boolean isStatic,
         boolean forcePropDeclaration,
@@ -2471,11 +2610,12 @@ class DeclarationGenerator {
       // The static methods from the function prototype are provided by lib.d.ts.
       if (isStatic && isFunctionPrototypeProp(propName)) return;
       maybeEmitJsDoc(objType.getOwnPropertyJSDocInfo(propName), /* ignoreParams */ false);
-      emitProperty(propName, propertyType, isStatic, forcePropDeclaration, classTemplateTypeNames);
+      emitProperty(propName, emitName, propertyType, isStatic, forcePropDeclaration, classTemplateTypeNames);
     }
 
     private void emitProperty(
         String propName,
+        String emitName,
         JSType propertyType,
         boolean isStatic,
         boolean forcePropDeclaration,
@@ -2484,7 +2624,7 @@ class DeclarationGenerator {
         return;
 
       if (isStatic) emit("static");
-      emit(propName);
+      emit(emitName);
       if (!propertyType.isFunctionType() || forcePropDeclaration) {
         UnionType unionType = propertyType.toMaybeUnionType();
         boolean isOptionalProperty = false;
@@ -2624,8 +2764,8 @@ class DeclarationGenerator {
 
     private String getSignatureForInstanceTTEFn(
         String propName, List<String> classTemplateTypeNames, FunctionType ftype) {
-      // If ftype is foo.bar.Promise.prototype.then, extract className as Promise.
-      String className = getUnqualifiedName(getNamespace(getNamespace(ftype.getDisplayName())));
+      // If ftype is foo.bar.Promise.prototype.then, extract className as module$exports$foo$bar$Promise.
+      String className = getDisplayName(getNamespace(getNamespace(ftype.getDisplayName())), false);
       Iterator<String> templateTypeNames = classTemplateTypeNames.iterator();
       if (!templateTypeNames.hasNext()) return null;
 
@@ -2655,8 +2795,8 @@ class DeclarationGenerator {
     }
 
     private String getSignatureForStaticTTEFn(String propName, FunctionType ftype) {
-      // If ftype is foo.bar.Promise.all, extract className as Promise.
-      String className = getUnqualifiedName(getNamespace(ftype.getDisplayName()));
+      // If ftype is foo.bar.Promise.all, extract className as module$exports$foo$bar$Promise.
+      String className = getDisplayName(getNamespace(ftype.getDisplayName()), false);
       String maybePromiseMethod = getPromiseMethod(propName, className);
       if (maybePromiseMethod != null) {
         return "static " + maybePromiseMethod;
@@ -2810,38 +2950,37 @@ class DeclarationGenerator {
         }
       }
 
-      boolean foundNamespaceMembers = false;
+      String emitNamespace = isGoogModuleStyleName(innerNamespace) ? innerNamespace : "";
+      List<String> emittedSymbols = new ArrayList<>();
       for (NamedTypePair namedType : innerProps) {
         String propName = namedType.name;
         JSType pType = namedType.type;
         String qualifiedName = innerNamespace + '.' + propName;
         if (provides.contains(qualifiedName)) continue;
         if (pType.isEnumType()) {
-          if (!foundNamespaceMembers) {
-            emitNamespaceBegin(innerNamespace);
-            foundNamespaceMembers = true;
+          if (emittedSymbols.isEmpty()) {
+            emitNamespaceBegin(emitNamespace);
           }
-          visitEnumType(propName, qualifiedName, (EnumType) pType);
+          emittedSymbols.add(qualifiedName);
+          visitEnumType(qualifiedName, qualifiedName, (EnumType) pType);
         } else if (isClassLike(pType)) {
-          if (!foundNamespaceMembers) {
-            emitNamespaceBegin(innerNamespace);
-            foundNamespaceMembers = true;
+          if (emittedSymbols.isEmpty()) {
+            emitNamespaceBegin(emitNamespace);
           }
-          visitClassOrInterface(propName, (FunctionType) pType);
+          emittedSymbols.add(qualifiedName);
+          visitClassOrInterface(qualifiedName, (FunctionType) pType);
         } else if (isTypedef(pType)) {
-          if (!foundNamespaceMembers) {
-            emitNamespaceBegin(innerNamespace);
-            foundNamespaceMembers = true;
+          if (emittedSymbols.isEmpty()) {
+            emitNamespaceBegin(emitNamespace);
           }
+          emittedSymbols.add(qualifiedName);
           JSType registryType = typeRegistry.getType(qualifiedName);
           if (registryType != null) {
-            visitTypeAlias(registryType, propName, false);
+            visitTypeAlias(registryType, qualifiedName, false);
           } else {
             emitComment(
                 "Intended to visit type alias '"
-                    + innerNamespace
-                    + "."
-                    + propName
+                    + qualifiedName
                     + " but type not found in Closure type registry.");
           }
           // An extra pass is required for interfaces, because in Closure they might have
@@ -2852,25 +2991,30 @@ class DeclarationGenerator {
           // Interfaces are "backed" by a function() {} assignment in closure,
           // which adds some function prototype methods, that are not truely part of the interface.
           if (isFunctionPrototypeProp(propName)) continue;
-          if (!foundNamespaceMembers) {
-            emitNamespaceBegin(innerNamespace);
-            foundNamespaceMembers = true;
+          if (emittedSymbols.isEmpty()) {
+            emitNamespaceBegin(emitNamespace);
           }
-          visitFunctionExpression(propName, (FunctionType) pType);
+          emittedSymbols.add(qualifiedName);
+          visitFunctionExpression(qualifiedName, (FunctionType) pType);
         } else if (type.isInterface() && !pType.isNoType() && !pType.isFunctionPrototypeType()) {
-          if (!foundNamespaceMembers) {
-            emitNamespaceBegin(innerNamespace);
-            foundNamespaceMembers = true;
+          if (emittedSymbols.isEmpty()) {
+            emitNamespaceBegin(emitNamespace);
           }
-          visitVarDeclaration(propName, pType);
+          emittedSymbols.add(qualifiedName);
+          visitVarDeclaration(qualifiedName, pType);
         }
       }
-      if (foundNamespaceMembers) emitNamespaceEnd();
+      if (!emittedSymbols.isEmpty()) {
+        emitNamespaceEnd();
+        if (!isGoogModuleStyleName(innerNamespace)) {
+          declareGoogProvideSupplementalNamespaces(emittedSymbols);
+        }
+      }
     }
 
     private void visitFunctionExpression(String propName, FunctionType ftype) {
       emit("function");
-      emit(propName);
+      emitDisplayName(propName);
       visitFunctionDeclaration(ftype, Collections.<String>emptyList());
       emit(";");
       emitBreak();
@@ -2878,7 +3022,12 @@ class DeclarationGenerator {
 
     public void emitPrivateValue(String emitName) {
       emit("var");
-      emit(getUnqualifiedName(emitName));
+      // if (!isGoogModuleStyleName(emitName)) {
+      //   emitName = rewriteGoogProvideName(emitName);
+      // }
+      // emitName = getDisplayName(emitName);
+      emitDisplayName(emitName);
+      // emit(getUnqualifiedName(emitName));
       emit(":");
       emit(getGlobalSymbolNamespacePrefix() + "PrivateType;");
       emitBreak();
@@ -2898,20 +3047,22 @@ class DeclarationGenerator {
       } else if (type.isDict()) {
         emit("{[key: string]: any}");
       } else if (type.getReferenceName() != null) {
-        String name = getAbsoluteName(type);
         // Under special conditions (see prototype_inferred_type.js) closure can infer
         // the type be the prototype object. TypeScript has nothing that matches the shape
         // of the prototype object (surprisingly typeof A.prototype is A). The best we can do is
         // any.
-        if (name.endsWith(".prototype")) {
+        if (type.getReferenceName().endsWith(".prototype")) {
           emit("any");
           return null;
         }
-        if (this.isGoogNamespace && name.equals("global this")) {
+        if (this.isGoogNamespace && type.getReferenceName().equals("global this")) {
           emit("any");
           return null;
         }
-        emit(extendingInstanceClass ? name + INSTANCE_CLASS_SUFFIX : name);
+        emitAbsoluteName(type.getDisplayName());
+        if (extendingInstanceClass) {
+          emitNoSpace(INSTANCE_CLASS_SUFFIX);
+        }
         if (!type.getDisplayName().equals("Object")) {
           typesUsed.add(type.getDisplayName());
         }

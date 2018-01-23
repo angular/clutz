@@ -1,25 +1,40 @@
-declare namespace ಠ_ಠ.clutz.aliasT {
-  type I < T > = ಠ_ಠ.clutz.$jscomp.scope.I < T > ;
+declare namespace ಠ_ಠ.clutz {
+  type module$exports$aliasT$I < T > = ಠ_ಠ.clutz.module$exports$$jscomp$scope$I < T > ;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$aliasT {
+  export import I = ಠ_ಠ.clutz.module$exports$aliasT$I;
 }
 declare module 'goog:aliasT.I' {
-  import alias = ಠ_ಠ.clutz.aliasT.I;
+  import alias = ಠ_ಠ.clutz.module$exports$aliasT$I;
   export default alias;
 }
-declare namespace ಠ_ಠ.clutz.aliasT {
-  type I2 < T > = ಠ_ಠ.clutz.$jscomp.scope.I < T > ;
+declare namespace ಠ_ಠ.clutz {
+  type module$exports$aliasT$I2 < T > = ಠ_ಠ.clutz.module$exports$$jscomp$scope$I < T > ;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$aliasT {
+  export import I2 = ಠ_ಠ.clutz.module$exports$aliasT$I2;
 }
 declare module 'goog:aliasT.I2' {
-  import alias = ಠ_ಠ.clutz.aliasT.I2;
+  import alias = ಠ_ಠ.clutz.module$exports$aliasT$I2;
   export default alias;
 }
-declare namespace ಠ_ಠ.clutz.aliasT {
-  var iboom : ಠ_ಠ.clutz.$jscomp.scope.I < string > | null ;
+declare namespace ಠ_ಠ.clutz {
+  var module$exports$aliasT$iboom : ಠ_ಠ.clutz.module$exports$$jscomp$scope$I < string > | null ;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$aliasT {
+  export import iboom = ಠ_ಠ.clutz.module$exports$aliasT$iboom;
 }
 declare module 'goog:aliasT.iboom' {
-  import alias = ಠ_ಠ.clutz.aliasT.iboom;
+  import alias = ಠ_ಠ.clutz.module$exports$aliasT$iboom;
   export default alias;
 }
-declare namespace ಠ_ಠ.clutz.$jscomp.scope {
-  interface I < T > {
+declare namespace ಠ_ಠ.clutz {
+  interface module$exports$$jscomp$scope$I < T > {
   }
+}
+declare namespace ಠ_ಠ.clutz.module$exports$$jscomp.scope {
+  export import I = ಠ_ಠ.clutz.module$exports$$jscomp$scope$I;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$$jscomp$scope {
+  export import I = ಠ_ಠ.clutz.module$exports$$jscomp$scope$I;
 }

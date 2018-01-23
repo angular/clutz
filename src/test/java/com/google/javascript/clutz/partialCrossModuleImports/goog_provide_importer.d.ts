@@ -1,7 +1,7 @@
 declare namespace ಠ_ಠ.clutz {
   class module$exports$goog$provide$importer$GClass extends module$exports$goog$provide$importer$GClass_Instance {
   }
-  class module$exports$goog$provide$importer$GClass_Instance extends module$exports$goog$provide$exporter$ProvideClass {
+  class module$exports$goog$provide$importer$GClass_Instance extends ಠ_ಠ.clutz.module$exports$goog$provide$exporter$ProvideClass {
     constructor ( ) ;
   }
 }
@@ -21,7 +21,7 @@ declare module 'goog:goog.provide.importer.GClass' {
 declare namespace ಠ_ಠ.clutz {
   class module$exports$goog$provide$importer$HClass extends module$exports$goog$provide$importer$HClass_Instance {
   }
-  class module$exports$goog$provide$importer$HClass_Instance extends module$exports$goog$multi$provide$exporter.FirstMultiProvideClass {
+  class module$exports$goog$provide$importer$HClass_Instance extends ಠ_ಠ.clutz.module$exports$goog$multi$provide$exporter$FirstMultiProvideClass {
     constructor ( ) ;
   }
 }
@@ -41,7 +41,7 @@ declare module 'goog:goog.provide.importer.HClass' {
 declare namespace ಠ_ಠ.clutz {
   class module$exports$goog$provide$importer$IClass extends module$exports$goog$provide$importer$IClass_Instance {
   }
-  class module$exports$goog$provide$importer$IClass_Instance extends module$exports$goog$multi$provide$exporter.SecondMultiProvideClass {
+  class module$exports$goog$provide$importer$IClass_Instance extends ಠ_ಠ.clutz.module$exports$goog$multi$provide$exporter$SecondMultiProvideClass {
     constructor ( ) ;
   }
 }
@@ -61,7 +61,7 @@ declare module 'goog:goog.provide.importer.IClass' {
 declare namespace ಠ_ಠ.clutz {
   class module$exports$goog$provide$importer$JClass extends module$exports$goog$provide$importer$JClass_Instance {
   }
-  class module$exports$goog$provide$importer$JClass_Instance extends module$exports$goog$module$default$exporter {
+  class module$exports$goog$provide$importer$JClass_Instance extends ಠ_ಠ.clutz.module$exports$goog$module$default$exporter {
     constructor ( ) ;
   }
 }
@@ -81,7 +81,7 @@ declare module 'goog:goog.provide.importer.JClass' {
 declare namespace ಠ_ಠ.clutz {
   class module$exports$goog$provide$importer$KClass extends module$exports$goog$provide$importer$KClass_Instance {
   }
-  class module$exports$goog$provide$importer$KClass_Instance extends module$exports$goog$module$named$exporter.NamedClass {
+  class module$exports$goog$provide$importer$KClass_Instance extends ಠ_ಠ.clutz.module$exports$goog$module$named$exporter.NamedClass {
     constructor ( ) ;
   }
 }

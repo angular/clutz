@@ -1,7 +1,7 @@
 declare namespace ಠ_ಠ.clutz {
-  function default_fn ( ) : number ;
+  function module$exports$default_fn ( ) : number ;
 }
 declare module 'goog:default_fn' {
-  import alias = ಠ_ಠ.clutz.default_fn;
+  import alias = ಠ_ಠ.clutz.module$exports$default_fn;
   export default alias;
 }

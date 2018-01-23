@@ -1,7 +1,7 @@
 declare namespace ಠ_ಠ.clutz.module$exports$override {
   class ExtendsBase extends ExtendsBase_Instance {
   }
-  class ExtendsBase_Instance extends module$contents$override_Base_Instance {
+  class ExtendsBase_Instance extends ಠ_ಠ.clutz.module$contents$override_Base_Instance {
     /**
      * This function has no type information, but its base class is visible, so it should inherit
      * the types from the base.
@@ -10,7 +10,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$override {
   }
   class ExtendsInvisible extends ExtendsInvisible_Instance {
   }
-  class ExtendsInvisible_Instance extends module$exports$override.Invisible {
+  class ExtendsInvisible_Instance extends ಠ_ಠ.clutz.module$exports$override.Invisible {
     constructor ( ) ;
     /**
      * This function has no known type, so its parameter should be optional.

@@ -1,12 +1,12 @@
-declare namespace ಠ_ಠ.clutz.x {
+declare namespace ಠ_ಠ.clutz {
   /**
    * Docs on a ctor.
    *
    * Across multiple paragraphs.
    */
-  class Y extends Y_Instance {
+  class module$exports$x$Y extends module$exports$x$Y_Instance {
   }
-  class Y_Instance {
+  class module$exports$x$Y_Instance {
     private noStructuralTyping_: any;
     /**
      * Docs on a ctor.
@@ -26,7 +26,10 @@ declare namespace ಠ_ಠ.clutz.x {
     method (foo : string ) : void ;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$x {
+  export import Y = ಠ_ಠ.clutz.module$exports$x$Y;
+}
 declare module 'goog:x.Y' {
-  import alias = ಠ_ಠ.clutz.x.Y;
+  import alias = ಠ_ಠ.clutz.module$exports$x$Y;
   export default alias;
 }

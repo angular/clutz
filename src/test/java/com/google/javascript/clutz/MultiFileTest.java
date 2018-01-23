@@ -97,7 +97,7 @@ public class MultiFileTest {
 
   @Test
   public void partialCrossModuleImports() throws Exception {
-    String expected = DeclarationGeneratorTests.getTestFileText(input("total.d.ts"));
+    File golden = input("total.d.ts");
     assertThatProgram(
             ImmutableList.of(input("goog_module_importer.js"), input("goog_provide_importer.js")),
             ImmutableList.of(
@@ -105,7 +105,7 @@ public class MultiFileTest {
                 input("goog_module_named_exporter.js"),
                 input("goog_provide_exporter.js"),
                 input("goog_multi_provide_exporter.js")))
-        .generatesDeclarations(expected);
+        .generatesDeclarations(golden);
   }
 
   private File input(String filename) {

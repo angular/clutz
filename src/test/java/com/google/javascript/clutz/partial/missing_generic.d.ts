@@ -4,7 +4,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$missing$gen {
   class GenericClassDefaultsTypeParamToAny_Instance < T = any > {
     private noStructuralTyping_: any;
   }
-  var genericClassUse : missing.GenericClass ;
+  var genericClassUse : ಠ_ಠ.clutz.module$exports$missing$GenericClass ;
 }
 declare module 'goog:missing.gen' {
   import alias = ಠ_ಠ.clutz.module$exports$missing$gen;

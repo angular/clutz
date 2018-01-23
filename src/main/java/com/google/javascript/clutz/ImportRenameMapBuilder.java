@@ -91,6 +91,23 @@ public class ImportRenameMapBuilder {
         && googRequireCall.getFirstChild().matchesQualifiedName("goog.require");
   }
 
+  /** Matches a top level `goog.provide()` call. */
+  private static boolean isGoogProvideCall(Node statement) {
+    if (statement == null) {
+      return false;
+    }
+
+    if (!statement.isExprResult()) {
+      return false;
+    }
+
+    Node googRequireCall = statement.getFirstChild();
+
+    return googRequireCall != null
+        && googRequireCall.isCall()
+        && googRequireCall.getFirstChild().matchesQualifiedName("goog.provide");
+  }
+
   /**
    * Matches either `const foo = goog.require()` or `const foo = goog.module.get()` depending on if
    * statement is in a goog.module or a goog.scope.
@@ -196,7 +213,13 @@ public class ImportRenameMapBuilder {
         String importedModuleId = statement.getFirstChild().getChildAtIndex(1).getString();
 
         String exportedSymbolName = buildWholeModuleExportSymbolName(importedModuleId);
-        importRenameMap.put(importedModuleId, exportedSymbolName);
+        importRenameMap.put(importedModuleId, importedModuleId);
+      } else if (isGoogProvideCall(statement)) {
+        // `goog.provide()`
+        String importedModuleId = statement.getFirstChild().getChildAtIndex(1).getString();
+
+        String exportedSymbolName = buildWholeModuleExportSymbolName(importedModuleId);
+        importRenameMap.put(importedModuleId, importedModuleId);
       }
     }
 

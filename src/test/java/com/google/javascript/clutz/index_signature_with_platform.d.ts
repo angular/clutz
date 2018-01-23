@@ -1,63 +1,93 @@
-declare namespace ಠ_ಠ.clutz.index_signature {
-  class ImplementsIArrayLike extends ImplementsIArrayLike_Instance {
+declare namespace ಠ_ಠ.clutz {
+  class module$exports$index_signature$ImplementsIArrayLike extends module$exports$index_signature$ImplementsIArrayLike_Instance {
   }
-  class ImplementsIArrayLike_Instance implements ArrayLike < string > {
+  class module$exports$index_signature$ImplementsIArrayLike_Instance implements ArrayLike < string > {
     private noStructuralTyping_: any;
     [ key: number ]: string ;
     length : number ;
   }
-  class ImplementsIArrayLikeBare extends ImplementsIArrayLikeBare_Instance {
+  class module$exports$index_signature$ImplementsIArrayLikeBare extends module$exports$index_signature$ImplementsIArrayLikeBare_Instance {
   }
-  class ImplementsIArrayLikeBare_Instance implements ArrayLike < any > {
+  class module$exports$index_signature$ImplementsIArrayLikeBare_Instance implements ArrayLike < any > {
     private noStructuralTyping_: any;
     [ key: number ]: any ;
     length : number ;
   }
-  class ImplementsIArrayLikeWithGeneric < T > extends ImplementsIArrayLikeWithGeneric_Instance < T > {
+  class module$exports$index_signature$ImplementsIArrayLikeWithGeneric < T > extends module$exports$index_signature$ImplementsIArrayLikeWithGeneric_Instance < T > {
   }
-  class ImplementsIArrayLikeWithGeneric_Instance < T > implements ArrayLike < T > {
+  class module$exports$index_signature$ImplementsIArrayLikeWithGeneric_Instance < T > implements ArrayLike < T > {
     private noStructuralTyping_: any;
     [ key: number ]: T ;
     length : number ;
   }
-  class ImplementsIObject extends ImplementsIObject_Instance {
+  class module$exports$index_signature$ImplementsIObject extends module$exports$index_signature$ImplementsIObject_Instance {
   }
-  class ImplementsIObject_Instance implements IObject < string , number > {
+  class module$exports$index_signature$ImplementsIObject_Instance implements ಠ_ಠ.clutz.module$exports$IObject < string , number > {
     private noStructuralTyping_: any;
     [ key: string ]: number ;
   }
-  class ImplementsIObjectLikeBare extends ImplementsIObjectLikeBare_Instance {
+  class module$exports$index_signature$ImplementsIObjectLikeBare extends module$exports$index_signature$ImplementsIObjectLikeBare_Instance {
   }
-  class ImplementsIObjectLikeBare_Instance implements IObject < any , any > {
+  class module$exports$index_signature$ImplementsIObjectLikeBare_Instance implements ಠ_ಠ.clutz.module$exports$IObject < any , any > {
     private noStructuralTyping_: any;
     [ /* warning: coerced from ? */ key: string ]: any ;
   }
-  class ImplementsIObjectWithGeneric < T > extends ImplementsIObjectWithGeneric_Instance < T > {
+  class module$exports$index_signature$ImplementsIObjectWithGeneric < T > extends module$exports$index_signature$ImplementsIObjectWithGeneric_Instance < T > {
   }
-  class ImplementsIObjectWithGeneric_Instance < T > implements IObject < string , T > {
+  class module$exports$index_signature$ImplementsIObjectWithGeneric_Instance < T > implements ಠ_ಠ.clutz.module$exports$IObject < string , T > {
     private noStructuralTyping_: any;
     [ key: string ]: T ;
   }
-  interface InterfaceExtendingIArrayLike extends ArrayLike < string > {
+  interface module$exports$index_signature$InterfaceExtendingIArrayLike extends ArrayLike < string > {
   }
-  class ShouldContainIndexSignature extends ShouldContainIndexSignature_Instance {
+  class module$exports$index_signature$ShouldContainIndexSignature extends module$exports$index_signature$ShouldContainIndexSignature_Instance {
   }
-  class ShouldContainIndexSignature_Instance implements ಠ_ಠ.clutz.index_signature.InterfaceExtendingIArrayLike {
+  class module$exports$index_signature$ShouldContainIndexSignature_Instance implements ಠ_ಠ.clutz.module$exports$index_signature$InterfaceExtendingIArrayLike {
     private noStructuralTyping_: any;
     [ key: number ]: string ;
     length : number ;
   }
-  class ShouldNotContainIndexSignature extends ShouldNotContainIndexSignature_Instance {
+  class module$exports$index_signature$ShouldNotContainIndexSignature extends module$exports$index_signature$ShouldNotContainIndexSignature_Instance {
   }
-  class ShouldNotContainIndexSignature_Instance extends ಠ_ಠ.clutz.index_signature.ImplementsIArrayLike {
+  class module$exports$index_signature$ShouldNotContainIndexSignature_Instance extends ಠ_ಠ.clutz.module$exports$index_signature$ImplementsIArrayLike {
   }
-  class SomeType extends SomeType_Instance {
+  class module$exports$index_signature$SomeType extends module$exports$index_signature$SomeType_Instance {
   }
-  class SomeType_Instance {
+  class module$exports$index_signature$SomeType_Instance {
     private noStructuralTyping_: any;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$index_signature {
+  export import ImplementsIArrayLike = ಠ_ಠ.clutz.module$exports$index_signature$ImplementsIArrayLike;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$index_signature {
+  export import ImplementsIArrayLikeBare = ಠ_ಠ.clutz.module$exports$index_signature$ImplementsIArrayLikeBare;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$index_signature {
+  export import ImplementsIArrayLikeWithGeneric = ಠ_ಠ.clutz.module$exports$index_signature$ImplementsIArrayLikeWithGeneric;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$index_signature {
+  export import ImplementsIObject = ಠ_ಠ.clutz.module$exports$index_signature$ImplementsIObject;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$index_signature {
+  export import ImplementsIObjectLikeBare = ಠ_ಠ.clutz.module$exports$index_signature$ImplementsIObjectLikeBare;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$index_signature {
+  export import ImplementsIObjectWithGeneric = ಠ_ಠ.clutz.module$exports$index_signature$ImplementsIObjectWithGeneric;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$index_signature {
+  export import InterfaceExtendingIArrayLike = ಠ_ಠ.clutz.module$exports$index_signature$InterfaceExtendingIArrayLike;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$index_signature {
+  export import ShouldContainIndexSignature = ಠ_ಠ.clutz.module$exports$index_signature$ShouldContainIndexSignature;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$index_signature {
+  export import ShouldNotContainIndexSignature = ಠ_ಠ.clutz.module$exports$index_signature$ShouldNotContainIndexSignature;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$index_signature {
+  export import SomeType = ಠ_ಠ.clutz.module$exports$index_signature$SomeType;
+}
 declare module 'goog:index_signature' {
-  import alias = ಠ_ಠ.clutz.index_signature;
+  import alias = ಠ_ಠ.clutz.module$exports$index_signature;
   export = alias;
 }
