@@ -5,8 +5,10 @@ import static com.google.common.truth.Truth.assert_;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 import com.google.common.truth.FailureStrategy;
 import com.google.common.truth.StringSubject;
 import com.google.common.truth.Subject;
@@ -14,6 +16,7 @@ import com.google.common.truth.SubjectFactory;
 import com.google.javascript.jscomp.SourceFile;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -73,14 +76,23 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
     super(failureStrategy, subject);
   }
 
-  void generatesDeclarations(String expected) {
+  void generatesDeclarations(File golden) throws IOException {
     String[] parseResult = parse();
     assertThat(parseResult[1]).isEqualTo("");
     String actual = parseResult[0];
     String stripped =
         DeclarationGeneratorTests.GOLDEN_FILE_COMMENTS_REGEXP.matcher(actual).replaceAll("");
-    if (!stripped.equals(expected)) {
-      failureStrategy.failComparing("compilation result doesn't match", expected, stripped);
+    String expected = DeclarationGeneratorTests.getTestFileText(golden);
+    String expectedClean =
+        DeclarationGeneratorTests.GOLDEN_FILE_COMMENTS_REGEXP.matcher(expected).replaceAll("");
+    if (!stripped.equals(expectedClean)) {
+      if (System.getenv("UPDATE_GOLDENS") != null
+          && !golden.getName().endsWith("_with_platform.d.ts")
+          && expected.equals(expectedClean)) {
+        Files.write(stripped, golden, Charsets.UTF_8);
+      } else {
+        failureStrategy.failComparing("compilation result doesn't match", expected, stripped);
+      }
     }
   }
 
