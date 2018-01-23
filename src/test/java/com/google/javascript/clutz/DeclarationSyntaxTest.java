@@ -62,6 +62,15 @@ public class DeclarationSyntaxTest {
         }
       };
 
+  private static final FilenameFilter JS_CROSS_MODULE_IMPORTS =
+      new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+          return JS_NO_EXTERNS.accept(dir, name)
+              && dir.getName().equals("partialCrossModuleImports");
+        }
+      };
+
   public static final Path TSC =
       FileSystems.getDefault().getPath("node_modules", "typescript", "bin", "tsc");
 
@@ -93,6 +102,12 @@ public class DeclarationSyntaxTest {
   @Test
   public void testMultiFilePartialDeclarationSyntax() throws Exception {
     List<File> inputs = DeclarationGeneratorTests.getTestInputFiles(JS_MULTIFILE_PARTIAL);
+    doTestDeclarationSyntax(inputs);
+  }
+
+  @Test
+  public void testCrossModuleImportsDeclarationSyntax() throws Exception {
+    List<File> inputs = DeclarationGeneratorTests.getTestInputFiles(JS_CROSS_MODULE_IMPORTS);
     doTestDeclarationSyntax(inputs);
   }
 

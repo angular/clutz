@@ -24,11 +24,14 @@ public class ImportRenameMapBuilder {
   public static Map<String, String> build(Collection<Node> parsedInputs) {
     Map<String, String> importRenameMap = new HashMap<>();
     for (Node ast : parsedInputs) {
-      // Symbols can be imported into a variable in a goog.module() file, so look for imports in the
-      // body of the goog module.
       String moduleId = getGoogModuleId(ast);
       if (moduleId != null) {
+        // Symbols can be imported into a variable in a goog.module() file, so look for imports in the
+        // body of the goog module.
         importRenameMap.putAll(build(moduleId, ast.getFirstChild()));
+      } else {
+        // Also get renames for goog.require() symbols in goog.provide() files
+        importRenameMap.putAll(build(null, ast));
       }
 
       // Or symbols can be imported into a variable in a top-level goog.scope() block, so look for
@@ -69,6 +72,23 @@ public class ImportRenameMapBuilder {
 
     Node expression = statement.getFirstChild();
     return expression.isCall() && expression.getFirstChild().matchesQualifiedName("goog.module");
+  }
+
+  /** Matches a top level `goog.require()` call. */
+  private static boolean isGoogRequireCall(Node statement) {
+    if (statement == null) {
+      return false;
+    }
+
+    if (!statement.isExprResult()) {
+      return false;
+    }
+
+    Node googRequireCall = statement.getFirstChild();
+
+    return googRequireCall != null
+        && googRequireCall.isCall()
+        && googRequireCall.getFirstChild().matchesQualifiedName("goog.require");
   }
 
   /**
@@ -171,6 +191,12 @@ public class ImportRenameMapBuilder {
             importRenameMap.put(localSymbolName, exportedSymbolName);
           }
         }
+      } else if (isGoogRequireCall(statement)) {
+        // `goog.require()`
+        String importedModuleId = statement.getFirstChild().getChildAtIndex(1).getString();
+
+        String exportedSymbolName = buildWholeModuleExportSymbolName(importedModuleId);
+        importRenameMap.put(importedModuleId, exportedSymbolName);
       }
     }
 
