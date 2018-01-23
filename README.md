@@ -55,6 +55,12 @@ version of TypeScript
 suite runs against the version of `typescript` in `npm-shrinkwrap.json`, so that is
 always a good choice.
 
+## Tests
+You can run the test suite with:
+```shell
+$ ./gradlew test
+```
+Pass the environment variable `UPDATE_GOLDENS=y` to update the golden files.
 
 # Gents - Closure to TypeScript converter
 
