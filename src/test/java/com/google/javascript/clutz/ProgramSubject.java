@@ -86,6 +86,9 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
     String expectedClean =
         DeclarationGeneratorTests.GOLDEN_FILE_COMMENTS_REGEXP.matcher(expected).replaceAll("");
     if (!stripped.equals(expectedClean)) {
+      // If the `UPDATE_GOLDENS` flag is set, overwrite the golden files, unless it's a `_with_platform.d.ts`
+      // which have 2 golden files that are concatenated, or if the golden has comments, both of which
+      // shouldn't be blindly overwritten
       if (System.getenv("UPDATE_GOLDENS") != null
           && !golden.getName().endsWith("_with_platform.d.ts")
           && expected.equals(expectedClean)) {
