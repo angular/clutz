@@ -6,7 +6,7 @@ declare namespace ಠ_ಠ.clutz.sim_nested {
 }
 declare namespace ಠ_ಠ.clutz.sim_nested.Child {
   enum Nested {
-    B ,
+    B = 1 ,
   }
 }
 declare module 'goog:sim_nested.Child' {
@@ -15,7 +15,7 @@ declare module 'goog:sim_nested.Child' {
 }
 declare namespace ಠ_ಠ.clutz.sim_nested.Child {
   enum NestedAndProvided {
-    B ,
+    B = 1 ,
   }
 }
 declare module 'goog:sim_nested.Child.NestedAndProvided' {
