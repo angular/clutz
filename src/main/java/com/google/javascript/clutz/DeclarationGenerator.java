@@ -160,7 +160,10 @@ class DeclarationGenerator {
           "IObject",
           "Iterator",
           "HTMLImageElement",
-          "ArrayBufferView");
+          "ArrayBufferView",
+              "Element",
+              "XMLHttpRequest",
+              "HTMLDocument");
 
   /**
    * List of files that are part of closures platform externs. Not exhaustive, see isPlatformExtern
@@ -550,7 +553,7 @@ class DeclarationGenerator {
         emit(": any;");
         emitBreak();
         emitNamespaceEnd();
-        declareGoogProvideSupplementalNamespaces(Arrays.asList(emitName));
+//        declareGoogProvideSupplementalNamespaces(Arrays.asList(emitName));
         declareModule(provide, true, emitName);
         continue;
       }
@@ -992,7 +995,7 @@ class DeclarationGenerator {
     boolean rewroteGoogProvide = false;
     List<String> emittedSymbols = new ArrayList<>();
     if (!isGoogNamespace && !isGoogModuleStyleName(emitName)) {
-      namespace = "";
+      namespace = isDefault ? "" : rewriteGoogProvideName(namespace);
       // String googModuleEmitName = rewriteGoogProvideName(emitName);
       // emitName = googModuleEmitName;
       rewroteGoogProvide = true;
@@ -1100,7 +1103,7 @@ class DeclarationGenerator {
     emitNamespaceEnd();
 
     if (rewroteGoogProvide) {
-      declareGoogProvideSupplementalNamespaces(emittedSymbols);
+//      declareGoogProvideSupplementalNamespaces(emittedSymbols);
     }
 
     // extra walk required for inner classes and inner enums. They are allowed in closure,
@@ -1343,7 +1346,7 @@ class DeclarationGenerator {
     // `goog.require(foo.bar)`, so clutz needs to rewrite as eg `module$exports$foo$bar.baz`,
     // replacing the first two dotted parts.
     List<String> displayNameParts = new ArrayList<>(Arrays.asList(displayName.split("\\.")));
-    for (int i = 1; i <= displayNameParts.size(); i++) {
+    for (int i = displayNameParts.size(); i >= 1; i--) {
       List<String> displayNamePrefix = displayNameParts.subList(0, i);
       String baseDisplayName = Joiner.on(".").join(displayNamePrefix);
       if (importRenameMap.containsKey(baseDisplayName)) {
@@ -1355,7 +1358,11 @@ class DeclarationGenerator {
           displayName = Joiner.on(".").join(displayNameParts);
           return Constants.INTERNAL_NAMESPACE + "." + rewriteGoogProvideName(displayName);
         } else {
-          return rewriteGoogProvideName(displayName);
+          if (i == displayNameParts.size()) {
+            return rewriteGoogProvideName(displayName);
+          } else {
+            return getUnqualifiedName(displayName);
+          }
         }
       }
     }
@@ -2950,7 +2957,7 @@ class DeclarationGenerator {
         }
       }
 
-      String emitNamespace = isGoogModuleStyleName(innerNamespace) ? innerNamespace : "";
+      String emitNamespace = isGoogModuleStyleName(innerNamespace) ? innerNamespace : rewriteGoogProvideName(innerNamespace);
       List<String> emittedSymbols = new ArrayList<>();
       for (NamedTypePair namedType : innerProps) {
         String propName = namedType.name;
@@ -3007,7 +3014,7 @@ class DeclarationGenerator {
       if (!emittedSymbols.isEmpty()) {
         emitNamespaceEnd();
         if (!isGoogModuleStyleName(innerNamespace)) {
-          declareGoogProvideSupplementalNamespaces(emittedSymbols);
+//          declareGoogProvideSupplementalNamespaces(emittedSymbols);
         }
       }
     }

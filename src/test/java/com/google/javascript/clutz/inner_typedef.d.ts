@@ -5,17 +5,8 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.module$exports$innerTypeDef {
-  export import Foo = ಠ_ಠ.clutz.module$exports$innerTypeDef$Foo;
-}
-declare namespace ಠ_ಠ.clutz {
-  type module$exports$innerTypeDef$Foo$Bar = { a : string } ;
-}
-declare namespace ಠ_ಠ.clutz.module$exports$innerTypeDef.Foo {
-  export import Bar = ಠ_ಠ.clutz.module$exports$innerTypeDef$Foo$Bar;
-}
 declare namespace ಠ_ಠ.clutz.module$exports$innerTypeDef$Foo {
-  export import Bar = ಠ_ಠ.clutz.module$exports$innerTypeDef$Foo$Bar;
+  type Bar = { a : string } ;
 }
 declare module 'goog:innerTypeDef.Foo' {
   import alias = ಠ_ಠ.clutz.module$exports$innerTypeDef$Foo;

@@ -1,4 +1,4 @@
-declare namespace ಠ_ಠ.clutz {
+declare namespace ಠ_ಠ.clutz.module$exports$lends {
 }
 declare module 'goog:lends' {
   import alias = ಠ_ಠ.clutz.module$exports$lends;
@@ -13,9 +13,6 @@ declare namespace ಠ_ಠ.clutz {
     a : string ;
     c : boolean ;
   }
-}
-declare namespace ಠ_ಠ.clutz.module$exports$lends {
-  export import A = ಠ_ಠ.clutz.module$exports$lends$A;
 }
 declare module 'goog:lends.A' {
   import alias = ಠ_ಠ.clutz.module$exports$lends$A;

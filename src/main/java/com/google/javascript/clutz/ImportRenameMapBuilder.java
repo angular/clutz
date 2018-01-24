@@ -42,6 +42,7 @@ public class ImportRenameMapBuilder {
           importRenameMap.putAll(build(null, googScope));
         }
       }
+      //TODO(lucassloan): handle goog.module.declareLegacyNamespace();
     }
     return importRenameMap;
   }
@@ -213,13 +214,13 @@ public class ImportRenameMapBuilder {
         String importedModuleId = statement.getFirstChild().getChildAtIndex(1).getString();
 
         String exportedSymbolName = buildWholeModuleExportSymbolName(importedModuleId);
-        importRenameMap.put(importedModuleId, importedModuleId);
+        importRenameMap.put(importedModuleId, exportedSymbolName);
       } else if (isGoogProvideCall(statement)) {
         // `goog.provide()`
         String importedModuleId = statement.getFirstChild().getChildAtIndex(1).getString();
 
         String exportedSymbolName = buildWholeModuleExportSymbolName(importedModuleId);
-        importRenameMap.put(importedModuleId, importedModuleId);
+        importRenameMap.put(importedModuleId, exportedSymbolName);
       }
     }
 

@@ -1,5 +1,6 @@
 goog.require("goog.provide.exporter.ProvideClass");
-goog.require("goog.multi.provide.exporter");
+goog.require("goog.multi.provide.exporter.FirstMultiProvideClass");
+goog.require("goog.multi.provide.exporter.SecondMultiProvideClass");
 goog.provide("goog.provide.importer.GClass");
 goog.provide("goog.provide.importer.HClass");
 goog.provide("goog.provide.importer.IClass");

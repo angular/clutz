@@ -5,9 +5,6 @@ declare namespace ಠ_ಠ.clutz {
     B : module$exports$some$ObjectValuedEnum ,
   };
 }
-declare namespace ಠ_ಠ.clutz.module$exports$some {
-  export import ObjectValuedEnum = ಠ_ಠ.clutz.module$exports$some$ObjectValuedEnum;
-}
 declare module 'goog:some.ObjectValuedEnum' {
   import alias = ಠ_ಠ.clutz.module$exports$some$ObjectValuedEnum;
   export default alias;
@@ -17,9 +14,6 @@ declare namespace ಠ_ಠ.clutz {
     A ,
     B ,
   }
-}
-declare namespace ಠ_ಠ.clutz.module$exports$some {
-  export import SomeEnum = ಠ_ಠ.clutz.module$exports$some$SomeEnum;
 }
 declare module 'goog:some.SomeEnum' {
   import alias = ಠ_ಠ.clutz.module$exports$some$SomeEnum;

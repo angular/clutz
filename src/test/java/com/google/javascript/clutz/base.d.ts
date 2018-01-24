@@ -38,9 +38,6 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.module$exports$goog {
-  export import Uri = ಠ_ಠ.clutz.module$exports$goog$Uri;
-}
 declare module 'goog:goog.Uri' {
   import alias = ಠ_ಠ.clutz.module$exports$goog$Uri;
   export default alias;

@@ -10,9 +10,6 @@ declare namespace ಠ_ಠ.clutz {
     when < RESULT, T > (value: T, successCallback: (promiseValue: T) => module$exports$tte$Promise < RESULT >|RESULT, errorCallback: null | undefined |  ((reason: any) => any), notifyCallback?: (state: any) => any): module$exports$tte$Promise < RESULT >;
   }
 }
-declare namespace ಠ_ಠ.clutz.module$exports$tte {
-  export import Promise = ಠ_ಠ.clutz.module$exports$tte$Promise;
-}
 declare module 'goog:tte.Promise' {
   import alias = ಠ_ಠ.clutz.module$exports$tte$Promise;
   export default alias;
@@ -25,18 +22,9 @@ declare namespace ಠ_ಠ.clutz {
     all(promises : module$exports$tte$PromiseService.Promise < any > [] ) : module$exports$tte$PromiseService.Promise < any [] > ;
   }
 }
-declare namespace ಠ_ಠ.clutz.module$exports$tte {
-  export import PromiseService = ಠ_ಠ.clutz.module$exports$tte$PromiseService;
-}
-declare namespace ಠ_ಠ.clutz {
-  interface module$exports$tte$PromiseService$Promise < T > {
-  }
-}
-declare namespace ಠ_ಠ.clutz.module$exports$tte.PromiseService {
-  export import Promise = ಠ_ಠ.clutz.module$exports$tte$PromiseService$Promise;
-}
 declare namespace ಠ_ಠ.clutz.module$exports$tte$PromiseService {
-  export import Promise = ಠ_ಠ.clutz.module$exports$tte$PromiseService$Promise;
+  interface Promise < T > {
+  }
 }
 declare module 'goog:tte.PromiseService' {
   import alias = ಠ_ಠ.clutz.module$exports$tte$PromiseService;

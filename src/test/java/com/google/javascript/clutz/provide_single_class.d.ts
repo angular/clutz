@@ -7,44 +7,20 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_: any;
     field : string ;
     avalue : number ;
-    equals (b : ಠ_ಠ.clutz.module$exports$foo$bar$Baz$NestedClass ) : boolean ;
+    equals (b : ಠ_ಠ.clutz.module$exports$foo$bar$Baz.NestedClass ) : boolean ;
     method (a : string ) : number ;
   }
 }
-declare namespace ಠ_ಠ.clutz.module$exports$foo.bar {
-  export import Baz = ಠ_ಠ.clutz.module$exports$foo$bar$Baz;
-}
-declare namespace ಠ_ಠ.clutz.module$exports$foo$bar {
-  export import Baz = ಠ_ಠ.clutz.module$exports$foo$bar$Baz;
-}
-declare namespace ಠ_ಠ.clutz {
-  class module$exports$foo$bar$Baz$NestedClass extends module$exports$foo$bar$Baz$NestedClass_Instance {
+declare namespace ಠ_ಠ.clutz.module$exports$foo$bar$Baz {
+  class NestedClass extends NestedClass_Instance {
   }
-  class module$exports$foo$bar$Baz$NestedClass_Instance {
+  class NestedClass_Instance {
     private noStructuralTyping_: any;
   }
-  enum module$exports$foo$bar$Baz$NestedEnum {
+  enum NestedEnum {
     A ,
     B ,
   }
-}
-declare namespace ಠ_ಠ.clutz.module$exports$foo.bar.Baz {
-  export import NestedClass = ಠ_ಠ.clutz.module$exports$foo$bar$Baz$NestedClass;
-}
-declare namespace ಠ_ಠ.clutz.module$exports$foo$bar.Baz {
-  export import NestedClass = ಠ_ಠ.clutz.module$exports$foo$bar$Baz$NestedClass;
-}
-declare namespace ಠ_ಠ.clutz.module$exports$foo$bar$Baz {
-  export import NestedClass = ಠ_ಠ.clutz.module$exports$foo$bar$Baz$NestedClass;
-}
-declare namespace ಠ_ಠ.clutz.module$exports$foo.bar.Baz {
-  export import NestedEnum = ಠ_ಠ.clutz.module$exports$foo$bar$Baz$NestedEnum;
-}
-declare namespace ಠ_ಠ.clutz.module$exports$foo$bar.Baz {
-  export import NestedEnum = ಠ_ಠ.clutz.module$exports$foo$bar$Baz$NestedEnum;
-}
-declare namespace ಠ_ಠ.clutz.module$exports$foo$bar$Baz {
-  export import NestedEnum = ಠ_ಠ.clutz.module$exports$foo$bar$Baz$NestedEnum;
 }
 declare module 'goog:foo.bar.Baz' {
   import alias = ಠ_ಠ.clutz.module$exports$foo$bar$Baz;

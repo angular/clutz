@@ -6,9 +6,6 @@ declare namespace ಠ_ಠ.clutz {
     [Symbol.iterator]():  Iterator < string > ;
   }
 }
-declare namespace ಠ_ಠ.clutz.module$exports$implements_iterable {
-  export import ImplIterable = ಠ_ಠ.clutz.module$exports$implements_iterable$ImplIterable;
-}
 declare module 'goog:implements_iterable.ImplIterable' {
   import alias = ಠ_ಠ.clutz.module$exports$implements_iterable$ImplIterable;
   export default alias;
@@ -20,9 +17,6 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_: any;
     [Symbol.iterator]():  Iterator < any > ;
   }
-}
-declare namespace ಠ_ಠ.clutz.module$exports$implements_iterable {
-  export import ImplIterableGeneric = ಠ_ಠ.clutz.module$exports$implements_iterable$ImplIterableGeneric;
 }
 declare module 'goog:implements_iterable.ImplIterableGeneric' {
   import alias = ಠ_ಠ.clutz.module$exports$implements_iterable$ImplIterableGeneric;
@@ -36,9 +30,6 @@ declare namespace ಠ_ಠ.clutz {
     [Symbol.iterator]():  IterableIterator < string > ;
     next (a ? : string ) : IteratorResult < string > ;
   }
-}
-declare namespace ಠ_ಠ.clutz.module$exports$implements_iterable {
-  export import ImplIterableIterator = ಠ_ಠ.clutz.module$exports$implements_iterable$ImplIterableIterator;
 }
 declare module 'goog:implements_iterable.ImplIterableIterator' {
   import alias = ಠ_ಠ.clutz.module$exports$implements_iterable$ImplIterableIterator;

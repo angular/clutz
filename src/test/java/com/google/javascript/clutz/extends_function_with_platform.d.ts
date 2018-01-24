@@ -5,9 +5,6 @@ declare namespace ಠ_ಠ.clutz {
     constructor ( ) ;
   }
 }
-declare namespace ಠ_ಠ.clutz.module$exports$foo {
-  export import A = ಠ_ಠ.clutz.module$exports$foo$A;
-}
 declare module 'goog:foo.A' {
   import alias = ಠ_ಠ.clutz.module$exports$foo$A;
   export default alias;

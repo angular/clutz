@@ -4,19 +4,10 @@ declare namespace ಠ_ಠ.clutz {
   class module$exports$sim_nested$Child_Instance extends ಠ_ಠ.clutz.module$exports$sim_nested$Parent_Instance {
   }
 }
-declare namespace ಠ_ಠ.clutz.module$exports$sim_nested {
-  export import Child = ಠ_ಠ.clutz.module$exports$sim_nested$Child;
-}
-declare namespace ಠ_ಠ.clutz {
-  enum module$exports$sim_nested$Child$Nested {
+declare namespace ಠ_ಠ.clutz.module$exports$sim_nested$Child {
+  enum Nested {
     B ,
   }
-}
-declare namespace ಠ_ಠ.clutz.module$exports$sim_nested.Child {
-  export import Nested = ಠ_ಠ.clutz.module$exports$sim_nested$Child$Nested;
-}
-declare namespace ಠ_ಠ.clutz.module$exports$sim_nested$Child {
-  export import Nested = ಠ_ಠ.clutz.module$exports$sim_nested$Child$Nested;
 }
 declare module 'goog:sim_nested.Child' {
   import alias = ಠ_ಠ.clutz.module$exports$sim_nested$Child;
@@ -26,12 +17,6 @@ declare namespace ಠ_ಠ.clutz {
   enum module$exports$sim_nested$Child$NestedAndProvided {
     B ,
   }
-}
-declare namespace ಠ_ಠ.clutz.module$exports$sim_nested.Child {
-  export import NestedAndProvided = ಠ_ಠ.clutz.module$exports$sim_nested$Child$NestedAndProvided;
-}
-declare namespace ಠ_ಠ.clutz.module$exports$sim_nested$Child {
-  export import NestedAndProvided = ಠ_ಠ.clutz.module$exports$sim_nested$Child$NestedAndProvided;
 }
 declare module 'goog:sim_nested.Child.NestedAndProvided' {
   import alias = ಠ_ಠ.clutz.module$exports$sim_nested$Child$NestedAndProvided;
@@ -44,20 +29,11 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.module$exports$sim_nested {
-  export import Parent = ಠ_ಠ.clutz.module$exports$sim_nested$Parent;
-}
-declare namespace ಠ_ಠ.clutz {
-  type module$exports$sim_nested$Parent$Nested = string &{clutzEnumBrand: never} ;
-  var module$exports$sim_nested$Parent$Nested : {
-    A : module$exports$sim_nested$Parent$Nested ,
-  };
-}
-declare namespace ಠ_ಠ.clutz.module$exports$sim_nested.Parent {
-  export import Nested = ಠ_ಠ.clutz.module$exports$sim_nested$Parent$Nested;
-}
 declare namespace ಠ_ಠ.clutz.module$exports$sim_nested$Parent {
-  export import Nested = ಠ_ಠ.clutz.module$exports$sim_nested$Parent$Nested;
+  type Nested = string &{clutzEnumBrand: never} ;
+  var Nested : {
+    A : Nested ,
+  };
 }
 declare module 'goog:sim_nested.Parent' {
   import alias = ಠ_ಠ.clutz.module$exports$sim_nested$Parent;
@@ -68,12 +44,6 @@ declare namespace ಠ_ಠ.clutz {
   var module$exports$sim_nested$Parent$NestedAndProvided : {
     A : module$exports$sim_nested$Parent$NestedAndProvided ,
   };
-}
-declare namespace ಠ_ಠ.clutz.module$exports$sim_nested.Parent {
-  export import NestedAndProvided = ಠ_ಠ.clutz.module$exports$sim_nested$Parent$NestedAndProvided;
-}
-declare namespace ಠ_ಠ.clutz.module$exports$sim_nested$Parent {
-  export import NestedAndProvided = ಠ_ಠ.clutz.module$exports$sim_nested$Parent$NestedAndProvided;
 }
 declare module 'goog:sim_nested.Parent.NestedAndProvided' {
   import alias = ಠ_ಠ.clutz.module$exports$sim_nested$Parent$NestedAndProvided;

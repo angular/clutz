@@ -9,9 +9,6 @@ declare namespace ಠ_ಠ.clutz {
     fn (a : any ) : any ;
   }
 }
-declare namespace ಠ_ಠ.clutz.module$exports$forward {
-  export import A = ಠ_ಠ.clutz.module$exports$forward$A;
-}
 declare module 'goog:forward.A' {
   import alias = ಠ_ಠ.clutz.module$exports$forward$A;
   export default alias;

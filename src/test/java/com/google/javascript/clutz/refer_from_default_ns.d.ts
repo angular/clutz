@@ -12,9 +12,6 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.module$exports$fn {
-  export import String = ಠ_ಠ.clutz.module$exports$fn$String;
-}
 declare module 'goog:fn.String' {
   import alias = ಠ_ಠ.clutz.module$exports$fn$String;
   export default alias;

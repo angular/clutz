@@ -7,12 +7,6 @@ declare namespace ಠ_ಠ.clutz {
     length : number ;
   }
 }
-declare namespace ಠ_ಠ.clutz.module$exports$extend.arraylike {
-  export import A = ಠ_ಠ.clutz.module$exports$extend$arraylike$A;
-}
-declare namespace ಠ_ಠ.clutz.module$exports$extend$arraylike {
-  export import A = ಠ_ಠ.clutz.module$exports$extend$arraylike$A;
-}
 declare module 'goog:extend.arraylike.A' {
   import alias = ಠ_ಠ.clutz.module$exports$extend$arraylike$A;
   export default alias;
@@ -26,12 +20,6 @@ declare namespace ಠ_ಠ.clutz {
     length : number ;
   }
 }
-declare namespace ಠ_ಠ.clutz.module$exports$extend.arraylike {
-  export import B = ಠ_ಠ.clutz.module$exports$extend$arraylike$B;
-}
-declare namespace ಠ_ಠ.clutz.module$exports$extend$arraylike {
-  export import B = ಠ_ಠ.clutz.module$exports$extend$arraylike$B;
-}
 declare module 'goog:extend.arraylike.B' {
   import alias = ಠ_ಠ.clutz.module$exports$extend$arraylike$B;
   export default alias;
@@ -39,12 +27,6 @@ declare module 'goog:extend.arraylike.B' {
 declare namespace ಠ_ಠ.clutz {
   interface module$exports$extend$arraylike$I extends ArrayLike < any > {
   }
-}
-declare namespace ಠ_ಠ.clutz.module$exports$extend.arraylike {
-  export import I = ಠ_ಠ.clutz.module$exports$extend$arraylike$I;
-}
-declare namespace ಠ_ಠ.clutz.module$exports$extend$arraylike {
-  export import I = ಠ_ಠ.clutz.module$exports$extend$arraylike$I;
 }
 declare module 'goog:extend.arraylike.I' {
   import alias = ಠ_ಠ.clutz.module$exports$extend$arraylike$I;

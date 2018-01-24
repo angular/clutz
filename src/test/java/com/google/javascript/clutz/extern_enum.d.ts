@@ -3,6 +3,3 @@ declare namespace ಠ_ಠ.clutz {
     A ,
   }
 }
-declare namespace ಠ_ಠ.clutz.module$exports$ns {
-  export import Enum = ಠ_ಠ.clutz.module$exports$ns$Enum;
-}

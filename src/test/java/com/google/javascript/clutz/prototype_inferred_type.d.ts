@@ -9,9 +9,6 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_: any;
   }
 }
-declare namespace ಠ_ಠ.clutz.module$exports$foo {
-  export import Klass = ಠ_ಠ.clutz.module$exports$foo$Klass;
-}
 declare module 'goog:foo.Klass' {
   import alias = ಠ_ಠ.clutz.module$exports$foo$Klass;
   export default alias;
