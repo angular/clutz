@@ -22,19 +22,19 @@ declare namespace ಠ_ಠ.clutz {
   }
   class module$exports$index_signature$ImplementsIObject extends module$exports$index_signature$ImplementsIObject_Instance {
   }
-  class module$exports$index_signature$ImplementsIObject_Instance implements ಠ_ಠ.clutz.module$exports$IObject < string , number > {
+  class module$exports$index_signature$ImplementsIObject_Instance implements IObject < string , number > {
     private noStructuralTyping_: any;
     [ key: string ]: number ;
   }
   class module$exports$index_signature$ImplementsIObjectLikeBare extends module$exports$index_signature$ImplementsIObjectLikeBare_Instance {
   }
-  class module$exports$index_signature$ImplementsIObjectLikeBare_Instance implements ಠ_ಠ.clutz.module$exports$IObject < any , any > {
+  class module$exports$index_signature$ImplementsIObjectLikeBare_Instance implements IObject < any , any > {
     private noStructuralTyping_: any;
     [ /* warning: coerced from ? */ key: string ]: any ;
   }
   class module$exports$index_signature$ImplementsIObjectWithGeneric < T > extends module$exports$index_signature$ImplementsIObjectWithGeneric_Instance < T > {
   }
-  class module$exports$index_signature$ImplementsIObjectWithGeneric_Instance < T > implements ಠ_ಠ.clutz.module$exports$IObject < string , T > {
+  class module$exports$index_signature$ImplementsIObjectWithGeneric_Instance < T > implements IObject < string , T > {
     private noStructuralTyping_: any;
     [ key: string ]: T ;
   }

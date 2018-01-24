@@ -1,7 +1,7 @@
 declare namespace ಠ_ಠ.clutz {
   class module$exports$implements_iterable$ImplIterable extends module$exports$implements_iterable$ImplIterable_Instance {
   }
-  class module$exports$implements_iterable$ImplIterable_Instance implements ಠ_ಠ.clutz.module$exports$Iterable < string > {
+  class module$exports$implements_iterable$ImplIterable_Instance implements Iterable < string > {
     private noStructuralTyping_: any;
     [Symbol.iterator]():  Iterator < string > ;
   }
@@ -16,7 +16,7 @@ declare module 'goog:implements_iterable.ImplIterable' {
 declare namespace ಠ_ಠ.clutz {
   class module$exports$implements_iterable$ImplIterableGeneric < T > extends module$exports$implements_iterable$ImplIterableGeneric_Instance < T > {
   }
-  class module$exports$implements_iterable$ImplIterableGeneric_Instance < T > implements ಠ_ಠ.clutz.module$exports$Iterable < T > {
+  class module$exports$implements_iterable$ImplIterableGeneric_Instance < T > implements Iterable < T > {
     private noStructuralTyping_: any;
     [Symbol.iterator]():  Iterator < any > ;
   }

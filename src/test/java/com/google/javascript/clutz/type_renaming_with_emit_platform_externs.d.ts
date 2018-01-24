@@ -18,12 +18,12 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  interface module$exports$IArrayLike < VALUE2 > extends ಠ_ಠ.clutz.module$exports$IObject < number , VALUE2 > {
+  interface module$exports$IArrayLike < VALUE2 > extends IObject < number , VALUE2 > {
     length : number ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  interface module$exports$IObject < KEY1 , VALUE > {
+  interface IObject < KEY1 , VALUE > {
   }
 }
 declare namespace ಠ_ಠ.clutz {
