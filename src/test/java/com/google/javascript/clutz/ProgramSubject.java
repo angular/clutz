@@ -131,14 +131,14 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
     Set<String> nonroots = new LinkedHashSet<>();
     for (File nonroot : actual().nonroots) {
       sourceFiles.add(SourceFile.fromPath(nonroot.toPath(), UTF_8));
-      nonroots.add(nonroot.getPath());
+      nonroots.add(nonroot.getPath().replace(System.getProperty("file.separator"), "/"));
     }
 
     Set<String> roots = new LinkedHashSet<>();
 
     for (File root : actual().roots) {
       sourceFiles.add(SourceFile.fromPath(root.toPath(), UTF_8));
-      roots.add(root.getPath());
+      roots.add(root.getPath().replace(System.getProperty("file.separator"), "/"));
     }
 
     if (actual().sourceText != null) {
