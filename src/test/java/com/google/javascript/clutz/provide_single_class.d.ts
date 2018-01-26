@@ -11,6 +11,12 @@ declare namespace ಠ_ಠ.clutz {
     method (a : string ) : number ;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$foo.bar {
+  export import Baz =  ಠ_ಠ.clutz.module$exports$foo$bar$Baz;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$foo$bar {
+  export import Baz =  ಠ_ಠ.clutz.module$exports$foo$bar$Baz;
+}
 declare namespace ಠ_ಠ.clutz.module$exports$foo$bar$Baz {
   class NestedClass extends NestedClass_Instance {
   }
@@ -21,6 +27,18 @@ declare namespace ಠ_ಠ.clutz.module$exports$foo$bar$Baz {
     A ,
     B ,
   }
+}
+declare namespace ಠ_ಠ.clutz.module$exports$foo.bar.Baz {
+  export import NestedClass =  ಠ_ಠ.clutz.module$exports$foo$bar$Baz.NestedClass;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$foo$bar.Baz {
+  export import NestedClass =  ಠ_ಠ.clutz.module$exports$foo$bar$Baz.NestedClass;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$foo.bar.Baz {
+  export import NestedEnum =  ಠ_ಠ.clutz.module$exports$foo$bar$Baz.NestedEnum;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$foo$bar.Baz {
+  export import NestedEnum =  ಠ_ಠ.clutz.module$exports$foo$bar$Baz.NestedEnum;
 }
 declare module 'goog:foo.bar.Baz' {
   import alias = ಠ_ಠ.clutz.module$exports$foo$bar$Baz;

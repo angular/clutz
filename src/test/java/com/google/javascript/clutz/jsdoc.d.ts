@@ -26,6 +26,9 @@ declare namespace ಠ_ಠ.clutz {
     method (foo : string ) : void ;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$x {
+  export import Y =  ಠ_ಠ.clutz.module$exports$x$Y;
+}
 declare module 'goog:x.Y' {
   import alias = ಠ_ಠ.clutz.module$exports$x$Y;
   export default alias;

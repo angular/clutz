@@ -13,9 +13,27 @@ declare namespace ಠ_ಠ.clutz {
 declare namespace ಠ_ಠ.clutz {
   var module$exports$ExternStaticC$fn$a : string ;
 }
+declare namespace ಠ_ಠ.clutz.module$exports$ExternStaticC.fn {
+  export import a =  ಠ_ಠ.clutz.module$exports$ExternStaticC$fn$a;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$ExternStaticC$fn {
+  export import a =  ಠ_ಠ.clutz.module$exports$ExternStaticC$fn$a;
+}
 declare namespace ಠ_ಠ.clutz {
   var module$exports$ExternStaticC$ns$a : number ;
 }
+declare namespace ಠ_ಠ.clutz.module$exports$ExternStaticC.ns {
+  export import a =  ಠ_ಠ.clutz.module$exports$ExternStaticC$ns$a;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$ExternStaticC$ns {
+  export import a =  ಠ_ಠ.clutz.module$exports$ExternStaticC$ns$a;
+}
 declare namespace ಠ_ಠ.clutz {
   var module$exports$ExternStaticC$objNsLike$a : string ;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$ExternStaticC.objNsLike {
+  export import a =  ಠ_ಠ.clutz.module$exports$ExternStaticC$objNsLike$a;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$ExternStaticC$objNsLike {
+  export import a =  ಠ_ಠ.clutz.module$exports$ExternStaticC$objNsLike$a;
 }

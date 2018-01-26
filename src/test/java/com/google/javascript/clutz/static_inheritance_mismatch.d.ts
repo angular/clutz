@@ -8,6 +8,9 @@ declare namespace ಠ_ಠ.clutz {
   class module$exports$static_inherit$Child_Instance extends ಠ_ಠ.clutz.module$exports$static_inherit$Parent_Instance {
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$static_inherit {
+  export import Child =  ಠ_ಠ.clutz.module$exports$static_inherit$Child;
+}
 declare module 'goog:static_inherit.Child' {
   import alias = ಠ_ಠ.clutz.module$exports$static_inherit$Child;
   export default alias;
@@ -19,6 +22,9 @@ declare namespace ಠ_ಠ.clutz {
   }
   class module$exports$static_inherit$GrandChild_Instance extends ಠ_ಠ.clutz.module$exports$static_inherit$Child_Instance {
   }
+}
+declare namespace ಠ_ಠ.clutz.module$exports$static_inherit {
+  export import GrandChild =  ಠ_ಠ.clutz.module$exports$static_inherit$GrandChild;
 }
 declare module 'goog:static_inherit.GrandChild' {
   import alias = ಠ_ಠ.clutz.module$exports$static_inherit$GrandChild;
@@ -34,6 +40,9 @@ declare namespace ಠ_ಠ.clutz {
   class module$exports$static_inherit$Parent_Instance {
     private noStructuralTyping_: any;
   }
+}
+declare namespace ಠ_ಠ.clutz.module$exports$static_inherit {
+  export import Parent =  ಠ_ಠ.clutz.module$exports$static_inherit$Parent;
 }
 declare module 'goog:static_inherit.Parent' {
   import alias = ಠ_ಠ.clutz.module$exports$static_inherit$Parent;

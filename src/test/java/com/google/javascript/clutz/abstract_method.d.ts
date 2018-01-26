@@ -5,6 +5,9 @@ declare namespace ಠ_ಠ.clutz {
     bar (a : number ) : string ;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$abstract_method {
+  export import Child =  ಠ_ಠ.clutz.module$exports$abstract_method$Child;
+}
 declare module 'goog:abstract_method.Child' {
   import alias = ಠ_ಠ.clutz.module$exports$abstract_method$Child;
   export default alias;
@@ -18,6 +21,9 @@ declare namespace ಠ_ಠ.clutz {
     foo ( ) : string ;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$abstract_method {
+  export import Clazz =  ಠ_ಠ.clutz.module$exports$abstract_method$Clazz;
+}
 declare module 'goog:abstract_method.Clazz' {
   import alias = ಠ_ಠ.clutz.module$exports$abstract_method$Clazz;
   export default alias;
@@ -27,6 +33,9 @@ declare namespace ಠ_ಠ.clutz {
     bar (a : number ) : string ;
     foo ( ) : string ;
   }
+}
+declare namespace ಠ_ಠ.clutz.module$exports$abstract_method {
+  export import Interface =  ಠ_ಠ.clutz.module$exports$abstract_method$Interface;
 }
 declare module 'goog:abstract_method.Interface' {
   import alias = ಠ_ಠ.clutz.module$exports$abstract_method$Interface;

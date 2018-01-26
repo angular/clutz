@@ -30,6 +30,9 @@ declare namespace ಠ_ಠ.clutz {
     apply : number ;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$typesWithExterns {
+  export import A =  ಠ_ಠ.clutz.module$exports$typesWithExterns$A;
+}
 declare module 'goog:typesWithExterns.A' {
   import alias = ಠ_ಠ.clutz.module$exports$typesWithExterns$A;
   export default alias;
@@ -42,6 +45,9 @@ declare namespace ಠ_ಠ.clutz {
     constructor ( ) ;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$typesWithExterns {
+  export import B =  ಠ_ಠ.clutz.module$exports$typesWithExterns$B;
+}
 declare module 'goog:typesWithExterns.B' {
   import alias = ಠ_ಠ.clutz.module$exports$typesWithExterns$B;
   export default alias;
@@ -52,6 +58,9 @@ declare namespace ಠ_ಠ.clutz {
   class module$exports$typesWithExterns$C_Instance extends ಠ_ಠ.clutz.module$exports$typesWithExterns$A_Instance {
     constructor ( ) ;
   }
+}
+declare namespace ಠ_ಠ.clutz.module$exports$typesWithExterns {
+  export import C =  ಠ_ಠ.clutz.module$exports$typesWithExterns$C;
 }
 declare module 'goog:typesWithExterns.C' {
   import alias = ಠ_ಠ.clutz.module$exports$typesWithExterns$C;
@@ -64,12 +73,18 @@ declare namespace ಠ_ಠ.clutz {
 declare namespace ಠ_ಠ.clutz {
   function module$exports$functionNamespace$dom (nodeOrEvent : Node | null | GlobalEvent ) : ಠ_ಠ.clutz.module$exports$functionNamespaceHelperClass ;
 }
+declare namespace ಠ_ಠ.clutz.module$exports$functionNamespace {
+  export import dom =  ಠ_ಠ.clutz.module$exports$functionNamespace$dom;
+}
 declare namespace ಠ_ಠ.clutz {
   class module$exports$functionNamespace$privateClass extends module$exports$functionNamespace$privateClass_Instance {
   }
   class module$exports$functionNamespace$privateClass_Instance {
     private noStructuralTyping_: any;
   }
+}
+declare namespace ಠ_ಠ.clutz.module$exports$functionNamespace {
+  export import privateClass =  ಠ_ಠ.clutz.module$exports$functionNamespace$privateClass;
 }
 declare namespace ಠ_ಠ.clutz {
   class module$exports$functionNamespaceHelperClass extends module$exports$functionNamespaceHelperClass_Instance {
@@ -89,8 +104,14 @@ declare namespace ಠ_ಠ.clutz {
     method (opt_exp ? : (a : ಠ_ಠ.clutz.module$exports$namespace$Foo ) => any ) : any ;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$namespace {
+  export import Foo =  ಠ_ಠ.clutz.module$exports$namespace$Foo;
+}
 declare namespace ಠ_ಠ.clutz {
   type module$exports$namespace$atypedef = (a : string , b ? : ಠ_ಠ.clutz.module$exports$namespace$atypedef$Options ) => ಠ_ಠ.clutz.module$exports$namespace$atypedef$Cache < any > ;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$namespace {
+  export import atypedef =  ಠ_ಠ.clutz.module$exports$namespace$atypedef;
 }
 declare namespace ಠ_ಠ.clutz {
   class module$exports$namespace$atypedef$Cache < T > extends module$exports$namespace$atypedef$Cache_Instance < T > {
@@ -105,15 +126,45 @@ declare namespace ಠ_ಠ.clutz {
     removeAll ( ) : any ;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$namespace.atypedef {
+  export import Cache =  ಠ_ಠ.clutz.module$exports$namespace$atypedef$Cache;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$namespace$atypedef {
+  export import Cache =  ಠ_ಠ.clutz.module$exports$namespace$atypedef$Cache;
+}
 declare namespace ಠ_ಠ.clutz {
   type module$exports$namespace$atypedef$Cache$Info = { id : string , options : ಠ_ಠ.clutz.module$exports$namespace$atypedef$Options , size : number } ;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$namespace.atypedef.Cache {
+  export import Info =  ಠ_ಠ.clutz.module$exports$namespace$atypedef$Cache$Info;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$namespace$atypedef.Cache {
+  export import Info =  ಠ_ಠ.clutz.module$exports$namespace$atypedef$Cache$Info;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$namespace$atypedef$Cache {
+  export import Info =  ಠ_ಠ.clutz.module$exports$namespace$atypedef$Cache$Info;
 }
 declare namespace ಠ_ಠ.clutz {
   type module$exports$namespace$atypedef$Options = { capacity ? : number } ;
 }
+declare namespace ಠ_ಠ.clutz.module$exports$namespace.atypedef {
+  export import Options =  ಠ_ಠ.clutz.module$exports$namespace$atypedef$Options;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$namespace$atypedef {
+  export import Options =  ಠ_ಠ.clutz.module$exports$namespace$atypedef$Options;
+}
 declare namespace ಠ_ಠ.clutz {
   type module$exports$namespace$atypedef$get = (a : string ) => ಠ_ಠ.clutz.module$exports$namespace$atypedef$Cache < any > | null ;
 }
+declare namespace ಠ_ಠ.clutz.module$exports$namespace.atypedef {
+  export import get =  ಠ_ಠ.clutz.module$exports$namespace$atypedef$get;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$namespace$atypedef {
+  export import get =  ಠ_ಠ.clutz.module$exports$namespace$atypedef$get;
+}
 declare namespace ಠ_ಠ.clutz {
   function module$exports$namespace$bootstrap (arg1 : Element | null | HTMLDocument , opt_arg2 ? : ( string | Function | null ) [] | null ) : any ;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$namespace {
+  export import bootstrap =  ಠ_ಠ.clutz.module$exports$namespace$bootstrap;
 }

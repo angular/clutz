@@ -38,12 +38,18 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_: any;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$goog {
+  export import Uri =  goog.Uri;
+}
 declare module 'goog:goog.Uri' {
   import alias = ಠ_ಠ.clutz.module$exports$goog$Uri;
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz {
   type module$exports$partial$FunctionAlias = Function ;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$partial {
+  export import FunctionAlias =  ಠ_ಠ.clutz.module$exports$partial$FunctionAlias;
 }
 declare module 'goog:partial.FunctionAlias' {
   import alias = ಠ_ಠ.clutz.module$exports$partial$FunctionAlias;

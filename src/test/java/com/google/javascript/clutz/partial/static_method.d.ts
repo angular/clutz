@@ -6,6 +6,12 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_: any;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$foo.bar {
+  export import Class =  ಠ_ಠ.clutz.module$exports$foo$bar$Class;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$foo$bar {
+  export import Class =  ಠ_ಠ.clutz.module$exports$foo$bar$Class;
+}
 declare module 'goog:foo.bar.Class' {
   import alias = ಠ_ಠ.clutz.module$exports$foo$bar$Class;
   export default alias;

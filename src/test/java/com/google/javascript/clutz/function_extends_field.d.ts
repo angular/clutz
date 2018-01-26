@@ -25,6 +25,15 @@ declare namespace ಠ_ಠ.clutz.module$exports$fn$field {
     pg : ( ) => number ;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$fn.field {
+  export import A =  ಠ_ಠ.clutz.module$exports$fn$field.A;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$fn.field {
+  export import B =  ಠ_ಠ.clutz.module$exports$fn$field.B;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$fn.field {
+  export import C =  ಠ_ಠ.clutz.module$exports$fn$field.C;
+}
 declare module 'goog:fn.field' {
   import alias = ಠ_ಠ.clutz.module$exports$fn$field;
   export = alias;

@@ -5,6 +5,15 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_: any;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$goog.provide.exporter {
+  export import ProvideClass =  ಠ_ಠ.clutz.module$exports$goog$provide$exporter$ProvideClass;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$goog$provide.exporter {
+  export import ProvideClass =  ಠ_ಠ.clutz.module$exports$goog$provide$exporter$ProvideClass;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$goog$provide$exporter {
+  export import ProvideClass =  ಠ_ಠ.clutz.module$exports$goog$provide$exporter$ProvideClass;
+}
 declare module 'goog:goog.provide.exporter.ProvideClass' {
   import alias = ಠ_ಠ.clutz.module$exports$goog$provide$exporter$ProvideClass;
   export default alias;

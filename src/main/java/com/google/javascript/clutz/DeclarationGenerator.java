@@ -553,7 +553,7 @@ class DeclarationGenerator {
         emit(": any;");
         emitBreak();
         emitNamespaceEnd();
-//        declareGoogProvideSupplementalNamespaces(Arrays.asList(emitName));
+       declareGoogProvideSupplementalNamespaces(Arrays.asList(emitName), true);
         declareModule(provide, true, emitName);
         continue;
       }
@@ -943,11 +943,8 @@ class DeclarationGenerator {
    * was just `goog.require('foo')`. To match that ability with goog.module/dollar style symbol
    * names, goog.provided symbols need to declare multiple namespaces that they're in.
    */
-  private void declareGoogProvideSupplementalNamespaces(List<String> emitNames) {
+  private void declareGoogProvideSupplementalNamespaces(List<String> emitNames, boolean isDefault) {
     for (String emitName: emitNames) {
-      // emitName = rewriteGoogProvideName(emitName);
-      // emitName = emitName.replace("module$exports$", "");
-
       List<String> nameParts = Arrays.asList(emitName.split("\\."));
       String unqualifiedName = nameParts.get(nameParts.size() - 1);
       if (RESERVED_JS_WORDS.contains(unqualifiedName)) {
@@ -956,7 +953,7 @@ class DeclarationGenerator {
       }
 
       List<String> qualifyingNameParts = nameParts.subList(0, nameParts.size() - 1);
-      for (int i = 1; i <= qualifyingNameParts.size(); i++) {
+      for (int i = 1; i <= (isDefault ? qualifyingNameParts.size() : qualifyingNameParts.size() - 1); i++) {
         List<String> dollarNameParts = qualifyingNameParts.subList(0, i);
         String dollarNamePart = Joiner.on("$").join(dollarNameParts);
 
@@ -970,9 +967,7 @@ class DeclarationGenerator {
         emit("export import ");
         emitNoSpace(unqualifiedName);
         emitNoSpace(" = ");
-        emitNoSpace(Constants.INTERNAL_NAMESPACE);
-        emitNoSpace(".");
-        emitNoSpace(rewriteGoogProvideName(emitName));
+        emitAbsoluteName(emitName);
         emitNoSpace(";");
         emitBreak();
 
@@ -1103,7 +1098,7 @@ class DeclarationGenerator {
     emitNamespaceEnd();
 
     if (rewroteGoogProvide) {
-//      declareGoogProvideSupplementalNamespaces(emittedSymbols);
+     declareGoogProvideSupplementalNamespaces(emittedSymbols, isDefault);
     }
 
     // extra walk required for inner classes and inner enums. They are allowed in closure,
@@ -3014,7 +3009,8 @@ class DeclarationGenerator {
       if (!emittedSymbols.isEmpty()) {
         emitNamespaceEnd();
         if (!isGoogModuleStyleName(innerNamespace)) {
-//          declareGoogProvideSupplementalNamespaces(emittedSymbols);
+          //TODO(lucassloan): figure out what isDefault should be here.
+         declareGoogProvideSupplementalNamespaces(emittedSymbols, false);
         }
       }
     }

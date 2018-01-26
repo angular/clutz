@@ -11,8 +11,14 @@ declare namespace ಠ_ಠ.clutz {
     f (a : ಠ_ಠ.clutz.module$exports$typedef$C.T , b ? : ಠ_ಠ.clutz.module$exports$typedef$C.T , c ? : ( ಠ_ಠ.clutz.module$exports$typedef$C.T ) | null ) : void ;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$typedef {
+  export import C =  ಠ_ಠ.clutz.module$exports$typedef$C;
+}
 declare namespace ಠ_ಠ.clutz.module$exports$typedef$C {
   type T = (a : any ) => any ;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$typedef.C {
+  export import T =  ಠ_ಠ.clutz.module$exports$typedef$C.T;
 }
 declare module 'goog:typedef.C' {
   import alias = ಠ_ಠ.clutz.module$exports$typedef$C;

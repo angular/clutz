@@ -11,6 +11,12 @@ declare namespace ಠ_ಠ.clutz.module$exports$def$ctor {
     constructor ( ) ;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$def.ctor {
+  export import A =  ಠ_ಠ.clutz.module$exports$def$ctor.A;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$def.ctor {
+  export import B =  ಠ_ಠ.clutz.module$exports$def$ctor.B;
+}
 declare module 'goog:def.ctor' {
   import alias = ಠ_ಠ.clutz.module$exports$def$ctor;
   export = alias;

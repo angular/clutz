@@ -22,12 +22,18 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_: any;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$priv2 {
+  export import PublicClass =  ಠ_ಠ.clutz.module$exports$priv2$PublicClass;
+}
 declare namespace ಠ_ಠ.clutz.module$exports$priv2$PublicClass {
   class PrivateNestedClass_ extends PrivateNestedClass__Instance {
   }
   class PrivateNestedClass__Instance {
     private noStructuralTyping_: any;
   }
+}
+declare namespace ಠ_ಠ.clutz.module$exports$priv2.PublicClass {
+  export import PrivateNestedClass_ =  ಠ_ಠ.clutz.module$exports$priv2$PublicClass.PrivateNestedClass_;
 }
 declare module 'goog:priv2.PublicClass' {
   import alias = ಠ_ಠ.clutz.module$exports$priv2$PublicClass;

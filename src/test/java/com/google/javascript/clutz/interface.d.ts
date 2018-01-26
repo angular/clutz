@@ -22,6 +22,9 @@ declare namespace ಠ_ಠ.clutz {
     B ,
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$interface_exp {
+  export import SomeEnum =  ಠ_ಠ.clutz.module$exports$interface_exp$SomeEnum;
+}
 declare module 'goog:interface_exp.SomeEnum' {
   import alias = ಠ_ಠ.clutz.module$exports$interface_exp$SomeEnum;
   export default alias;

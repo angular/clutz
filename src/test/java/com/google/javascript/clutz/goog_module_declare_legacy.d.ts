@@ -2,6 +2,12 @@ declare namespace ಠ_ಠ.clutz {
   type module$exports$module$Foo$Legacy = ಠ_ಠ.clutz.module$contents$module$Foo$Legacy_A ;
   var module$exports$module$Foo$Legacy : typeof ಠ_ಠ.clutz.module$contents$module$Foo$Legacy_A ;
 }
+declare namespace ಠ_ಠ.clutz.module$exports$module.Foo {
+  export import Legacy =  ಠ_ಠ.clutz.module$exports$module$Foo$Legacy;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$module$Foo {
+  export import Legacy =  ಠ_ಠ.clutz.module$exports$module$Foo$Legacy;
+}
 declare module 'goog:module.Foo.Legacy' {
   import alias = ಠ_ಠ.clutz.module$exports$module$Foo$Legacy;
   export default alias;
