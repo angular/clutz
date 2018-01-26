@@ -1332,9 +1332,6 @@ class DeclarationGenerator {
     if (PLATFORM_SYMBOLS_IN_TYPESCRIPT.contains(displayName)) {
       return displayName;
     }
-    if (emitAbsolute && isInBaseGoogNamespace(displayName)) {
-      return displayName;
-    }
     // In partial mode, closure doesn't know the correct name of imported symbols.  If the name
     // matches one in the precomputed map, replace it with the original declared name
     // The displayName can be of the form foo.bar.baz, but the import could be
@@ -1360,6 +1357,9 @@ class DeclarationGenerator {
           }
         }
       }
+    }
+    if (emitAbsolute && isInBaseGoogNamespace(displayName)) {
+      return displayName;
     }
     // If a symbol has a goog.provide style name, and is an exported symbol, rewrite it to use
     // goog.module syntax
