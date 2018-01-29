@@ -435,7 +435,8 @@ class DeclarationGenerator {
     // Compile should always be first here, because it sets internal state.
     compiler.compile(externs, sourceFiles, opts.getCompilerOptions());
     if (opts.partialInput) {
-      importRenameMap = ImportRenameMapBuilder.build(compiler.getParsedInputs());
+      importRenameMap =
+          ImportRenameMapBuilder.build(compiler.getParsedInputs(), opts.knownGoogProvides);
     }
     unknownType = compiler.getTypeRegistry().getNativeType(JSTypeNative.UNKNOWN_TYPE);
     numberType = compiler.getTypeRegistry().getNativeType(JSTypeNative.NUMBER_TYPE);

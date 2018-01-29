@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * If Clutz is running in incremental mode, closure can't resolve imported symbols, so it gives them
@@ -21,14 +22,15 @@ public class ImportRenameMapBuilder {
    * variables to build a map from the name closure generates in incremental mode to the exported
    * name of the import.
    */
-  public static Map<String, String> build(Collection<Node> parsedInputs) {
+  public static Map<String, String> build(
+      Collection<Node> parsedInputs, Set<String> knownGoogProvides) {
     Map<String, String> importRenameMap = new HashMap<>();
     for (Node ast : parsedInputs) {
       // Symbols can be imported into a variable in a goog.module() file, so look for imports in the
       // body of the goog module.
       String moduleId = getGoogModuleId(ast);
       if (moduleId != null) {
-        importRenameMap.putAll(build(moduleId, ast.getFirstChild()));
+        importRenameMap.putAll(build(moduleId, ast.getFirstChild(), knownGoogProvides));
       }
 
       // Or symbols can be imported into a variable in a top-level goog.scope() block, so look for
@@ -36,7 +38,7 @@ public class ImportRenameMapBuilder {
       List<Node> googScopes = getTopLevelGoogScopes(ast);
       if (!googScopes.isEmpty()) {
         for (Node googScope : googScopes) {
-          importRenameMap.putAll(build(null, googScope));
+          importRenameMap.putAll(build(null, googScope, knownGoogProvides));
         }
       }
     }
@@ -127,9 +129,11 @@ public class ImportRenameMapBuilder {
   /**
    * Build does the actual work of walking over the AST, finding any goog.require() or
    * goog.module.get() assignments or destructuring assignments, parsing them, and generating the
-   * mappings from local symbol names to exported symbol names.
+   * mappings from local symbol names to exported symbol names. If the imported module's id is in
+   * knownGoogProvides, emit a rename in goog.provide style, otherwise, use goog.module style.
    */
-  private static Map<String, String> build(String localModuleId, Node moduleBody) {
+  private static Map<String, String> build(
+      String localModuleId, Node moduleBody, Set<String> knownGoogProvides) {
     Map<String, String> importRenameMap = new HashMap<>();
 
     for (Node statement : moduleBody.children()) {
@@ -139,7 +143,12 @@ public class ImportRenameMapBuilder {
         String importedModuleId = statement.getFirstFirstChild().getChildAtIndex(1).getString();
         String variableName = statement.getFirstChild().getString();
 
-        String exportedSymbolName = buildWholeModuleExportSymbolName(importedModuleId);
+        String exportedSymbolName;
+        if (!knownGoogProvides.contains(importedModuleId)) {
+          exportedSymbolName = buildWholeModuleExportSymbolName(importedModuleId);
+        } else {
+          exportedSymbolName = importedModuleId;
+        }
         importRenameMap.put(variableName, exportedSymbolName);
         // If we're in a goog scope, there isn't a module id
         if (localModuleId != null) {
@@ -163,7 +172,12 @@ public class ImportRenameMapBuilder {
             variableName = originalName;
           }
 
-          String exportedSymbolName = buildNamedExportSymbolName(importedModuleId, originalName);
+          String exportedSymbolName;
+          if (!knownGoogProvides.contains(importedModuleId)) {
+            exportedSymbolName = buildNamedExportSymbolName(importedModuleId, originalName);
+          } else {
+            exportedSymbolName = importedModuleId;
+          }
           importRenameMap.put(variableName, exportedSymbolName);
           // If we're in a goog scope, there isn't a module id
           if (localModuleId != null) {

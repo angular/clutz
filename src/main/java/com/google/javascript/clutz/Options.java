@@ -1,13 +1,19 @@
 package com.google.javascript.clutz;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.google.common.collect.Sets;
+import com.google.common.io.Files;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import com.google.javascript.jscomp.DependencyOptions;
 import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.parsing.Config;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -129,12 +135,20 @@ public class Options {
   )
   String skipEmitRegExp = null;
 
+  @Option(
+    name = "--googProvides",
+    usage =
+        "file containing a list of namespaces names that we know come from goog.provides (not goog.modules)"
+  )
+  String googProvidesFile = null;
+
   @Argument List<String> arguments = new ArrayList<>();
 
   Depgraph depgraph;
   // TODO(martinprobst): Remove when internal Google is upgraded to a more recent args4j
   // library that supports Pattern arguments.
   Pattern skipEmitPattern;
+  Set<String> knownGoogProvides = new HashSet<>();
 
   public CompilerOptions getCompilerOptions() {
     final CompilerOptions options = new CompilerOptions();
@@ -204,6 +218,14 @@ public class Options {
     }
     if (arguments.isEmpty() && externs.isEmpty()) {
       throw new CmdLineException(parser, "No files or externs were given");
+    }
+
+    if (googProvidesFile != null) {
+      try {
+        knownGoogProvides.addAll(Files.readLines(new File(googProvidesFile), UTF_8));
+      } catch (IOException e) {
+        throw new RuntimeException("Error reading goog provides file " + googProvidesFile, e);
+      }
     }
   }
 

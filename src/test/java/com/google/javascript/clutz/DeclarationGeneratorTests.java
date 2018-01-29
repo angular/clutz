@@ -3,6 +3,7 @@ package com.google.javascript.clutz;
 import static com.google.javascript.clutz.ProgramSubject.assertThatProgram;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import java.io.File;
@@ -76,8 +77,12 @@ public class DeclarationGeneratorTests {
       if (input.getName().contains("_output_base")) {
         subject.emitBase = true;
       }
-      if (Arrays.asList("partial", "multifilePartial").contains(input.getParentFile().getName())) {
+      if (Arrays.asList("partial", "multifilePartial", "partialCrossModuleTypeImports")
+          .contains(input.getParentFile().getName())) {
         subject.partialInput = true;
+      }
+      if (input.getParentFile().getName().equals("partialCrossModuleTypeImports")) {
+        subject.knownGoogProvides = ImmutableSet.of("googprovide.exporter");
       }
       subject.extraExternFile = getExternFileNameOrNull(input.getName());
       suite.addTest(new DeclarationTest(input.getName(), golden, subject));
@@ -104,11 +109,17 @@ public class DeclarationGeneratorTests {
     // compiled in a single run in MultiFileTest
     File[] testMultifilePartailFiles =
         getPackagePath().resolve("multifilePartial").toFile().listFiles(filter);
+    // Test files that live in the 'testPartialCrossModuleTypeImportsFiles' dir, and run with the
+    // --partialInput and --googProvides options.  The resulting .d.ts files are checked with a
+    // DeclarationSyntaxTest, and they're also compiled in a single run in MultiFileTest
+    File[] testPartialCrossModuleTypeImportsFiles =
+        getPackagePath().resolve("partialCrossModuleTypeImports").toFile().listFiles(filter);
     // Output base files live in the 'outputBase' dir and impilicitly have base.js in their roots
     File[] testOutputBaseFiles = getPackagePath().resolve("outputBase").toFile().listFiles(filter);
     List<File> filesList = Lists.newArrayList(testFiles);
     filesList.addAll(Arrays.asList(testPartialFiles));
     filesList.addAll(Arrays.asList(testMultifilePartailFiles));
+    filesList.addAll(Arrays.asList(testPartialCrossModuleTypeImportsFiles));
     filesList.addAll(Arrays.asList(testOutputBaseFiles));
     return filesList;
   }
