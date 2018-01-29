@@ -402,6 +402,6 @@ declare namespace ಠ_ಠ.clutz {
     abort ? : (a : any ) => PromiseLike < any > | undefined ;
     close ? : ( ) => PromiseLike < any > | undefined ;
     start ? : (a : WritableStreamDefaultController ) => PromiseLike < any > | undefined ;
-    write ? : (a : WritableStreamDefaultController ) => PromiseLike < any > | undefined ;
+    write ? : (a : any , b : WritableStreamDefaultController ) => PromiseLike < any > | undefined ;
   }
 }
