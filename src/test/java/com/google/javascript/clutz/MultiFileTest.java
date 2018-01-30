@@ -95,6 +95,15 @@ public class MultiFileTest {
         .generatesDeclarations(golden);
   }
 
+  @Test
+  public void partialCrossModuleTypeImports() throws Exception {
+    File golden = input("total.d.ts");
+    assertThatProgram(
+            ImmutableList.of(input("goog_module_importer.js")),
+            ImmutableList.of(input("goog_provide_exporter.js")))
+        .generatesDeclarations(golden);
+  }
+
   private File input(String filename) {
     Path testDir = FileSystems.getDefault().getPath("src", "test", "java");
     String packageName = ProgramSubject.class.getPackage().getName();

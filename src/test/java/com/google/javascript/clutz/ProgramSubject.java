@@ -49,6 +49,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
   public String extraExternFile = null;
   public boolean emitPlatformExterns;
   public boolean emitBase = false;
+  public Set<String> knownGoogProvides = null;
 
   static ProgramSubject assertThatProgram(String... sourceLines) {
     String sourceText = Joiner.on('\n').join(sourceLines);
@@ -112,6 +113,9 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
     if (partialInput) {
       opts.partialInput = true;
       opts.debug = false;
+    }
+    if (knownGoogProvides != null) {
+      opts.knownGoogProvides = knownGoogProvides;
     }
     List<SourceFile> sourceFiles = new ArrayList<>();
 

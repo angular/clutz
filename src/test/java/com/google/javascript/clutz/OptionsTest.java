@@ -131,4 +131,16 @@ public class OptionsTest {
             });
     assertThat(opts.externs).isEmpty();
   }
+
+  @Test
+  public void testGoogProvides() throws Exception {
+    Options opts =
+        new Options(
+            new String[] {
+              "foo.js",
+              "--googProvides",
+              DeclarationGeneratorTests.getTestInputFile("test_goog_provides").toFile().toString()
+            });
+    assertThat(opts.knownGoogProvides).containsExactly("foo.bar", "baz.quux");
+  }
 }
