@@ -964,7 +964,7 @@ class DeclarationGenerator {
         String namespace = "module$exports$" + Joiner.on(".").join(dotNameParts);
         emitNamespaceBegin(namespace);
 
-        emit("export import ");
+        emit("export type ");
         emitNoSpace(unqualifiedName);
         emitNoSpace(" = ");
         emitAbsoluteName(emitName);
