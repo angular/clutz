@@ -1786,20 +1786,15 @@ class DeclarationGenerator {
         return;
       }
       String displayName = maybeRewriteImportedName(type.getDisplayName());
-
-      // We have a choice whether to emit Foo or ಠ_ಠ.clutz.Foo here. Only the first option
-      // works in partial input mode, because it would work for both types within clutz's
-      // view and types that come from lib.d.ts.
-      // Note, that TypeScript allows implicit namespace fallback
-      // <pre>
-      // decalre namespace a.b {
-      //   class F {}
-      // }
-      // delcare namespace a.b.c.d {
-      //   export let x: F;  // F is looked up in a.b.c.d, then a.b.c, then a.b.
-      // }
-      // </pre>
-      emit(displayName);
+      // In partial mode, closure doesn't know the correct name of imported symbols, if the name
+      // matches one in the precomputed map, replace it with the original declared name
+      // The displayName can be of the form foo.bar, but the symbol that was goog required was just
+      // foo, so just replace the part of the display name before the first period
+      String baseDisplayName = displayName.split("\\.")[0];
+      if (importRenameMap.containsKey(baseDisplayName)) {
+        displayName = displayName.replace(baseDisplayName, importRenameMap.get(baseDisplayName));
+      }
+      emit(Constants.INTERNAL_NAMESPACE + "." + displayName);
       List<JSType> templateTypes = nType.getTemplateTypes();
       if (templateTypes != null && templateTypes.size() > 0) {
         emitGenericTypeArguments(type.getTemplateTypes().iterator());
@@ -1914,7 +1909,8 @@ class DeclarationGenerator {
               // compilation
               // unit - A ends up as NoType, while B ends up as NamedType.
               if (opts.partialInput && refType.isUnknownType()) {
-                emit(maybeRewriteImportedName(type.getDisplayName()));
+                String displayName = maybeRewriteImportedName(type.getDisplayName());
+                emit(Constants.INTERNAL_NAMESPACE + "." + displayName);
                 List<JSType> templateTypes = type.getTemplateTypes();
                 if (templateTypes != null && templateTypes.size() > 0) {
                   emitGenericTypeArguments(type.getTemplateTypes().iterator());

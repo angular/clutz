@@ -1,17 +1,17 @@
 declare namespace ಠ_ಠ.clutz.module$exports$goog$module$importer {
   class ClassExtendingLegacyBaseClass extends ClassExtendingLegacyBaseClass_Instance {
   }
-  class ClassExtendingLegacyBaseClass_Instance extends goog.legacy.namespace.exporter.LegacyBaseClass {
+  class ClassExtendingLegacyBaseClass_Instance extends ಠ_ಠ.clutz.goog.legacy.namespace.exporter.LegacyBaseClass {
     constructor ( ) ;
   }
   class ClassExtendingMissingRequire extends ClassExtendingMissingRequire_Instance {
   }
-  class ClassExtendingMissingRequire_Instance extends googprovide.exporter {
+  class ClassExtendingMissingRequire_Instance extends ಠ_ಠ.clutz.googprovide.exporter {
     constructor ( ) ;
   }
   class ClassExtendingRename extends ClassExtendingRename_Instance {
   }
-  class ClassExtendingRename_Instance extends goog.legacy.namespace.exporter.OriginalName {
+  class ClassExtendingRename_Instance extends ಠ_ಠ.clutz.goog.legacy.namespace.exporter.OriginalName {
     constructor ( ) ;
   }
 }
