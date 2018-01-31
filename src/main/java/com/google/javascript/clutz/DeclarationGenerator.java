@@ -1351,7 +1351,7 @@ class DeclarationGenerator {
         if (!isAliasedClassOrInterface(symbol, ftype)) {
           visitClassOrInterface(getUnqualifiedName(symbol), ftype);
         } else {
-          visitClassOrInterfaceAlias(getUnqualifiedName(symbol), ftype);
+          visitTypeValueAlias(getUnqualifiedName(symbol), ftype);
         }
       } else {
         maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
@@ -1382,6 +1382,13 @@ class DeclarationGenerator {
                     + " but type not found in Closure type registry.");
           }
         }
+        // The enum alias of an unknown type is present in the type registry, but its type is still
+        // listed as unknown type instead of enum type.
+        JSType registryType = typeRegistry.getType(symbol.getName());
+        if (type.isUnknownType() && registryType != null && registryType.isEnumElementType()) {
+          visitTypeValueAlias(symbol.getName(), (EnumElementType) registryType);
+          return;
+        }
         visitVarDeclaration(getUnqualifiedName(emitName), type);
       }
     }
@@ -1405,17 +1412,24 @@ class DeclarationGenerator {
       return type.isConstructor() && type.getDisplayName() == null;
     }
 
-    private void visitClassOrInterfaceAlias(String unqualifiedName, FunctionType ftype) {
-      String typeName = Constants.INTERNAL_NAMESPACE + "." + ftype.getDisplayName();
+    /**
+     * In closure almost any object can be aliased by 'const Something = Other', where other can be
+     * value, type or value-type object. For types (interfaces) and value-type (classes, enums)
+     * TypeScript does not have an easy one-liner syntax. Instead we have to expand into the form:
+     *
+     * <p>type KlassAlias = Klass; const KlassAlias = typeof Klass;
+     */
+    private void visitTypeValueAlias(String unqualifiedName, ObjectType otype) {
+      String typeName = Constants.INTERNAL_NAMESPACE + "." + otype.getDisplayName();
       emit("type");
       emit(unqualifiedName);
-      visitTemplateTypes(ftype);
+      visitTemplateTypes(otype);
       emit("=");
       emit(typeName);
-      visitTemplateTypes(ftype, Collections.emptyList(), false);
+      visitTemplateTypes(otype, Collections.emptyList(), false);
       emit(";");
       emitBreak();
-      if (!ftype.isInterface()) {
+      if (!otype.isInterface()) {
         // TS type aliases are only useful in type positions.
         // To emulate closure alias semantics, introduce also an aliased constructor
         emit("var " + unqualifiedName);
@@ -1425,7 +1439,7 @@ class DeclarationGenerator {
         emit(";");
         emitBreak();
       }
-      typesUsed.add(ftype.getDisplayName());
+      typesUsed.add(otype.getDisplayName());
     }
 
     private void maybeEmitJsDoc(JSDocInfo docs, boolean ignoreParams) {
