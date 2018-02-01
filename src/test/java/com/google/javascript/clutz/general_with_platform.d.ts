@@ -1,14 +1,4 @@
 declare namespace ಠ_ಠ.clutz {
-  interface Body {
-    arrayBuffer ( ) : Promise < ArrayBuffer > ;
-    blob ( ) : Promise < Blob > ;
-    bodyUsed : boolean ;
-    formData ( ) : Promise < FormData > ;
-    json ( ) : Promise < any > ;
-    text ( ) : Promise < string > ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
   class ByteLengthQueuingStrategy extends ByteLengthQueuingStrategy_Instance {
   }
   class ByteLengthQueuingStrategy_Instance {
@@ -151,31 +141,6 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class Headers extends Headers_Instance {
-  }
-  class Headers_Instance implements Iterable < string [] > {
-    private noStructuralTyping_: any;
-    constructor (opt_headersInit ? : Headers | string [] [] | IObject < string , string > ) ;
-    [Symbol.iterator]():  Iterator < string [] > ;
-    append (name : string , value : string ) : void ;
-    delete (name : string ) : void ;
-    entries ( ) : IterableIterator < string [] > ;
-    get (name : string ) : string | null ;
-    getAll (name : string ) : string [] ;
-    has (name : string ) : boolean ;
-    keys ( ) : Iterator < string > ;
-    set (name : string , value : string ) : void ;
-    values ( ) : Iterator < string > ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  class Image extends Image_Instance {
-  }
-  class Image_Instance extends HTMLImageElement {
-    constructor (opt_width ? : number , opt_height ? : number ) ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
   /**
    * Metadata interface.
    */
@@ -185,13 +150,6 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_: any;
     modificationTime : GlobalDate ;
     size : number ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  interface PipeOptions {
-    preventAbort ? : boolean ;
-    preventCancel ? : boolean ;
-    preventClose ? : boolean ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -205,20 +163,6 @@ declare namespace ಠ_ಠ.clutz {
     desiredSize : number ;
     enqueue (chunk : ArrayBufferView ) : void ;
     error (err : any ) : void ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  class ReadableStream extends ReadableStream_Instance {
-  }
-  class ReadableStream_Instance {
-    private noStructuralTyping_: any;
-    constructor (opt_underlyingSource ? : ReadableStreamSource , opt_queuingStrategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark : number , size ? : (a : any ) => number } ) ;
-    cancel (reason : any ) : Promise < undefined > ;
-    getReader (opt_options ? : { mode ? : string } ) : ReadableStreamDefaultReader | ReadableStreamBYOBReader ;
-    locked : boolean ;
-    pipeThrough (transform : TransformStream , opt_options ? : PipeOptions ) : ReadableStream ;
-    pipeTo (dest : WritableStream , opt_options ? : PipeOptions ) : Promise < undefined > ;
-    tee ( ) : ReadableStream [] ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -271,99 +215,6 @@ declare namespace ಠ_ಠ.clutz {
     pull ? : (a : ReadableByteStreamController | ReadableStreamDefaultController ) => PromiseLike < any > | undefined ;
     start ? : (a : ReadableByteStreamController | ReadableStreamDefaultController ) => PromiseLike < any > | undefined ;
     type ? : string ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  class Request extends Request_Instance {
-  }
-  class Request_Instance implements Body {
-    private noStructuralTyping_: any;
-    constructor (input : Request | string , opt_init ? : RequestInit ) ;
-    arrayBuffer ( ) : Promise < ArrayBuffer > ;
-    blob ( ) : Promise < Blob > ;
-    bodyUsed : any ;
-    cache : string ;
-    clone ( ) : Request ;
-    credentials : string ;
-    destination : string ;
-    formData ( ) : Promise < FormData > ;
-    headers : Headers ;
-    integrity : string ;
-    json ( ) : Promise < any > ;
-    method : string ;
-    mode : string ;
-    redirect : string ;
-    referrer : string ;
-    text ( ) : Promise < string > ;
-    type : string ;
-    url : string ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  interface RequestInit {
-    body ? : Blob | ArrayBuffer | ArrayBufferView | FormData | string | null ;
-    cache ? : string ;
-    credentials ? : string ;
-    headers ? : Headers | string [] [] | IObject < string , string > ;
-    integrity ? : string ;
-    method ? : string ;
-    mode ? : string ;
-    redirect ? : string ;
-    referrer ? : string ;
-    referrerPolicy ? : string ;
-    window ? : null ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  class Response extends Response_Instance {
-    static error ( ) : Response ;
-    static redirect (url : string , opt_status ? : number ) : Response ;
-  }
-  class Response_Instance implements Body {
-    private noStructuralTyping_: any;
-    constructor (opt_body ? : Blob | ArrayBuffer | ArrayBufferView | FormData | string | ReadableStream | null , opt_init ? : ResponseInit ) ;
-    arrayBuffer ( ) : Promise < ArrayBuffer > ;
-    blob ( ) : Promise < Blob > ;
-    body : ReadableStream | null ;
-    bodyUsed : any ;
-    clone ( ) : Response ;
-    formData ( ) : Promise < FormData > ;
-    headers : Headers ;
-    json ( ) : Promise < any > ;
-    ok : boolean ;
-    redirected : boolean ;
-    status : number ;
-    statusText : string ;
-    text ( ) : Promise < string > ;
-    trailer : Promise < Headers > ;
-    type : string ;
-    url : string ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  interface ResponseInit {
-    headers ? : Headers | string [] [] | IObject < string , string > ;
-    status ? : number ;
-    statusText ? : string ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  interface TransformStream {
-    readable : ReadableStream ;
-    writable : WritableStream ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  interface WorkerLocation {
-    hash : string ;
-    host : string ;
-    hostname : string ;
-    href : string ;
-    origin : string ;
-    pathname : string ;
-    port : string ;
-    protocol : string ;
-    search : string ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
