@@ -90,6 +90,23 @@ public class ImportRenameMapBuilder {
             || rightHandSide.getFirstChild().matchesQualifiedName("goog.module.get"));
   }
 
+  /** Matches destructing from a variable ie `const {foo, bar: baz} = quux;` */
+  private static boolean isVariableDestructuringAssignment(Node statement) {
+    if (!(statement.isConst() || statement.isVar() || statement.isLet())) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().isDestructuringLhs()) {
+      return false;
+    }
+
+    Node destructuringAssignment = statement.getFirstChild();
+
+    Node rightHandSide = destructuringAssignment.getChildAtIndex(1);
+
+    return rightHandSide.isName();
+  }
+
   /**
    * Matches either `const {foo} = goog.require()` or `const {foo} = goog.module.get()` depending on
    * if statement is in a goog.module or a goog.scope.
@@ -167,8 +184,10 @@ public class ImportRenameMapBuilder {
           // generates, so we have to extract it.
           String variableName;
           if (destructured.getFirstChild() != null) {
+            // Renaming
             variableName = destructured.getFirstChild().getString();
           } else {
+            // No rename
             variableName = originalName;
           }
 
@@ -179,7 +198,41 @@ public class ImportRenameMapBuilder {
             exportedSymbolName = importedModuleId;
           }
           importRenameMap.put(variableName, exportedSymbolName);
-          // If we're in a goog scope, there isn't a module id
+          // If there's a local module id, a goog.module is being processed, so there needs to be a
+          // rename for `module$contents$local$module$id_foo`
+          if (localModuleId != null) {
+            String localSymbolName = buildLocalSymbolName(localModuleId, variableName);
+            importRenameMap.put(localSymbolName, exportedSymbolName);
+          }
+        }
+      } else if (isVariableDestructuringAssignment(statement)) {
+        // `const B = goog.require()`
+        // `const {C, Clazz: RenamedClazz} = B`
+        // On separate lines
+        String destructuredVariable = statement.getFirstChild().getChildAtIndex(1).getString();
+
+        for (Node destructured : statement.getFirstFirstChild().children()) {
+          String originalName = destructured.getString();
+          // Destructuring can use the original name `const {A} = goog.require("foo.a")` or rename
+          // it `const {A: RenamedA} = ...`, and closure uses whichever in the symbol name it
+          // generates, so we have to extract it.
+          String variableName;
+          if (destructured.getFirstChild() != null) {
+            // Renaming
+            variableName = destructured.getFirstChild().getString();
+          } else {
+            // No rename
+            variableName = originalName;
+          }
+
+          // The statements are iterated in order, so the statement with the goog.require() is already
+          // processed, so the value is already in the import rename map.
+          String exportedSymbolName =
+              importRenameMap.get(destructuredVariable) + "." + originalName;
+
+          importRenameMap.put(variableName, exportedSymbolName);
+          // If there's a local module id, a goog.module is being processed, so there needs to be a
+          // rename for `module$contents$local$module$id_foo`
           if (localModuleId != null) {
             String localSymbolName = buildLocalSymbolName(localModuleId, variableName);
             importRenameMap.put(localSymbolName, exportedSymbolName);
