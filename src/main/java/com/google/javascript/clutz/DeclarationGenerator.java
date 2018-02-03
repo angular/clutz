@@ -75,104 +75,6 @@ class DeclarationGenerator {
   static final String INSTANCE_CLASS_SUFFIX = "_Instance";
 
   /**
-   * Contains symbols that are part of platform externs, but not yet in lib.d.ts. This list is
-   * incomplete and will grow as needed.
-   */
-  private static final ImmutableSet<String> PLATFORM_SYMBOLS_MISSING_IN_TYPESCRIPT =
-      ImmutableSet.of(
-          "Image",
-          "IDBDatabaseException",
-          "RequestCache",
-          "RequestCredentials",
-          "Request",
-          "Headers",
-          "RequestMode",
-          "WorkerLocation",
-          "RequestContext",
-          "Response",
-          "ReadableByteStream",
-          "ResponseType",
-          "ReadableStreamController",
-          "CountQueuingStrategy",
-          "ByteLengthQueuingStrategy",
-          "ReadableByteStreamReader",
-          "ReadableStream",
-          "WritableStream",
-          "ReadableStreamReader",
-          "Entry",
-          "DirectoryEntry",
-          "FileSystem",
-          "FileSystemFlags",
-          "Metadata",
-          "FileError",
-          "DirectoryReader",
-          "FileEntry",
-          "FileWriter",
-          "FileSaver",
-          "ChromeEvent",
-          "ChromeBaseEvent",
-          "ChromeBaseEventNoListeners",
-          "Rule",
-          "Tab",
-          "ChromeStringArrayEvent",
-          "ChromeStringStringEvent",
-          "ChromeObjectEvent",
-          "ChromeStringEvent",
-          "ChromeBooleanEvent",
-          "MessageSender",
-          "Port",
-          "Body",
-          "RequestInit",
-          "RequestDestination",
-          "FetchRequestType",
-          "RequestRedirect",
-          "RefererrerPolicy",
-          "ResponseInit",
-          "ReferrerPolicy",
-          "WritableStreamSink",
-          "PipeOptions",
-          "WritableStreamDefaultWriter",
-          "TransformStream",
-          "ReadableStreamBYOBReader",
-          "ReadableStreamDefaultReader",
-          "ReadableStreamSource",
-          "ReadableByteStreamController",
-          "ReadableStreamDefaultController",
-          "WritableStreamDefaultController",
-          "ReadableStreamBYOBRequest",
-          "MutedInfo");
-
-  /**
-   * List of files that are part of closures platform externs. Not exhaustive, see isPlatformExtern
-   * for the rest.
-   */
-  private static final ImmutableSet<String> PLATFORM_EXTERNS_FILENAMES =
-      ImmutableSet.of(
-          "chrome.js",
-          // This file is needed by all typed tsickle emit, for types that are in lib.d.ts but not
-          // in closure externs. Clutz should not emit any symbols from it, because they are already
-          // provided by lib.d.ts.
-          "closure_externs.js",
-          "deprecated.js",
-          "fetchapi.js",
-          "fileapi.js",
-          "flash.js",
-          "google.js",
-          "html5.js",
-          "intl.js",
-          "iphone.js",
-          "mediakeys.js",
-          "mediasource.js",
-          "page_visibility.js",
-          "streamapi.js",
-          "url.js",
-          "v8.js",
-          "webgl.js",
-          "webstorage.js",
-          "whatwg_encoding.js",
-          "window.js");
-
-  /**
    * Words for which we cannot generate 'namespace foo.Word {}'; Instead clutz tries to roll them up
    * into properties of the parent namespace, but that can be lossy.
    *
@@ -222,39 +124,6 @@ class DeclarationGenerator {
           "with");
 
   private static final String GOOG_BASE_NAMESPACE = "goog";
-
-  /**
-   * List of global platform symbols that are redirected through an alias in closure.lib.d.ts This
-   * allows the following pattern to work:
-   *
-   * <pre>
-   * namespace foo {
-   *   class Error extends Error {}
-   * }
-   * </pre>
-   *
-   * by replacing the second Error with GlobalError.
-   *
-   * <p>Closure has internal "externs" for some global symbols:
-   * https://github.com/google/closure-compiler/blob/master/src/com/google/javascript/rhino/jstype/JSTypeRegistry.java
-   * Which will be emitted in each file that references them in partial mode. For example, using
-   * Date in a file results in:
-   *
-   * <pre>
-   * declare namespace ಠ_ಠ.clutz {
-   *   class Date extends Date_Instance {
-   *   }
-   *   class Date_Instance {
-   *     private noStructuralTyping_: any;
-   *     constructor (a ? : any , b ? : any , c ? : any , d ? : any , e ? : any , f ? : any , g ? : any ) ;
-   *   }
-   * }
-   * </pre>
-   *
-   * Adding a symbol to this list also suppresses the duplicate externs.
-   */
-  private static final ImmutableSet<String> GLOBAL_SYMBOL_ALIASES =
-      ImmutableSet.of("Error", "Event", "EventTarget", "Object", "Date");
 
   private static final String MODULE_PREFIX = "module$exports$";
 
@@ -897,19 +766,32 @@ class DeclarationGenerator {
 
   /** For platform externs we skip emitting, to avoid collisions with lib.d.ts. */
   private boolean isPlatformExtern(String filePath, String symbolName) {
-    // Some symbols are not yet provided by lib.d.ts, so we have to emit them.
-    if (PLATFORM_SYMBOLS_MISSING_IN_TYPESCRIPT.contains(symbolName)) return false;
-    // This matches our test setup.
-    if (filePath.startsWith("externs.zip//")) return true;
+    // This file is built in to Clutz for testing, so special-case it here.
     String fileName = new File(filePath).getName();
-    // This loosely matches the filenames from
-    // https://github.com/google/closure-compiler/tree/master/externs
-    return PLATFORM_EXTERNS_FILENAMES.contains(fileName)
-        || fileName.startsWith("es")
-        || fileName.startsWith("gecko_")
-        || fileName.startsWith("w3c_")
-        || fileName.startsWith("ie_")
-        || fileName.startsWith("webkit_");
+    if (fileName.equals("es6_min.js")) return true;
+
+    // If asked about a symbol like "window.Array", perform the below lookups on just
+    // "Array".
+    if (symbolName.startsWith("window.")) {
+      symbolName = symbolName.substring("window.".length());
+    }
+
+    // We're asked about e.g. "Array.from", which we should treat as a platform extern.
+    // The PlatformSymbols lists just contain the toplevel name like "Array", so strip after
+    // the first dot.
+    int dotPos = symbolName.indexOf('.');
+    if (dotPos > 0) {
+      symbolName = symbolName.substring(0, dotPos);
+    }
+
+    // Don't emit externs for Closure types that nobody uses.
+    if (PlatformSymbols.CLOSURE_EXTERNS_NOT_USED_IN_TYPESCRIPT.contains(symbolName)) return true;
+    // Don't emit externs for Closure types that have TypeScript equivalents.
+    if (PlatformSymbols.CLOSURE_TO_TYPESCRIPT.containsKey(symbolName)) return true;
+    // Don't emit externs for Closure types that exist in TypeScript already.
+    if (PlatformSymbols.TYPESCRIPT_LIB_D_TS.contains(symbolName)) return true;
+
+    return false;
   }
 
   private void declareNamespace(
@@ -1736,7 +1618,7 @@ class DeclarationGenerator {
         emit(defaultEmit);
         return;
       }
-      if (maybeEmitGlobalAlias(type)) return;
+      if (maybeEmitGlobalType(type)) return;
       // When processing partial inputs, this case handles implicitly forward declared types
       // for which we just emit the literal type written along with any type parameters.
       NoResolvedType nType = (NoResolvedType) type;
@@ -1755,19 +1637,7 @@ class DeclarationGenerator {
       if (importRenameMap.containsKey(baseDisplayName)) {
         displayName = displayName.replace(baseDisplayName, importRenameMap.get(baseDisplayName));
       }
-      // We have a choice whether to emit Foo or ಠ_ಠ.clutz.Foo here. Only the first option
-      // works in partial input mode, because it would work for both types within clutz's
-      // view and types that come from lib.d.ts.
-      // Note, that TypeScript allows implicit namespace fallback
-      // <pre>
-      // decalre namespace a.b {
-      //   class F {}
-      // }
-      // delcare namespace a.b.c.d {
-      //   export let x: F;  // F is looked up in a.b.c.d, then a.b.c, then a.b.
-      // }
-      // </pre>
-      emit(displayName);
+      emit(Constants.INTERNAL_NAMESPACE + "." + displayName);
       List<JSType> templateTypes = nType.getTemplateTypes();
       if (templateTypes != null && templateTypes.size() > 0) {
         emitGenericTypeArguments(type.getTemplateTypes().iterator());
@@ -1869,7 +1739,7 @@ class DeclarationGenerator {
               // unit - A ends up as NoType, while B ends up as NamedType.
               if (opts.partialInput && refType.isUnknownType()) {
                 String displayName = type.getDisplayName();
-                emit(displayName);
+                emit(Constants.INTERNAL_NAMESPACE + "." + displayName);
                 List<JSType> templateTypes = type.getTemplateTypes();
                 if (templateTypes != null && templateTypes.size() > 0) {
                   emitGenericTypeArguments(type.getTemplateTypes().iterator());
@@ -2847,13 +2717,13 @@ class DeclarationGenerator {
 
     public Void emitObjectType(
         ObjectType type, boolean extendingInstanceClass, boolean inExtendsImplementsPosition) {
-      if (maybeEmitGlobalAlias(type)) return null;
       // Closure doesn't require that all the type params be declared, but TS does
       if (!type.getTemplateTypeMap().isEmpty()
           && !typeRegistry.getNativeType(OBJECT_TYPE).equals(type)) {
         return emitTemplatizedType(
             typeRegistry.createTemplatizedType(type), false, inExtendsImplementsPosition);
       }
+      if (maybeEmitGlobalType(type)) return null;
       if (type.isRecordType()) {
         visitRecordType((RecordType) type);
       } else if (type.isDict()) {
@@ -2882,10 +2752,26 @@ class DeclarationGenerator {
       return null;
     }
 
-    /** See comment on GLOBAL_SYMBOL_ALIASES. */
-    private boolean maybeEmitGlobalAlias(ObjectType type) {
-      if (type.getDisplayName() != null && GLOBAL_SYMBOL_ALIASES.contains(type.getDisplayName())) {
-        emit(getGlobalSymbolNamespacePrefix() + "Global" + type.getDisplayName());
+    /** If ObjectType refers to a "platform" type (e.g. Promise) emit it specially here and return true. */
+    private boolean maybeEmitGlobalType(ObjectType type) {
+      String name = type.getDisplayName();
+      if (name == null) return false;
+
+      if (PlatformSymbols.GLOBAL_SYMBOL_ALIASES.contains(name)) {
+        // See comment on GLOBAL_SYMBOL_ALIASES.
+        emit(getGlobalSymbolNamespacePrefix() + "Global" + name);
+        return true;
+      }
+
+      String newName = PlatformSymbols.CLOSURE_TO_TYPESCRIPT.get(name);
+      if (newName != null) {
+        emit(newName);
+        return true;
+      }
+
+      if (PlatformSymbols.TYPESCRIPT_LIB_D_TS.contains(name)) {
+        // Assume it's safe to emit the name as-is.
+        emit(name);
         return true;
       }
       return false;
