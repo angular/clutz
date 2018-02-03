@@ -1746,15 +1746,8 @@ class DeclarationGenerator {
         emit(defaultEmit);
         return;
       }
-      String displayName = type.getDisplayName();
-      // In partial mode, closure doesn't know the correct name of imported symbols, if the name
-      // matches one in the precomputed map, replace it with the original declared name
-      // The displayName can be of the form foo.bar, but the symbol that was goog required was just
-      // foo, so just replace the part of the display name before the first period
-      String baseDisplayName = displayName.split("\\.")[0];
-      if (importRenameMap.containsKey(baseDisplayName)) {
-        displayName = displayName.replace(baseDisplayName, importRenameMap.get(baseDisplayName));
-      }
+      String displayName = maybeRewriteImportedName(type.getDisplayName());
+
       // We have a choice whether to emit Foo or ಠ_ಠ.clutz.Foo here. Only the first option
       // works in partial input mode, because it would work for both types within clutz's
       // view and types that come from lib.d.ts.
@@ -1772,6 +1765,20 @@ class DeclarationGenerator {
       if (templateTypes != null && templateTypes.size() > 0) {
         emitGenericTypeArguments(type.getTemplateTypes().iterator());
       }
+    }
+
+    /**
+     * In partial mode, closure doesn't know the correct name of imported symbols, if the name
+     * matches one in the precomputed map, replace it with the original declared name The
+     * displayName can be of the form foo.bar, but the symbol that was goog required was just foo,
+     * so just replace the part of the display name before the first period
+     */
+    private String maybeRewriteImportedName(String displayName) {
+      String baseDisplayName = displayName.split("\\.")[0];
+      if (importRenameMap.containsKey(baseDisplayName)) {
+        displayName = displayName.replace(baseDisplayName, importRenameMap.get(baseDisplayName));
+      }
+      return displayName;
     }
 
     /**
@@ -1868,8 +1875,7 @@ class DeclarationGenerator {
               // compilation
               // unit - A ends up as NoType, while B ends up as NamedType.
               if (opts.partialInput && refType.isUnknownType()) {
-                String displayName = type.getDisplayName();
-                emit(displayName);
+                emit(maybeRewriteImportedName(type.getDisplayName()));
                 List<JSType> templateTypes = type.getTemplateTypes();
                 if (templateTypes != null && templateTypes.size() > 0) {
                   emitGenericTypeArguments(type.getTemplateTypes().iterator());
