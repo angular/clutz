@@ -17,6 +17,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
@@ -221,6 +222,25 @@ class DeclarationGenerator {
           "while",
           "with");
 
+  /**
+   * Incremental clutz cannot infer class aliases like:
+   *
+   * <pre>
+   *   /** @constructor *
+   *   an.KlassAlias = some.Missing;
+   * </pre>
+   *
+   * Closure reports an.KlassAlias as regular empty class. In order to emit the correct clutz
+   * description for now we work-around this issue by hardcoding some known aliases.
+   *
+   * <p>So far this works only for classes with no generic type parameters.
+   */
+  private static final ImmutableMap<String, String> KNOWN_CLASS_ALIASES =
+      ImmutableMap.of(
+          "goog.log.Logger", "goog.debug.Logger",
+          "goog.log.Level", "goog.debug.Logger.Level",
+          "goog.log.LogRecord", "goog.debug.LogRecord");
+
   private static final String GOOG_BASE_NAMESPACE = "goog";
 
   /**
@@ -408,6 +428,7 @@ class DeclarationGenerator {
 
   void generateDeclarations() {
     List<SourceFile> sourceFiles = new ArrayList<>();
+
     for (String source : opts.arguments) {
       sourceFiles.add(SourceFile.fromFile(source, UTF_8));
     }
@@ -736,11 +757,6 @@ class DeclarationGenerator {
         if (symbolInput != null && symbolInput.isExtern()) continue;
 
         if (shouldSkipVar(symbol)) {
-          continue;
-        }
-
-        // Symbols in partial_goog_base.js are just stand ins for the real symbols, so don't emit
-        if (symbol.getInputName().endsWith("partial_goog_base.js")) {
           continue;
         }
 
@@ -1351,7 +1367,12 @@ class DeclarationGenerator {
         if (!isAliasedClassOrInterface(symbol, ftype)) {
           visitClassOrInterface(getUnqualifiedName(symbol), ftype);
         } else {
-          visitTypeValueAlias(getUnqualifiedName(symbol), ftype);
+          if (KNOWN_CLASS_ALIASES.containsKey(symbol.getName())) {
+            visitKnownTypeValueAlias(
+                getUnqualifiedName(symbol), KNOWN_CLASS_ALIASES.get(symbol.getName()));
+          } else {
+            visitTypeValueAlias(getUnqualifiedName(symbol), ftype);
+          }
         }
       } else {
         maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
@@ -1418,14 +1439,17 @@ class DeclarationGenerator {
      * TypeScript does not have an easy one-liner syntax. Instead we have to expand into the form:
      *
      * <p>type KlassAlias = Klass; const KlassAlias = typeof Klass;
+     *
+     * <p>With incremental clutz it is possible that the type is not present. In such cases one
+     * needs to pass 'null' and an explicit non-null alternativeAliasName will be used.
      */
     private void visitTypeValueAlias(String unqualifiedName, ObjectType otype) {
-      String typeName = Constants.INTERNAL_NAMESPACE + "." + otype.getDisplayName();
+      String emitName = Constants.INTERNAL_NAMESPACE + "." + otype.getDisplayName();
       emit("type");
       emit(unqualifiedName);
       visitTemplateTypes(otype);
       emit("=");
-      emit(typeName);
+      emit(emitName);
       visitTemplateTypes(otype, Collections.emptyList(), false);
       emit(";");
       emitBreak();
@@ -1435,11 +1459,34 @@ class DeclarationGenerator {
         emit("var " + unqualifiedName);
         emit(":");
         emit("typeof");
-        emit(typeName);
+        emit(emitName);
         emit(";");
         emitBreak();
       }
       typesUsed.add(otype.getDisplayName());
+    }
+
+    /**
+     * Special emit for known aliases See KNOWN_ALIASES comment why this workaround is need.
+     *
+     * <p>This shares some similarity with visitTypeValueAlias method above, but it has to hardcode
+     * one assumptions - the alias is for a class with no generics.
+     */
+    private void visitKnownTypeValueAlias(String unqualifiedName, String alternativeAliasName) {
+      String emitName = Constants.INTERNAL_NAMESPACE + "." + alternativeAliasName;
+      emit("type");
+      emit(unqualifiedName);
+      emit("=");
+      emit(emitName);
+      emit(";");
+      emitBreak();
+      emit("var " + unqualifiedName);
+      emit(":");
+      emit("typeof");
+      emit(emitName);
+      emit(";");
+      emitBreak();
+      typesUsed.add(alternativeAliasName);
     }
 
     private void maybeEmitJsDoc(JSDocInfo docs, boolean ignoreParams) {
@@ -3042,7 +3089,10 @@ class DeclarationGenerator {
     // Confusingly typedefs are constructors. However, they cannot be aliased AFAICT.
     if (type.isNoType()) return false;
     if (!type.isConstructor() && !type.isInterface()) return false;
-    return !symbol.getName().equals(type.getDisplayName());
+    String symbolName = symbol.getName();
+    String typeName = type.getDisplayName();
+    // Turns out that for aliases the symbol and type name differ.
+    return !symbolName.equals(typeName) || KNOWN_CLASS_ALIASES.containsKey(symbolName);
   }
 
   private void emitSkipTypeAlias(TypedVar symbol) {
