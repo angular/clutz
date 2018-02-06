@@ -65,6 +65,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -344,6 +345,9 @@ class DeclarationGenerator {
    */
   private Map<String, String> importRenameMap = Collections.emptyMap();
 
+  /** If true, add all the import rename map entries to the output as comments in the .d.ts. */
+  private final boolean PRINT_IMPORT_RENAME_MAP = false;
+
   DeclarationGenerator(Options opts) {
     this.opts = opts;
     this.compiler = new InitialParseRetainingCompiler();
@@ -513,6 +517,13 @@ class DeclarationGenerator {
             String.format(
                 "Processing provides %s from input %s",
                 compilerInput.getProvides(), compilerInput.getSourceFile().getOriginalPath()));
+      }
+    }
+
+    if (PRINT_IMPORT_RENAME_MAP) {
+      emitComment(String.format("import rename map contains %d entries", importRenameMap.size()));
+      for (Entry<String, String> e : importRenameMap.entrySet()) {
+        emitComment(String.format("Rename %s to %s", e.getKey(), e.getValue()));
       }
     }
 
