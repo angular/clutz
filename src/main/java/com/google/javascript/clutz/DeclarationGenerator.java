@@ -197,6 +197,13 @@ class DeclarationGenerator {
   /** If true, add all the import rename map entries to the output as comments in the .d.ts. */
   private final boolean PRINT_IMPORT_RENAME_MAP = false;
 
+  /**
+   * If one file defines a name and another uses it as a namespace, we have the
+   * Constants.COLLDING_PROVIDE_ALIAS_POSTFIX workaround. In partial mode, Clutz can't see all
+   * definitions of a name, so the list of names that require aliases must be passed as an input.
+   */
+  private Set<String> collidingProvides = new LinkedHashSet<>();
+
   DeclarationGenerator(Options opts) {
     this.opts = opts;
     this.compiler = new InitialParseRetainingCompiler();
@@ -311,7 +318,9 @@ class DeclarationGenerator {
     if (opts.partialInput) {
       importRenameMap =
           ImportRenameMapBuilder.build(compiler.getParsedInputs(), opts.knownGoogProvides);
+      collidingProvides = opts.collidingProvides;
     }
+
     unknownType = compiler.getTypeRegistry().getNativeType(JSTypeNative.UNKNOWN_TYPE);
     numberType = compiler.getTypeRegistry().getNativeType(JSTypeNative.NUMBER_TYPE);
     iterableType = compiler.getTypeRegistry().getType("Iterable");
@@ -394,7 +403,7 @@ class DeclarationGenerator {
         rewrittenProvides.add(rewritenProvide);
       }
       if (needsAlias(shadowedProvides, provide, symbol)) {
-        emitName += Constants.SYMBOL_ALIAS_POSTFIX;
+        emitName += Constants.COLLDING_PROVIDE_ALIAS_POSTFIX;
       }
       if (symbol == null) {
         // Sometimes goog.provide statements are used as pure markers for dependency management, or
@@ -698,7 +707,7 @@ class DeclarationGenerator {
       boolean isDefault = isDefaultExport(symbol);
       String emitName = symbol.getName();
       if (needsAlias(shadowedSymbols, symbol.getName(), symbol)) {
-        emitName += Constants.SYMBOL_ALIAS_POSTFIX;
+        emitName += Constants.COLLDING_PROVIDE_ALIAS_POSTFIX;
       }
 
       // There is nothing to emit for a namespace, because all its symbols will be visited later,
@@ -736,6 +745,9 @@ class DeclarationGenerator {
   }
 
   private boolean needsAlias(Set<String> shadowedSymbols, String provide, TypedVar symbol) {
+    if (collidingProvides.contains(provide)) {
+      return true;
+    }
     if (!shadowedSymbols.contains(provide)) {
       return false;
     }
