@@ -14,5 +14,5 @@ public interface Constants {
    * The alias does not affect the external module declaration, thus the user can still import the
    * symbol using unaliased module name (i.e. import bar from 'goog:foo.bar').
    */
-  static final String SYMBOL_ALIAS_POSTFIX = "__clutz_alias";
+  static final String COLLDING_PROVIDE_ALIAS_POSTFIX = "__clutz_alias";
 }

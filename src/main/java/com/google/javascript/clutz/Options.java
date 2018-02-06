@@ -151,6 +151,12 @@ public class Options {
   /** Mappings should be comma separated, with no spaces, one mapping per line */
   String knownClassAliasesFile = null;
 
+  @Option(
+    name = "--collidingProvides",
+    usage = "file containing a list of names that we know conflict with namespaces"
+  )
+  String collidingProvidesFile = null;
+
   @Argument List<String> arguments = new ArrayList<>();
 
   Depgraph depgraph;
@@ -158,6 +164,7 @@ public class Options {
   // library that supports Pattern arguments.
   Pattern skipEmitPattern;
   Set<String> knownGoogProvides = new HashSet<>();
+  Set<String> collidingProvides = new HashSet<>();
 
   /**
    * Incremental clutz cannot infer class aliases like:
@@ -265,6 +272,14 @@ public class Options {
       } catch (IOException e) {
         throw new RuntimeException(
             "Error reading known class aliases file " + knownClassAliasesFile, e);
+      }
+    }
+
+    if (collidingProvidesFile != null) {
+      try {
+        collidingProvides.addAll(Files.readLines(new File(collidingProvidesFile), UTF_8));
+      } catch (IOException e) {
+        throw new RuntimeException("Error reading aliased names file " + collidingProvidesFile, e);
       }
     }
   }

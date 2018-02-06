@@ -8,6 +8,7 @@ import static java.util.Collections.singletonList;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.google.common.truth.FailureMetadata;
@@ -124,6 +125,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
             "goog.log.Level", "goog.debug.Logger.Level",
             "goog.log.LogRecord", "goog.debug.LogRecord",
             "module$exports$bare$reexport", "module$exports$original$module.Class");
+    opts.collidingProvides = ImmutableSet.of("colliding_provide.aliased");
 
     List<SourceFile> sourceFiles = new ArrayList<>();
 
