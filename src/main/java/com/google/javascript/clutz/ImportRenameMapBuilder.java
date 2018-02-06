@@ -195,7 +195,7 @@ public class ImportRenameMapBuilder {
           if (!knownGoogProvides.contains(importedModuleId)) {
             exportedSymbolName = buildNamedExportSymbolName(importedModuleId, originalName);
           } else {
-            exportedSymbolName = importedModuleId;
+            exportedSymbolName = importedModuleId + "." + originalName;
           }
           importRenameMap.put(variableName, exportedSymbolName);
           // If there's a local module id, a goog.module is being processed, so there needs to be a

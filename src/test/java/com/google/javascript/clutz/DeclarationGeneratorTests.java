@@ -82,7 +82,8 @@ public class DeclarationGeneratorTests {
         subject.partialInput = true;
       }
       if (input.getParentFile().getName().equals("partialCrossModuleTypeImports")) {
-        subject.knownGoogProvides = ImmutableSet.of("googprovide.exporter");
+        subject.knownGoogProvides =
+            ImmutableSet.of("googprovide.exporter", "goog.legacy.namespace.exporter");
       }
       subject.extraExternFile = getExternFileNameOrNull(input.getName());
       suite.addTest(new DeclarationTest(input.getName(), golden, subject));

@@ -100,7 +100,8 @@ public class MultiFileTest {
     File golden = input("total.d.ts");
     assertThatProgram(
             ImmutableList.of(input("goog_module_importer.js")),
-            ImmutableList.of(input("goog_provide_exporter.js")))
+            ImmutableList.of(
+                input("goog_provide_exporter.js"), input("goog_legacy_namespace_exporter.js")))
         .generatesDeclarations(golden);
   }
 
