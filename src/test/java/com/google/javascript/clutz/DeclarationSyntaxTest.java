@@ -17,10 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * A test that checks the syntax of all {@code .d.ts} files using {@code tsc}, as a sanity check.
  */
+@RunWith(JUnit4.class)
 public class DeclarationSyntaxTest {
   private static final FilenameFilter TS_SOURCES_WITHOUT_PLATFORM_EXTERNS =
       new FilenameFilter() {
