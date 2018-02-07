@@ -143,4 +143,27 @@ public class OptionsTest {
             });
     assertThat(opts.knownGoogProvides).containsExactly("foo.bar", "baz.quux");
   }
+
+  @Test
+  public void testKnownClassAliases() throws Exception {
+    Options opts =
+        new Options(
+            new String[] {
+              "foo.js",
+              "--knownClassAliases",
+              DeclarationGeneratorTests.getTestInputFile("test_known_class_aliases")
+                  .toFile()
+                  .toString()
+            });
+    assertThat(opts.knownClassAliases)
+        .containsExactly(
+            "goog.log.Logger",
+            "goog.debug.Logger",
+            "goog.log.Level",
+            "goog.debug.Logger.Level",
+            "goog.log.LogRecord",
+            "goog.debug.LogRecord",
+            "module$exports$bare$reexport",
+            "module$exports$original$module.Class");
+  }
 }
