@@ -10,10 +10,9 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
-import com.google.common.truth.FailureStrategy;
+import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.StringSubject;
 import com.google.common.truth.Subject;
-import com.google.common.truth.SubjectFactory;
 import com.google.javascript.jscomp.SourceFile;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -66,16 +65,17 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
     return assert_().about(ProgramSubject.FACTORY).that(program);
   }
 
-  static final SubjectFactory<ProgramSubject, ProgramSubject.Program> FACTORY =
-      new SubjectFactory<ProgramSubject, ProgramSubject.Program>() {
+  static final Subject.Factory<ProgramSubject, ProgramSubject.Program> FACTORY =
+      new Subject.Factory<ProgramSubject, ProgramSubject.Program>() {
         @Override
-        public ProgramSubject getSubject(FailureStrategy fs, ProgramSubject.Program that) {
-          return new ProgramSubject(fs, that);
+        public ProgramSubject createSubject(
+            FailureMetadata failureMetadata, ProgramSubject.Program that) {
+          return new ProgramSubject(failureMetadata, that);
         }
       };
 
-  ProgramSubject(FailureStrategy failureStrategy, ProgramSubject.Program subject) {
-    super(failureStrategy, subject);
+  ProgramSubject(FailureMetadata failureMetadata, ProgramSubject.Program subject) {
+    super(failureMetadata, subject);
   }
 
   void generatesDeclarations(File golden) throws IOException {
@@ -96,7 +96,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
           && expected.equals(expectedClean)) {
         Files.write(stripped, golden, Charsets.UTF_8);
       } else {
-        failureStrategy.failComparing("compilation result doesn't match", expected, stripped);
+        failComparing("compilation result doesn't match", expected, stripped);
       }
     }
   }
