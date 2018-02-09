@@ -13,11 +13,9 @@ import com.google.javascript.jscomp.parsing.Config;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.kohsuke.args4j.Argument;
@@ -145,13 +143,6 @@ public class Options {
   String googProvidesFile = null;
 
   @Option(
-    name = "--knownClassAliases",
-    usage = "file containing a map of names that we know are aliases"
-  )
-  /** Mappings should be comma separated, with no spaces, one mapping per line */
-  String knownClassAliasesFile = null;
-
-  @Option(
     name = "--collidingProvides",
     usage = "file containing a list of names that we know conflict with namespaces"
   )
@@ -165,21 +156,6 @@ public class Options {
   Pattern skipEmitPattern;
   Set<String> knownGoogProvides = new HashSet<>();
   Set<String> collidingProvides = new HashSet<>();
-
-  /**
-   * Incremental clutz cannot infer class aliases like:
-   *
-   * <pre>
-   *   /** @constructor *
-   *   an.KlassAlias = some.Missing;
-   * </pre>
-   *
-   * Closure reports an.KlassAlias as regular empty class. In order to emit the correct clutz
-   * description for now we work-around this issue by hardcoding some known aliases.
-   *
-   * <p>So far this works only for classes with no generic type parameters.
-   */
-  Map<String, String> knownClassAliases = new HashMap<>();
 
   public CompilerOptions getCompilerOptions() {
     final CompilerOptions options = new CompilerOptions();
@@ -258,23 +234,6 @@ public class Options {
         throw new RuntimeException("Error reading goog provides file " + googProvidesFile, e);
       }
     }
-
-    if (knownClassAliasesFile != null) {
-      try {
-        for (String line : Files.readLines(new File(knownClassAliasesFile), UTF_8)) {
-          String[] alias = line.split(",");
-          if (alias.length != 2) {
-            throw new RuntimeException(
-                "Badly formatted mapping in known class aliases file: " + line);
-          }
-          knownClassAliases.put(alias[0], alias[1]);
-        }
-      } catch (IOException e) {
-        throw new RuntimeException(
-            "Error reading known class aliases file " + knownClassAliasesFile, e);
-      }
-    }
-
     if (collidingProvidesFile != null) {
       try {
         collidingProvides.addAll(Files.readLines(new File(collidingProvidesFile), UTF_8));

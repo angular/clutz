@@ -17,6 +17,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
@@ -123,6 +124,25 @@ class DeclarationGenerator {
           "void",
           "while",
           "with");
+
+  /**
+   * Incremental clutz cannot infer class aliases like:
+   *
+   * <pre>
+   *   /** @constructor *
+   *   an.KlassAlias = some.Missing;
+   * </pre>
+   *
+   * Closure reports an.KlassAlias as regular empty class. In order to emit the correct clutz
+   * description for now we work-around this issue by hardcoding some known aliases.
+   *
+   * <p>So far this works only for classes with no generic type parameters.
+   */
+  private static final ImmutableMap<String, String> KNOWN_CLASS_ALIASES =
+      ImmutableMap.of(
+          "goog.log.Logger", "goog.debug.Logger",
+          "goog.log.Level", "goog.debug.Logger.Level",
+          "goog.log.LogRecord", "goog.debug.LogRecord");
 
   private static final String GOOG_BASE_NAMESPACE = "goog";
 
@@ -1249,12 +1269,6 @@ class DeclarationGenerator {
       if (type.isFunctionType() && !isNewableFunctionType((FunctionType) type)) {
         FunctionType ftype = (FunctionType) type;
 
-        if (opts.knownClassAliases.containsKey(symbol.getName())) {
-          visitKnownTypeValueAlias(
-              getUnqualifiedName(symbol), opts.knownClassAliases.get(symbol.getName()));
-          return;
-        }
-
         if (isOrdinaryFunction(ftype)) {
           maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
           visitFunctionExpression(getUnqualifiedName(symbol), ftype);
@@ -1269,7 +1283,12 @@ class DeclarationGenerator {
         if (!isAliasedClassOrInterface(symbol, ftype)) {
           visitClassOrInterface(getUnqualifiedName(symbol), ftype);
         } else {
-          visitTypeValueAlias(getUnqualifiedName(symbol), ftype);
+          if (KNOWN_CLASS_ALIASES.containsKey(symbol.getName())) {
+            visitKnownTypeValueAlias(
+                getUnqualifiedName(symbol), KNOWN_CLASS_ALIASES.get(symbol.getName()));
+          } else {
+            visitTypeValueAlias(getUnqualifiedName(symbol), ftype);
+          }
         }
       } else {
         maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
@@ -3004,7 +3023,7 @@ class DeclarationGenerator {
     String symbolName = symbol.getName();
     String typeName = type.getDisplayName();
     // Turns out that for aliases the symbol and type name differ.
-    return !symbolName.equals(typeName);
+    return !symbolName.equals(typeName) || KNOWN_CLASS_ALIASES.containsKey(symbolName);
   }
 
   private void emitSkipTypeAlias(TypedVar symbol) {
