@@ -30,6 +30,12 @@ declare namespace ಠ_ಠ.clutz {
 
   interface IObject<KEY1, VALUE> {}
 
+  // Note: in total mode, DeclarationGenerator#emitTemplatizedType rewrites IArrayLike as ArrayLike.
+  // In partial mode, we totally miss that code path (because IArrayLike is an unresolved type)
+  // and this synonym serves the same purpose.  We should just eliminate the DeclarationGenerator
+  // logic around this once we eliminate total mode.
+  type IArrayLike<T=any> = ArrayLike<T>;
+
   /**
    * A base class that can be used for extends/implement clauses when the used value is missing.
    */
