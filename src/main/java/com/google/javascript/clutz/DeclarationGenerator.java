@@ -214,6 +214,12 @@ class DeclarationGenerator {
    */
   private Map<String, String> importRenameMap = Collections.emptyMap();
 
+  /**
+   * In partial mode, closure doesn't give proper types for reexported symbols. This map contains
+   * potential aliases for reexported types. See AliasMapBuilder for details.
+   */
+  private Map<String, String> aliasMap = Collections.emptyMap();
+
   /** If true, add all the import rename map entries to the output as comments in the .d.ts. */
   private final boolean PRINT_IMPORT_RENAME_MAP = false;
 
@@ -337,7 +343,8 @@ class DeclarationGenerator {
     compiler.compile(externs, sourceFiles, opts.getCompilerOptions());
     if (opts.partialInput) {
       importRenameMap =
-          ImportRenameMapBuilder.build(compiler.getParsedInputs(), opts.knownGoogProvides);
+          new ImportRenameMapBuilder().build(compiler.getParsedInputs(), opts.knownGoogProvides);
+      aliasMap = new AliasMapBuilder().build(compiler.getParsedInputs(), opts.knownGoogProvides);
       collidingProvides = opts.collidingProvides;
     }
 
@@ -402,6 +409,10 @@ class DeclarationGenerator {
       emitComment(String.format("import rename map contains %d entries", importRenameMap.size()));
       for (Entry<String, String> e : importRenameMap.entrySet()) {
         emitComment(String.format("Rename %s to %s", e.getKey(), e.getValue()));
+      }
+      emitComment(String.format("alias map contains %d entries", aliasMap.size()));
+      for (Entry<String, String> e : aliasMap.entrySet()) {
+        emitComment(String.format("Alias %s to %s", e.getKey(), e.getValue()));
       }
     }
 
@@ -1326,7 +1337,13 @@ class DeclarationGenerator {
           visitTypeValueAlias(symbol.getName(), (EnumElementType) registryType);
           return;
         }
-        visitVarDeclaration(getUnqualifiedName(emitName), type);
+        // Clutz doesn't have good type info - check if the symbol is a reexport by checking aliasMap
+        // otherwise assume it's a var declaration
+        if (aliasMap.containsKey(emitName)) {
+          visitKnownTypeValueAlias(symbol.getName(), aliasMap.get(emitName));
+        } else {
+          visitVarDeclaration(getUnqualifiedName(emitName), type);
+        }
       }
     }
 
