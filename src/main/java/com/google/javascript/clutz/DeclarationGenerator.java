@@ -17,6 +17,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
@@ -124,6 +125,25 @@ class DeclarationGenerator {
           "while",
           "with");
 
+  /**
+   * Incremental clutz cannot infer class aliases like:
+   *
+   * <pre>
+   *   /** @constructor *
+   *   an.KlassAlias = some.Missing;
+   * </pre>
+   *
+   * Closure reports an.KlassAlias as regular empty class. In order to emit the correct clutz
+   * description for now we work-around this issue by hardcoding some known aliases.
+   *
+   * <p>So far this works only for classes with no generic type parameters.
+   */
+  private static final ImmutableMap<String, String> KNOWN_CLASS_ALIASES =
+      ImmutableMap.of(
+          "goog.log.Logger", "goog.debug.Logger",
+          "goog.log.Level", "goog.debug.Logger.Level",
+          "goog.log.LogRecord", "goog.debug.LogRecord");
+
   private static final String GOOG_BASE_NAMESPACE = "goog";
 
   private static final String MODULE_PREFIX = "module$exports$";
@@ -193,6 +213,12 @@ class DeclarationGenerator {
    * is used to store the mappings from the closure supplied names to the correct names.
    */
   private Map<String, String> importRenameMap = Collections.emptyMap();
+
+  /**
+   * In partial mode, closure doesn't give proper types for reexported symbols. This map contains
+   * potential aliases for reexported types. See AliasMapBuilder for details.
+   */
+  private Map<String, String> aliasMap = Collections.emptyMap();
 
   /** If true, add all the import rename map entries to the output as comments in the .d.ts. */
   private final boolean PRINT_IMPORT_RENAME_MAP = false;
@@ -317,7 +343,8 @@ class DeclarationGenerator {
     compiler.compile(externs, sourceFiles, opts.getCompilerOptions());
     if (opts.partialInput) {
       importRenameMap =
-          ImportRenameMapBuilder.build(compiler.getParsedInputs(), opts.knownGoogProvides);
+          new ImportRenameMapBuilder().build(compiler.getParsedInputs(), opts.knownGoogProvides);
+      aliasMap = new AliasMapBuilder().build(compiler.getParsedInputs(), opts.knownGoogProvides);
       collidingProvides = opts.collidingProvides;
     }
 
@@ -382,6 +409,10 @@ class DeclarationGenerator {
       emitComment(String.format("import rename map contains %d entries", importRenameMap.size()));
       for (Entry<String, String> e : importRenameMap.entrySet()) {
         emitComment(String.format("Rename %s to %s", e.getKey(), e.getValue()));
+      }
+      emitComment(String.format("alias map contains %d entries", aliasMap.size()));
+      for (Entry<String, String> e : aliasMap.entrySet()) {
+        emitComment(String.format("Alias %s to %s", e.getKey(), e.getValue()));
       }
     }
 
@@ -1249,12 +1280,6 @@ class DeclarationGenerator {
       if (type.isFunctionType() && !isNewableFunctionType((FunctionType) type)) {
         FunctionType ftype = (FunctionType) type;
 
-        if (opts.knownClassAliases.containsKey(symbol.getName())) {
-          visitKnownTypeValueAlias(
-              getUnqualifiedName(symbol), opts.knownClassAliases.get(symbol.getName()));
-          return;
-        }
-
         if (isOrdinaryFunction(ftype)) {
           maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
           visitFunctionExpression(getUnqualifiedName(symbol), ftype);
@@ -1269,7 +1294,12 @@ class DeclarationGenerator {
         if (!isAliasedClassOrInterface(symbol, ftype)) {
           visitClassOrInterface(getUnqualifiedName(symbol), ftype);
         } else {
-          visitTypeValueAlias(getUnqualifiedName(symbol), ftype);
+          if (KNOWN_CLASS_ALIASES.containsKey(symbol.getName())) {
+            visitKnownTypeValueAlias(
+                getUnqualifiedName(symbol), KNOWN_CLASS_ALIASES.get(symbol.getName()));
+          } else {
+            visitTypeValueAlias(getUnqualifiedName(symbol), ftype);
+          }
         }
       } else {
         maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
@@ -1307,7 +1337,13 @@ class DeclarationGenerator {
           visitTypeValueAlias(symbol.getName(), (EnumElementType) registryType);
           return;
         }
-        visitVarDeclaration(getUnqualifiedName(emitName), type);
+        // Clutz doesn't have good type info - check if the symbol is a reexport by checking aliasMap
+        // otherwise assume it's a var declaration
+        if (aliasMap.containsKey(emitName)) {
+          visitKnownTypeValueAlias(symbol.getName(), aliasMap.get(emitName));
+        } else {
+          visitVarDeclaration(getUnqualifiedName(emitName), type);
+        }
       }
     }
 
@@ -3004,7 +3040,7 @@ class DeclarationGenerator {
     String symbolName = symbol.getName();
     String typeName = type.getDisplayName();
     // Turns out that for aliases the symbol and type name differ.
-    return !symbolName.equals(typeName);
+    return !symbolName.equals(typeName) || KNOWN_CLASS_ALIASES.containsKey(symbolName);
   }
 
   private void emitSkipTypeAlias(TypedVar symbol) {

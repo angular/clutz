@@ -1,4 +1,0 @@
-goog.log.Logger,goog.debug.Logger
-goog.log.Level,goog.debug.Logger.Level
-goog.log.LogRecord,goog.debug.LogRecord
-module$exports$bare$reexport,module$exports$original$module.Class
