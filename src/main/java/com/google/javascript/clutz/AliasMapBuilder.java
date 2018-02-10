@@ -63,6 +63,8 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
               buildNamedAndWholeModuleMappings(localModuleId, variableName, exportedSymbolName));
         }
       }
+      // TODO(lucassloan): actually parse the `exports = foo` or `exports.foo = foo` statements
+      // to avoid overwriting exports that aren't actually aliases.
     }
 
     return aliasMap;
