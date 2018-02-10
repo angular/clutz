@@ -18,10 +18,10 @@ public class ImportRenameMapBuilder extends ImportBasedMapBuilder {
    * Build does the actual work of walking over the AST, finding any goog.require() or
    * goog.module.get() assignments or destructuring assignments, parsing them, and generating the
    * mappings from local symbol names to exported symbol names. If the imported module's id is in
-   * knownGoogProvides, emit a rename in goog.provide style, otherwise, use goog.module style.
+   * googProvides, emit a rename in goog.provide style, otherwise, use goog.module style.
    */
   protected Map<String, String> build(
-      String localModuleId, Node moduleBody, Set<String> knownGoogProvides) {
+      String localModuleId, Node moduleBody, Set<String> googProvides) {
     Map<String, String> importRenameMap = new HashMap<>();
 
     for (Node statement : moduleBody.children()) {
@@ -32,7 +32,7 @@ public class ImportRenameMapBuilder extends ImportBasedMapBuilder {
         String variableName = statement.getFirstChild().getString();
 
         String exportedSymbolName;
-        if (!knownGoogProvides.contains(importedModuleId)) {
+        if (!googProvides.contains(importedModuleId)) {
           exportedSymbolName = buildWholeModuleExportSymbolName(importedModuleId);
         } else {
           exportedSymbolName = importedModuleId;
@@ -63,7 +63,7 @@ public class ImportRenameMapBuilder extends ImportBasedMapBuilder {
           }
 
           String exportedSymbolName;
-          if (!knownGoogProvides.contains(importedModuleId)) {
+          if (!googProvides.contains(importedModuleId)) {
             exportedSymbolName = buildNamedExportSymbolName(importedModuleId, originalName);
           } else {
             exportedSymbolName = importedModuleId + "." + originalName;

@@ -343,8 +343,10 @@ class DeclarationGenerator {
     compiler.compile(externs, sourceFiles, opts.getCompilerOptions());
     if (opts.partialInput) {
       importRenameMap =
-          new ImportRenameMapBuilder().build(compiler.getParsedInputs(), opts.knownGoogProvides);
-      aliasMap = new AliasMapBuilder().build(compiler.getParsedInputs(), opts.knownGoogProvides);
+          new ImportRenameMapBuilder()
+              .build(compiler.getParsedInputs(), opts.depgraph.getGoogProvides());
+      aliasMap =
+          new AliasMapBuilder().build(compiler.getParsedInputs(), opts.depgraph.getGoogProvides());
       collidingProvides = opts.collidingProvides;
     }
 

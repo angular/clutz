@@ -3,7 +3,6 @@ package com.google.javascript.clutz;
 import static com.google.javascript.clutz.ProgramSubject.assertThatProgram;
 
 import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import java.io.File;
@@ -77,11 +76,9 @@ public class DeclarationGeneratorTests {
       if (Arrays.asList("partial", "multifilePartial", "partialCrossModuleTypeImports")
           .contains(input.getParentFile().getName())) {
         subject.partialInput = true;
-        subject.knownGoogProvides = ImmutableSet.of("goog.events.EventTarget");
       }
       if (input.getParentFile().getName().equals("partialCrossModuleTypeImports")) {
-        subject.knownGoogProvides =
-            ImmutableSet.of("googprovide.exporter", "goog.legacy.namespace.exporter");
+        subject.depgraph = "partialCrossModuleTypeImports/cross_module_type.depgraph";
       }
       subject.extraExternFile = getExternFileNameOrNull(input.getName());
       suite.addTest(new DeclarationTest(input.getName(), golden, subject));
