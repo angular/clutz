@@ -13,7 +13,7 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
   var a : { a : number } ;
   var b : IArguments ;
   var c : NodeList ;
-  function elementMaybe ( ) : Element | null ;
+  function elementMaybe ( ) : GlobalElement | null ;
   var myScope : ಠ_ಠ.clutz.namespace.Foo ;
   function topLevelFunction ( ...a : any [] ) : any ;
 }
@@ -115,5 +115,5 @@ declare namespace ಠ_ಠ.clutz.namespace.atypedef {
   type get = (a : string ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > | null ;
 }
 declare namespace ಠ_ಠ.clutz.namespace {
-  function bootstrap (arg1 : Element | null | HTMLDocument , opt_arg2 ? : ( string | Function | null ) [] | null ) : any ;
+  function bootstrap (arg1 : GlobalElement | null | HTMLDocument , opt_arg2 ? : ( string | Function | null ) [] | null ) : any ;
 }
