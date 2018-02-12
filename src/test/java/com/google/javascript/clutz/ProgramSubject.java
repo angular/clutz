@@ -47,7 +47,6 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
   public boolean withPlatform = false;
   public boolean partialInput = false;
   public String extraExternFile = null;
-  public boolean emitPlatformExterns;
   public boolean emitBase = false;
   public Set<String> knownGoogProvides = null;
 
@@ -109,7 +108,6 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
   private String[] parse() throws AssertionError {
     Options opts = new Options();
     opts.debug = true;
-    opts.emitPlatformExterns = emitPlatformExterns;
     opts.skipEmitPattern = Pattern.compile(".*\\.skip\\.tsickle\\.js$");
     if (partialInput) {
       opts.partialInput = true;
