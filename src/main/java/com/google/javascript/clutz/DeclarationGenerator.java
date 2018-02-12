@@ -1338,7 +1338,7 @@ class DeclarationGenerator {
         }
         // Clutz doesn't have good type info - check if the symbol is a reexport by checking aliasMap
         // otherwise assume it's a var declaration
-        if (aliasMap.containsKey(emitName)) {
+        if (aliasMap.containsKey(emitName) && symbol.getType().isUnknownType()) {
           visitKnownTypeValueAlias(symbol.getName(), aliasMap.get(emitName));
         } else {
           visitVarDeclaration(getUnqualifiedName(emitName), type);
