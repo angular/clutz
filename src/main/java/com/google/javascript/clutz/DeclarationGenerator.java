@@ -1716,26 +1716,27 @@ class DeclarationGenerator {
         emit(defaultEmit);
         return;
       }
-      if (maybeEmitGlobalType(type)) return;
       // When processing partial inputs, this case handles implicitly forward declared types
       // for which we just emit the literal type written along with any type parameters.
       NoResolvedType nType = (NoResolvedType) type;
-      // TODO(rado): Find a case where this happens for extends/implements and add
-      // a test for it.
-      if (nType.getReferenceName() == null) {
-        emit(defaultEmit);
-        return;
+      if (!maybeEmitGlobalType(type)) {
+        // TODO(rado): Find a case where this happens for extends/implements and add
+        // a test for it.
+        if (nType.getReferenceName() == null) {
+          emit(defaultEmit);
+          return;
+        }
+        String displayName = maybeRewriteImportedName(type.getDisplayName());
+        // In partial mode, closure doesn't know the correct name of imported symbols, if the name
+        // matches one in the precomputed map, replace it with the original declared name
+        // The displayName can be of the form foo.bar, but the symbol that was goog required was just
+        // foo, so just replace the part of the display name before the first period
+        String baseDisplayName = displayName.split("\\.")[0];
+        if (importRenameMap.containsKey(baseDisplayName)) {
+          displayName = displayName.replace(baseDisplayName, importRenameMap.get(baseDisplayName));
+        }
+        emit(Constants.INTERNAL_NAMESPACE + "." + displayName);
       }
-      String displayName = maybeRewriteImportedName(type.getDisplayName());
-      // In partial mode, closure doesn't know the correct name of imported symbols, if the name
-      // matches one in the precomputed map, replace it with the original declared name
-      // The displayName can be of the form foo.bar, but the symbol that was goog required was just
-      // foo, so just replace the part of the display name before the first period
-      String baseDisplayName = displayName.split("\\.")[0];
-      if (importRenameMap.containsKey(baseDisplayName)) {
-        displayName = displayName.replace(baseDisplayName, importRenameMap.get(baseDisplayName));
-      }
-      emit(Constants.INTERNAL_NAMESPACE + "." + displayName);
       List<JSType> templateTypes = nType.getTemplateTypes();
       if (templateTypes != null && templateTypes.size() > 0) {
         emitGenericTypeArguments(type.getTemplateTypes().iterator());
