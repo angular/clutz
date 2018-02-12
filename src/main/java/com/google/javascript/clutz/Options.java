@@ -104,12 +104,6 @@ public class Options {
   boolean filterSourcesWithDepgraphs = false;
 
   @Option(
-    name = "--emitPlatformExterns",
-    usage = "emits platform externs, instead of omitting them in favor of TS lib.d.ts"
-  )
-  boolean emitPlatformExterns;
-
-  @Option(
     name = "--closure_entry_points",
     usage =
         "only generate output for the given entry points to the program. Must be"

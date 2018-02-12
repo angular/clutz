@@ -687,8 +687,7 @@ class DeclarationGenerator {
       if (symbolInput == null || !symbolInput.isExtern() || symbol.getType() == null) {
         continue;
       }
-      if (!opts.emitPlatformExterns
-          && shouldAvoidGeneratingExterns(symbolInput.getName(), symbol.getName())) {
+      if (shouldAvoidGeneratingExterns(symbolInput.getName(), symbol.getName())) {
         continue;
       }
       JSType type = symbol.getType();
@@ -1502,8 +1501,7 @@ class DeclarationGenerator {
       ObjectType superType = getSuperType(ftype);
       if (superType != null) {
         emit("extends");
-        boolean emitInstanceForObject =
-            emitInstance && (opts.emitPlatformExterns || !shouldAvoidGeneratingExterns(superType));
+        boolean emitInstanceForObject = emitInstance && !shouldAvoidGeneratingExterns(superType);
         Visitor<Void> visitor = new ExtendsImplementsTypeVisitor(emitInstanceForObject);
         superType.visit(visitor);
       }
@@ -1988,34 +1986,32 @@ class DeclarationGenerator {
         return null;
       }
 
-      if (!opts.emitPlatformExterns) {
-        switch (type.getDisplayName()) {
-            // Arguments<?> and NodeList<?> in es3 externs are correspondingly
-            // IArguments and NodeList interfaces (not-parametrized) in lib.d.ts.
-          case "Arguments":
-            emit("IArguments");
-            return null;
-          case "NodeList":
-            emit("NodeList");
-            return null;
-          case "MessageEvent":
-            emit("MessageEvent");
-            return null;
-          case "IThenable":
-            templateTypeName = "PromiseLike";
-            break;
-          case "IArrayLike":
-            templateTypeName = "ArrayLike";
-            break;
-          case "IteratorIterable":
-            templateTypeName = "IterableIterator";
-            break;
-          case "IIterableResult":
-            templateTypeName = "IteratorResult";
-            break;
-          default:
-            break;
-        }
+      switch (type.getDisplayName()) {
+          // Arguments<?> and NodeList<?> in es3 externs are correspondingly
+          // IArguments and NodeList interfaces (not-parametrized) in lib.d.ts.
+        case "Arguments":
+          emit("IArguments");
+          return null;
+        case "NodeList":
+          emit("NodeList");
+          return null;
+        case "MessageEvent":
+          emit("MessageEvent");
+          return null;
+        case "IThenable":
+          templateTypeName = "PromiseLike";
+          break;
+        case "IArrayLike":
+          templateTypeName = "ArrayLike";
+          break;
+        case "IteratorIterable":
+          templateTypeName = "IterableIterator";
+          break;
+        case "IIterableResult":
+          templateTypeName = "IteratorResult";
+          break;
+        default:
+          break;
       }
 
       if (type.getTemplateTypes().isEmpty()) {
