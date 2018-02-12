@@ -2,6 +2,8 @@
 // All clutz namespaces are below ಠ_ಠ.clutz, thus
 // this acts as global.
 declare namespace ಠ_ಠ.clutz {
+  type GlobalElement = Element;
+  var GlobalElement: Element;
   type GlobalError = Error;
   var GlobalError: ErrorConstructor;
   type GlobalEvent = Event;
