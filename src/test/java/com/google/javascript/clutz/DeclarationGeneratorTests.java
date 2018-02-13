@@ -77,6 +77,7 @@ public class DeclarationGeneratorTests {
       if (Arrays.asList("partial", "multifilePartial", "partialCrossModuleTypeImports")
           .contains(input.getParentFile().getName())) {
         subject.partialInput = true;
+        subject.knownGoogProvides = ImmutableSet.of("goog.events.EventTarget");
       }
       if (input.getParentFile().getName().equals("partialCrossModuleTypeImports")) {
         subject.knownGoogProvides =

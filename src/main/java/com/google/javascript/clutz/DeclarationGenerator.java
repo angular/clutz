@@ -1714,7 +1714,6 @@ class DeclarationGenerator {
         emit(defaultEmit);
         return;
       }
-      if (maybeEmitGlobalType(type)) return;
       // When processing partial inputs, this case handles implicitly forward declared types
       // for which we just emit the literal type written along with any type parameters.
       NoResolvedType nType = (NoResolvedType) type;
@@ -1725,6 +1724,8 @@ class DeclarationGenerator {
         return;
       }
       String displayName = maybeRewriteImportedName(type.getDisplayName());
+      if (maybeEmitGlobalType(displayName)) return;
+
       // In partial mode, closure doesn't know the correct name of imported symbols, if the name
       // matches one in the precomputed map, replace it with the original declared name
       // The displayName can be of the form foo.bar, but the symbol that was goog required was just
@@ -2831,7 +2832,7 @@ class DeclarationGenerator {
         return emitTemplatizedType(
             typeRegistry.createTemplatizedType(type), false, inExtendsImplementsPosition);
       }
-      if (maybeEmitGlobalType(type)) return null;
+      if (maybeEmitGlobalType(type.getDisplayName())) return null;
       if (type.isRecordType()) {
         visitRecordType((RecordType) type);
       } else if (type.isDict()) {
@@ -2861,11 +2862,10 @@ class DeclarationGenerator {
     }
 
     /**
-     * If ObjectType refers to a "platform" type (e.g. Promise) emit it specially here and return
+     * If a symbol refers to a "platform" type (e.g. Promise) emit it specially here and return
      * true.
      */
-    private boolean maybeEmitGlobalType(ObjectType type) {
-      String name = type.getDisplayName();
+    private boolean maybeEmitGlobalType(String name) {
       if (name == null) return false;
 
       if (PlatformSymbols.GLOBAL_SYMBOL_ALIASES.contains(name)) {
