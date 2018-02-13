@@ -2564,14 +2564,18 @@ class DeclarationGenerator {
 
     private String getSignatureForInstanceTTEFn(
         String propName, List<String> classTemplateTypeNames, FunctionType ftype) {
-      // If ftype is foo.bar.Promise.prototype.then, extract className as Promise.
-      String className = getUnqualifiedName(getNamespace(getNamespace(ftype.getDisplayName())));
+      // If ftype is foo.bar.Promise.prototype.then, extract className as ಠ_ಠ.clutz.foo.bar.Promise.
+      String className =
+          Constants.INTERNAL_NAMESPACE + "." + getNamespace(getNamespace(ftype.getDisplayName()));
       Iterator<String> templateTypeNames = classTemplateTypeNames.iterator();
       if (!templateTypeNames.hasNext()) return null;
 
       String templateVarName = templateTypeNames.next();
 
-      String classTemplatizedType = className + " < RESULT >";
+      // TODO(lucassloan): goog.Promise has bad types (caused by an inconsistent number of generic type
+      // params) that are coerced to any, so explicitly emit any and fix when the callers have been fixed.
+      String classTemplatizedType =
+          className.equals("ಠ_ಠ.clutz.goog.Promise") ? " any" : className + " < RESULT >";
       if (propName.equals("then")) {
         return "then < RESULT > (opt_onFulfilled ? : ( (a : "
             + templateVarName
@@ -2595,8 +2599,8 @@ class DeclarationGenerator {
     }
 
     private String getSignatureForStaticTTEFn(String propName, FunctionType ftype) {
-      // If ftype is foo.bar.Promise.all, extract className as Promise.
-      String className = getUnqualifiedName(getNamespace(ftype.getDisplayName()));
+      // If ftype is foo.bar.Promise.all, extract className as ಠ_ಠ.clutz.foo.bar.Promise.
+      String className = Constants.INTERNAL_NAMESPACE + "." + getNamespace(ftype.getDisplayName());
       String maybePromiseMethod = getPromiseMethod(propName, className);
       if (maybePromiseMethod != null) {
         return "static " + maybePromiseMethod;
@@ -2607,7 +2611,14 @@ class DeclarationGenerator {
     private String getPromiseMethod(String propName, String className) {
       switch (propName) {
         case "resolve":
-          return "resolve < T >(value: " + className + " < T > | T): " + className + " < T >;";
+          // TODO(lucassloan): goog.Promise has bad types that are coerced to any, so explicitly emit any
+          // and change to the proper type `(value: googPromise< T , any > | T): googPromise<T, any>`
+          // when the callers have been fixed.
+          if (className.equals("ಠ_ಠ.clutz.goog.Promise")) {
+            return "resolve < T >(value: " + className + " < T , any > | T): any;";
+          } else {
+            return "resolve < T >(value: " + className + " < T > | T): " + className + " < T >;";
+          }
         case "race":
           return "race < T > (values : T [] ) : " + className + " < T > ;";
           // TODO(rado): angular.d.ts has improved types for .all, replace with all overrides from
