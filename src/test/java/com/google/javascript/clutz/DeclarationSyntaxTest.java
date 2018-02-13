@@ -85,7 +85,10 @@ public class DeclarationSyntaxTest {
           "--lib",
           "es5,dom,es2015.iterable",
           "--noImplicitAny",
-          "--strictNullChecks");
+          "--strictNullChecks",
+          // TODO(lucassloan): Necessary to allow promise like things that extend other promise like
+          // things.  Turn off when turned off in g3
+          "--noStrictGenericChecks");
 
   @Test
   public void testDeclarationSyntax() throws Exception {

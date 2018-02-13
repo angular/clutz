@@ -3,7 +3,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$tte$Promise$Partial {
   }
   class PartialDeferred_Instance < VALUE = any > extends ಠ_ಠ.clutz.Base < VALUE > {
     constructor ( ) ;
-    then < RESULT > (opt_onFulfilled ? : ( (a : VALUE ) => PartialDeferred < RESULT > | RESULT ) | null , opt_onRejected ? : ( (a : any ) => any ) | null) : PartialDeferred < RESULT > ;
+    then < RESULT > (opt_onFulfilled ? : ( (a : VALUE ) => ಠ_ಠ.clutz.module$exports$tte$Promise$Partial.PartialDeferred < RESULT > | RESULT ) | null , opt_onRejected ? : ( (a : any ) => any ) | null) : ಠ_ಠ.clutz.module$exports$tte$Promise$Partial.PartialDeferred < RESULT > ;
   }
 }
 declare module 'goog:tte.Promise.Partial' {
