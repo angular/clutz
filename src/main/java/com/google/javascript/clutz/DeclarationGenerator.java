@@ -954,6 +954,10 @@ class DeclarationGenerator {
             emitComment("skipping property " + propName + " because it is not a valid symbol.");
             continue;
           }
+          if (aliasMap.containsKey(desiredSymbol)) {
+            visitKnownTypeValueAlias(propName, aliasMap.get(desiredSymbol));
+            continue;
+          }
           if (oType.getPropertyType(propName).toMaybeFunctionType() == null) {
             emit("var");
           } else {
@@ -974,6 +978,29 @@ class DeclarationGenerator {
     if (isDefault && !isExtern && otype != null && !isAliasedClassOrInterface(symbol, otype)) {
       treeWalker.walkInnerSymbols(otype, symbol.getName());
     }
+  }
+
+  /**
+   * Special emit for known aliases See KNOWN_ALIASES comment why this workaround is need.
+   *
+   * <p>This shares some similarity with visitTypeValueAlias method above, but it has to hardcode
+   * one assumptions - the alias is for a class with no generics.
+   */
+  private void visitKnownTypeValueAlias(String unqualifiedName, String alternativeAliasName) {
+    String emitName = Constants.INTERNAL_NAMESPACE + "." + alternativeAliasName;
+    emit("type");
+    emit(unqualifiedName);
+    emit("=");
+    emit(emitName);
+    emit(";");
+    emitBreak();
+    emit("var " + unqualifiedName);
+    emit(":");
+    emit("typeof");
+    emit(emitName);
+    emit(";");
+    emitBreak();
+    typesUsed.add(alternativeAliasName);
   }
 
   private boolean isValidJSProperty(String name) {
@@ -1338,7 +1365,7 @@ class DeclarationGenerator {
         }
         // Clutz doesn't have good type info - check if the symbol is a reexport by checking aliasMap
         // otherwise assume it's a var declaration
-        if (aliasMap.containsKey(emitName) && symbol.getType().isUnknownType()) {
+        if (aliasMap.containsKey(emitName)) {
           visitKnownTypeValueAlias(symbol.getName(), aliasMap.get(emitName));
         } else {
           visitVarDeclaration(getUnqualifiedName(emitName), type);
@@ -1396,29 +1423,6 @@ class DeclarationGenerator {
         emitBreak();
       }
       typesUsed.add(otype.getDisplayName());
-    }
-
-    /**
-     * Special emit for known aliases See KNOWN_ALIASES comment why this workaround is need.
-     *
-     * <p>This shares some similarity with visitTypeValueAlias method above, but it has to hardcode
-     * one assumptions - the alias is for a class with no generics.
-     */
-    private void visitKnownTypeValueAlias(String unqualifiedName, String alternativeAliasName) {
-      String emitName = Constants.INTERNAL_NAMESPACE + "." + alternativeAliasName;
-      emit("type");
-      emit(unqualifiedName);
-      emit("=");
-      emit(emitName);
-      emit(";");
-      emitBreak();
-      emit("var " + unqualifiedName);
-      emit(":");
-      emit("typeof");
-      emit(emitName);
-      emit(";");
-      emitBreak();
-      typesUsed.add(alternativeAliasName);
     }
 
     private void maybeEmitJsDoc(JSDocInfo docs, boolean ignoreParams) {
