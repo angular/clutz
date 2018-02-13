@@ -28,7 +28,7 @@ declare namespace ಠ_ಠ.clutz.implements_iterable {
   class ImplIterableIterator_Instance implements IterableIterator < string > {
     private noStructuralTyping_: any;
     [Symbol.iterator]():  IterableIterator < string > ;
-    next (a ? : string ) : IteratorResult < string > ;
+    next (a ? : any ) : IteratorResult < string > ;
   }
 }
 declare module 'goog:implements_iterable.ImplIterableIterator' {
