@@ -549,7 +549,9 @@ public final class TypeAnnotationPass implements CompilerPass {
           importSpec = Node.newString(Token.NAME, symbol);
           importFile = Node.newString("goog:" + importedNamespace);
         } else {
-          importSpec = new Node(Token.IMPORT_SPECS, new Node(Token.IMPORT_SPEC, IR.name(symbol)));
+          Node spec = new Node(Token.IMPORT_SPEC, IR.name(symbol));
+          spec.setShorthandProperty(true);
+          importSpec = new Node(Token.IMPORT_SPECS, spec);
           importFile = Node.newString(pathUtil.getImportPath(sourceFile, module.file));
         }
         Node importNode = new Node(Token.IMPORT, IR.empty(), importSpec, importFile);

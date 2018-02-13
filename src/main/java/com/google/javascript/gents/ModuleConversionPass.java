@@ -157,11 +157,7 @@ public final class ModuleConversionPass implements CompilerPass {
             if (exportedNamespace != null) {
               String localName = symbols.get(exportedNamespace);
               Node export =
-                  new Node(
-                      Token.EXPORT,
-                      new Node(
-                          Token.EXPORT_SPECS,
-                          new Node(Token.EXPORT_SPEC, Node.newString(Token.NAME, localName))));
+                  new Node(Token.EXPORT, createExportSpecs(Node.newString(Token.NAME, localName)));
               export.useSourceInfoFromForTree(child);
               parent.addChildAfter(export, n);
               // Registers symbol for rewriting local uses.
@@ -442,6 +438,7 @@ public final class ModuleConversionPass implements CompilerPass {
         moduleImport.requiredNamespace)) {
       // import {value as localName} from "./file"
       Node importSpec = new Node(Token.IMPORT_SPEC, IR.name(moduleImport.moduleSuffix));
+      importSpec.setShorthandProperty(true);
       // import {a as b} only when a != b
       if (!moduleImport.moduleSuffix.equals(localName)) {
         importSpec.addChildToBack(IR.name(localName));
@@ -522,6 +519,7 @@ public final class ModuleConversionPass implements CompilerPass {
     Node importSpecs = new Node(Token.IMPORT_SPECS);
     for (String localName : moduleImport.localNames) {
       Node importSpec = new Node(Token.IMPORT_SPEC);
+      importSpec.setShorthandProperty(true);
       importSpec.addChildToBack(IR.name(localName));
       importSpecs.addChildToBack(importSpec);
     }
@@ -591,8 +589,11 @@ public final class ModuleConversionPass implements CompilerPass {
     Node importSpec = IR.empty();
     if (moduleImport.isDestructuringImport) {
       importSpec = new Node(Token.IMPORT_SPECS);
+      importSpec.setShorthandProperty(true);
       for (String fullLocalName : moduleImport.fullLocalNames) {
-        importSpec.addChildToBack(IR.name(fullLocalName));
+        Node spec = new Node(Token.IMPORT_SPEC, IR.name(fullLocalName));
+        spec.setShorthandProperty(true);
+        importSpec.addChildToBack(spec);
       }
     } else if (moduleImport.isFullModuleImport()) {
       // const A = goog.require('...'); -> import * as A from '...';
@@ -660,7 +661,7 @@ public final class ModuleConversionPass implements CompilerPass {
         return;
       } else if (rhs.isName() && exportedSymbol.equals(rhs.getString())) {
         // Rewrite the export line to: <code>export {rhs}</code>.
-        exportSpecNode = new Node(Token.EXPORT_SPECS, new Node(Token.EXPORT_SPEC, rhs));
+        exportSpecNode = createExportSpecs(rhs);
         exportSpecNode.useSourceInfoFrom(rhs);
       } else {
         // Rewrite the export line to: <code>export const exportedSymbol = rhs</code>.
@@ -675,6 +676,14 @@ public final class ModuleConversionPass implements CompilerPass {
       // Assume prefix has already been exported and just trim the prefix
       nameUtil.replacePrefixInName(lhs, exportedNamespace, exportedSymbol);
     }
+  }
+
+  /** Creates an ExportSpecs node, which is the {...} part of an "export {name}" node. */
+  private Node createExportSpecs(Node name) {
+    Node exportSpec = new Node(Token.EXPORT_SPEC, name);
+    // Set the "is shorthand" property so that we "export {x}", not "export {x as x}".
+    exportSpec.setShorthandProperty(true);
+    return new Node(Token.EXPORT_SPECS, exportSpec);
   }
 
   /** Saves the local name for imported symbols to be used for code rewriting later. */
