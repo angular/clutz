@@ -28,17 +28,19 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
       return aliasMap;
     }
 
+    // Loop over the statements, looking for import statements, and build a map from the local variable
+    // names to the original symbol name eg `const C = goog.require('a.b.c');` will result in the map
+    // containing 'C' -> 'module$exports$a$b$c'
+    Map<String, String> localVariableToImportedSymbolNameMap = new HashMap<>();
     for (Node statement : moduleBody.children()) {
       if (isImportAssignment(statement)) {
         // `const C = goog.require()` or
         // `const C = goog.module.get()`
         String importedModuleId = statement.getFirstFirstChild().getChildAtIndex(1).getString();
-        String variableName = statement.getFirstChild().getString();
+        String localVariableName = statement.getFirstChild().getString();
 
-        String exportedSymbolName = buildWholeModuleExportSymbolName(importedModuleId);
-        aliasMap.putAll(
-            buildNamedAndWholeModuleMappings(localModuleId, variableName, exportedSymbolName));
-
+        String importedSymbolName = buildWholeModuleExportSymbolName(importedModuleId);
+        localVariableToImportedSymbolNameMap.put(localVariableName, importedSymbolName);
       } else if (isImportDestructuringAssignment(statement)) {
         // `const {C, Clazz: RenamedClazz} = goog.require()` or
         // `const {C, Clazz: RenamedClazz} = goog.module.get()`
@@ -49,43 +51,93 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
           // Destructuring can use the original name `const {A} = goog.require("foo.a")` or rename
           // it `const {A: RenamedA} = ...`, and closure uses whichever in the symbol name it
           // generates, so we have to extract it.
-          String variableName;
+          String localVariableName;
           if (destructured.getFirstChild() != null) {
             // Renaming
-            variableName = destructured.getFirstChild().getString();
+            localVariableName = destructured.getFirstChild().getString();
           } else {
             // No rename
-            variableName = originalName;
+            localVariableName = originalName;
           }
 
-          String exportedSymbolName = buildNamedExportSymbolName(importedModuleId, originalName);
-          aliasMap.putAll(
-              buildNamedAndWholeModuleMappings(localModuleId, variableName, exportedSymbolName));
+          String importedSymbolName = buildNamedExportSymbolName(importedModuleId, originalName);
+          localVariableToImportedSymbolNameMap.put(localVariableName, importedSymbolName);
         }
       }
-      // TODO(lucassloan): actually parse the `exports = foo` or `exports.foo = foo` statements
-      // to avoid overwriting exports that aren't actually aliases.
+    }
+
+    // Loop over the statements, looking for export statements, and add mappings to the alias map
+    // if the export is of a variable that was imported
+    for (Node statement : moduleBody.children()) {
+      if (isWholeModuleExportAssignment(statement)) {
+        // `exports = foo`
+        String localVariableName = statement.getFirstChild().getChildAtIndex(1).getString();
+
+        if (localVariableToImportedSymbolNameMap.containsKey(localVariableName)) {
+          aliasMap.put(
+              buildWholeModuleExportSymbolName(localModuleId),
+              localVariableToImportedSymbolNameMap.get(localVariableName));
+        }
+      } else if (isNamedExportAssignment(statement)) {
+        // `exports.foo = foo`
+        String localVariableName = statement.getFirstChild().getChildAtIndex(1).getString();
+        String exportName =
+            statement.getFirstChild().getFirstChild().getChildAtIndex(1).getString();
+
+        if (localVariableToImportedSymbolNameMap.containsKey(localVariableName)) {
+          aliasMap.put(
+              buildNamedExportSymbolName(localModuleId, exportName),
+              localVariableToImportedSymbolNameMap.get(localVariableName));
+        }
+      }
     }
 
     return aliasMap;
   }
 
-  /**
-   * To avoid parsing for the export statements, generate mappings for both styles of exports from
-   * goog.modules.
-   *
-   * <p>`exports = Foo` produces the name `module$exports$module$Name` `exports.Foo = Foo` produces
-   * the name `module$exports$module$Name.Foo`
-   */
-  private static Map<String, String> buildNamedAndWholeModuleMappings(
-      String localModuleId, String variableName, String exportedSymbolName) {
-    //TODO(lucassloan): handle knownGoogProvides
-    Map<String, String> mappings = new HashMap<>();
-    // exports = Foo
-    mappings.put(buildWholeModuleExportSymbolName(localModuleId), exportedSymbolName);
-    // exports.Foo = Foo
-    mappings.put(buildNamedExportSymbolName(localModuleId, variableName), exportedSymbolName);
+  /** Matches `exports = foo;` */
+  protected boolean isWholeModuleExportAssignment(Node statement) {
+    if (!statement.isExprResult()) {
+      return false;
+    }
 
-    return mappings;
+    if (!statement.getFirstChild().isAssign()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().getFirstChild().isName()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().getChildAtIndex(1).isName()) {
+      return false;
+    }
+
+    return statement.getFirstChild().getFirstChild().getString().equals("exports");
+  }
+
+  /** Matches `exports.foo = foo;` */
+  protected boolean isNamedExportAssignment(Node statement) {
+    if (!statement.isExprResult()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().isAssign()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().getFirstChild().isGetProp()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().getFirstChild().getFirstChild().isName()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().getChildAtIndex(1).isName()) {
+      return false;
+    }
+
+    return statement.getFirstChild().getFirstChild().getFirstChild().getString().equals("exports");
   }
 }
