@@ -2572,8 +2572,9 @@ class DeclarationGenerator {
 
       // TODO(lucassloan): goog.Promise has bad types (caused by an inconsistent number of generic type
       // params) that are coerced to any, so explicitly emit any and fix when the callers have been fixed.
-      String classTemplatizedType =
-          className.equals("ಠ_ಠ.clutz.goog.Promise") ? " any" : className + " < RESULT >";
+      String templateType =
+          className.equals("ಠ_ಠ.clutz.goog.Promise") ? " < RESULT , any >" : " < RESULT >";
+      String classTemplatizedType = className + templateType;
       if (propName.equals("then")) {
         return "then < RESULT > (opt_onFulfilled ? : ( (a : "
             + templateVarName
@@ -2613,7 +2614,11 @@ class DeclarationGenerator {
           // and change to the proper type `(value: googPromise< T , any > | T): googPromise<T, any>`
           // when the callers have been fixed.
           if (className.equals("ಠ_ಠ.clutz.goog.Promise")) {
-            return "resolve < T >(value: " + className + " < T , any > | T): any;";
+            return "resolve < T >(value: "
+                + className
+                + " < T , any > | T): "
+                + className
+                + " < T , any >;";
           } else {
             return "resolve < T >(value: " + className + " < T > | T): " + className + " < T >;";
           }
