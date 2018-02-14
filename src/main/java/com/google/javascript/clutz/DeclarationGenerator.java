@@ -1713,7 +1713,7 @@ class DeclarationGenerator {
      * the literal string that was in the original code. Special care is taken for templatized
      * types.
      */
-    private void emitNoResolvedType(NoType type, String defaultEmit) {
+    private void emitNoResolvedTypeOrDefault(NoType type, String defaultEmit) {
       if (!opts.partialInput || !type.isNoResolvedType()) {
         emit(defaultEmit);
         return;
@@ -1727,19 +1727,23 @@ class DeclarationGenerator {
         emit(defaultEmit);
         return;
       }
-      String displayName = maybeRewriteImportedName(type.getDisplayName());
-      if (maybeEmitGlobalType(displayName)) return;
 
-      // In partial mode, closure doesn't know the correct name of imported symbols, if the name
-      // matches one in the precomputed map, replace it with the original declared name
-      // The displayName can be of the form foo.bar, but the symbol that was goog required was just
-      // foo, so just replace the part of the display name before the first period
-      String baseDisplayName = displayName.split("\\.")[0];
-      if (importRenameMap.containsKey(baseDisplayName)) {
-        displayName = displayName.replace(baseDisplayName, importRenameMap.get(baseDisplayName));
-      }
-      emit(Constants.INTERNAL_NAMESPACE + "." + displayName);
-      List<JSType> templateTypes = nType.getTemplateTypes();
+      emitNoResolvedTypeAsumingForwardDeclare(type);
+    }
+
+    /**
+     * Emits a type that is not resolved by closure, as the literal string that was in the original
+     * code. Special care is taken for templatized types.
+     */
+    private void emitNoResolvedTypeAsumingForwardDeclare(ObjectType type) {
+      String displayName = maybeRewriteImportedName(type.getDisplayName());
+      String maybeGlobalName = maybeRenameGlobalType(displayName);
+      displayName =
+          maybeGlobalName == null
+              ? Constants.INTERNAL_NAMESPACE + "." + displayName
+              : maybeGlobalName;
+      emit(displayName);
+      List<JSType> templateTypes = type.getTemplateTypes();
       if (templateTypes != null && templateTypes.size() > 0) {
         emitGenericTypeArguments(type.getTemplateTypes().iterator());
       }
@@ -1853,12 +1857,7 @@ class DeclarationGenerator {
               // compilation
               // unit - A ends up as NoType, while B ends up as NamedType.
               if (opts.partialInput && refType.isUnknownType()) {
-                String displayName = maybeRewriteImportedName(type.getDisplayName());
-                emit(Constants.INTERNAL_NAMESPACE + "." + displayName);
-                List<JSType> templateTypes = type.getTemplateTypes();
-                if (templateTypes != null && templateTypes.size() > 0) {
-                  emitGenericTypeArguments(type.getTemplateTypes().iterator());
-                }
+                emitNoResolvedTypeAsumingForwardDeclare(type);
                 return null;
               }
               visitType(refType);
@@ -1878,7 +1877,7 @@ class DeclarationGenerator {
 
             @Override
             public Void caseNoType(NoType type) {
-              emitNoResolvedType(type, "any");
+              emitNoResolvedTypeOrDefault(type, "any");
               return null;
             }
 
@@ -2847,8 +2846,10 @@ class DeclarationGenerator {
         return emitTemplatizedType(
             typeRegistry.createTemplatizedType(type), false, inExtendsImplementsPosition);
       }
-      if (maybeEmitGlobalType(type.getDisplayName())) return null;
-      if (type.isRecordType()) {
+      String maybeGlobalName = maybeRenameGlobalType(type.getDisplayName());
+      if (maybeGlobalName != null) {
+        emit(maybeGlobalName);
+      } else if (type.isRecordType()) {
         visitRecordType((RecordType) type);
       } else if (type.isDict()) {
         emit("{[key: string]: any}");
@@ -2877,30 +2878,22 @@ class DeclarationGenerator {
     }
 
     /**
-     * If a symbol refers to a "platform" type (e.g. Promise) emit it specially here and return
-     * true.
+     * If a symbol refers to a "platform" type (e.g. Promise) emit return its platform name,
+     * otherwise, return null.
      */
-    private boolean maybeEmitGlobalType(String name) {
-      if (name == null) return false;
-
+    private String maybeRenameGlobalType(String name) {
+      String globalName = null;
       if (PlatformSymbols.GLOBAL_SYMBOL_ALIASES.contains(name)) {
         // See comment on GLOBAL_SYMBOL_ALIASES.
-        emit(getGlobalSymbolNamespacePrefix() + "Global" + name);
-        return true;
-      }
-
-      String newName = PlatformSymbols.CLOSURE_TO_TYPESCRIPT.get(name);
-      if (newName != null) {
-        emit(newName);
-        return true;
-      }
-
-      if (PlatformSymbols.TYPESCRIPT_LIB_D_TS.contains(name)) {
+        globalName = getGlobalSymbolNamespacePrefix() + "Global" + name;
+      } else if (PlatformSymbols.CLOSURE_TO_TYPESCRIPT.get(name) != null) {
+        globalName = PlatformSymbols.CLOSURE_TO_TYPESCRIPT.get(name);
+      } else if (PlatformSymbols.TYPESCRIPT_LIB_D_TS.contains(name)) {
         // Assume it's safe to emit the name as-is.
-        emit(name);
-        return true;
+        globalName = name;
       }
-      return false;
+
+      return globalName;
     }
 
     /**
@@ -2975,7 +2968,7 @@ class DeclarationGenerator {
 
       @Override
       public Void caseNoType(NoType type) {
-        emitNoResolvedType(type, "ClutzMissingBase");
+        emitNoResolvedTypeOrDefault(type, "ClutzMissingBase");
         return null;
       }
 
