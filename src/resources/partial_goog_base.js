@@ -9,6 +9,12 @@
 var goog = goog || {};
 
 /**
+ * Null function used for default values of callbacks, etc.
+ * @return {void} Nothing.
+ */
+goog.nullFunction = function() {};
+
+/**
  * @type {!Function}
  */
 goog.abstractMethod = function() {
