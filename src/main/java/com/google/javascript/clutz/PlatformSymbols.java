@@ -24,6 +24,7 @@ public class PlatformSymbols {
   public static final ImmutableMap<String, String> CLOSURE_TO_TYPESCRIPT =
       new ImmutableMap.Builder<String, String>()
           .put("CSSProperties", "CSSStyleDeclaration")
+          .put("IteratorIterable", "IterableIterator")
           .build();
 
   /**
