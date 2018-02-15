@@ -1990,6 +1990,8 @@ class DeclarationGenerator {
         return null;
       }
 
+      // TODO(rado): Move these to CLOSURE_TO_TYPESCRIPT and use the renaming function
+      // maybeRenameGlobalType here.
       switch (type.getDisplayName()) {
           // Arguments<?> and NodeList<?> in es3 externs are correspondingly
           // IArguments and NodeList interfaces (not-parametrized) in lib.d.ts.
@@ -2324,6 +2326,10 @@ class DeclarationGenerator {
      *
      * <p>JSCompiler does not understand nor represent Symbol properties, so we cannot just emit the
      * property in the loop above, and must guess on the actual return type of the iterator method.
+     *
+     * <p>TODO(rado): This code will almost never work with iclutz, because IterableIterator and the
+     * class that implements it would be part of different complitation. Investigate whether this
+     * can be syntactically resolved.
      */
     private void maybeEmitSymbolIterator(JSType instanceType) {
       if (instanceType == null) {
