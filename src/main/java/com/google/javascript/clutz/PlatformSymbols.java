@@ -25,6 +25,10 @@ public class PlatformSymbols {
       new ImmutableMap.Builder<String, String>()
           .put("CSSProperties", "CSSStyleDeclaration")
           .put("IteratorIterable", "IterableIterator")
+          .put("IArrayLike", "ArrayLike")
+          .put("Arguments", "IArguments")
+          .put("IThenable", "PromiseLike")
+          .put("IIterableResult", "IteratorResult")
           .build();
 
   /**

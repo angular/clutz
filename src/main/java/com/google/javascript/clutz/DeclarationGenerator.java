@@ -1990,8 +1990,6 @@ class DeclarationGenerator {
         return null;
       }
 
-      // TODO(rado): Move these to CLOSURE_TO_TYPESCRIPT and use the renaming function
-      // maybeRenameGlobalType here.
       switch (type.getDisplayName()) {
           // Arguments<?> and NodeList<?> in es3 externs are correspondingly
           // IArguments and NodeList interfaces (not-parametrized) in lib.d.ts.
@@ -2004,21 +2002,12 @@ class DeclarationGenerator {
         case "MessageEvent":
           emit("MessageEvent");
           return null;
-        case "IThenable":
-          templateTypeName = "PromiseLike";
-          break;
-        case "IArrayLike":
-          templateTypeName = "ArrayLike";
-          break;
-        case "IteratorIterable":
-          templateTypeName = "IterableIterator";
-          break;
-        case "IIterableResult":
-          templateTypeName = "IteratorResult";
-          break;
         default:
           break;
       }
+
+      String maybeGlobalName = maybeRenameGlobalType(type.getDisplayName());
+      templateTypeName = maybeGlobalName == null ? templateTypeName : maybeGlobalName;
 
       if (type.getTemplateTypes().isEmpty()) {
         // In Closure, subtypes of `TemplatizedType`s that do not take type arguments are still
