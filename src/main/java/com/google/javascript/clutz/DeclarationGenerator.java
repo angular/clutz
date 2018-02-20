@@ -1738,10 +1738,12 @@ class DeclarationGenerator {
     private void emitNoResolvedTypeAsumingForwardDeclare(ObjectType type) {
       String displayName = maybeRewriteImportedName(type.getDisplayName());
       String maybeGlobalName = maybeRenameGlobalType(displayName);
-      displayName =
-          maybeGlobalName == null
-              ? Constants.INTERNAL_NAMESPACE + "." + displayName
-              : maybeGlobalName;
+      if (maybeGlobalName == null) {
+        typesUsed.add(displayName);
+        displayName = Constants.INTERNAL_NAMESPACE + "." + displayName;
+      } else {
+        displayName = maybeGlobalName;
+      }
       emit(displayName);
       List<JSType> templateTypes = type.getTemplateTypes();
       if (templateTypes != null && templateTypes.size() > 0) {
