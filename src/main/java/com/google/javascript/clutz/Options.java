@@ -142,6 +142,16 @@ public class Options {
   )
   String collidingProvidesFile = null;
 
+  @Option(
+    name = "--tracer_mode",
+    hidden = true,
+    usage =
+        "Shows the duration of each compiler pass and the impact to "
+            + "the compiled output size. "
+            + "Options: ALL, AST_SIZE, RAW_SIZE, TIMING_ONLY, OFF"
+  )
+  private CompilerOptions.TracerMode tracerMode = CompilerOptions.TracerMode.OFF;
+
   @Argument List<String> arguments = new ArrayList<>();
 
   Depgraph depgraph;
@@ -154,6 +164,7 @@ public class Options {
   public CompilerOptions getCompilerOptions() {
     final CompilerOptions options = new CompilerOptions();
     options.setClosurePass(true);
+    options.setTracerMode(this.tracerMode);
 
     DependencyOptions deps = new DependencyOptions();
     deps.setDependencySorting(true);
