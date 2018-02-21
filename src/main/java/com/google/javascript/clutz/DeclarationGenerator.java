@@ -2474,14 +2474,22 @@ class DeclarationGenerator {
      * called "entries" that have the right return type.
      */
     private boolean specialCaseMapEntries(String propName, FunctionType propertyType) {
-      if (propertyType.getMaxArity() != 0
-          || !propName.equals("entries")
-          || !propertyType.getReturnType().isTemplatizedType()) {
+      if (propertyType.getMaxArity() != 0 || !propName.equals("entries")) {
         return false;
       }
-      TemplatizedType ttType = propertyType.getReturnType().toMaybeTemplatizedType();
-      ImmutableList<JSType> ttypes = ttType.getTemplateTypes();
-      if (!isTemplateOf(ttType, "IteratorIterable")
+
+      ImmutableList<JSType> ttypes = null;
+      JSType returnType = propertyType.getReturnType();
+
+      // In incremental mode this type is noResolvedType, while in total mode it is TemplatizedType
+      // They both have getTemplateTypes, but neither extends the other in the class heirarchy.
+      if (returnType.isTemplatizedType()) {
+        ttypes = ((TemplatizedType) returnType).getTemplateTypes();
+      } else if (returnType.isNoResolvedType()) {
+        ttypes = ((NoResolvedType) returnType).getTemplateTypes();
+      }
+      if (ttypes == null
+          || !returnType.getDisplayName().equals("IteratorIterable")
           || ttypes.size() != 1
           || !isTemplateOf(ttypes.get(0), "Array")) {
         return false;
