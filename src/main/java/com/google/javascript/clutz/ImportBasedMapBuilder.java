@@ -9,20 +9,20 @@ import java.util.*;
  */
 public abstract class ImportBasedMapBuilder {
   protected abstract Map<String, String> build(
-      String localModuleId, Node moduleBody, Set<String> knownGoogProvides);
+      String localModuleId, Node moduleBody, Set<String> googProvides);
 
   /**
    * Build takes a collection of parsed inputs and walks the ast to find any imports into local
    * variables to build a map based on the concrete class's implementation of build.
    */
-  public Map<String, String> build(Collection<Node> parsedInputs, Set<String> knownGoogProvides) {
+  public Map<String, String> build(Collection<Node> parsedInputs, Set<String> googProvides) {
     Map<String, String> importRenameMap = new HashMap<>();
     for (Node ast : parsedInputs) {
       // Symbols can be imported into a variable in a goog.module() file, so look for imports in the
       // body of the goog module.
       String moduleId = getGoogModuleId(ast);
       if (moduleId != null) {
-        importRenameMap.putAll(build(moduleId, ast.getFirstChild(), knownGoogProvides));
+        importRenameMap.putAll(build(moduleId, ast.getFirstChild(), googProvides));
       }
 
       // Or symbols can be imported into a variable in a top-level goog.scope() block, so look for
@@ -30,7 +30,7 @@ public abstract class ImportBasedMapBuilder {
       List<Node> googScopes = getTopLevelGoogScopes(ast);
       if (!googScopes.isEmpty()) {
         for (Node googScope : googScopes) {
-          importRenameMap.putAll(build(null, googScope, knownGoogProvides));
+          importRenameMap.putAll(build(null, googScope, googProvides));
         }
       }
     }

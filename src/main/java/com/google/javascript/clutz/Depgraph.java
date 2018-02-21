@@ -2,13 +2,16 @@ package com.google.javascript.clutz;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +30,12 @@ class Depgraph {
   private final Set<String> nonroots = new LinkedHashSet<>();
   private final Set<String> rootExterns = new LinkedHashSet<>();
   private final Set<String> nonrootExterns = new LinkedHashSet<>();
+  /**
+   * Closure's internal name for goog.provide and goog.module symbols is incompatible, and in a
+   * goog.module file, it's impossible to tell which is being referenced, so information is pulled
+   * out of the depgraph, and later passed to ImportBasedMapBuilder to resolve the ambiguity.
+   */
+  private final Set<String> googProvides = new HashSet<>();
 
   private Depgraph() {}
 
@@ -58,6 +67,10 @@ class Depgraph {
 
   Set<String> getNonrootExterns() {
     return Collections.unmodifiableSet(nonrootExterns);
+  }
+
+  Set<String> getGoogProvides() {
+    return Collections.unmodifiableSet(googProvides);
   }
 
   static Depgraph forRoots(Set<String> roots, Set<String> nonroots) {
@@ -118,11 +131,28 @@ class Depgraph {
       @SuppressWarnings("unchecked")
       List<List<?>> fileProperties = (List<List<?>>) rootDescriptor.get(1);
       boolean isExterns = false;
+      boolean isGoogProvide = true;
+      List<String> provides = new ArrayList<>();
       for (List<?> tuple : fileProperties) {
         String key = (String) tuple.get(0);
         if ("is_externs".equals(key) && Boolean.TRUE.equals(tuple.get(1))) {
           isExterns = true;
           break;
+        }
+        if ("load_flags".equals(key)) {
+          // load flags is a list of lists of strings ie [["lang","es6"],["module","goog"]]
+          List<List<String>> loadFlags = (List<List<String>>) tuple.get(1);
+          if (loadFlags.contains(ImmutableList.of("module", "goog"))) {
+            isGoogProvide = false;
+          }
+        }
+        if ("provides".equals(key)) {
+          // provides is a list of strings, where the first element is the file name with a prefix
+          // and all the remaining elements are the provides from that file
+          List<String> provideList = (List<String>) tuple.get(1);
+          if (provideList.size() > 1) {
+            provides.addAll(provideList.subList(1, provideList.size()));
+          }
         }
       }
       fileName = GENERATED_FILE.matcher(fileName).replaceAll("$1");
@@ -134,6 +164,9 @@ class Depgraph {
         roots.add(fileName);
       } else {
         nonroots.add(fileName);
+      }
+      if (isGoogProvide) {
+        googProvides.addAll(provides);
       }
     }
   }

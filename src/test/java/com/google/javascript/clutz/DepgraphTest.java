@@ -10,16 +10,17 @@ import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public class DepgraphTest {
-
   static final Path DEPGRAPH_PATH = DeclarationGeneratorTests.getTestInputFile("closure.depgraph");
 
-  private Depgraph parseFile() {
-    return Depgraph.parseFrom(Collections.singletonList(DEPGRAPH_PATH.toFile().toString()));
+  static Depgraph parseFile(String filename) {
+    return Depgraph.parseFrom(
+        Collections.singletonList(
+            DeclarationGeneratorTests.getTestInputFile(filename).toFile().toString()));
   }
 
   @Test
   public void testParseFile() throws Exception {
-    Depgraph depgraph = parseFile();
+    Depgraph depgraph = parseFile("closure.depgraph");
     assertThat(depgraph.getRoots())
         .containsExactly(
             "my/thing/static/js/annotations/annotations-canvas-controller.js",
@@ -30,5 +31,12 @@ public class DepgraphTest {
         .inOrder();
     assertThat(depgraph.getRootExterns()).isEmpty();
     assertThat(depgraph.getNonrootExterns()).containsExactly("javascript/common/dom.js").inOrder();
+  }
+
+  @Test
+  public void testKnownGoogProvideParsing() throws Exception {
+    Depgraph depgraph = parseFile("partialCrossModuleTypeImports/cross_module_type.depgraph");
+    assertThat(depgraph.getGoogProvides())
+        .containsExactly("goog.legacy.namespace.exporter", "googprovide.exporter");
   }
 }

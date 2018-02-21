@@ -48,7 +48,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
   public boolean partialInput = false;
   public String extraExternFile = null;
   public boolean emitBase = false;
-  public Set<String> knownGoogProvides = null;
+  public String depgraph = null;
 
   static ProgramSubject assertThatProgram(String... sourceLines) {
     String sourceText = Joiner.on('\n').join(sourceLines);
@@ -113,9 +113,6 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       opts.partialInput = true;
       opts.debug = false;
     }
-    if (knownGoogProvides != null) {
-      opts.knownGoogProvides = knownGoogProvides;
-    }
     opts.collidingProvides = ImmutableSet.of("colliding_provide.aliased");
 
     List<SourceFile> sourceFiles = new ArrayList<>();
@@ -163,6 +160,12 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       // to compile ES6 unless es6.js extern is passed in. To speed up test exectution we
       // pass a thin shim instead of the real es6.js extern.
       externFiles = Lists.newArrayList(SourceFile.fromFile("src/resources/es6_min.js", UTF_8));
+    }
+
+    if (depgraph != null) {
+      opts.depgraph = DepgraphTest.parseFile(depgraph);
+    } else {
+      opts.depgraph = Depgraph.forRoots(roots, nonroots);
     }
 
     if (extraExternFile != null) {

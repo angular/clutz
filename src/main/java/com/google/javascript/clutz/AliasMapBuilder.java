@@ -21,7 +21,7 @@ import java.util.Set;
 public class AliasMapBuilder extends ImportBasedMapBuilder {
   @Override
   protected Map<String, String> build(
-      String localModuleId, Node moduleBody, Set<String> knownGoogProvides) {
+      String localModuleId, Node moduleBody, Set<String> googProvides) {
     Map<String, String> aliasMap = new HashMap<>();
     if (localModuleId == null) {
       //TODO(lucassloan): handle goog.module.get()
