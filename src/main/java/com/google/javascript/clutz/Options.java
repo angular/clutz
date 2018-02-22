@@ -142,6 +142,7 @@ public class Options {
   )
   String collidingProvidesFile = null;
 
+  // https://github.com/google/closure-compiler/blob/036a6dd24c4b0831838a63f983d63670b1f1a9b6/src/com/google/javascript/jscomp/CommandLineRunner.java#L667
   @Option(
     name = "--tracer_mode",
     hidden = true,
