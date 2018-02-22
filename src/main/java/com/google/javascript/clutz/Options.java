@@ -142,6 +142,17 @@ public class Options {
   )
   String collidingProvidesFile = null;
 
+  // https://github.com/google/closure-compiler/blob/036a6dd24c4b0831838a63f983d63670b1f1a9b6/src/com/google/javascript/jscomp/CommandLineRunner.java#L667
+  @Option(
+    name = "--tracer_mode",
+    hidden = true,
+    usage =
+        "Shows the duration of each compiler pass and the impact to "
+            + "the compiled output size. "
+            + "Options: ALL, AST_SIZE, RAW_SIZE, TIMING_ONLY, OFF"
+  )
+  private CompilerOptions.TracerMode tracerMode = CompilerOptions.TracerMode.OFF;
+
   @Argument List<String> arguments = new ArrayList<>();
 
   Depgraph depgraph;
@@ -154,6 +165,7 @@ public class Options {
   public CompilerOptions getCompilerOptions() {
     final CompilerOptions options = new CompilerOptions();
     options.setClosurePass(true);
+    options.setTracerMode(this.tracerMode);
 
     DependencyOptions deps = new DependencyOptions();
     deps.setDependencySorting(true);
