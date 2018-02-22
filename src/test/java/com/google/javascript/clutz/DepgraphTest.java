@@ -36,7 +36,6 @@ public class DepgraphTest {
   @Test
   public void testKnownGoogProvideParsing() throws Exception {
     Depgraph depgraph = parseFile("partialCrossModuleTypeImports/cross_module_type.depgraph");
-    assertThat(depgraph.getGoogProvides())
-        .containsExactly("goog.legacy.namespace.exporter", "googprovide.exporter");
+    assertThat(depgraph.getGoogProvides()).containsExactly("googprovide.exporter");
   }
 }

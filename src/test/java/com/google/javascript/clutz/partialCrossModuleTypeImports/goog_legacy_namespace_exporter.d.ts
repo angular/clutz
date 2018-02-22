@@ -22,3 +22,11 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_: any;
   }
 }
+declare namespace ಠ_ಠ.clutz.module$exports$goog$legacy$namespace$exporter {
+  type OriginalName = ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_OriginalName ;
+  var OriginalName : typeof ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_OriginalName ;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$goog$legacy$namespace$exporter {
+  type LegacyBaseClass = ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_LegacyBaseClass ;
+  var LegacyBaseClass : typeof ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_LegacyBaseClass ;
+}
