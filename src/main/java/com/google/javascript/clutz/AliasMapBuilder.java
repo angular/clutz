@@ -71,7 +71,7 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
     for (Node statement : moduleBody.children()) {
       if (isWholeModuleExportAssignment(statement)) {
         // `exports = foo`
-        String localVariableName = statement.getFirstChild().getChildAtIndex(1).getString();
+        String localVariableName = getExportsAssignmentRHS(statement);
 
         if (localVariableToImportedSymbolNameMap.containsKey(localVariableName)) {
           aliasMap.put(
@@ -80,9 +80,8 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
         }
       } else if (isNamedExportAssignment(statement)) {
         // `exports.foo = foo`
-        String localVariableName = statement.getFirstChild().getChildAtIndex(1).getString();
-        String exportName =
-            statement.getFirstChild().getFirstChild().getChildAtIndex(1).getString();
+        String localVariableName = getExportsAssignmentRHS(statement);
+        String exportName = getNamedExportName(statement);
 
         if (localVariableToImportedSymbolNameMap.containsKey(localVariableName)) {
           aliasMap.put(
@@ -93,51 +92,5 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
     }
 
     return aliasMap;
-  }
-
-  /** Matches `exports = foo;` */
-  protected boolean isWholeModuleExportAssignment(Node statement) {
-    if (!statement.isExprResult()) {
-      return false;
-    }
-
-    if (!statement.getFirstChild().isAssign()) {
-      return false;
-    }
-
-    if (!statement.getFirstChild().getFirstChild().isName()) {
-      return false;
-    }
-
-    if (!statement.getFirstChild().getChildAtIndex(1).isName()) {
-      return false;
-    }
-
-    return statement.getFirstChild().getFirstChild().getString().equals("exports");
-  }
-
-  /** Matches `exports.foo = foo;` */
-  protected boolean isNamedExportAssignment(Node statement) {
-    if (!statement.isExprResult()) {
-      return false;
-    }
-
-    if (!statement.getFirstChild().isAssign()) {
-      return false;
-    }
-
-    if (!statement.getFirstChild().getFirstChild().isGetProp()) {
-      return false;
-    }
-
-    if (!statement.getFirstChild().getFirstChild().getFirstChild().isName()) {
-      return false;
-    }
-
-    if (!statement.getFirstChild().getChildAtIndex(1).isName()) {
-      return false;
-    }
-
-    return statement.getFirstChild().getFirstChild().getFirstChild().getString().equals("exports");
   }
 }

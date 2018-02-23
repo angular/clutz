@@ -220,6 +220,13 @@ class DeclarationGenerator {
    */
   private Map<String, String> aliasMap = Collections.emptyMap();
 
+  /**
+   * declareLegacyNamespace modules declare goog.provides symbols, but depgraph analysis shows them
+   * as goog.modules. This map contains aliases for the symbols in goog.module style, so they can be
+   * imported from other goog.modules. See LegacyNamespaceReexportMapBuilder for more details.
+   */
+  private Map<String, String> legacyNamespaceReexportMap = Collections.emptyMap();
+
   /** If true, add all the import rename map entries to the output as comments in the .d.ts. */
   private final boolean PRINT_IMPORT_RENAME_MAP = false;
 
@@ -347,6 +354,9 @@ class DeclarationGenerator {
               .build(compiler.getParsedInputs(), opts.depgraph.getGoogProvides());
       aliasMap =
           new AliasMapBuilder().build(compiler.getParsedInputs(), opts.depgraph.getGoogProvides());
+      legacyNamespaceReexportMap =
+          new LegacyNamespaceReexportMapBuilder()
+              .build(compiler.getParsedInputs(), opts.depgraph.getGoogProvides());
       collidingProvides = opts.collidingProvides;
     }
 
@@ -488,6 +498,7 @@ class DeclarationGenerator {
     // combine original provides and rewritten ones.
     provides.addAll(rewrittenProvides);
     processUnprovidedTypes(provides, transitiveProvides);
+    declareLegacyNamespaceAliases();
 
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
@@ -674,6 +685,31 @@ class DeclarationGenerator {
       // if no new types seen, safely break out.
       if (typesUsed.size() == typesUsedCount) break;
       maxTypeUsedDepth--;
+    }
+  }
+
+  /**
+   * If any inputs declare a legacy namespace, emit aliases for their exports in goog.module style.
+   */
+  private void declareLegacyNamespaceAliases() {
+    if (!legacyNamespaceReexportMap.isEmpty()) {
+      for (Entry<String, String> e : legacyNamespaceReexportMap.entrySet()) {
+        String namespace;
+        String googModuleStyleName;
+        if (e.getKey().contains(".")) {
+          String[] nameParts = e.getKey().split("\\.");
+          namespace = nameParts[0];
+          googModuleStyleName = nameParts[1];
+        } else {
+          namespace = "";
+          googModuleStyleName = e.getKey();
+        }
+        emitNamespaceBegin(namespace);
+        // TODO(lucassloan): not technically correct, since this emits an alias as if it's a class
+        // with a type and value. Change to emit the alias only for type or value as necessary.
+        visitKnownTypeValueAlias(googModuleStyleName, e.getValue());
+        emitNamespaceEnd();
+      }
     }
   }
 

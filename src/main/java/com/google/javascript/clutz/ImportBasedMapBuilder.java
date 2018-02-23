@@ -135,6 +135,62 @@ public abstract class ImportBasedMapBuilder {
     return null;
   }
 
+  /** Matches `exports = foo;` */
+  protected boolean isWholeModuleExportAssignment(Node statement) {
+    if (!statement.isExprResult()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().isAssign()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().getFirstChild().isName()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().getChildAtIndex(1).isName()) {
+      return false;
+    }
+
+    return statement.getFirstChild().getFirstChild().getString().equals("exports");
+  }
+
+  /** Matches `exports.foo = foo;` */
+  protected boolean isNamedExportAssignment(Node statement) {
+    if (!statement.isExprResult()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().isAssign()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().getFirstChild().isGetProp()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().getFirstChild().getFirstChild().isName()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().getChildAtIndex(1).isName()) {
+      return false;
+    }
+
+    return statement.getFirstChild().getFirstChild().getFirstChild().getString().equals("exports");
+  }
+
+  /** Returns `foo` from 'exports.foo = bar` */
+  protected String getNamedExportName(Node statement) {
+    return statement.getFirstChild().getFirstChild().getChildAtIndex(1).getString();
+  }
+
+  /** Returns `foo` from `exports = foo` or `exports.foo = foo` */
+  protected String getExportsAssignmentRHS(Node statement) {
+    return statement.getFirstChild().getChildAtIndex(1).getString();
+  }
+
   /**
    * The exported symbol can take 2 forms - one where it refers to everything that the module
    * exports and another where it refers to just one thing the module exports. If the original
