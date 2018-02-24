@@ -465,8 +465,8 @@ class DeclarationGenerator {
         // corresponding type from the type registry.
         JSType moduleType = compiler.getTypeRegistry().getType(rewritenProvide);
         if (moduleType != null) {
-          declareTypedefDefaultModule(
-              provides, provide, symbol.getName(), rewritenProvide, moduleType);
+          declareTypedefNamespace(symbol.getName(), moduleType, provides);
+          declareModule(provide, /* isDefault */ true, rewritenProvide);
         } else {
           emitComment("Skipping symbol " + symbol.getName() + " due to missing type information.");
         }
@@ -518,28 +518,26 @@ class DeclarationGenerator {
     return opts.skipEmitPattern != null && opts.skipEmitPattern.matcher(path).matches();
   }
 
-  /** Special emit for goog modules that only emit a default export that is a typedef. */
-  private void declareTypedefDefaultModule(
-      TreeSet<String> provides,
-      String moduleName,
-      String typedefName,
-      String rewritenProvide,
-      JSType moduleType) {
+  /**
+   * Special emit for emitting namespaces for typedefs as one-offs. Typedefs (type aliases in TS)
+   * are special because their information does not come solely from a TypedVar object, but rather
+   * from a pair of name (string) and type (JSType).
+   *
+   * <p>Note that this only handles default exports of typedefs. Typedefs as properties on an
+   * already exported object (like class) are handled separately.
+   */
+  private void declareTypedefNamespace(
+      String typedefName, JSType typedefType, Set<String> provides) {
     String namespace = getNamespace(typedefName);
 
     // Ideally we should be using declareNamespace here, but it cannot handle gluing the TypedVar
-    // symbol with the additional JSType moduleType.
+    // symbol with the additional JSType typedefType.
     emitNamespaceBegin(namespace);
-    emit("type");
-    emit(getUnqualifiedName(typedefName));
-    emit("=");
 
-    new TreeWalker(compiler.getTypeRegistry(), provides, false, false).visitType(moduleType);
-    emit(";");
-    emitBreak();
+    new TreeWalker(compiler.getTypeRegistry(), provides, false, false)
+        .visitTypeAlias(typedefType, typedefName, false);
+
     emitNamespaceEnd();
-
-    declareModule(moduleName, /* isDefault */ true, rewritenProvide);
   }
 
   /**
@@ -670,6 +668,17 @@ class DeclarationGenerator {
         if (symbolInput != null && symbolInput.isExtern()) continue;
 
         if (shouldSkipVar(symbol)) {
+          continue;
+        }
+
+        // A symbol with a name, but a null type is likely a typedef. DeclareNamespace cannot handle
+        // this scenario, but declareTypedefNamespace
+        if (symbol.getType() == null) {
+          JSType typedef = compiler.getTypeRegistry().getType(name);
+          if (typedef != null) {
+            declareTypedefNamespace(symbol.getName(), typedef, Collections.emptySet());
+            typesEmitted.add(name);
+          }
           continue;
         }
 
