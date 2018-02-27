@@ -215,14 +215,22 @@ public class Options {
       Set<String> merged = Sets.union(depgraph.getRoots(), depgraph.getNonroots());
       arguments.retainAll(merged);
     }
-    // set union command line externs and depgraph.externs.
-    Set<String> allExterns = new LinkedHashSet<>();
-    allExterns.addAll(depgraph.getRootExterns());
+
     if (!partialInput) {
+      // set union command line externs and depgraph.externs.
+      Set<String> allExterns = new LinkedHashSet<>();
+      allExterns.addAll(depgraph.getRootExterns());
       allExterns.addAll(depgraph.getNonrootExterns());
+      allExterns.addAll(externs);
+      externs = new ArrayList<>(allExterns);
     }
-    allExterns.addAll(externs);
-    externs = new ArrayList<>(allExterns);
+    // Incremental clutz does not use the externs option in regular invocations. Since it is only
+    // ran on a per js_library basis, there is no way to separate sources and externs.
+    // For legacy reasons, it is seperately called on the externs_list's of files, but it those
+    // invocations depgraphs are not used (since they don't exist for bundles of files).
+    //
+    // So either there are no externs present or no depgraphs present. In either case there is no
+    // point doing any union/intersection of those.
 
     // Exclude externs that are already in the sources to avoid duplicated symbols.
     arguments.removeAll(externs);
