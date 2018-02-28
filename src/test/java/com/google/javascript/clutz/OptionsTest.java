@@ -31,24 +31,35 @@ public class OptionsTest {
               "javascript/closure/other_file_not_in_depgraph.js",
               "javascript/closure/string/string.js",
               "blaze-out/blah/my/blaze-out-file.js",
+              "--depgraphs",
+              DepgraphTest.DEPGRAPH_PATH.toFile().toString(),
+              "--depgraphs_filter_sources",
+            });
+    // Arguments are filtered by what appears in the depgraph.
+    assertThat(opts.arguments)
+        .containsExactly(
+            "javascript/closure/string/string.js", // kept as a root in depgraph
+            "blaze-out/blah/my/blaze-out-file.js") // kept as a non-root in depgraph
+        .inOrder();
+  }
+
+  @Test
+  public void testFilterSourcesWithExternsInDepgraphs() throws Exception {
+    Options opts =
+        new Options(
+            new String[] {
+              "javascript/closure/string/string.js",
               "--externs",
               "extern1.js",
               "extern2.js",
               "--depgraphs",
               DepgraphTest.DEPGRAPH_PATH.toFile().toString(),
               "--depgraphs_filter_sources",
-              "-o",
-              "output.d.ts"
             });
-    // Outputs are filtered by what appears in the depgraph.
-    assertThat(opts.arguments)
-        .containsExactly(
-            "javascript/closure/string/string.js", "blaze-out/blah/my/blaze-out-file.js")
-        .inOrder();
+    // All depgraph externs are added to the externs list.
     assertThat(opts.externs)
-        .containsExactly("javascript/common/dom.js", "extern1.js", "extern2.js")
+        .containsExactly("my/root/extern.js", "my/nonroot/extern.js", "extern1.js", "extern2.js")
         .inOrder();
-    assertThat(opts.output).isEqualTo("output.d.ts");
   }
 
   @Test
@@ -104,11 +115,12 @@ public class OptionsTest {
         new Options(
             new String[] {
               "--externs",
-              "javascript/common/dom.js",
+              "my/root/extern.js",
               "--depgraphs",
+              // Depgraph also has my/root/extern.js, and additionally my/nonroot/extern.js.
               DepgraphTest.DEPGRAPH_PATH.toFile().toString(),
             });
-    assertThat(opts.externs).containsExactly("javascript/common/dom.js");
+    assertThat(opts.externs).containsExactly("my/root/extern.js", "my/nonroot/extern.js");
   }
 
   @Test
@@ -128,7 +140,9 @@ public class OptionsTest {
         new Options(
             new String[] {
               "--partialInput",
-              "javascript/common/dom.js",
+              // a random file from the depgraph. Not relevant to the test, but we need at least
+              // one input.
+              "my/thing/static/js/0-bootstrap.js",
               "--depgraphs",
               DepgraphTest.DEPGRAPH_PATH.toFile().toString(),
             });
@@ -145,5 +159,23 @@ public class OptionsTest {
               DeclarationGeneratorTests.getTestInputFile("test_goog_provides").toFile().toString()
             });
     assertThat(opts.knownGoogProvides).containsExactly("foo.bar", "baz.quux");
+  }
+
+  @Test
+  public void testPartialInputIgnoresDepgraphRootExternsIfNotPassedToExterns() throws Exception {
+    // Due to "exported" libraries, what the depgraph considers "root" can be incorrect for the
+    // purposes of incremental clutz. Arguments and Externs lists should only be filtered down
+    // with depgraph info and never extended.
+    Options opts =
+        new Options(
+            new String[] {
+              "--partialInput",
+              // a random file from the depgraph. Not relevant to the test, but we need at least
+              // one input.
+              "my/thing/static/js/0-bootstrap.js",
+              "--depgraphs",
+              DepgraphTest.DEPGRAPH_PATH.toFile().toString(),
+            });
+    assertThat(opts.externs).isEmpty();
   }
 }

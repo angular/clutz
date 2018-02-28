@@ -1,7 +1,7 @@
 [ [ "nonroots", [
     [ "javascript/closure/base.js", []],
     [ "javascript/closure/string/string.js", []],
-    [ "javascript/common/dom.js", [
+    [ "my/nonroot/extern.js", [
       ["provides", []],
       ["is_externs", true],
       ["requires", []],
@@ -11,6 +11,11 @@
   [ "roots", [
     [ "my/thing/static/js/0-bootstrap.js", []],
     [ "my/thing/static/js/annotations/annotations-canvas-controller.js", []],
-    [ "[blaze-out/blah/]my/blaze-out-file.js", []]
+    [ "[blaze-out/blah/]my/blaze-out-file.js", []],
+    [ "my/root/extern.js", [
+      ["provides", []],
+      ["is_externs", true],
+      ["requires", []],
+    ]]
   ] ]
 ]
