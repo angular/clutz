@@ -219,6 +219,10 @@ public abstract class ImportBasedMapBuilder {
       // Object literals can use the original name `{A}` or rename it `{RenameA: A}`.
       String variableName;
       if (objectMember.getFirstChild() != null) {
+        // RHS is an expression, not a name
+        if (!objectMember.getFirstChild().isName()) {
+          continue;
+        }
         // Renaming
         variableName = objectMember.getFirstChild().getString();
       } else {
