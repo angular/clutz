@@ -3,6 +3,7 @@ package com.google.javascript.clutz;
 import com.google.javascript.rhino.Node;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -43,6 +44,17 @@ public class LegacyNamespaceReexportMapBuilder extends ImportBasedMapBuilder {
         reexportMap.put(
             buildNamedExportSymbolName(localModuleId, exportName),
             buildLocalSymbolName(localModuleId, localVariableName));
+      } else if (isObjectLiteralExport(statement)) {
+        // `exports = {foo, bar}`
+        for (Entry<String, String> e :
+            objectLiteralASTToStringMap(statement.getFirstChild().getChildAtIndex(1)).entrySet()) {
+          String localVariableName = e.getValue();
+          String exportName = e.getKey();
+
+          reexportMap.put(
+              buildNamedExportSymbolName(localModuleId, exportName),
+              buildLocalSymbolName(localModuleId, localVariableName));
+        }
       }
     }
     return reexportMap;
