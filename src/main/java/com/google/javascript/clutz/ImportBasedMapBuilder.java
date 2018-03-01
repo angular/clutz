@@ -156,6 +156,27 @@ public abstract class ImportBasedMapBuilder {
     return statement.getFirstChild().getFirstChild().getString().equals("exports");
   }
 
+  /** Matches `exports = {foo, bar};` */
+  protected boolean isObjectLiteralExport(Node statement) {
+    if (!statement.isExprResult()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().isAssign()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().getFirstChild().isName()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().getChildAtIndex(1).isObjectLit()) {
+      return false;
+    }
+
+    return statement.getFirstChild().getFirstChild().getString().equals("exports");
+  }
+
   /** Matches `exports.foo = foo;` */
   protected boolean isNamedExportAssignment(Node statement) {
     if (!statement.isExprResult()) {
@@ -189,6 +210,25 @@ public abstract class ImportBasedMapBuilder {
   /** Returns `foo` from `exports = foo` or `exports.foo = foo` */
   protected String getExportsAssignmentRHS(Node statement) {
     return statement.getFirstChild().getChildAtIndex(1).getString();
+  }
+
+  protected Map<String, String> objectLiteralASTToStringMap(Node objectLiteral) {
+    Map<String, String> stringMap = new HashMap<>();
+    for (Node objectMember : objectLiteral.children()) {
+      String originalName = objectMember.getString();
+      // Object literals can use the original name `{A}` or rename it `{RenameA: A}`.
+      String variableName;
+      if (objectMember.getFirstChild() != null) {
+        // Renaming
+        variableName = objectMember.getFirstChild().getString();
+      } else {
+        // No rename
+        variableName = originalName;
+      }
+
+      stringMap.put(originalName, variableName);
+    }
+    return stringMap;
   }
 
   /**

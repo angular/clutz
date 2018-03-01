@@ -3,6 +3,7 @@ package com.google.javascript.clutz;
 import com.google.javascript.rhino.Node;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -48,19 +49,13 @@ public class ImportRenameMapBuilder extends ImportBasedMapBuilder {
         // `const {C, Clazz: RenamedClazz} = goog.module.get()`
         String importedModuleId =
             statement.getFirstChild().getChildAtIndex(1).getChildAtIndex(1).getString();
-        for (Node destructured : statement.getFirstFirstChild().children()) {
-          String originalName = destructured.getString();
+        for (Entry<String, String> e :
+            objectLiteralASTToStringMap(statement.getFirstFirstChild()).entrySet()) {
+          String originalName = e.getKey();
           // Destructuring can use the original name `const {A} = goog.require("foo.a")` or rename
           // it `const {A: RenamedA} = ...`, and closure uses whichever in the symbol name it
           // generates, so we have to extract it.
-          String variableName;
-          if (destructured.getFirstChild() != null) {
-            // Renaming
-            variableName = destructured.getFirstChild().getString();
-          } else {
-            // No rename
-            variableName = originalName;
-          }
+          String variableName = e.getValue();
 
           String exportedSymbolName;
           if (!googProvides.contains(importedModuleId)) {
@@ -82,19 +77,13 @@ public class ImportRenameMapBuilder extends ImportBasedMapBuilder {
         // On separate lines
         String destructuredVariable = statement.getFirstChild().getChildAtIndex(1).getString();
 
-        for (Node destructured : statement.getFirstFirstChild().children()) {
-          String originalName = destructured.getString();
+        for (Entry<String, String> e :
+            objectLiteralASTToStringMap(statement.getFirstFirstChild()).entrySet()) {
+          String originalName = e.getKey();
           // Destructuring can use the original name `const {A} = goog.require("foo.a")` or rename
           // it `const {A: RenamedA} = ...`, and closure uses whichever in the symbol name it
           // generates, so we have to extract it.
-          String variableName;
-          if (destructured.getFirstChild() != null) {
-            // Renaming
-            variableName = destructured.getFirstChild().getString();
-          } else {
-            // No rename
-            variableName = originalName;
-          }
+          String variableName = e.getValue();
 
           // The statements are iterated in order, so the statement with the goog.require() is already
           // processed, so the value is already in the import rename map.
