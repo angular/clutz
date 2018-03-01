@@ -3,6 +3,8 @@ declare namespace ಠ_ಠ.clutz.object.literal.exports {
   var Class1 : typeof ಠ_ಠ.clutz.module$contents$object$literal$exports_Class1 ;
   type RenamedClass2 = ಠ_ಠ.clutz.module$contents$object$literal$exports_Class2 ;
   var RenamedClass2 : typeof ಠ_ಠ.clutz.module$contents$object$literal$exports_Class2 ;
+  var aConstant : number ;
+  function aFunction ( ) : void ;
 }
 declare module 'goog:object.literal.exports' {
   import alias = ಠ_ಠ.clutz.object.literal.exports;
