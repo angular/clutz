@@ -1010,7 +1010,8 @@ class DeclarationGenerator {
           } else {
             emit("function");
           }
-          treeWalker.visitProperty(propName, oType, false, false, Collections.<String>emptyList());
+          treeWalker.visitProperty(
+              propName, oType, false, false, true, Collections.<String>emptyList());
         }
       }
     }
@@ -2355,7 +2356,12 @@ class DeclarationGenerator {
           continue;
         }
         visitProperty(
-            propName, objType, isStatic, forceProps.contains(propName), classTemplateTypeNames);
+            propName,
+            objType,
+            isStatic,
+            forceProps.contains(propName),
+            false,
+            classTemplateTypeNames);
       }
     }
 
@@ -2445,6 +2451,7 @@ class DeclarationGenerator {
         ObjectType objType,
         boolean isStatic,
         boolean forcePropDeclaration,
+        boolean isNamespace,
         List<String> classTemplateTypeNames) {
       JSType propertyType = objType.getPropertyType(propName);
       // Some symbols might be emitted as provides, so don't duplicate them
@@ -2458,7 +2465,13 @@ class DeclarationGenerator {
       // The static methods from the function prototype are provided by lib.d.ts.
       if (isStatic && isFunctionPrototypeProp(propName)) return;
       maybeEmitJsDoc(objType.getOwnPropertyJSDocInfo(propName), /* ignoreParams */ false);
-      emitProperty(propName, propertyType, isStatic, forcePropDeclaration, classTemplateTypeNames);
+      emitProperty(
+          propName,
+          propertyType,
+          isStatic,
+          forcePropDeclaration,
+          isNamespace,
+          classTemplateTypeNames);
     }
 
     private void emitProperty(
@@ -2466,6 +2479,7 @@ class DeclarationGenerator {
         JSType propertyType,
         boolean isStatic,
         boolean forcePropDeclaration,
+        boolean isNamespace,
         List<String> classTemplateTypeNames) {
       if (handleSpecialTTEFunctions(propertyType, propName, isStatic, classTemplateTypeNames))
         return;
@@ -2475,11 +2489,14 @@ class DeclarationGenerator {
       if (!propertyType.isFunctionType() || forcePropDeclaration) {
         UnionType unionType = propertyType.toMaybeUnionType();
         boolean isOptionalProperty = false;
+        // emitProperty is used to emit properties on object, as well as namespaces.  The ? optional
+        // syntax is only valid for objects.
         if (unionType != null
             && unionType
                 .getAlternatesWithoutStructuralTyping()
                 .stream()
-                .anyMatch(JSType::isVoidType)) {
+                .anyMatch(JSType::isVoidType)
+            && !isNamespace) {
           emit("?");
           isOptionalProperty = true;
         }
