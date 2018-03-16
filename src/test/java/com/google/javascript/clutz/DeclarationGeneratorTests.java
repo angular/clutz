@@ -76,9 +76,15 @@ public class DeclarationGeneratorTests {
       if (Arrays.asList("partial", "multifilePartial", "partialCrossModuleTypeImports")
           .contains(input.getParentFile().getName())) {
         subject.partialInput = true;
+        subject.debug = false;
       }
       if (input.getParentFile().getName().equals("partialCrossModuleTypeImports")) {
         subject.depgraph = "partialCrossModuleTypeImports/cross_module_type.depgraph";
+      }
+      // using async/await causes warnings inside closure's standard library, so ignore them for our
+      // tests
+      if (input.getName().contains("async")) {
+        subject.debug = false;
       }
       subject.extraExternFile = getExternFileNameOrNull(input.getName());
       suite.addTest(new DeclarationTest(input.getName(), golden, subject));

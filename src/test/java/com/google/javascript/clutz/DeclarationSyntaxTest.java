@@ -25,38 +25,6 @@ import org.junit.runners.JUnit4;
  */
 @RunWith(JUnit4.class)
 public class DeclarationSyntaxTest {
-  private static final FilenameFilter TS_SOURCES_WITHOUT_PLATFORM_EXTERNS =
-      new FilenameFilter() {
-        @Override
-        public boolean accept(File dir, String name) {
-          return TS_SOURCES.accept(dir, name) && !name.contains("_emit_platform_externs");
-        }
-      };
-
-  private static final FilenameFilter TS_SOURCES_WITH_PLATFORM_EXTERNS =
-      new FilenameFilter() {
-        @Override
-        public boolean accept(File dir, String name) {
-          return TS_SOURCES.accept(dir, name) && name.contains("_emit_platform_externs");
-        }
-      };
-
-  private static final FilenameFilter JS_NO_EXTERNS_WITHOUT_PLATFORM_EXTERNS =
-      new FilenameFilter() {
-        @Override
-        public boolean accept(File dir, String name) {
-          return JS_NO_EXTERNS.accept(dir, name) && !name.contains("_emit_platform_externs");
-        }
-      };
-
-  private static final FilenameFilter JS_NO_EXTERNS_WITH_PLATFORM_EXTERNS =
-      new FilenameFilter() {
-        @Override
-        public boolean accept(File dir, String name) {
-          return JS_NO_EXTERNS.accept(dir, name) && name.contains("_emit_platform_externs");
-        }
-      };
-
   private static final FilenameFilter JS_MULTIFILE_PARTIAL =
       new FilenameFilter() {
         @Override
@@ -92,16 +60,7 @@ public class DeclarationSyntaxTest {
 
   @Test
   public void testDeclarationSyntax() throws Exception {
-    List<File> inputs =
-        DeclarationGeneratorTests.getTestInputFilesNoPartial(
-            JS_NO_EXTERNS_WITHOUT_PLATFORM_EXTERNS);
-    doTestDeclarationSyntax(inputs);
-  }
-
-  @Test
-  public void testDeclarationSyntaxWithPlatformExterns() throws Exception {
-    List<File> inputs =
-        DeclarationGeneratorTests.getTestInputFilesNoPartial(JS_NO_EXTERNS_WITH_PLATFORM_EXTERNS);
+    List<File> inputs = DeclarationGeneratorTests.getTestInputFilesNoPartial(JS_NO_EXTERNS);
     doTestDeclarationSyntax(inputs);
   }
 
@@ -137,12 +96,7 @@ public class DeclarationSyntaxTest {
 
   @Test
   public void testDeclarationUsage() throws Exception {
-    doTestDeclarationUsage(TS_SOURCES_WITHOUT_PLATFORM_EXTERNS);
-  }
-
-  @Test
-  public void testDeclarationUsageWithPlatformExterns() throws Exception {
-    doTestDeclarationUsage(TS_SOURCES_WITH_PLATFORM_EXTERNS);
+    doTestDeclarationUsage(TS_SOURCES);
   }
 
   private void doTestDeclarationUsage(FilenameFilter filenameFilter) throws Exception {

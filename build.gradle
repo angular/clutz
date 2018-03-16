@@ -59,10 +59,12 @@ dependencies {
     force = true
   }
   compile 'com.google.code.gson:gson:2.7'
-  if (System.getenv().get('CI_MODE') == 'Nightly') {
-    compile 'com.google.javascript:closure-compiler:1.0-SNAPSHOT'
-  } else {
+  // clutz runs against closure head inside google, so default to that, but also test against
+  // the latest release for external users
+  if (System.getenv().get('CI_MODE') == 'Released') {
     compile 'com.google.javascript:closure-compiler:v20180204'
+  } else {
+    compile 'com.google.javascript:closure-compiler:1.0-SNAPSHOT'
   }
 
   compile 'com.google.code.findbugs:jsr305:3.0.1'
