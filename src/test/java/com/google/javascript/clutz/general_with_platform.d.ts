@@ -1,24 +1,35 @@
-declare namespace ಠ_ಠ.clutz {
-  class ByteLengthQueuingStrategy extends ByteLengthQueuingStrategy_Instance {
-  }
-  class ByteLengthQueuingStrategy_Instance {
-    private noStructuralTyping_: any;
-    constructor (config : { highWaterMark : number } ) ;
-    /**
-     * If we don't want to be strict we can define chunk as {*}
-     * and return as {number|undefined}
-     */
-    size (chunk : { byteLength : number } ) : number ;
-  }
+declare namespace ಠ_ಠ.clutz.u2f {
+  /**
+   * An error object for responses
+   */
+  type Error = { errorCode : number , errorMessage : string | null } ;
 }
-declare namespace ಠ_ಠ.clutz {
-  class CountQueuingStrategy extends CountQueuingStrategy_Instance {
-  }
-  class CountQueuingStrategy_Instance {
-    private noStructuralTyping_: any;
-    constructor (config : { highWaterMark : number } ) ;
-    size (chunk : any ) : number ;
-  }
+declare namespace ಠ_ಠ.clutz.u2f {
+  type RegisterRequest = { challenge : string , version : string } ;
+}
+declare namespace ಠ_ಠ.clutz.u2f {
+  /**
+   * Data object for a registered key.
+   */
+  type RegisteredKey = { appId : string | null , keyHandle : string , transports ? : string [] , version : string } ;
+}
+declare namespace ಠ_ಠ.clutz.u2f {
+  /**
+   * Data object for a sign response.
+   */
+  type SignResponse = { clientData : string , keyHandle : string , signatureData : string } ;
+}
+declare namespace ಠ_ಠ.clutz.u2f {
+  /**
+   * Data object for a single sign request.
+   */
+  type Transport = string ;
+}
+declare namespace ಠ_ಠ.clutz.u2f {
+  function register (appId : string , registerRequests : ಠ_ಠ.clutz.u2f.RegisterRequest [] , registeredKeys : ಠ_ಠ.clutz.u2f.RegisteredKey [] , callback : (a : ಠ_ಠ.clutz.u2f.Error | ಠ_ಠ.clutz.u2f.SignResponse ) => any , opt_timeoutSeconds ? : number ) : any ;
+}
+declare namespace ಠ_ಠ.clutz.u2f {
+  function sign (appId : string , challenge : string , registeredKeys : ಠ_ಠ.clutz.u2f.RegisteredKey [] , callback : (a : ಠ_ಠ.clutz.u2f.Error | ಠ_ಠ.clutz.u2f.SignResponse ) => any , opt_timeoutSeconds ? : number ) : any ;
 }
 declare namespace ಠ_ಠ.clutz {
   class DirectoryEntry extends DirectoryEntry_Instance {
@@ -153,6 +164,41 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  class StorageManager extends StorageManager_Instance {
+  }
+  class StorageManager_Instance {
+    private noStructuralTyping_: any;
+    estimate ( ) : Promise < { quota : number , usage : number } > ;
+    persist ( ) : Promise < boolean > ;
+    persisted ( ) : Promise < boolean > ;
+  }
+}
+declare namespace ಠ_ಠ.clutz.window {
+  type StorageEstimate = { quota : number , usage : number } ;
+}
+declare namespace ಠ_ಠ.clutz {
+  class ByteLengthQueuingStrategy extends ByteLengthQueuingStrategy_Instance {
+  }
+  class ByteLengthQueuingStrategy_Instance {
+    private noStructuralTyping_: any;
+    constructor (config : { highWaterMark : number } ) ;
+    /**
+     * If we don't want to be strict we can define chunk as {*}
+     * and return as {number|undefined}
+     */
+    size (chunk : { byteLength : number } ) : number ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class CountQueuingStrategy extends CountQueuingStrategy_Instance {
+  }
+  class CountQueuingStrategy_Instance {
+    private noStructuralTyping_: any;
+    constructor (config : { highWaterMark : number } ) ;
+    size (chunk : any ) : number ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   /**
    * The ReadableByteStreamController constructor cannot be used directly;
    * it only works on a ReadableStream that is in the middle of being constructed.
@@ -255,4 +301,38 @@ declare namespace ಠ_ಠ.clutz {
     start ? : (a : WritableStreamDefaultController ) => PromiseLike < any > | undefined ;
     write ? : (a : any , b : WritableStreamDefaultController ) => PromiseLike < any > | undefined ;
   }
+}
+declare namespace ಠ_ಠ.clutz {
+  class AbortController extends AbortController_Instance {
+  }
+  class AbortController_Instance {
+    private noStructuralTyping_: any;
+    abort ( ) : any ;
+    signal : AbortSignal ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface AbortSignal extends GlobalEventTarget {
+    aborted : boolean ;
+    onabort : ( (a : GlobalEvent ) => any ) | null ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface RTCRtpTransceiverInit {
+    /**
+     * The direction of the `RTCRtpTransceiver`. Defaults to "sendrecv".
+     */
+    direction ? : string | null ;
+    sendEncodings ? : RTCRtpEncodingParameters [] | null ;
+    /**
+     * The streams to add to the tranceiver's sender.
+     */
+    streams ? : MediaStream [] | null ;
+  }
+}
+declare namespace ಠ_ಠ.clutz.window {
+  /**
+   * Possible values are "sendrecv", "sendonly", "recvonly", and "inactive".
+   */
+  type RTCRtpTransceiverDirection = string ;
 }

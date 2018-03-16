@@ -49,6 +49,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
   public String extraExternFile = null;
   public boolean emitBase = false;
   public String depgraph = null;
+  public boolean debug = true;
 
   static ProgramSubject assertThatProgram(String... sourceLines) {
     String sourceText = Joiner.on('\n').join(sourceLines);
@@ -107,11 +108,10 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
 
   private String[] parse() throws AssertionError {
     Options opts = new Options();
-    opts.debug = true;
+    opts.debug = debug;
     opts.skipEmitPattern = Pattern.compile(".*\\.skip\\.tsickle\\.js$");
     if (partialInput) {
       opts.partialInput = true;
-      opts.debug = false;
     }
     opts.collidingProvides = ImmutableSet.of("colliding_provide.aliased");
 

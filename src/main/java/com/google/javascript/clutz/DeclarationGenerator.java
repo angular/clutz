@@ -288,7 +288,7 @@ class DeclarationGenerator {
         continue;
       }
 
-      JSType realType = compiler.getTypeRegistry().getType(var.getName());
+      JSType realType = compiler.getTypeRegistry().getGlobalType(var.getName());
       if (realType != null
           && shouldEmitTypedefByName(realType)
           && !typedefs.containsKey(realType)) {
@@ -362,8 +362,8 @@ class DeclarationGenerator {
 
     unknownType = compiler.getTypeRegistry().getNativeType(JSTypeNative.UNKNOWN_TYPE);
     numberType = compiler.getTypeRegistry().getNativeType(JSTypeNative.NUMBER_TYPE);
-    iterableType = compiler.getTypeRegistry().getType("Iterable");
-    iteratorIterableType = compiler.getTypeRegistry().getType("IteratorIterable");
+    iterableType = compiler.getTypeRegistry().getGlobalType("Iterable");
+    iteratorIterableType = compiler.getTypeRegistry().getGlobalType("IteratorIterable");
     // TODO(rado): replace with null and do not emit file when errors.
     String dts = "";
     // If there is an error top scope is null.
@@ -463,7 +463,7 @@ class DeclarationGenerator {
       if (symbol.getType() == null) {
         // A module that contains only typedefs will appear as null symbol. However, we can get the
         // corresponding type from the type registry.
-        JSType moduleType = compiler.getTypeRegistry().getType(rewritenProvide);
+        JSType moduleType = compiler.getTypeRegistry().getGlobalType(rewritenProvide);
         if (moduleType != null) {
           declareTypedefNamespace(symbol.getName(), moduleType, provides);
           declareModule(provide, /* isDefault */ true, rewritenProvide);
@@ -674,7 +674,7 @@ class DeclarationGenerator {
         // A symbol with a name, but a null type is likely a typedef. DeclareNamespace cannot handle
         // this scenario, but declareTypedefNamespace
         if (symbol.getType() == null) {
-          JSType typedef = compiler.getTypeRegistry().getType(name);
+          JSType typedef = compiler.getTypeRegistry().getGlobalType(name);
           if (typedef != null) {
             declareTypedefNamespace(symbol.getName(), typedef, Collections.emptySet());
             typesEmitted.add(name);
@@ -809,6 +809,14 @@ class DeclarationGenerator {
     }
   }
 
+  private static final Ordering<TypedVar> BY_SOURCE_FILE =
+      Ordering.natural()
+          .onResultOf(
+              input -> {
+                if (input == null) return null;
+                return input.getInputName();
+              });
+
   private static final Ordering<TypedVar> BY_VAR_NAME =
       Ordering.natural()
           .onResultOf(
@@ -817,8 +825,11 @@ class DeclarationGenerator {
                 return input.getName();
               });
 
+  private static final Ordering<TypedVar> BY_SOURCE_FILE_AND_VAR_NAME =
+      BY_SOURCE_FILE.compound(BY_VAR_NAME);
+
   private void sortSymbols(List<TypedVar> symbols) {
-    Collections.sort(symbols, BY_VAR_NAME);
+    Collections.sort(symbols, BY_SOURCE_FILE_AND_VAR_NAME);
   }
 
   private boolean needsAlias(Set<String> shadowedSymbols, String provide, TypedVar symbol) {
@@ -1393,7 +1404,7 @@ class DeclarationGenerator {
             return;
           }
           // The aliased type is present in the registry under the symbol name.
-          JSType registryType = typeRegistry.getType(symbol.getName());
+          JSType registryType = typeRegistry.getGlobalType(symbol.getName());
           if (registryType != null) {
             visitTypeAlias(registryType, symbol);
             return;
@@ -1406,7 +1417,7 @@ class DeclarationGenerator {
         }
         // The enum alias of an unknown type is present in the type registry, but its type is still
         // listed as unknown type instead of enum type.
-        JSType registryType = typeRegistry.getType(symbol.getName());
+        JSType registryType = typeRegistry.getGlobalType(symbol.getName());
         if (type.isUnknownType() && registryType != null && registryType.isEnumElementType()) {
           visitTypeValueAlias(symbol.getName(), (EnumElementType) registryType);
           return;
@@ -1883,6 +1894,12 @@ class DeclarationGenerator {
             @Override
             public Void caseStringType() {
               emit("string");
+              return null;
+            }
+
+            @Override
+            public Void caseSymbolType() {
+              emit("symbol");
               return null;
             }
 
@@ -2856,7 +2873,7 @@ class DeclarationGenerator {
             emitNamespaceBegin(innerNamespace);
             foundNamespaceMembers = true;
           }
-          JSType registryType = typeRegistry.getType(qualifiedName);
+          JSType registryType = typeRegistry.getGlobalType(qualifiedName);
           if (registryType != null) {
             visitTypeAlias(registryType, propName, false);
           } else {
@@ -3011,6 +3028,11 @@ class DeclarationGenerator {
 
       @Override
       public Void caseStringType() {
+        return null;
+      }
+
+      @Override
+      public Void caseSymbolType() {
         return null;
       }
 
