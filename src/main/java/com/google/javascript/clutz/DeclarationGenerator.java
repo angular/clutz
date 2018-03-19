@@ -2394,23 +2394,31 @@ class DeclarationGenerator {
      *
      * <p>JSCompiler does not understand nor represent Symbol properties, so we cannot just emit the
      * property in the loop above, and must guess on the actual return type of the iterator method.
-     *
-     * <p>TODO(rado): This code will almost never work with iclutz, because IterableIterator and the
-     * class that implements it would be part of different complitation. Investigate whether this
-     * can be syntactically resolved.
      */
     private void maybeEmitSymbolIterator(JSType instanceType) {
       if (instanceType == null) {
         return;
       }
-      // iteratorIterableType and iterableType can be null if they were not found in the current
-      // run's externs definitions.
+      // iteratorIterableType will be null if not found in the current run's externs definitions.
       JSType implemented;
       String returnType;
+
+      // It appears that iterableType is always defined. Moreover, in partial mode when extending
+      // an unknown base, the isSubtype check always returns true. This is not that surprising,
+      // because when the base is unknown the only correct answer is unknown, not true or false.
+      //
+      // Emitting a [Symbol.iterator()] signature for all record/interfaces that extend an unknown
+      // base is too limiting, as it doesn't allow assigning object literal to those interfaces.
+      // So instead we detect when an interface extends a base and skip emitting the extra signature
+      // in the case of unknown base.
+      // For unknown reasons instanceType.isInterface() return false, so we turn off the emit for
+      // all partial input compilations.
       if (iteratorIterableType != null && instanceType.isSubtype(iteratorIterableType)) {
         implemented = iteratorIterableType;
         returnType = "IterableIterator";
-      } else if (iterableType != null && instanceType.isSubtype(iterableType)) {
+      } else if (iterableType != null
+          && instanceType.isSubtype(iterableType)
+          && !opts.partialInput) {
         implemented = iterableType;
         returnType = "Iterator";
       } else {
