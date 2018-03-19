@@ -1016,7 +1016,14 @@ class DeclarationGenerator {
             visitKnownTypeValueAlias(propName, aliasMap.get(desiredSymbol));
             continue;
           }
-          if (oType.getPropertyType(propName).toMaybeFunctionType() == null) {
+          JSType propType = oType.getPropertyType(propName);
+          // TreeWalker.visitProperty doesn't handle class types, so handle them separately
+          if (isClassLike(propType)) {
+            treeWalker.visitClassOrInterface(propName, propType.toMaybeFunctionType());
+            continue;
+          }
+
+          if (propType.toMaybeFunctionType() == null) {
             emit("var");
           } else {
             emit("function");
@@ -2475,8 +2482,8 @@ class DeclarationGenerator {
       String qualifiedName = objType.getDisplayName() + "." + propName;
       if (provides.contains(qualifiedName)) {
         return;
-      } else if (isDefiningType(propertyType)) {
-        // enums and classes are emitted in a namespace later.
+      } else if (isDefiningType(propertyType) && !isNamespace) {
+        // if we're not traversing a namepace, inner enums and classes are emitted in a namespace later.
         return;
       }
       // The static methods from the function prototype are provided by lib.d.ts.
