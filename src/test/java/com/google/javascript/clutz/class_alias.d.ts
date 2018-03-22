@@ -1,6 +1,8 @@
 declare namespace ಠ_ಠ.clutz.alias {
   type A = ಠ_ಠ.clutz.original.A ;
   var A : typeof ಠ_ಠ.clutz.original.A ;
+  type A_Instance = ಠ_ಠ.clutz.original.A_Instance ;
+  var A_Instance : typeof ಠ_ಠ.clutz.original.A_Instance ;
 }
 declare module 'goog:alias.A' {
   import alias = ಠ_ಠ.clutz.alias.A;

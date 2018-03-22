@@ -1,6 +1,8 @@
 declare namespace ಠ_ಠ.clutz.declare.legacy {
   type namespace = ಠ_ಠ.clutz.module$contents$declare$legacy$namespace_Class ;
   var namespace : typeof ಠ_ಠ.clutz.module$contents$declare$legacy$namespace_Class ;
+  type namespace_Instance = ಠ_ಠ.clutz.module$contents$declare$legacy$namespace_Class_Instance ;
+  var namespace_Instance : typeof ಠ_ಠ.clutz.module$contents$declare$legacy$namespace_Class_Instance ;
 }
 declare module 'goog:declare.legacy.namespace' {
   import alias = ಠ_ಠ.clutz.declare.legacy.namespace;
@@ -16,4 +18,6 @@ declare namespace ಠ_ಠ.clutz {
 declare namespace ಠ_ಠ.clutz {
   type module$exports$declare$legacy$namespace = ಠ_ಠ.clutz.module$contents$declare$legacy$namespace_Class ;
   var module$exports$declare$legacy$namespace : typeof ಠ_ಠ.clutz.module$contents$declare$legacy$namespace_Class ;
+  type module$exports$declare$legacy$namespace_Instance = ಠ_ಠ.clutz.module$contents$declare$legacy$namespace_Class_Instance ;
+  var module$exports$declare$legacy$namespace_Instance : typeof ಠ_ಠ.clutz.module$contents$declare$legacy$namespace_Class_Instance ;
 }
