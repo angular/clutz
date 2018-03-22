@@ -1,6 +1,8 @@
 declare namespace ಠ_ಠ.clutz.module$exports$default$object$exporter {
   type BaseClass = ಠ_ಠ.clutz.module$contents$default$object$exporter_BaseClass ;
   var BaseClass : typeof ಠ_ಠ.clutz.module$contents$default$object$exporter_BaseClass ;
+  type BaseClass_Instance = ಠ_ಠ.clutz.module$contents$default$object$exporter_BaseClass_Instance ;
+  var BaseClass_Instance : typeof ಠ_ಠ.clutz.module$contents$default$object$exporter_BaseClass_Instance ;
 }
 declare module 'goog:default.object.exporter' {
   import alias = ಠ_ಠ.clutz.module$exports$default$object$exporter;

@@ -714,9 +714,12 @@ class DeclarationGenerator {
           googModuleStyleName = e.getKey();
         }
         emitNamespaceBegin(namespace);
-        // TODO(lucassloan): not technically correct, since this emits an alias as if it's a class
-        // with a type and value. Change to emit the alias only for type or value as necessary.
-        visitKnownTypeValueAlias(googModuleStyleName, e.getValue());
+        TreeWalker treeWalker =
+            new TreeWalker(compiler.getTypeRegistry(), new HashSet<>(), false, false);
+        JSType type = compiler.getTopScope().getOwnSlot(e.getValue()).getType();
+        if (type != null && isDefiningType(type)) {
+          treeWalker.visitTypeValueAlias(googModuleStyleName, type.toMaybeObjectType());
+        }
         emitNamespaceEnd();
       }
     }
@@ -1488,6 +1491,25 @@ class DeclarationGenerator {
         emit(";");
         emitBreak();
       }
+      if (!otype.isInterface() && otype.isFunctionType()) {
+        // otype is a class, so also emit the alias for the instance side of the class
+        String instanceEmitName = emitName + INSTANCE_CLASS_SUFFIX;
+        String instanceUnqualifiedName = unqualifiedName + INSTANCE_CLASS_SUFFIX;
+        emit("type");
+        emit(instanceUnqualifiedName);
+        visitTemplateTypes(otype);
+        emit("=");
+        emit(instanceEmitName);
+        visitTemplateTypes(otype, Collections.emptyList(), false);
+        emit(";");
+        emitBreak();
+        emit("var " + instanceUnqualifiedName);
+        emit(":");
+        emit("typeof");
+        emit(instanceEmitName);
+        emit(";");
+        emitBreak();
+      }
       typesUsed.add(otype.getDisplayName());
     }
 
@@ -1778,8 +1800,13 @@ class DeclarationGenerator {
      * are assuming forward declarations or not) we either emit the defaultEmit string passed, or
      * the literal string that was in the original code. Special care is taken for templatized
      * types.
+     *
+     * <p>emitInstanceForObject controls whether to append _Instance to the end of the name. Used
+     * when referring to a class, which are split into an instance half and a static half to model
+     * closure's inheritance.
      */
-    private void emitNoResolvedTypeOrDefault(NoType type, String defaultEmit) {
+    private void emitNoResolvedTypeOrDefault(
+        NoType type, String defaultEmit, boolean emitInstanceForObject) {
       if (!opts.partialInput || !type.isNoResolvedType()) {
         emit(defaultEmit);
         return;
@@ -1794,14 +1821,15 @@ class DeclarationGenerator {
         return;
       }
 
-      emitNoResolvedTypeAsumingForwardDeclare(type);
+      emitNoResolvedTypeAsumingForwardDeclare(type, emitInstanceForObject);
     }
 
     /**
      * Emits a type that is not resolved by closure, as the literal string that was in the original
      * code. Special care is taken for templatized types.
      */
-    private void emitNoResolvedTypeAsumingForwardDeclare(ObjectType type) {
+    private void emitNoResolvedTypeAsumingForwardDeclare(
+        ObjectType type, boolean emitInstanceForObject) {
       String displayName = maybeRewriteImportedName(type.getDisplayName());
       String maybeGlobalName = maybeRenameGlobalType(displayName);
       if (maybeGlobalName == null) {
@@ -1809,6 +1837,9 @@ class DeclarationGenerator {
         displayName = Constants.INTERNAL_NAMESPACE + "." + displayName;
       } else {
         displayName = maybeGlobalName;
+      }
+      if (emitInstanceForObject) {
+        displayName = displayName + INSTANCE_CLASS_SUFFIX;
       }
       emit(displayName);
       List<JSType> templateTypes = type.getTemplateTypes();
@@ -1931,7 +1962,7 @@ class DeclarationGenerator {
               // compilation
               // unit - A ends up as NoType, while B ends up as NamedType.
               if (opts.partialInput && refType.isUnknownType()) {
-                emitNoResolvedTypeAsumingForwardDeclare(type);
+                emitNoResolvedTypeAsumingForwardDeclare(type, false);
                 return null;
               }
               visitType(refType);
@@ -1951,7 +1982,7 @@ class DeclarationGenerator {
 
             @Override
             public Void caseNoType(NoType type) {
-              emitNoResolvedTypeOrDefault(type, "any");
+              emitNoResolvedTypeOrDefault(type, "any", false);
               return null;
             }
 
@@ -3074,7 +3105,7 @@ class DeclarationGenerator {
 
       @Override
       public Void caseNoType(NoType type) {
-        emitNoResolvedTypeOrDefault(type, "ClutzMissingBase");
+        emitNoResolvedTypeOrDefault(type, "ClutzMissingBase", emitInstanceForObject);
         return null;
       }
 

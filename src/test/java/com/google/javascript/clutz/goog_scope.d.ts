@@ -1,6 +1,8 @@
 declare namespace ಠ_ಠ.clutz.foo {
   type Bar = ಠ_ಠ.clutz.$jscomp.scope.Bar ;
   var Bar : typeof ಠ_ಠ.clutz.$jscomp.scope.Bar ;
+  type Bar_Instance = ಠ_ಠ.clutz.$jscomp.scope.Bar_Instance ;
+  var Bar_Instance : typeof ಠ_ಠ.clutz.$jscomp.scope.Bar_Instance ;
 }
 declare module 'goog:foo.Bar' {
   import alias = ಠ_ಠ.clutz.foo.Bar;

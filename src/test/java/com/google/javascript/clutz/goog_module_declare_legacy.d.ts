@@ -1,6 +1,8 @@
 declare namespace ಠ_ಠ.clutz.module.Foo {
   type Legacy = ಠ_ಠ.clutz.module$contents$module$Foo$Legacy_A ;
   var Legacy : typeof ಠ_ಠ.clutz.module$contents$module$Foo$Legacy_A ;
+  type Legacy_Instance = ಠ_ಠ.clutz.module$contents$module$Foo$Legacy_A_Instance ;
+  var Legacy_Instance : typeof ಠ_ಠ.clutz.module$contents$module$Foo$Legacy_A_Instance ;
 }
 declare module 'goog:module.Foo.Legacy' {
   import alias = ಠ_ಠ.clutz.module.Foo.Legacy;
