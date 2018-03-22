@@ -8,7 +8,7 @@ declare module 'goog:nested.bar.HahaEnum' {
 }
 declare namespace ಠ_ಠ.clutz.nested.baz {
   enum Enum {
-    A ,
+    A = 1 ,
   }
 }
 declare module 'goog:nested.baz.Enum' {

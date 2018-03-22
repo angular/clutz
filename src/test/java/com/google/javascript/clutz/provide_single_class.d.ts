@@ -18,8 +18,8 @@ declare namespace ಠ_ಠ.clutz.foo.bar.Baz {
     private noStructuralTyping_: any;
   }
   enum NestedEnum {
-    A ,
-    B ,
+    A = 1 ,
+    B = 2 ,
   }
 }
 declare module 'goog:foo.bar.Baz' {

@@ -1750,8 +1750,11 @@ class DeclarationGenerator {
         emit("{");
         emitBreak();
         indent();
+        int i = 0;
         for (String elem : sorted(type.getElements())) {
           emit(elem);
+          emit("=");
+          emit(String.valueOf(++i));
           emit(",");
           emitBreak();
         }

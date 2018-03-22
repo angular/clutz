@@ -11,8 +11,8 @@ declare module 'goog:some.ObjectValuedEnum' {
 }
 declare namespace ಠ_ಠ.clutz.some {
   enum SomeEnum {
-    A ,
-    B ,
+    A = 1 ,
+    B = 2 ,
   }
 }
 declare module 'goog:some.SomeEnum' {
