@@ -1719,8 +1719,7 @@ class DeclarationGenerator {
       emitBreak();
     }
 
-    private void visitEnumType(
-        String symbolName, String qualifiedName, EnumType type, Node node) {
+    private void visitEnumType(String symbolName, String qualifiedName, EnumType type, Node node) {
       // Enums are top level vars, but also declare a corresponding type:
       // <pre>
       // /** @enum {ValueType} */ var MyEnum = {A: ..., B: ...};
@@ -1758,9 +1757,10 @@ class DeclarationGenerator {
         emit("{");
         emitBreak();
         indent();
-        Map<String, String> elements = Streams.stream(node.getNext().children())
-            .collect(Collectors.toMap(
-              Node::getString, n->String.valueOf(n.getFirstChild().getDouble())));
+        Map<String, String> elements =
+            Streams.stream(node.getNext().children()).collect(
+                Collectors.toMap(
+                    Node::getString, n -> String.valueOf(n.getFirstChild().getDouble())));
         for (String elem : sorted(elements.keySet())) {
           emit(elem);
           emit("=");
@@ -2905,13 +2905,11 @@ class DeclarationGenerator {
           }
         }
       } else {
-        Map<String, Node> nodes = childListMap.get(innerNamespace)
-            .stream()
+        Map<String, Node> nodes = childListMap.get(innerNamespace).stream()
             .collect(Collectors.toMap(TypedVar::getName, TypedVar::getNode));
         for (String propName : getSortedPropertyNamesToEmit(type)) {
-          innerProps.put(
-            new NamedTypePair(type.getPropertyType(propName), propName),
-            nodes.get(innerNamespace+"."+propName));
+          innerProps.put(new NamedTypePair(type.getPropertyType(propName), propName),
+              nodes.get(innerNamespace + "." + propName));
         }
       }
 
