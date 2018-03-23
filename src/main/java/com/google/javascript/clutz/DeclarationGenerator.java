@@ -714,14 +714,17 @@ class DeclarationGenerator {
           namespace = "";
           googModuleStyleName = e.getKey();
         }
-        emitNamespaceBegin(namespace);
         TreeWalker treeWalker =
             new TreeWalker(compiler.getTypeRegistry(), new HashSet<>(), false, false);
-        JSType type = compiler.getTopScope().getOwnSlot(e.getValue()).getType();
-        if (type != null && isDefiningType(type)) {
-          treeWalker.visitTypeValueAlias(googModuleStyleName, type.toMaybeObjectType());
+        TypedVar symbol = compiler.getTopScope().getOwnSlot(e.getValue());
+        if (symbol != null) {
+          JSType type = symbol.getType();
+          if (type != null && isDefiningType(type)) {
+            emitNamespaceBegin(namespace);
+            treeWalker.visitTypeValueAlias(googModuleStyleName, type.toMaybeObjectType());
+            emitNamespaceEnd();
+          }
         }
-        emitNamespaceEnd();
       }
     }
   }
