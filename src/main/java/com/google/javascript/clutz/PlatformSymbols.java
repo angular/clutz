@@ -63,7 +63,15 @@ public class PlatformSymbols {
    * Adding a symbol to this list also suppresses the duplicate externs.
    */
   public static final ImmutableSet<String> GLOBAL_SYMBOL_ALIASES =
-      ImmutableSet.of("Element", "Error", "Event", "EventTarget", "Object", "Date");
+      ImmutableSet.of(
+          "Date",
+          "Element",
+          "Error",
+          "Event",
+          "EventTarget",
+          "Float32Array",
+          "Float64Array",
+          "Object");
 
   /**
    * Set of symbols that are defined in a platform externs.js that we don't need a matching
