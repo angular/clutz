@@ -66,8 +66,8 @@ public abstract class ImportBasedMapBuilder {
   }
 
   /**
-   * Matches either `const foo = goog.require()` or `const foo = goog.module.get()` depending on if
-   * statement is in a goog.module or a goog.scope.
+   * Matches either `const foo = goog.require()` or `const foo = goog.module.get()` or `const foo =
+   * goog.forwardDeclare()` depending on if statement is in a goog.module or a goog.scope.
    */
   protected static boolean isImportAssignment(Node statement) {
     if (!(statement.isConst() || statement.isVar() || statement.isLet())) {
@@ -79,7 +79,8 @@ public abstract class ImportBasedMapBuilder {
     return rightHandSide != null
         && rightHandSide.isCall()
         && (rightHandSide.getFirstChild().matchesQualifiedName("goog.require")
-            || rightHandSide.getFirstChild().matchesQualifiedName("goog.module.get"));
+            || rightHandSide.getFirstChild().matchesQualifiedName("goog.module.get")
+            || rightHandSide.getFirstChild().matchesQualifiedName("goog.forwardDeclare"));
   }
 
   /** Matches destructing from a variable ie `const {foo, bar: baz} = quux;` */
