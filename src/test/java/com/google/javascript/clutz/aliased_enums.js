@@ -3,7 +3,7 @@ goog.provide('nested.bar.HahaEnum');
 
 /** @enum */
 nested.baz.Enum = {
-  A: 1
+  A: 5
 };
 
 /** @enum */
