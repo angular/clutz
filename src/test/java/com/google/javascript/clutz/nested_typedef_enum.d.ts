@@ -7,7 +7,7 @@ declare module 'goog:nested_typedef_enum.Bar' {
 }
 declare namespace ಠ_ಠ.clutz.nested_typedef_enum.Bar {
   enum Baz {
-    A ,
+    A = 1.0 ,
   }
 }
 declare module 'goog:nested_typedef_enum.Bar.Baz' {
