@@ -1839,11 +1839,11 @@ class DeclarationGenerator {
       if (maybeGlobalName == null) {
         typesUsed.add(displayName);
         displayName = Constants.INTERNAL_NAMESPACE + "." + displayName;
+        if (emitInstanceForObject) {
+          displayName = displayName + INSTANCE_CLASS_SUFFIX;
+        }
       } else {
         displayName = maybeGlobalName;
-      }
-      if (emitInstanceForObject) {
-        displayName = displayName + INSTANCE_CLASS_SUFFIX;
       }
       emit(displayName);
       List<JSType> templateTypes = type.getTemplateTypes();
