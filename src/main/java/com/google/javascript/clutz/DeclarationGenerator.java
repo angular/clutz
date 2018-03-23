@@ -1439,7 +1439,8 @@ class DeclarationGenerator {
           visitTypeValueAlias(symbol.getName(), (EnumElementType) registryType);
           return;
         }
-        // Clutz doesn't have good type info - check if the symbol is a reexport by checking aliasMap
+        // Clutz doesn't have good type info - check if the symbol is a reexport by checking
+        // aliasMap
         // otherwise assume it's a var declaration
         if (aliasMap.containsKey(emitName)) {
           visitKnownTypeValueAlias(symbol.getName(), aliasMap.get(emitName));
@@ -1758,9 +1759,10 @@ class DeclarationGenerator {
         emitBreak();
         indent();
         Map<String, String> elements =
-            Streams.stream(node.getNext().children()).collect(
-                Collectors.toMap(
-                    Node::getString, n -> String.valueOf(n.getFirstChild().getDouble())));
+            Streams.stream(node.getNext().children())
+                .collect(
+                    Collectors.toMap(
+                        Node::getString, n -> String.valueOf(n.getFirstChild().getDouble())));
         for (String elem : sorted(elements.keySet())) {
           emit(elem);
           emit("=");
@@ -2535,7 +2537,8 @@ class DeclarationGenerator {
       if (provides.contains(qualifiedName)) {
         return;
       } else if (isDefiningType(propertyType) && !isNamespace) {
-        // if we're not traversing a namepace, inner enums and classes are emitted in a namespace later.
+        // if we're not traversing a namepace, inner enums and classes are emitted in a namespace
+        // later.
         return;
       }
       // The static methods from the function prototype are provided by lib.d.ts.
@@ -2720,8 +2723,10 @@ class DeclarationGenerator {
 
       String templateVarName = templateTypeNames.next();
 
-      // TODO(lucassloan): goog.Promise has bad types (caused by an inconsistent number of generic type
-      // params) that are coerced to any, so explicitly emit any and fix when the callers have been fixed.
+      // TODO(lucassloan): goog.Promise has bad types (caused by an inconsistent number of generic
+      // type
+      // params) that are coerced to any, so explicitly emit any and fix when the callers have been
+      // fixed.
       String classTemplatizedType =
           className.equals("ಠ_ಠ.clutz.goog.Promise") ? " any" : className + " < RESULT >";
       if (propName.equals("then")) {
@@ -2759,8 +2764,10 @@ class DeclarationGenerator {
     private String getPromiseMethod(String propName, String className) {
       switch (propName) {
         case "resolve":
-          // TODO(lucassloan): goog.Promise has bad types that are coerced to any, so explicitly emit any
-          // and change to the proper type `(value: googPromise< T , any > | T): googPromise<T, any>`
+          // TODO(lucassloan): goog.Promise has bad types that are coerced to any, so explicitly
+          // emit any
+          // and change to the proper type `(value: googPromise< T , any > | T): googPromise<T,
+          // any>`
           // when the callers have been fixed.
           if (className.equals("ಠ_ಠ.clutz.goog.Promise")) {
             return "resolve < T >(value: " + className + " < T , any > | T): any;";
@@ -2905,10 +2912,14 @@ class DeclarationGenerator {
           }
         }
       } else {
-        Map<String, Node> nodes = childListMap.get(innerNamespace).stream()
-            .collect(Collectors.toMap(TypedVar::getName, TypedVar::getNode));
+        Map<String, Node> nodes =
+            childListMap
+                .get(innerNamespace)
+                .stream()
+                .collect(Collectors.toMap(TypedVar::getName, TypedVar::getNode));
         for (String propName : getSortedPropertyNamesToEmit(type)) {
-          innerProps.put(new NamedTypePair(type.getPropertyType(propName), propName),
+          innerProps.put(
+              new NamedTypePair(type.getPropertyType(propName), propName),
               nodes.get(innerNamespace + "." + propName));
         }
       }
