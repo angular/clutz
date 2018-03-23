@@ -663,9 +663,10 @@ class DeclarationGenerator {
           continue;
         }
 
-        // skip extern symbols (they have a separate pass).
+        // Skip extern symbols (they have a separate pass) and skip built-ins.
+        // Built-ins can be indentified by having null as input file.
         CompilerInput symbolInput = this.compiler.getInput(new InputId(symbol.getInputName()));
-        if (symbolInput != null && symbolInput.isExtern()) continue;
+        if (symbolInput == null || symbolInput.isExtern()) continue;
 
         if (shouldSkipVar(symbol)) {
           continue;
