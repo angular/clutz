@@ -1,7 +1,7 @@
 goog.provide('foo.bar.Baz');
 
-// NestedClass and NestedEnum are not provided because this is against JS closure's
-// style guide.
+// NestedClass and NestedEnum are not provided because this is against JS
+// closure's style guide.
 // https://google.github.io/styleguide/javascriptguide.xml?showone=Providing_Dependencies_With_goog.provide#Providing_Dependencies_With_goog.provide
 
 /** @constructor */
@@ -54,6 +54,6 @@ foo.bar.Baz.NestedClass = function() {};
 
 /** @enum */
 foo.bar.Baz.NestedEnum = {
-  A: 1,
+  XD: 1,
   B: 2
 };

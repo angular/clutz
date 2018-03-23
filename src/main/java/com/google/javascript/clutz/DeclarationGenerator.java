@@ -23,6 +23,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
+import com.google.common.collect.Streams;
 import com.google.common.io.Files;
 import com.google.javascript.jscomp.AbstractCommandLineRunner;
 import com.google.javascript.jscomp.CompilerInput;
@@ -67,8 +68,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.kohsuke.args4j.CmdLineException;
 
@@ -1378,7 +1381,7 @@ class DeclarationGenerator {
       } else {
         maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
         if (type.isEnumType()) {
-          visitEnumType(emitName, emitName, (EnumType) type);
+          visitEnumType(emitName, emitName, (EnumType) type, symbol.getNode());
           return;
         }
         if (isTypedef(type)) {
@@ -1672,7 +1675,8 @@ class DeclarationGenerator {
       emitBreak();
     }
 
-    private void visitEnumType(String symbolName, String qualifiedName, EnumType type) {
+    private void visitEnumType(
+        String symbolName, String qualifiedName, EnumType type, Node node) {
       // Enums are top level vars, but also declare a corresponding type:
       // <pre>
       // /** @enum {ValueType} */ var MyEnum = {A: ..., B: ...};
@@ -1710,8 +1714,13 @@ class DeclarationGenerator {
         emit("{");
         emitBreak();
         indent();
-        for (String elem : sorted(type.getElements())) {
+        Map<String, String> elements = Streams.stream(node.getNext().children())
+            .collect(Collectors.toMap(
+              Node::getString, n->String.valueOf(n.getFirstChild().getDouble())));
+        for (String elem : sorted(elements.keySet())) {
           emit(elem);
+          emit("=");
+          emit(elements.get(elem));
           emit(",");
           emitBreak();
         }
@@ -2816,25 +2825,31 @@ class DeclarationGenerator {
       // TODO(martinprobst): This curiously duplicates visitProperty above. Investigate the code
       // smell and reduce duplication (or figure out & document why it's needed).
 
-      Set<NamedTypePair> innerProps = new TreeSet<>();
+      Map<NamedTypePair, Node> innerProps = new TreeMap<>();
       // No type means the symbol is a typedef.
       if (type.isNoType() && childListMap.containsKey(innerNamespace)) {
         // For typedefs, the inner symbols are not accessible as properties.
         // We iterate over all symbols to find possible inner symbols.
         for (TypedVar symbol : childListMap.get(innerNamespace)) {
           if (getNamespace(symbol.getName()).equals(innerNamespace)) {
-            innerProps.add(
-                new NamedTypePair(symbol.getType(), getUnqualifiedName(symbol.getName())));
+            innerProps.put(
+                new NamedTypePair(symbol.getType(), getUnqualifiedName(symbol.getName())),
+                symbol.getNode());
           }
         }
       } else {
+        Map<String, Node> nodes = childListMap.get(innerNamespace)
+            .stream()
+            .collect(Collectors.toMap(TypedVar::getName, TypedVar::getNode));
         for (String propName : getSortedPropertyNamesToEmit(type)) {
-          innerProps.add(new NamedTypePair(type.getPropertyType(propName), propName));
+          innerProps.put(
+            new NamedTypePair(type.getPropertyType(propName), propName),
+            nodes.get(innerNamespace+"."+propName));
         }
       }
 
       boolean foundNamespaceMembers = false;
-      for (NamedTypePair namedType : innerProps) {
+      for (NamedTypePair namedType : innerProps.keySet()) {
         String propName = namedType.name;
         JSType pType = namedType.type;
         String qualifiedName = innerNamespace + '.' + propName;
@@ -2844,7 +2859,7 @@ class DeclarationGenerator {
             emitNamespaceBegin(innerNamespace);
             foundNamespaceMembers = true;
           }
-          visitEnumType(propName, qualifiedName, (EnumType) pType);
+          visitEnumType(propName, qualifiedName, (EnumType) pType, innerProps.get(namedType));
         } else if (isClassLike(pType)) {
           if (!foundNamespaceMembers) {
             emitNamespaceBegin(innerNamespace);
