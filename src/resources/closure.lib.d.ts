@@ -2,6 +2,8 @@
 // All clutz namespaces are below ಠ_ಠ.clutz, thus
 // this acts as global.
 declare namespace ಠ_ಠ.clutz {
+  type GlobalDate = Date;
+  var GlobalDate: typeof Date;
   type GlobalElement = Element;
   var GlobalElement: Element;
   type GlobalError = Error;
@@ -10,10 +12,12 @@ declare namespace ಠ_ಠ.clutz {
   var GlobalEvent: typeof Event;
   type GlobalEventTarget = EventTarget;
   var GlobalEventTarget: typeof EventTarget;
-  var GlobalObject: typeof Object;
   type GlobalObject = Object;
-  var GlobalDate: typeof Date;
-  type GlobalDate = Date;
+  var GlobalObject: typeof Object;
+  type GlobalFloat32Array = Float32Array;
+  var GlobalFloat32Array: typeof Float32Array;
+  type GlobalFloat64Array = Float64Array;
+  var GlobalFloat64Array: typeof Float64Array;
 
   /** Represents the type returned when goog.require-ing an unknown symbol */
   type ClosureSymbolNotGoogProvided = void;
