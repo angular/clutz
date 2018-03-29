@@ -2899,6 +2899,8 @@ class DeclarationGenerator {
       // TODO(martinprobst): This curiously duplicates visitProperty above. Investigate the code
       // smell and reduce duplication (or figure out & document why it's needed).
 
+      // We collect the AST Node so we can extract the enum value when generating the declaration
+      // file, this is only useful for numeric enums and other enum types don't use the node object.
       Map<NamedTypePair, Node> innerProps = new TreeMap<>();
       // No type means the symbol is a typedef.
       if (type.isNoType() && childListMap.containsKey(innerNamespace)) {
