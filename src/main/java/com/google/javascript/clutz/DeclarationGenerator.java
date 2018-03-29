@@ -663,9 +663,10 @@ class DeclarationGenerator {
           continue;
         }
 
-        // skip extern symbols (they have a separate pass).
+        // Skip extern symbols (they have a separate pass) and skip built-ins.
+        // Built-ins can be indentified by having null as input file.
         CompilerInput symbolInput = this.compiler.getInput(new InputId(symbol.getInputName()));
-        if (symbolInput != null && symbolInput.isExtern()) continue;
+        if (symbolInput == null || symbolInput.isExtern()) continue;
 
         if (shouldSkipVar(symbol)) {
           continue;
@@ -713,14 +714,17 @@ class DeclarationGenerator {
           namespace = "";
           googModuleStyleName = e.getKey();
         }
-        emitNamespaceBegin(namespace);
         TreeWalker treeWalker =
             new TreeWalker(compiler.getTypeRegistry(), new HashSet<>(), false, false);
-        JSType type = compiler.getTopScope().getOwnSlot(e.getValue()).getType();
-        if (type != null && isDefiningType(type)) {
-          treeWalker.visitTypeValueAlias(googModuleStyleName, type.toMaybeObjectType());
+        TypedVar symbol = compiler.getTopScope().getOwnSlot(e.getValue());
+        if (symbol != null) {
+          JSType type = symbol.getType();
+          if (type != null && isDefiningType(type)) {
+            emitNamespaceBegin(namespace);
+            treeWalker.visitTypeValueAlias(googModuleStyleName, type.toMaybeObjectType());
+            emitNamespaceEnd();
+          }
         }
-        emitNamespaceEnd();
       }
     }
   }
@@ -1835,11 +1839,11 @@ class DeclarationGenerator {
       if (maybeGlobalName == null) {
         typesUsed.add(displayName);
         displayName = Constants.INTERNAL_NAMESPACE + "." + displayName;
+        if (emitInstanceForObject) {
+          displayName = displayName + INSTANCE_CLASS_SUFFIX;
+        }
       } else {
         displayName = maybeGlobalName;
-      }
-      if (emitInstanceForObject) {
-        displayName = displayName + INSTANCE_CLASS_SUFFIX;
       }
       emit(displayName);
       List<JSType> templateTypes = type.getTemplateTypes();
