@@ -54,6 +54,8 @@ foo.bar.Baz.NestedClass = function() {};
 
 /** @enum */
 foo.bar.Baz.NestedEnum = {
-  XD: 1,
-  B: 2
+  // XD goes before B to test for enum value sorting. B should go first in the
+  // declarations file.
+  XD: 2,
+  B: 1
 };

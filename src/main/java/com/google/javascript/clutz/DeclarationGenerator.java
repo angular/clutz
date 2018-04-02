@@ -1714,15 +1714,16 @@ class DeclarationGenerator {
         emit("{");
         emitBreak();
         indent();
-        Map<String, String> elements =
+        Map<String, Node> elements =
             Streams.stream(node.getNext().children())
-                .collect(
-                    Collectors.toMap(
-                        Node::getString, n -> String.valueOf(n.getFirstChild().getDouble())));
+                .collect(Collectors.toMap(Node::getString, Node::getFirstChild));
         for (String elem : sorted(elements.keySet())) {
           emit(elem);
-          emit("=");
-          emit(elements.get(elem));
+          @Nullable Node n = elements.get(elem);
+          if (n != null && n.isNumber()) {
+            emit("=");
+            emit(String.valueOf(n.getDouble()));
+          }
           emit(",");
           emitBreak();
         }
