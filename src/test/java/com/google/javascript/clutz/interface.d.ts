@@ -18,8 +18,8 @@ declare module 'goog:interface_exp' {
 }
 declare namespace ಠ_ಠ.clutz.interface_exp {
   enum SomeEnum {
-    A ,
-    B ,
+    A = 1.0 ,
+    B = 2.0 ,
   }
 }
 declare module 'goog:interface_exp.SomeEnum' {
