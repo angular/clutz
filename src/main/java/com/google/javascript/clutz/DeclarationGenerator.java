@@ -2852,6 +2852,7 @@ class DeclarationGenerator {
             childListMap
                 .get(innerNamespace)
                 .stream()
+                .filter(symbol -> symbol.getName() != null && symbol.getNode() != null)
                 .collect(Collectors.toMap(TypedVar::getName, TypedVar::getNode));
         for (String propName : getSortedPropertyNamesToEmit(type)) {
           innerProps.put(
