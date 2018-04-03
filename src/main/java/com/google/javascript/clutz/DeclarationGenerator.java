@@ -1376,7 +1376,7 @@ class DeclarationGenerator {
 
     private void walk(TypedVar symbol, String emitName) {
       JSType type = symbol.getType();
-      if (type.isFunctionType() && !isNewableFunctionType((FunctionType) type)) {
+      if (type.isFunctionType() && !isNewableFunctionType(type.toMaybeFunctionType())) {
         FunctionType ftype = (FunctionType) type;
 
         if (isOrdinaryFunction(ftype)) {
