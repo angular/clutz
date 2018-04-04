@@ -1690,6 +1690,13 @@ class DeclarationGenerator {
 
       // @enums can be aliased by assignment. Emit a type alias + value alias for the situation.
       String elementsTypeName = type.getElementsType().getReferenceName();
+      if (qualifiedName.equals(elementsTypeName)) {
+        // @enums can also be aliased to external values even if they have the same type.
+        if (node != null && node.getNext() != null && node.getNext().isGetProp()) {
+          elementsTypeName = node.getNext().getQualifiedName();
+        }
+      }
+
       if (!qualifiedName.equals(elementsTypeName)) {
         emitComment(symbolName + " aliases enum " + elementsTypeName);
         emit("type");
@@ -1714,9 +1721,14 @@ class DeclarationGenerator {
         emit("{");
         emitBreak();
         indent();
+
+        // We get all enum properties excluding those that are not convertible to string to prevent
+        // issues with enums that get assigned another enum.
         Map<String, Node> elements =
             Streams.stream(node.getNext().children())
+                .filter(n -> n.getFirstChild() != null)
                 .collect(Collectors.toMap(Node::getString, Node::getFirstChild));
+
         for (String elem : sorted(elements.keySet())) {
           emit(elem);
           @Nullable Node n = elements.get(elem);
