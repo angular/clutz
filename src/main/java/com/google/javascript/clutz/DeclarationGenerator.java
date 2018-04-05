@@ -72,6 +72,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.kohsuke.args4j.CmdLineException;
 
@@ -1722,12 +1723,16 @@ class DeclarationGenerator {
         emitBreak();
         indent();
 
-        // We get all enum properties excluding those that are not convertible to string to prevent
-        // issues with enums that get assigned another enum.
+        // The current node points to the enum type declaration, this means that the next node will
+        // be the OBJECTLIT containing all enum key and value pairs. However, globally declared
+        // enums that are indirectly provided will instead be pointing to the parent of the
+        // OBJECTLIT parent.
+        Stream<Node> elementStream =
+            node.getNext() != null
+                ? Streams.stream(node.getNext().children())
+                : Streams.stream(node.getFirstChild().children());
         Map<String, Node> elements =
-            Streams.stream(node.getNext().children())
-                .filter(n -> n.getFirstChild() != null)
-                .collect(Collectors.toMap(Node::getString, Node::getFirstChild));
+            elementStream.collect(Collectors.toMap(Node::getString, Node::getFirstChild));
 
         for (String elem : sorted(elements.keySet())) {
           emit(elem);
