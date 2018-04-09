@@ -96,7 +96,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
           && expected.equals(expectedClean)) {
         Files.write(stripped, golden, Charsets.UTF_8);
       } else {
-        failComparing("compilation result doesn't match", expected, stripped);
+        check().that(stripped).isEqualTo(expected);
       }
     }
   }
