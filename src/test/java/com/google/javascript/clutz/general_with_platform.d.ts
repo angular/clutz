@@ -264,6 +264,28 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  /**
+   * The TransformStreamDefaultController class has methods that allow
+   * manipulation of the associated ReadableStream and WritableStream.
+   *
+   * This class cannot be directly constructed and is instead passed by the
+   * TransformStream to the methods of its transformer.
+   */
+  interface TransformStreamDefaultController {
+    desiredSize : number ;
+    enqueue (chunk : any ) : void ;
+    error (reason : any ) : void ;
+    terminate ( ) : void ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface TransformStreamTransformer {
+    flush ? : (a : TransformStreamDefaultController ) => PromiseLike < any > | undefined ;
+    start ? : (a : TransformStreamDefaultController ) => PromiseLike < any > | undefined ;
+    transform ? : (a : any , b : TransformStreamDefaultController ) => PromiseLike < any > | undefined ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   class WritableStream extends WritableStream_Instance {
   }
   class WritableStream_Instance {
