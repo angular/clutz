@@ -71,7 +71,7 @@ dependencies {
   compile 'com.google.guava:guava:20.0'
 
   testCompile 'junit:junit:4.11'
-  testCompile 'com.google.truth:truth:0.39'
+  testCompile 'com.google.truth:truth:0.40'
 }
 
 tasks.withType(Test) {
