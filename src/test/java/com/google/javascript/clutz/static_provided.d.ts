@@ -11,8 +11,8 @@ declare module 'goog:a.b.StaticHolder' {
 }
 declare namespace ಠ_ಠ.clutz.a.b.StaticHolder {
   enum AnEnum {
-    X ,
-    Y ,
+    X = 0.0 ,
+    Y = 1.0 ,
   }
 }
 declare module 'goog:a.b.StaticHolder.AnEnum' {

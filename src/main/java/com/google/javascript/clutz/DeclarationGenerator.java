@@ -23,6 +23,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
+import com.google.common.collect.Streams;
 import com.google.common.io.Files;
 import com.google.javascript.jscomp.AbstractCommandLineRunner;
 import com.google.javascript.jscomp.CompilerInput;
@@ -67,8 +68,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.kohsuke.args4j.CmdLineException;
 
@@ -1403,7 +1407,7 @@ class DeclarationGenerator {
       } else {
         maybeEmitJsDoc(symbol.getJSDocInfo(), /* ignoreParams */ false);
         if (type.isEnumType()) {
-          visitEnumType(emitName, emitName, (EnumType) type);
+          visitEnumType(emitName, emitName, (EnumType) type, symbol.getNode());
           return;
         }
         if (isTypedef(type)) {
@@ -1436,7 +1440,8 @@ class DeclarationGenerator {
           visitTypeValueAlias(symbol.getName(), (EnumElementType) registryType);
           return;
         }
-        // Clutz doesn't have good type info - check if the symbol is a reexport by checking aliasMap
+        // Clutz doesn't have good type info - check if the symbol is a reexport by checking
+        // aliasMap
         // otherwise assume it's a var declaration
         if (aliasMap.containsKey(emitName)) {
           visitKnownTypeValueAlias(symbol.getName(), aliasMap.get(emitName));
@@ -1716,7 +1721,7 @@ class DeclarationGenerator {
       emitBreak();
     }
 
-    private void visitEnumType(String symbolName, String qualifiedName, EnumType type) {
+    private void visitEnumType(String symbolName, String qualifiedName, EnumType type, Node node) {
       // Enums are top level vars, but also declare a corresponding type:
       // <pre>
       // /** @enum {ValueType} */ var MyEnum = {A: ..., B: ...};
@@ -1730,6 +1735,13 @@ class DeclarationGenerator {
 
       // @enums can be aliased by assignment. Emit a type alias + value alias for the situation.
       String elementsTypeName = type.getElementsType().getReferenceName();
+      if (qualifiedName.equals(elementsTypeName)) {
+        // @enums can also be aliased to external values even if they have the same type.
+        if (node != null && node.getNext() != null && node.getNext().isGetProp()) {
+          elementsTypeName = node.getNext().getQualifiedName();
+        }
+      }
+
       if (!qualifiedName.equals(elementsTypeName)) {
         emitComment(symbolName + " aliases enum " + elementsTypeName);
         emit("type");
@@ -1754,8 +1766,25 @@ class DeclarationGenerator {
         emit("{");
         emitBreak();
         indent();
-        for (String elem : sorted(type.getElements())) {
+
+        // The current node points to the enum type declaration, this means that the next node will
+        // be the OBJECTLIT containing all enum key and value pairs. However, globally declared
+        // enums that are indirectly provided will instead be pointing to the parent of the
+        // OBJECTLIT parent.
+        Stream<Node> elementStream =
+            node.getNext() != null
+                ? Streams.stream(node.getNext().children())
+                : Streams.stream(node.getFirstChild().children());
+        Map<String, Node> elements =
+            elementStream.collect(Collectors.toMap(Node::getString, Node::getFirstChild));
+
+        for (String elem : sorted(elements.keySet())) {
           emit(elem);
+          @Nullable Node n = elements.get(elem);
+          if (n != null && n.isNumber()) {
+            emit("=");
+            emit(String.valueOf(n.getDouble()));
+          }
           emit(",");
           emitBreak();
         }
@@ -2526,7 +2555,8 @@ class DeclarationGenerator {
       if (provides.contains(qualifiedName)) {
         return;
       } else if (isDefiningType(propertyType) && !isNamespace) {
-        // if we're not traversing a namepace, inner enums and classes are emitted in a namespace later.
+        // if we're not traversing a namepace, inner enums and classes are emitted in a namespace
+        // later.
         return;
       }
       // The static methods from the function prototype are provided by lib.d.ts.
@@ -2711,8 +2741,10 @@ class DeclarationGenerator {
 
       String templateVarName = templateTypeNames.next();
 
-      // TODO(lucassloan): goog.Promise has bad types (caused by an inconsistent number of generic type
-      // params) that are coerced to any, so explicitly emit any and fix when the callers have been fixed.
+      // TODO(lucassloan): goog.Promise has bad types (caused by an inconsistent number of generic
+      // type
+      // params) that are coerced to any, so explicitly emit any and fix when the callers have been
+      // fixed.
       String classTemplatizedType =
           className.equals("ಠ_ಠ.clutz.goog.Promise") ? " any" : className + " < RESULT >";
       if (propName.equals("then")) {
@@ -2750,8 +2782,10 @@ class DeclarationGenerator {
     private String getPromiseMethod(String propName, String className) {
       switch (propName) {
         case "resolve":
-          // TODO(lucassloan): goog.Promise has bad types that are coerced to any, so explicitly emit any
-          // and change to the proper type `(value: googPromise< T , any > | T): googPromise<T, any>`
+          // TODO(lucassloan): goog.Promise has bad types that are coerced to any, so explicitly
+          // emit any
+          // and change to the proper type `(value: googPromise< T , any > | T): googPromise<T,
+          // any>`
           // when the callers have been fixed.
           if (className.equals("ಠ_ಠ.clutz.goog.Promise")) {
             return "resolve < T >(value: " + className + " < T , any > | T): any;";
@@ -2883,25 +2917,36 @@ class DeclarationGenerator {
       // TODO(martinprobst): This curiously duplicates visitProperty above. Investigate the code
       // smell and reduce duplication (or figure out & document why it's needed).
 
-      Set<NamedTypePair> innerProps = new TreeSet<>();
+      // We collect the AST Node so we can extract the enum value when generating the declaration
+      // file, this is only useful for numeric enums and other enum types don't use the node object.
+      Map<NamedTypePair, Node> innerProps = new TreeMap<>();
       // No type means the symbol is a typedef.
       if (type.isNoType() && childListMap.containsKey(innerNamespace)) {
         // For typedefs, the inner symbols are not accessible as properties.
         // We iterate over all symbols to find possible inner symbols.
         for (TypedVar symbol : childListMap.get(innerNamespace)) {
           if (getNamespace(symbol.getName()).equals(innerNamespace)) {
-            innerProps.add(
-                new NamedTypePair(symbol.getType(), getUnqualifiedName(symbol.getName())));
+            innerProps.put(
+                new NamedTypePair(symbol.getType(), getUnqualifiedName(symbol.getName())),
+                symbol.getNode());
           }
         }
       } else {
+        Map<String, Node> nodes =
+            childListMap
+                .get(innerNamespace)
+                .stream()
+                .filter(symbol -> symbol.getName() != null && symbol.getNode() != null)
+                .collect(Collectors.toMap(TypedVar::getName, TypedVar::getNode));
         for (String propName : getSortedPropertyNamesToEmit(type)) {
-          innerProps.add(new NamedTypePair(type.getPropertyType(propName), propName));
+          innerProps.put(
+              new NamedTypePair(type.getPropertyType(propName), propName),
+              nodes.get(innerNamespace + "." + propName));
         }
       }
 
       boolean foundNamespaceMembers = false;
-      for (NamedTypePair namedType : innerProps) {
+      for (NamedTypePair namedType : innerProps.keySet()) {
         String propName = namedType.name;
         JSType pType = namedType.type;
         String qualifiedName = innerNamespace + '.' + propName;
@@ -2911,7 +2956,7 @@ class DeclarationGenerator {
             emitNamespaceBegin(innerNamespace);
             foundNamespaceMembers = true;
           }
-          visitEnumType(propName, qualifiedName, (EnumType) pType);
+          visitEnumType(propName, qualifiedName, (EnumType) pType, innerProps.get(namedType));
         } else if (isClassLike(pType)) {
           if (!foundNamespaceMembers) {
             emitNamespaceBegin(innerNamespace);
