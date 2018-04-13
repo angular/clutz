@@ -87,7 +87,7 @@ public final class CommentLinkingPass implements CompilerPass {
         // immutable list.
         ImmutableList<Comment> comments =
             ImmutableList.copyOf(compiler.getComments(script.getSourceFileName()));
-        NodeTraversal.traverseEs6(compiler, script, new LinkCommentsForOneFile(comments));
+        NodeTraversal.traverse(compiler, script, new LinkCommentsForOneFile(comments));
       }
     }
   }
