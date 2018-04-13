@@ -32,7 +32,7 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
 
   @Override
   public void process(Node externs, Node root) {
-    NodeTraversal.traverseEs6(compiler, root, this);
+    NodeTraversal.traverse(compiler, root, this);
   }
 
   @Override
