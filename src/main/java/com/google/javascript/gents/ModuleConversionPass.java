@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Converts Closure-style modules into TypeScript (ES6) modules (not namespaces). All module
@@ -59,6 +60,10 @@ public final class ModuleConversionPass implements CompilerPass {
 
   private final String alreadyConvertedPrefix;
 
+  // Used to store destructuring assignments like "const {a, b} = abModule;".
+  // Later on we use this map to rewrite full module imports.
+  private final Map<String, Node> destructuringAssignments = new HashMap<>();
+
   public Table<String, String, String> getTypeRewrite() {
     return typeRewrite;
   }
@@ -84,6 +89,7 @@ public final class ModuleConversionPass implements CompilerPass {
   @Override
   public void process(Node externs, Node root) {
     NodeTraversal.traverseEs6(compiler, root, new ModuleExportConverter());
+    NodeTraversal.traverseEs6(compiler, root, new DestructuringCollector());
     NodeTraversal.traverseEs6(compiler, root, new ModuleImportConverter());
     NodeTraversal.traverseEs6(compiler, root, new ModuleImportRewriter());
   }
@@ -202,6 +208,26 @@ public final class ModuleConversionPass implements CompilerPass {
         return;
       }
       exportsToNodes.put(ExportedSymbol.of(fileName, nodeName, nodeName), namedNode);
+    }
+  }
+  /**
+   * Collects all top-level destructuring assignments. If later we find that the right hand side is
+   * a local name of an import we will remove this destructuring assignment and fix the import specs
+   * to use the destructuring imports.
+   */
+  private class DestructuringCollector extends AbstractTopLevelCallback {
+    @Override
+    public void visit(NodeTraversal t, Node n, Node parent) {
+      @Nullable Node child = n.getFirstChild();
+      if (child != null && child.isDestructuringLhs()) {
+        Node potentialImportSpec = child.getFirstChild();
+        Node potentialModuleName = child.getSecondChild();
+        if (potentialImportSpec != null
+            && potentialModuleName != null
+            && potentialModuleName.isName()) {
+          destructuringAssignments.put(potentialModuleName.getQualifiedName(), potentialImportSpec);
+        }
+      }
     }
   }
 
@@ -598,7 +624,15 @@ public final class ModuleConversionPass implements CompilerPass {
     } else if (moduleImport.isFullModuleImport()) {
       // const A = goog.require('...'); -> import * as A from '...';
       // It is safe to assume there's one full local name because this is validated before.
-      importSpec = Node.newString(Token.IMPORT_STAR, moduleImport.fullLocalNames.get(0));
+      String fullLocalName = moduleImport.fullLocalNames.get(0);
+      importSpec = Node.newString(Token.IMPORT_STAR, fullLocalName);
+      if (destructuringAssignments.containsKey(fullLocalName)) {
+        importSpec = destructuringAssignments.get(fullLocalName);
+        Node destructuringLhs = importSpec.getParent();
+        Node assignmentNode = destructuringLhs.getParent();
+        importSpec.detach();
+        assignmentNode.getParent().removeChild(assignmentNode);
+      }
     }
     Node importNode =
         new Node(Token.IMPORT, IR.empty(), importSpec, Node.newString(referencedFile));
