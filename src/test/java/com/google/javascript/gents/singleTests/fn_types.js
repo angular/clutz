@@ -47,3 +47,9 @@ var restParamsTyped = function(n, br) {};
  * @type {function(number, boolean=, ...): number}
  */
 const complex = function(n, o, r) { return n; };
+
+/** @type {?function():string} */
+let f1 = null;
+
+/** @type {function()|string} */
+const f2 = 'string';

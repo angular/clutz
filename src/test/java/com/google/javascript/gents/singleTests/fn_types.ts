@@ -25,3 +25,5 @@ let restParamsTyped: (p1: number, ...p2: boolean[]) => any = function(n, br) {};
 function complex(n: number, o?: boolean, ...r: any[]): number {
   return n;
 }
+let f1: (() => string)|null = null;
+const f2: (() => any)|string = 'string';
