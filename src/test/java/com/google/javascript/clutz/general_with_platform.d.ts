@@ -164,6 +164,13 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  interface ShareData {
+    text ? : string ;
+    title ? : string ;
+    url ? : string ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   class StorageManager extends StorageManager_Instance {
   }
   class StorageManager_Instance {
