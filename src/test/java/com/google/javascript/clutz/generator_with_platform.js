@@ -11,7 +11,7 @@ function* typedG() {
 
 /**
  * @template T
- * @param {!Iterator<T>} iter
+ * @param {!Iterable<T>} iter
  * @return {!Generator<T>}
  */
 function* templateG(iter) {

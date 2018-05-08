@@ -5,6 +5,7 @@ import static com.google.javascript.clutz.DeclarationGeneratorTests.TS_SOURCES;
 import static org.junit.Assert.fail;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
@@ -113,6 +114,7 @@ public class DeclarationSyntaxTest {
   }
 
   public static void runChecked(final List<String> command) throws Exception {
+    System.out.println("Executing tsc command: " + Joiner.on(" ").join(command));
     final Process tsc = new ProcessBuilder().command(command).redirectErrorStream(true).start();
     if (!tsc.waitFor(5, TimeUnit.SECONDS)) {
       tsc.destroyForcibly();

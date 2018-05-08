@@ -86,8 +86,8 @@ public final class TypeAnnotationPass implements CompilerPass {
 
   @Override
   public void process(Node externs, Node root) {
-    NodeTraversal.traverseEs6(compiler, root, new TypeAnnotationConverter());
-    NodeTraversal.traverseEs6(compiler, root, new AccessModifierConverter());
+    NodeTraversal.traverse(compiler, root, new TypeAnnotationConverter());
+    NodeTraversal.traverse(compiler, root, new AccessModifierConverter());
     for (Node script : root.children()) {
       addTypeOnlyImports(script);
     }
