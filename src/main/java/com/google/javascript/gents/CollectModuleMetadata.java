@@ -63,7 +63,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
 
   @Override
   public void process(Node externs, Node root) {
-    NodeTraversal.traverseEs6(compiler, root, this);
+    NodeTraversal.traverse(compiler, root, this);
   }
 
   @Override

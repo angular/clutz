@@ -81,6 +81,7 @@ public class PlatformSymbols {
    */
   public static final ImmutableSet<String> CLOSURE_EXTERNS_NOT_USED_IN_TYPESCRIPT =
       ImmutableSet.of(
+          "RegExpResult", // Add this back would be nontrivial, because of [Symbol.iterator].
           "AlphaFilter",
           "AlphaImageLoaderFilter",
           "AppBannerPromptOutcome",
@@ -344,6 +345,12 @@ public class PlatformSymbols {
           "undefined",
           "unescape",
           "visualViewport",
+          "WebGL2RenderingContext",
+          "WebGLQuery",
+          "WebGLSampler",
+          "WebGLSync",
+          "WebGLTransformFeedback",
+          "WebGLVertexArrayObject",
           "webCrypto",
           "webkit",
           "webkitAudioContext",
