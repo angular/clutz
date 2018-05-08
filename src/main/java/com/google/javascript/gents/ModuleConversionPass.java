@@ -83,9 +83,9 @@ public final class ModuleConversionPass implements CompilerPass {
 
   @Override
   public void process(Node externs, Node root) {
-    NodeTraversal.traverseEs6(compiler, root, new ModuleExportConverter());
-    NodeTraversal.traverseEs6(compiler, root, new ModuleImportConverter());
-    NodeTraversal.traverseEs6(compiler, root, new ModuleImportRewriter());
+    NodeTraversal.traverse(compiler, root, new ModuleExportConverter());
+    NodeTraversal.traverse(compiler, root, new ModuleImportConverter());
+    NodeTraversal.traverse(compiler, root, new ModuleImportRewriter());
   }
 
   /**
