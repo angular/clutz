@@ -59,11 +59,11 @@ public final class TypeConversionPass implements CompilerPass {
       // We convert each file independently to avoid merging class methods from different files.
       if (child.isScript()) {
         this.types = new LinkedHashMap<>();
-        NodeTraversal.traverseEs6(compiler, child, new TypeConverter());
-        NodeTraversal.traverseEs6(compiler, child, new TypeMemberConverter());
-        NodeTraversal.traverseEs6(compiler, child, new FieldOnThisConverter());
-        NodeTraversal.traverseEs6(compiler, child, new InheritanceConverter());
-        NodeTraversal.traverseEs6(compiler, child, new EnumConverter());
+        NodeTraversal.traverse(compiler, child, new TypeConverter());
+        NodeTraversal.traverse(compiler, child, new TypeMemberConverter());
+        NodeTraversal.traverse(compiler, child, new FieldOnThisConverter());
+        NodeTraversal.traverse(compiler, child, new InheritanceConverter());
+        NodeTraversal.traverse(compiler, child, new EnumConverter());
       }
     }
     convertTypeAlias();
