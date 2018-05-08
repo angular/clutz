@@ -12,7 +12,7 @@ var oneParam = function(n) {};
  */
 function twoParams(b, s) {}
 
-/** @param {!Array<?>=} list */
+/** @param {!Array<?>} list */
 function withDefaultValue(list = []) {}
 
 // Function returns

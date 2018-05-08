@@ -308,12 +308,6 @@ public final class TypeConversionPass implements CompilerPass {
             if (!nodeAfterDefault.isName()) {
               continue;
             }
-            // It appears that adding ACCESS_MODIFIERs to Default params do not come out though
-            // the CodeGenerator, thus not safe to remove the declaration.
-            // TODO(rado): fix in emitting code and remove this line.
-            if (param.isDefaultValue()) {
-              continue;
-            }
             String paramName = nodeAfterDefault.getString();
             @Nullable
             JSTypeExpression paramType =

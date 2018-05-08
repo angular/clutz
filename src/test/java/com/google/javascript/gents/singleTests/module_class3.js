@@ -5,7 +5,7 @@ class Klass {
 
   /** 
    * @param {number} n
-   * @param {Array<?>=} list
+   * @param {Array<?>} list
    */
   constructor(n, list = []) {
     this.n = n;

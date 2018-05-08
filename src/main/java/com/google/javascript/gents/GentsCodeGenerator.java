@@ -113,6 +113,7 @@ public class GentsCodeGenerator extends CodeGenerator {
         add(n.getDeclaredTypeExpression());
         add(")");
         return true;
+      case DEFAULT_VALUE:
       case NAME:
         // Prepend access modifiers on constructor params
         if (n.getParent().isParamList()) {
