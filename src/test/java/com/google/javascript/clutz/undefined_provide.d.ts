@@ -1,12 +1,12 @@
 declare namespace ಠ_ಠ.clutz.undefined.nested {
-  var provide : GlobalObject ;
+  var provide : { } ;
 }
 declare module 'goog:undefined.nested.provide' {
   import alias = ಠ_ಠ.clutz.undefined.nested.provide;
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz {
-  var undefined_provide : GlobalObject ;
+  var undefined_provide : { } ;
 }
 declare module 'goog:undefined_provide' {
   import alias = ಠ_ಠ.clutz.undefined_provide;
