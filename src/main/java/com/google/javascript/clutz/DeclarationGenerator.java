@@ -56,6 +56,8 @@ import com.google.javascript.rhino.jstype.Visitor;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -72,6 +74,7 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.ZipFile;
 import javax.annotation.Nullable;
 import org.kohsuke.args4j.CmdLineException;
 
@@ -326,11 +329,19 @@ class DeclarationGenerator {
     List<SourceFile> sourceFiles = new ArrayList<>();
 
     for (String source : opts.arguments) {
-      sourceFiles.add(SourceFile.fromFile(source, UTF_8));
+      if (!source.endsWith(".zip")) {
+        sourceFiles.add(SourceFile.fromPath(Paths.get(source), UTF_8));
+        continue;
+      }
+
+      getJsEntryPathsFromZip(source)
+          .stream()
+          .map(p -> SourceFile.fromPath(p, UTF_8))
+          .forEach(sourceFiles::add);
     }
     List<SourceFile> externFiles = new ArrayList<>();
     for (String extern : opts.externs) {
-      externFiles.add(SourceFile.fromFile(extern, UTF_8));
+      externFiles.add(SourceFile.fromPath(Paths.get(extern), UTF_8));
     }
     String result = generateDeclarations(sourceFiles, externFiles, opts.depgraph);
 
@@ -343,6 +354,26 @@ class DeclarationGenerator {
       } catch (IOException e) {
         throw new IllegalArgumentException("Unable to write to file " + opts.output, e);
       }
+    }
+  }
+
+  /**
+   * Helper function helps read the entries in a zipfile and returns a list of only the javascript
+   * files (i.e files ending in .js).
+   *
+   * <p>Closure supports loading source files as {@code foo.zip!/path/in/zip.js}.
+   */
+  static List<Path> getJsEntryPathsFromZip(String source) {
+    try (ZipFile zipFile = new ZipFile(source)) {
+      return zipFile
+          .stream()
+          .filter(e -> !e.isDirectory())
+          .filter(e -> e.getName().endsWith(".js"))
+          .map(e -> source + "!/" + e.getName())
+          .map(Paths::get)
+          .collect(Collectors.toList());
+    } catch (IOException e) {
+      throw new RuntimeException("failed to read zip file " + source, e);
     }
   }
 
