@@ -418,6 +418,7 @@ public final class TypeConversionPass implements CompilerPass {
           lastCount = (int) value.getDouble();
         }
         enumMembers.addChildToBack(newMember);
+        nodeComments.moveComment(child, newMember);
       }
       return enumMembers;
     }

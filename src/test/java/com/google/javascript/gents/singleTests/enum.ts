@@ -10,8 +10,12 @@ export enum NumEnum {
 
 /** @enum {number} */
 export enum NonConseqNumEnum {
+
+  // Comment A
   A,
   B = 2,
+
+  // Comment C
   C,
   D = -2,
   E
