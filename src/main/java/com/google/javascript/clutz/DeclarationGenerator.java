@@ -48,7 +48,6 @@ import com.google.javascript.rhino.jstype.NoResolvedType;
 import com.google.javascript.rhino.jstype.NoType;
 import com.google.javascript.rhino.jstype.ObjectType;
 import com.google.javascript.rhino.jstype.ProxyObjectType;
-import com.google.javascript.rhino.jstype.RecordType;
 import com.google.javascript.rhino.jstype.TemplateType;
 import com.google.javascript.rhino.jstype.TemplateTypeMap;
 import com.google.javascript.rhino.jstype.TemplatizedType;
@@ -2201,7 +2200,7 @@ class DeclarationGenerator {
       }
     }
 
-    private void visitRecordType(RecordType type) {
+    private void visitRecordType(ObjectType type) {
       emit("{");
       Iterator<String> it = getSortedPropertyNamesToEmit(type).iterator();
       while (it.hasNext()) {
@@ -3032,8 +3031,6 @@ class DeclarationGenerator {
       String maybeGlobalName = maybeRenameGlobalType(type.getDisplayName());
       if (maybeGlobalName != null) {
         emit(maybeGlobalName);
-      } else if (type.isRecordType()) {
-        visitRecordType((RecordType) type);
       } else if (type.isDict()) {
         emit("{[key: string]: any}");
       } else if (type.getReferenceName() != null) {
@@ -3055,7 +3052,7 @@ class DeclarationGenerator {
           typesUsed.add(type.getDisplayName());
         }
       } else {
-        emit("GlobalObject");
+        visitRecordType(type);
       }
       return null;
     }

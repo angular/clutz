@@ -14,7 +14,7 @@ declare namespace ಠ_ಠ.clutz.types {
   /**
    * marked const to appear in `compiler.getTopScope().getAllSymbols()`
    */
-  var inferredobj : GlobalObject ;
+  var inferredobj : { } ;
   var j : { [ key: number ]: string } | null ;
   var recordType : { a : string , b : any } ;
   var recordTypeOptional : { a : string , optional ? : string } ;
