@@ -11,8 +11,10 @@ const NumEnum = {
 
 /** @enum {number} */
 const NonConseqNumEnum = {
+  // Comment A
   A: 0,
   B: 2,
+  // Comment C
   C: 3,
   D: -2,
   E: -1
