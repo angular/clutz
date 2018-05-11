@@ -769,13 +769,15 @@ class DeclarationGenerator {
     Iterator<TypedVar> it = externSymbols.iterator();
 
     while (it.hasNext()) {
-      // Some extern symbols appear twice, once unprefixed, and once prefixed with window.
+      // Some extern symbols appear twice, once unprefixed, and once prefixed with window or this.
       // Skip the second one, if both exist.
       TypedVar symbol = it.next();
-      if (symbol.getName().startsWith("window.")
-          && externSymbolNames.contains(symbol.getName().substring(7))) {
-        it.remove();
-        externSymbolNames.remove(symbol.getName());
+      if (symbol.getName().startsWith("window.") || symbol.getName().startsWith("this.")) {
+        String normalizedName = symbol.getName().replaceAll("^(window|this)\\.", "");
+        if (externSymbolNames.contains(normalizedName)) {
+          it.remove();
+          externSymbolNames.remove(symbol.getName());
+        }
       }
     }
 
