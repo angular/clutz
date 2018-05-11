@@ -214,6 +214,7 @@ public final class TypeConversionPass implements CompilerPass {
             break;
         }
         Node typeDef = Node.newString(Token.TYPE_ALIAS, name);
+        nodeComments.moveComment(n, typeDef);
         types.put(name, typeDef);
         typeDef.setJSDocInfo(bestJSDocInfo);
         replaceExpressionOrAssignment(n, parent, typeDef);

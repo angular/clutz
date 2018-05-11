@@ -46,7 +46,9 @@ public final class CommentLinkingPass implements CompilerPass {
     Pattern.compile(BEGIN_JSDOC_LINE + "@returns?[ \t]*(\\{.*\\})[ \t]*(?<keep>\\*\\/|\n)"),
     Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@(param|returns?))[ \t]*(\\{.*\\})"),
     // Remove type annotation from @export
-    Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@export)[ \t]*(\\{.*\\})")
+    Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@export)[ \t]*(\\{.*\\})"),
+    // Remove @typedef if there is no description
+    Pattern.compile(BEGIN_JSDOC_LINE + "@typedef[ \t]*(\\{.*\\})(?<keep>)" + EOL, Pattern.DOTALL)
   };
 
   private static final Pattern[] COMMENT_REPLACEMENTS = {
