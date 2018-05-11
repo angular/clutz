@@ -60,8 +60,8 @@ public final class ModuleConversionPass implements CompilerPass {
 
   private final String alreadyConvertedPrefix;
 
-  // Used to store destructuring assignments like "const {a, b} = abModule;".
-  // Later on we use this map to rewrite full module imports.
+  // Map from imported module local name to importSpecs, used to store destructuring assignments
+  // like "const {a, b} = abModule;". Later on we use this map to rewrite full module imports.
   private final Map<String, Node> destructuringAssignments = new HashMap<>();
 
   public Table<String, String, String> getTypeRewrite() {
@@ -622,11 +622,16 @@ public final class ModuleConversionPass implements CompilerPass {
         importSpec.addChildToBack(spec);
       }
     } else if (moduleImport.isFullModuleImport()) {
-      // const A = goog.require('...'); -> import * as A from '...';
       // It is safe to assume there's one full local name because this is validated before.
       String fullLocalName = moduleImport.fullLocalNames.get(0);
-      importSpec = Node.newString(Token.IMPORT_STAR, fullLocalName);
-      if (destructuringAssignments.containsKey(fullLocalName)) {
+      if (!destructuringAssignments.containsKey(fullLocalName)) {
+        // const A = goog.require('...'); -> import * as A from '...';
+        importSpec = Node.newString(Token.IMPORT_STAR, fullLocalName);
+      } else {
+        // const A = goog.require('...');
+        // const {destructuringA} = A;
+        // ->
+        // import {destructuringA} from '...';
         importSpec = destructuringAssignments.get(fullLocalName);
         Node destructuringLhs = importSpec.getParent();
         Node assignmentNode = destructuringLhs.getParent();
