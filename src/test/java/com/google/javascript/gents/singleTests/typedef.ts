@@ -1,3 +1,7 @@
+
+/**
+ * Comment
+ */
 type MyString = string;
 type MyInterface = {
   x: string,

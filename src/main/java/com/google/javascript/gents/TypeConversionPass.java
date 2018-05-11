@@ -214,6 +214,7 @@ public final class TypeConversionPass implements CompilerPass {
             break;
         }
         Node typeDef = Node.newString(Token.TYPE_ALIAS, name);
+        nodeComments.moveComment(n, typeDef);
         types.put(name, typeDef);
         typeDef.setJSDocInfo(bestJSDocInfo);
         replaceExpressionOrAssignment(n, parent, typeDef);
@@ -411,6 +412,7 @@ public final class TypeConversionPass implements CompilerPass {
           lastCount = (int) value.getDouble();
         }
         enumMembers.addChildToBack(newMember);
+        nodeComments.moveComment(child, newMember);
       }
       return enumMembers;
     }
