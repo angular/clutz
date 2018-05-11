@@ -932,7 +932,8 @@ class DeclarationGenerator {
       Set<String> provides,
       boolean isExtern) {
     if (!isValidJSProperty(getUnqualifiedName(symbol))) {
-      emitComment("skipping property " + symbol.getName() + " because it is not a valid symbol.");
+      emit("// skipping property " + symbol.getName() + " because it is not a valid symbol.");
+      emitBreak();
       return;
     }
     boolean isGoogNamespace =
@@ -987,7 +988,11 @@ class DeclarationGenerator {
             && !propertySymbol.getType().isFunctionPrototypeType()
             && !isPrototypeMethod(propertySymbol)) {
           if (!isValidJSProperty(getUnqualifiedName(propertySymbol))) {
-            emitComment("skipping property " + propertyName + " because it is not a valid symbol.");
+            emit(
+                "// skipping property '"
+                    + getUnqualifiedName(propertyName)
+                    + "' because it is not a valid symbol.");
+            emitBreak();
             continue;
           }
           // For safety we need to special case goog.require to return the empty interface by
@@ -2205,7 +2210,11 @@ class DeclarationGenerator {
       Iterator<String> it = getSortedPropertyNamesToEmit(type).iterator();
       while (it.hasNext()) {
         String propName = it.next();
-        emit(propName);
+        if (isValidJSProperty(propName)) {
+          emit(propName);
+        } else {
+          emit("'" + propName + "'");
+        }
         UnionType unionType = type.getPropertyType(propName).toMaybeUnionType();
         if (unionType != null
             && unionType
