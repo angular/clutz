@@ -675,30 +675,29 @@ public final class ModuleConversionPass implements CompilerPass {
     Node rhs = assign.getLastChild();
     JSDocInfo jsDoc = NodeUtil.getBestJSDocInfo(assign);
 
-    ExportedSymbol symbolToExport =
-        ExportedSymbol.fromExportAssignment(rhs, exportedNamespace, exportedSymbol, fileName);
-
     if (lhs.matchesQualifiedName(exportedNamespace)) {
       rhs.detach();
-      Node exportSpecNode;
-      if (rhs.isName() && exportsToNodes.containsKey(symbolToExport)) {
-        // Rewrite the AST to export the symbol directly using information from the export
-        // assignment.
-        Node namedNode = exportsToNodes.get(symbolToExport);
-        Node next = namedNode.getNext();
-        Node parent = namedNode.getParent();
-        namedNode.detach();
-
-        Node export = new Node(Token.EXPORT, namedNode);
-        export.useSourceInfoFromForTree(assign);
-
-        nodeComments.moveComment(namedNode, export);
-        parent.addChildBefore(export, next);
+      if (isObjLitWithSimpleRefs(rhs)) {
+        for (Node child : rhs.children()) {
+          ExportedSymbol symbolToExport =
+              ExportedSymbol.fromExportAssignment(
+                  child.getFirstChild(), exportedNamespace, child.getString(), fileName);
+          moveExportStmtToADeclKeyword(assign, exportsToNodes.get(symbolToExport));
+        }
         exprNode.detach();
-
-        compiler.reportChangeToEnclosingScope(parent);
         return;
-      } else if (rhs.isName() && exportedSymbol.equals(rhs.getString())) {
+      }
+      ExportedSymbol symbolToExport =
+          ExportedSymbol.fromExportAssignment(rhs, exportedNamespace, exportedSymbol, fileName);
+      if (rhs.isName() && exportsToNodes.containsKey(symbolToExport)) {
+        moveExportStmtToADeclKeyword(assign, exportsToNodes.get(symbolToExport));
+        exprNode.detach();
+        return;
+      }
+
+      // Below the export node stays but is modified.
+      Node exportSpecNode;
+      if (rhs.isName() && exportedSymbol.equals(rhs.getString())) {
         // Rewrite the export line to: <code>export {rhs}</code>.
         exportSpecNode = createExportSpecs(rhs);
         exportSpecNode.useSourceInfoFrom(rhs);
@@ -715,6 +714,50 @@ public final class ModuleConversionPass implements CompilerPass {
       // Assume prefix has already been exported and just trim the prefix
       nameUtil.replacePrefixInName(lhs, exportedNamespace, exportedSymbol);
     }
+  }
+
+  /**
+   * Returns true is the object is an object literal where all values are symbols that match the
+   * name:
+   *
+   * <p>Ex: {A, B: B} -> true {A: C} -> false {A: A + 1} -> false
+   *
+   * <p>TODO(rado): see if we can also support simple renaming objects like {NewName: OldName}.
+   */
+  private boolean isObjLitWithSimpleRefs(Node node) {
+    if (!node.isObjectLit()) return false;
+    for (Node child : node.children()) {
+      if (!child.isStringKey() || !child.getFirstChild().isName()) {
+        return false;
+      }
+      if (!child.getString().equals(child.getFirstChild().getString())) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Takes an assignment statement (export or goog.provide one), removes it and instead finds the
+   * matching declaration and adds an 'export' keyword.
+   *
+   * <p>Before: class C {} exports.C = C;
+   *
+   * <p>After: export class C {};
+   */
+  private void moveExportStmtToADeclKeyword(Node assignmentNode, Node declarationNode) {
+    // Rewrite the AST to export the symbol directly using information from the export
+    // assignment.
+    Node next = declarationNode.getNext();
+    Node parent = declarationNode.getParent();
+    declarationNode.detach();
+
+    Node export = new Node(Token.EXPORT, declarationNode);
+    export.useSourceInfoFromForTree(assignmentNode);
+
+    nodeComments.moveComment(declarationNode, export);
+    parent.addChildBefore(export, next);
+    compiler.reportChangeToEnclosingScope(parent);
   }
 
   /** Creates an ExportSpecs node, which is the {...} part of an "export {name}" node. */
