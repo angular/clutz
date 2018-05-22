@@ -50,7 +50,7 @@ public class DeclarationGeneratorTests {
 
   public static final String PLATFORM_MARKER = "/** Insert general_with_platform.d.ts here */\n";
 
-  public static TestSuite suite() throws IOException {
+  public static TestSuite suite() {
     TestSuite suite = new TestSuite(DeclarationGeneratorTests.class.getName());
 
     List<File> testFiles = getTestInputFiles(JS_NO_EXTERNS_OR_ZIP);
