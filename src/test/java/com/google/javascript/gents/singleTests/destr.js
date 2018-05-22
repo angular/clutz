@@ -19,3 +19,5 @@ class C {
     this.d = d;
   }
 }
+
+let {x = 0} = {};

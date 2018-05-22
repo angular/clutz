@@ -270,7 +270,9 @@ public final class TypeAnnotationPass implements CompilerPass {
       // Modify the AST to represent an optional parameter
       if (parameterType.getRoot().getToken() == Token.EQUALS) {
         attachTypeExpr = IR.name(node.getString());
-        attachTypeExpr.putBooleanProp(Node.OPT_ES6_TYPED, true);
+        if (!node.getParent().isDefaultValue()) {
+          attachTypeExpr.putBooleanProp(Node.OPT_ES6_TYPED, true);
+        }
         nodeComments.replaceWithComment(node, attachTypeExpr);
       }
       setTypeExpression(attachTypeExpr, parameterType, false);

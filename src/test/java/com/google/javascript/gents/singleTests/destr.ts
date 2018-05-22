@@ -11,3 +11,4 @@ class C {
     this.b = b;
   }
 }
+let {x = 0} = {};
