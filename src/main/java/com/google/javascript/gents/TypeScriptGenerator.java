@@ -137,7 +137,7 @@ public class TypeScriptGenerator {
           throw new IllegalArgumentException("Unable to make directories " + output.getParent());
         }
         try {
-          Files.write(tsCode, output, UTF_8);
+          Files.asCharSink(output, UTF_8).write(tsCode);
         } catch (IOException e) {
           throw new IllegalArgumentException("Unable to write to file " + output.getName(), e);
         }
@@ -145,7 +145,7 @@ public class TypeScriptGenerator {
     }
     try {
       if (opts.moduleRewriteLog != null) {
-        Files.write(result.moduleRewriteLog, new File(opts.moduleRewriteLog), UTF_8);
+        Files.asCharSink(new File(opts.moduleRewriteLog), UTF_8).write(result.moduleRewriteLog);
       }
     } catch (IOException e) {
       throw new IllegalArgumentException("Unable to write to file " + opts.moduleRewriteLog, e);

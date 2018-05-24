@@ -89,7 +89,7 @@ class Depgraph {
 
     for (String depgraphName : fileNames) {
       try {
-        String depgraph = Files.toString(new File(depgraphName), UTF_8);
+        String depgraph = Files.asCharSource(new File(depgraphName), UTF_8).read();
         List<List<?>> list =
             new Gson()
                 .fromJson(
@@ -141,6 +141,7 @@ class Depgraph {
         }
         if ("load_flags".equals(key)) {
           // load flags is a list of lists of strings ie [["lang","es6"],["module","goog"]]
+          @SuppressWarnings("unchecked")
           List<List<String>> loadFlags = (List<List<String>>) tuple.get(1);
           if (loadFlags.contains(ImmutableList.of("module", "goog"))) {
             isGoogProvide = false;
@@ -149,6 +150,7 @@ class Depgraph {
         if ("provides".equals(key)) {
           // provides is a list of strings, where the first element is the file name with a prefix
           // and all the remaining elements are the provides from that file
+          @SuppressWarnings("unchecked")
           List<String> provideList = (List<String>) tuple.get(1);
           if (provideList.size() > 1) {
             provides.addAll(provideList.subList(1, provideList.size()));
