@@ -94,7 +94,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       if (System.getenv("UPDATE_GOLDENS") != null
           && !golden.getName().endsWith("_with_platform.d.ts")
           && expected.equals(expectedClean)) {
-        Files.write(stripped, golden, Charsets.UTF_8);
+        Files.asCharSink(golden, Charsets.UTF_8).write(stripped);
       } else {
         check().that(stripped).isEqualTo(expected);
       }

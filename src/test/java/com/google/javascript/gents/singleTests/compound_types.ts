@@ -8,7 +8,7 @@ let foo = function(s: string): boolean {
 
 // Nullable types
 let niln: number|null = null;
-let bar = function(s: string|null): boolean | null {
+let bar = function(s: string|null): boolean|null {
   return null;
 };
 
@@ -16,6 +16,6 @@ let bar = function(s: string|null): boolean | null {
 let sn: string|number = 9;
 let snb: string|number|null|boolean = false;
 let manyNulls: string|null|number|string|null = null;
-let baz = function(s: number|string|null): null | boolean {
+let baz = function(s: number|string|null): null|boolean {
   return null;
 };
