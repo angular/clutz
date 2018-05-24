@@ -8,6 +8,7 @@ import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 /** Code generator for gents to add TypeScript specific code generation. */
 public class GentsCodeGenerator extends CodeGenerator {
@@ -26,6 +27,7 @@ public class GentsCodeGenerator extends CodeGenerator {
 
   @Override
   protected void add(Node n, Context ctx) {
+    @Nullable Node parent = n.getParent();
     maybeAddNewline(n);
 
     String comment = nodeComments.getComment(n);
@@ -52,6 +54,12 @@ public class GentsCodeGenerator extends CodeGenerator {
         // We add them back in to maintain a consistent style.
         if (n.hasOneChild()) {
           add("()");
+        }
+        break;
+      case FUNCTION_TYPE:
+        // Match the "(" in maybeOverrideCodeGen for FUNCTION_TYPE nodes.
+        if (parent != null && parent.getToken() == Token.UNION_TYPE) {
+          add(")");
         }
         break;
       default:
@@ -90,6 +98,7 @@ public class GentsCodeGenerator extends CodeGenerator {
    * @return true if no further code generation on this node is needed.
    */
   boolean maybeOverrideCodeGen(Node n) {
+    @Nullable Node parent = n.getParent();
     switch (n.getToken()) {
       case INDEX_SIGNATURE:
         Node first = n.getFirstChild();
@@ -157,6 +166,16 @@ public class GentsCodeGenerator extends CodeGenerator {
           add("export");
           add(n.getFirstChild());
           return true;
+        }
+        return false;
+      case FUNCTION_TYPE:
+        // In some cases we need to add a pair of "(" and ")" around the function type. We don't
+        // want to override the default code generation for FUNCTION_TYPE because the default code
+        // generation uses private APIs. Therefore we emit a "(" here, then let the default code
+        // generation for FUNCTION_TYPE emit and finally emit a ")" after maybeOverrideCodeGen.
+        // Union binding has higher precedence than "=>" in TypeScript.
+        if (parent != null && parent.getToken() == Token.UNION_TYPE) {
+          add("(");
         }
         return false;
       default:
