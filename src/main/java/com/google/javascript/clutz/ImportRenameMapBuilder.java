@@ -21,6 +21,7 @@ public class ImportRenameMapBuilder extends ImportBasedMapBuilder {
    * mappings from local symbol names to exported symbol names. If the imported module's id is in
    * googProvides, emit a rename in goog.provide style, otherwise, use goog.module style.
    */
+  @Override
   protected Map<String, String> build(
       String localModuleId, Node moduleBody, Set<String> googProvides) {
     Map<String, String> importRenameMap = new HashMap<>();

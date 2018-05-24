@@ -350,7 +350,7 @@ class DeclarationGenerator {
     } else {
       File output = new File(opts.output);
       try {
-        Files.write(result, output, UTF_8);
+        Files.asCharSink(output, UTF_8).write(result);
       } catch (IOException e) {
         throw new IllegalArgumentException("Unable to write to file " + opts.output, e);
       }
