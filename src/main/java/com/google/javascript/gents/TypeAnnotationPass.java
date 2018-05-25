@@ -162,6 +162,19 @@ public final class TypeAnnotationPass implements CompilerPass {
             maybeSetInlineTypeExpression(parent, n, bestJSDocInfo, true);
           }
           break;
+          // If a DEVAULE_VALUE is in a PARAM_LIST we type annotate its first child which is the
+          // actual parameter.
+        case DEFAULT_VALUE:
+          Node paramNode = n.getFirstChild();
+          if (parent != null && parent.isParamList() && paramNode != null && paramNode.isName()) {
+            boolean wasSetFromFunctionDoc = setParameterTypeFromFunctionDoc(paramNode, parent);
+            if (!wasSetFromFunctionDoc) {
+              // If we didn't set the parameter type from the functions's JsDoc, then maybe the type
+              // is inlined just before the parameter?
+              maybeSetInlineTypeExpression(paramNode, paramNode, bestJSDocInfo, false);
+            }
+          }
+          break;
         case CAST:
           setTypeExpression(n, n.getJSDocInfo().getType(), false);
           break;
@@ -257,7 +270,9 @@ public final class TypeAnnotationPass implements CompilerPass {
       // Modify the AST to represent an optional parameter
       if (parameterType.getRoot().getToken() == Token.EQUALS) {
         attachTypeExpr = IR.name(node.getString());
-        attachTypeExpr.putBooleanProp(Node.OPT_ES6_TYPED, true);
+        if (!node.getParent().isDefaultValue()) {
+          attachTypeExpr.putBooleanProp(Node.OPT_ES6_TYPED, true);
+        }
         nodeComments.replaceWithComment(node, attachTypeExpr);
       }
       setTypeExpression(attachTypeExpr, parameterType, false);

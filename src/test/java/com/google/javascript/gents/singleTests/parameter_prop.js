@@ -38,3 +38,11 @@ function B(a, b, c, d, e) {
   /** @const {number} */
   this.e = e;
 }
+
+class C {
+  /** @param {string} a */
+  constructor(a = 'default value') {
+    /** @const */
+    this.a = a;
+  }
+}

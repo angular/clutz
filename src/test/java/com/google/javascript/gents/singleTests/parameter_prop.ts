@@ -17,3 +17,7 @@ class B {
       public a: number, public b: number, protected c: number,
       private d: number, public readonly e: number) {}
 }
+
+class C {
+  constructor(public readonly a: string = 'default value') {}
+}
