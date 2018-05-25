@@ -30,12 +30,14 @@ export interface InnerTypedefNonNullable {
 }
 
 export interface InnerTypedefNullable {
-//!! Intentionally loose the nullability.
+  //!! Intentionally loose the nullability.
   a: number;
   b: number;
 }
 
-export interface InnerTypedef { a: number; }
+export interface InnerTypedef {
+  a: number;
+}
 
 export interface InnerTypedefWithNestedTypes {
   a: {b: {c: number}};

@@ -18,7 +18,7 @@ function typedReturn(): number {
 let partiallyTyped = function(n: number, u1, b: boolean, u2) {};
 
 // Both params and returns
-let complex = function(b: boolean, s: string, x: any): string | null {
+let complex = function(b: boolean, s: string, x: any): string|null {
   if (b) {
     return s;
   }
