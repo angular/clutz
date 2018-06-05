@@ -120,12 +120,23 @@ public final class TypeConversionPass implements CompilerPass {
           // Typedef of simple types
           createTypeAlias(n, parent);
           break;
-        case NAME:
         case VAR:
         case LET:
         case CONST:
           createTypeAlias(n, parent);
           break;
+        case NAME:
+          // NAME token can occur in many locations. Only create an alias for ones that are direct
+          // children of statements.
+          // Without this check, gents will try to create two aliases for code like:
+          // /** @typedef {...} */
+          // Foo.Bar = Buz;
+          // Because of the NAME tokens - Bar and Buz.
+          if (parent.isExprResult() && parent.getChildCount() == 1) {
+            createTypeAlias(n, parent);
+          }
+          break;
+
         case CLASS:
           JSDocInfo jsDoc = n.getJSDocInfo();
           // If a class has the @interface or @record annotation we will respect that and turn it into an interface.
