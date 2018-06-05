@@ -31,7 +31,9 @@ $ clutz path/to/my/source1.js path/to/my/source2.js ...
         -o out.d.ts
 ```
 
-This creates TypeScript type definitions in `out.d.ts` for all the closure types discovered in the inputs.
+When **running on Windows**, note that you have to use **Unix-style path separators** for the file paths (`/` instead of `\`).
+
+The example above creates TypeScript type definitions in `out.d.ts` for all the closure types discovered in the inputs.
 Symbols which were declared with `goog.provide('x')` may be imported in TypeScript as `import x from 'goog:x';`.
 For full explanation of what TypeScript types are produced for different Closure usages, see the `.js` and `.d.ts`
 files in `src/test/com/google/javascript/clutz`.
