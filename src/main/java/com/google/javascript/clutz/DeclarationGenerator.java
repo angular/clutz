@@ -802,12 +802,11 @@ class DeclarationGenerator {
       // Some extern symbols appear twice, once unprefixed, and once prefixed with window or this.
       // Skip the second one, if both exist.
       TypedVar symbol = it.next();
-      if (symbol.getName().startsWith("window.") || symbol.getName().startsWith("this.")) {
-        String normalizedName = symbol.getName().replaceAll("^(window|this)\\.", "");
-        if (externSymbolNames.contains(normalizedName)) {
-          it.remove();
-          externSymbolNames.remove(symbol.getName());
-        }
+      String originalName = symbol.getName();
+      String normalizedName = normalizeWindowGlobals(originalName);
+      if (!normalizedName.equals(originalName) && externSymbolNames.contains(normalizedName)) {
+        it.remove();
+        externSymbolNames.remove(originalName);
       }
     }
 
@@ -926,9 +925,7 @@ class DeclarationGenerator {
 
     // If asked about a symbol like "window.Array", perform the below lookups on just
     // "Array".
-    if (symbolName.startsWith("window.")) {
-      symbolName = symbolName.substring("window.".length());
-    }
+    symbolName = normalizeWindowGlobals(symbolName);
 
     // We're asked about e.g. "Array.from", which we should treat as a platform extern.
     // The PlatformSymbols lists just contain the toplevel name like "Array", so strip after
@@ -946,6 +943,15 @@ class DeclarationGenerator {
     if (PlatformSymbols.TYPESCRIPT_LIB_D_TS.contains(symbolName)) return true;
 
     return false;
+  }
+
+  /**
+   * Strip window. or this. from full symbol names. Technically, window. and this. symbols are
+   * tracked separately in the type system from the global symbols, but they largely overlap both in
+   * TS and Closure.
+   */
+  private String normalizeWindowGlobals(String name) {
+    return name.replaceAll("^(window|this)\\.", "");
   }
 
   /** See the comment above on shouldAvoidGeneratingExterns. */
