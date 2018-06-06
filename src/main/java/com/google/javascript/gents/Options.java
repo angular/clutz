@@ -48,6 +48,24 @@ public class Options {
   String moduleRewriteLog = null;
 
   @Option(
+    name = "--dependenciesManifest",
+    usage =
+        "the path to a manifest file containing all dependencies\n"
+            + "This option overrides the explicitly passed files",
+    metaVar = "DEPENDENCIES_MANIFEST"
+  )
+  String dependenciesManifest = null;
+
+  @Option(
+    name = "--sourcesManifest",
+    usage =
+        "the path to a manifest file containing all files that need to be converted to TypeScript\n"
+            + "This option overrides the files passed by \"--convert\"",
+    metaVar = "SOURCES_MANIFEST"
+  )
+  String sourcesManifest = null;
+
+  @Option(
     name = "--convert",
     usage =
         "list of all files to be converted to TypeScript\n"
@@ -136,7 +154,27 @@ public class Options {
   Options(String[] args) throws CmdLineException {
     CmdLineParser parser = new CmdLineParser(this);
     parser.parseArgument(args);
-    srcFiles.addAll(arguments);
+
+    if (sourcesManifest != null) {
+      try {
+        filesToConvert = Files.readAllLines(Paths.get(sourcesManifest), UTF_8);
+      } catch (IOException e) {
+        throw new CmdLineException(
+            parser, "sources manifest file " + sourcesManifest + " not found.", e);
+      }
+    }
+
+    if (dependenciesManifest == null) {
+      srcFiles.addAll(arguments);
+    } else {
+      try {
+        srcFiles.addAll(Files.readAllLines(Paths.get(dependenciesManifest), UTF_8));
+      } catch (IOException e) {
+        throw new CmdLineException(
+            parser, "dependencies manifest file " + dependenciesManifest + " not found.", e);
+      }
+    }
+
     srcFiles.addAll(filesToConvert);
 
     if (srcFiles.isEmpty()) {
