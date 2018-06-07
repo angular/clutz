@@ -51,7 +51,7 @@ public class Options {
     name = "--dependenciesManifest",
     usage =
         "the path to a manifest file containing all dependencies\n"
-            + "This option overrides the explicitly passed files",
+            + "Passing dependency files is disallowed when \"--dependenciesManifest\" option is used",
     metaVar = "DEPENDENCIES_MANIFEST"
   )
   String dependenciesManifest = null;
@@ -60,7 +60,7 @@ public class Options {
     name = "--sourcesManifest",
     usage =
         "the path to a manifest file containing all files that need to be converted to TypeScript\n"
-            + "This option overrides the files passed by \"--convert\"",
+            + "\"--convert\" option is disallowed when \"--sourcesManifest\" option is used",
     metaVar = "SOURCES_MANIFEST"
   )
   String sourcesManifest = null;
@@ -154,6 +154,16 @@ public class Options {
   Options(String[] args) throws CmdLineException {
     CmdLineParser parser = new CmdLineParser(this);
     parser.parseArgument(args);
+
+    if (filesToConvert.size() != 0 && sourcesManifest != null) {
+      throw new CmdLineException(
+          parser, "Don't specify a sources manifest file and source files at the same time.");
+    }
+    if (arguments.size() != 0 && dependenciesManifest != null) {
+      throw new CmdLineException(
+          parser,
+          "Don't specify a dependencies manifest file and dependency files at the same time.");
+    }
 
     if (sourcesManifest != null) {
       try {
