@@ -157,12 +157,13 @@ public class Options {
 
     if (filesToConvert.size() != 0 && sourcesManifest != null) {
       throw new CmdLineException(
-          parser, "Don't specify a sources manifest file and source files at the same time.");
+          parser,
+          "Don't specify a sources manifest file and source files (\"--convert\") at the same time.");
     }
     if (arguments.size() != 0 && dependenciesManifest != null) {
       throw new CmdLineException(
           parser,
-          "Don't specify a dependencies manifest file and dependency files at the same time.");
+          "Don't specify a dependencies manifest file and dependency files as arguments at the same time.");
     }
 
     if (sourcesManifest != null) {
