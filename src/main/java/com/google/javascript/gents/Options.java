@@ -48,6 +48,24 @@ public class Options {
   String moduleRewriteLog = null;
 
   @Option(
+    name = "--dependenciesManifest",
+    usage =
+        "the path to a manifest file containing all dependencies\n"
+            + "Passing dependency files is disallowed when \"--dependenciesManifest\" option is used",
+    metaVar = "DEPENDENCIES_MANIFEST"
+  )
+  String dependenciesManifest = null;
+
+  @Option(
+    name = "--sourcesManifest",
+    usage =
+        "the path to a manifest file containing all files that need to be converted to TypeScript\n"
+            + "\"--convert\" option is disallowed when \"--sourcesManifest\" option is used",
+    metaVar = "SOURCES_MANIFEST"
+  )
+  String sourcesManifest = null;
+
+  @Option(
     name = "--convert",
     usage =
         "list of all files to be converted to TypeScript\n"
@@ -136,7 +154,38 @@ public class Options {
   Options(String[] args) throws CmdLineException {
     CmdLineParser parser = new CmdLineParser(this);
     parser.parseArgument(args);
-    srcFiles.addAll(arguments);
+
+    if (filesToConvert.size() != 0 && sourcesManifest != null) {
+      throw new CmdLineException(
+          parser,
+          "Don't specify a sources manifest file and source files (\"--convert\") at the same time.");
+    }
+    if (arguments.size() != 0 && dependenciesManifest != null) {
+      throw new CmdLineException(
+          parser,
+          "Don't specify a dependencies manifest file and dependency files as arguments at the same time.");
+    }
+
+    if (sourcesManifest != null) {
+      try {
+        filesToConvert = Files.readAllLines(Paths.get(sourcesManifest), UTF_8);
+      } catch (IOException e) {
+        throw new CmdLineException(
+            parser, "sources manifest file " + sourcesManifest + " not found.", e);
+      }
+    }
+
+    if (dependenciesManifest == null) {
+      srcFiles.addAll(arguments);
+    } else {
+      try {
+        srcFiles.addAll(Files.readAllLines(Paths.get(dependenciesManifest), UTF_8));
+      } catch (IOException e) {
+        throw new CmdLineException(
+            parser, "dependencies manifest file " + dependenciesManifest + " not found.", e);
+      }
+    }
+
     srcFiles.addAll(filesToConvert);
 
     if (srcFiles.isEmpty()) {
