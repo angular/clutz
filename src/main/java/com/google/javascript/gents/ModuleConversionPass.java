@@ -60,9 +60,10 @@ public final class ModuleConversionPass implements CompilerPass {
 
   private final String alreadyConvertedPrefix;
 
-  // Map from imported module local name to importSpecs, used to store destructuring assignments
-  // like "const {a, b} = abModule;". Later on we use this map to rewrite full module imports.
-  private final Map<String, Node> destructuringAssignments = new HashMap<>();
+  // Map from source file name and imported module local name to importSpecs, used to store
+  // destructuring assignments like "const {a, b} = abModule;". Later on we use this map to rewrite
+  // full module imports.
+  private final Table<String, String, Node> destructuringAssignments = HashBasedTable.create();
 
   public Table<String, String, String> getTypeRewrite() {
     return typeRewrite;
@@ -225,7 +226,10 @@ public final class ModuleConversionPass implements CompilerPass {
         if (potentialImportSpec != null
             && potentialModuleName != null
             && potentialModuleName.isName()) {
-          destructuringAssignments.put(potentialModuleName.getQualifiedName(), potentialImportSpec);
+          destructuringAssignments.put(
+              potentialModuleName.getSourceFileName(),
+              potentialModuleName.getQualifiedName(),
+              potentialImportSpec);
         }
       }
     }
@@ -609,8 +613,8 @@ public final class ModuleConversionPass implements CompilerPass {
     // TODO(rado): sync this better with the mapping done in tsickle.
     String originalPath =
         moduleImport.requiredNamespace.replace(alreadyConvertedPrefix + ".", "").replace(".", "/");
-    String referencedFile =
-        pathUtil.getImportPath(moduleImport.originalImportNode.getSourceFileName(), originalPath);
+    String sourceFileName = moduleImport.originalImportNode.getSourceFileName();
+    String referencedFile = pathUtil.getImportPath(sourceFileName, originalPath);
     // goog.require('...'); -> import '...';
     Node importSpec = IR.empty();
     if (moduleImport.isDestructuringImport) {
@@ -624,7 +628,7 @@ public final class ModuleConversionPass implements CompilerPass {
     } else if (moduleImport.isFullModuleImport()) {
       // It is safe to assume there's one full local name because this is validated before.
       String fullLocalName = moduleImport.fullLocalNames.get(0);
-      if (!destructuringAssignments.containsKey(fullLocalName)) {
+      if (!destructuringAssignments.contains(sourceFileName, fullLocalName)) {
         // const A = goog.require('...'); -> import * as A from '...';
         importSpec = Node.newString(Token.IMPORT_STAR, fullLocalName);
       } else {
@@ -632,7 +636,7 @@ public final class ModuleConversionPass implements CompilerPass {
         // const {destructuringA} = A;
         // ->
         // import {destructuringA} from '...';
-        importSpec = destructuringAssignments.get(fullLocalName);
+        importSpec = destructuringAssignments.get(sourceFileName, fullLocalName);
         Node destructuringLhs = importSpec.getParent();
         Node assignmentNode = destructuringLhs.getParent();
         importSpec.detach();
