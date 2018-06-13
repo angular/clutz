@@ -11,11 +11,11 @@ inferred.nested.obj = {
   'quotedProp': 1,
   '0123': 2,
   'must-be-quoted': 3,
-  //!! TODO(radokirov): Add 'has.comma.bad' prop and fix issues.
+  //!! TODO(radokirov): Add a property named 'has.period' and fix issues.
   nestedObj: {
     regular: 0,
     'quoted': 1,
     '0123': 2,
-    'must-be-quoted': 3
+    'must-be-quoted': 3,
   }
 };

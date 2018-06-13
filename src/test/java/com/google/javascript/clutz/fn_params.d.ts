@@ -5,8 +5,8 @@ declare namespace ಠ_ಠ.clutz.fn_params {
   /**
    * Parameters intentionally documented in the wrong order
    */
-  function varargs (x : string ,  ...y : ( number | undefined ) [] ) : void ;
-  function varargs_fns ( ...var_args : ( Function | null | undefined ) [] ) : void ;
+  function varargs (x : string ,  ...y : number [] ) : void ;
+  function varargs_fns ( ...var_args : ( Function | null ) [] ) : void ;
 }
 declare module 'goog:fn_params' {
   import alias = ಠ_ಠ.clutz.fn_params;
