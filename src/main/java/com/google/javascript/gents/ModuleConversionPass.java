@@ -128,7 +128,7 @@ public final class ModuleConversionPass implements CompilerPass {
       }
 
       if (!n.isExprResult()) {
-        if (n.isConst() || n.isClass() || n.isFunction()) {
+        if (n.isConst() || n.isClass() || n.isFunction() || n.isLet() || n.isConst() || n.isVar()) {
           collectMetdataForExports(n, fileName);
         }
         return;
@@ -686,7 +686,10 @@ public final class ModuleConversionPass implements CompilerPass {
           ExportedSymbol symbolToExport =
               ExportedSymbol.fromExportAssignment(
                   child.getFirstChild(), exportedNamespace, child.getString(), fileName);
-          moveExportStmtToADeclKeyword(assign, exportsToNodes.get(symbolToExport));
+          Node exportNode = exportsToNodes.get(symbolToExport);
+          if (exportNode != null) {
+            moveExportStmtToADeclKeyword(assign, exportNode);
+          }
         }
         exprNode.detach();
         return;
