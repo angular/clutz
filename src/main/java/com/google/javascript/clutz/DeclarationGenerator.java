@@ -188,6 +188,7 @@ class DeclarationGenerator {
 
   private JSType unknownType;
   private JSType numberType;
+  private JSType stringType;
   @Nullable private JSType iterableType;
   @Nullable private JSType iteratorIterableType;
 
@@ -396,6 +397,7 @@ class DeclarationGenerator {
 
     unknownType = compiler.getTypeRegistry().getNativeType(JSTypeNative.UNKNOWN_TYPE);
     numberType = compiler.getTypeRegistry().getNativeType(JSTypeNative.NUMBER_TYPE);
+    stringType = compiler.getTypeRegistry().getNativeType(JSTypeNative.STRING_TYPE);
     iterableType = compiler.getTypeRegistry().getGlobalType("Iterable");
     iteratorIterableType = compiler.getTypeRegistry().getGlobalType("IteratorIterable");
     // TODO(rado): replace with null and do not emit file when errors.
@@ -1771,7 +1773,7 @@ class DeclarationGenerator {
       // type MyEnum = EnumValueType;
       // var MyEnum: {A: MyEnum, B: MyEnum, ...};
       // </pre>
-      // We special case "number" enums (and for TS 2.4 should include 'string' enums)
+      // We special case "number" enums and "string" enums.
 
       // TS `type` declarations accept only unqualified names.
       String unqualifiedName = getUnqualifiedName(symbolName);
@@ -1802,8 +1804,8 @@ class DeclarationGenerator {
         return;
       }
 
-      boolean isNumericEnum = type.getElementsType().getPrimitiveType().equals(numberType);
-      if (isNumericEnum) {
+      JSType primitiveType = type.getElementsType().getPrimitiveType();
+      if (primitiveType.equals(numberType) || primitiveType.equals(stringType)) {
         emit("enum");
         emit(unqualifiedName);
         emit("{");
@@ -1824,9 +1826,14 @@ class DeclarationGenerator {
         for (String elem : sorted(elements.keySet())) {
           emit(elem);
           @Nullable Node n = elements.get(elem);
-          if (n != null && n.isNumber()) {
-            emit("=");
-            emit(String.valueOf(n.getDouble()));
+          if (n != null) {
+            if (n.isNumber()) {
+              emit("=");
+              emit(String.valueOf(n.getDouble()));
+            } else if (n.isString()) {
+              emit("=");
+              emit("'" + n.getString() + "'");
+            }
           }
           emit(",");
           emitBreak();

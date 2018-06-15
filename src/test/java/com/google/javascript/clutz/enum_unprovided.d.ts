@@ -11,7 +11,6 @@ declare module 'goog:somenamespace.Foo' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.somenamespace {
-  type MyEnum = string &{clutzEnumBrand: never} ;
-  var MyEnum : {
-  };
+  enum MyEnum {
+  }
 }

@@ -11,8 +11,7 @@ declare module 'goog:foo.bar' {
   export = alias;
 }
 declare namespace ಠ_ಠ.clutz.module$contents$foo$bar_ExportObject {
-  type Enum = string &{clutzEnumBrand: never} ;
-  var Enum : {
-    A : Enum ,
-  };
+  enum Enum {
+    A = 'A' ,
+  }
 }

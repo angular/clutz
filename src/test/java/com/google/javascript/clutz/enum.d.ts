@@ -20,6 +20,16 @@ declare module 'goog:some.SomeEnum' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.some {
+  enum StringEnum {
+    A = '1' ,
+    B = '2' ,
+  }
+}
+declare module 'goog:some.StringEnum' {
+  import alias = ಠ_ಠ.clutz.some.StringEnum;
+  export default alias;
+}
+declare namespace ಠ_ಠ.clutz.some {
   function setEnvironment (a : Environment ) : any ;
 }
 declare module 'goog:some.setEnvironment' {

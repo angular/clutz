@@ -1,6 +1,7 @@
 goog.provide('some.SomeEnum');
 goog.provide('some.ObjectValuedEnum');
 goog.provide('some.setEnvironment');
+goog.provide('some.StringEnum');
 
 /** @enum {number} */
 some.SomeEnum = {
@@ -30,3 +31,9 @@ function setEnvironment(environment) {}
 
 /** @param {!Environment} environment */
 some.setEnvironment = setEnvironment;
+
+/** @enum {string} */
+some.StringEnum = {
+  A: '1',
+  B: '2'
+};
