@@ -30,6 +30,17 @@ declare module 'goog:some.StringEnum' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.some {
+  type StringVariableEnum = string &{clutzEnumBrand: never} ;
+  var StringVariableEnum : {
+    A : StringVariableEnum ,
+    B : StringVariableEnum ,
+  };
+}
+declare module 'goog:some.StringVariableEnum' {
+  import alias = ಠ_ಠ.clutz.some.StringVariableEnum;
+  export default alias;
+}
+declare namespace ಠ_ಠ.clutz.some {
   function setEnvironment (a : Environment ) : any ;
 }
 declare module 'goog:some.setEnvironment' {

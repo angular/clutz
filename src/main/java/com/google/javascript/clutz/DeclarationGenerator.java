@@ -1805,62 +1805,84 @@ class DeclarationGenerator {
       }
 
       JSType primitiveType = type.getElementsType().getPrimitiveType();
-      if (primitiveType.equals(numberType) || primitiveType.equals(stringType)) {
-        emit("enum");
-        emit(unqualifiedName);
-        emit("{");
-        emitBreak();
-        indent();
+      if (maybeStringOrNumericEnum(primitiveType, unqualifiedName, node)) {
+        return;
+      }
 
-        // The current node points to the enum type declaration, this means that the next node will
-        // be the OBJECTLIT containing all enum key and value pairs. However, globally declared
-        // enums that are indirectly provided will instead be pointing to the parent of the
-        // OBJECTLIT parent.
-        Stream<Node> elementStream =
-            node.getNext() != null
-                ? Streams.stream(node.getNext().children())
-                : Streams.stream(node.getFirstChild().children());
-        Map<String, Node> elements =
-            elementStream.collect(Collectors.toMap(Node::getString, Node::getFirstChild));
-
-        for (String elem : sorted(elements.keySet())) {
-          emit(elem);
-          @Nullable Node n = elements.get(elem);
-          if (n != null) {
-            if (n.isNumber()) {
-              emit("=");
-              emit(String.valueOf(n.getDouble()));
-            } else if (n.isString()) {
-              emit("=");
-              emit("'" + n.getString() + "'");
-            }
-          }
-          emit(",");
-          emitBreak();
-        }
-        unindent();
-        emit("}");
-        emitBreak();
-      } else {
-        visitTypeAlias(type.getElementsType().getPrimitiveType(), unqualifiedName, true);
-        emit("var");
+      visitTypeAlias(type.getElementsType().getPrimitiveType(), unqualifiedName, true);
+      emit("var");
+      emit(unqualifiedName);
+      emit(": {");
+      emitBreak();
+      indent();
+      for (String elem : sorted(type.getElements())) {
+        emit(elem);
+        emit(":");
+        // No need to use type.getMembersType(), this must match the type alias we just declared.
         emit(unqualifiedName);
-        emit(": {");
-        emitBreak();
-        indent();
-        for (String elem : sorted(type.getElements())) {
-          emit(elem);
-          emit(":");
-          // No need to use type.getMembersType(), this must match the type alias we just declared.
-          emit(unqualifiedName);
-          emit(",");
-          emitBreak();
-        }
-        unindent();
-        emit("}");
-        emitNoSpace(";");
+        emit(",");
         emitBreak();
       }
+      unindent();
+      emit("}");
+      emitNoSpace(";");
+      emitBreak();
+    }
+
+    /**
+     * Attempt to convert the node to a string enum or numeric enum and return a boolean indicating
+     * whether it successfully emitted the enum.
+     */
+    private boolean maybeStringOrNumericEnum(
+        JSType primitiveType, String unqualifiedName, Node node) {
+      if (!primitiveType.equals(numberType) && !primitiveType.equals(stringType)) {
+        return false;
+      }
+
+      // The current node points to the enum type declaration, this means that the next node will
+      // be the OBJECTLIT containing all enum key and value pairs. However, globally declared
+      // enums that are indirectly provided will instead be pointing to the parent of the
+      // OBJECTLIT parent.
+      Node objectOfAllMembers = node.getNext() != null ? node.getNext() : node.getFirstChild();
+
+      // Peek an enum member. If the Closure string enum's value is not literal don't emit anything
+      // and fall back to the safe conversion.
+      if (primitiveType.equals(stringType)
+          && objectOfAllMembers.getFirstChild() != null
+          && objectOfAllMembers.getFirstFirstChild() != null
+          && !objectOfAllMembers.getFirstFirstChild().isString()) {
+        return false;
+      }
+
+      emit("enum");
+      emit(unqualifiedName);
+      emit("{");
+      emitBreak();
+      indent();
+
+      Stream<Node> elementStream = Streams.stream(objectOfAllMembers.children());
+      Map<String, Node> elements =
+          elementStream.collect(Collectors.toMap(Node::getString, Node::getFirstChild));
+
+      for (String elem : sorted(elements.keySet())) {
+        emit(elem);
+        @Nullable Node n = elements.get(elem);
+        if (n != null) {
+          if (n.isNumber()) {
+            emit("=");
+            emit(String.valueOf(n.getDouble()));
+          } else if (n.isString()) {
+            emit("=");
+            emit("'" + n.getString() + "'");
+          }
+        }
+        emit(",");
+        emitBreak();
+      }
+      unindent();
+      emit("}");
+      emitBreak();
+      return true;
     }
 
     private void visitTypeDeclaration(JSType type, boolean isVarArgs, boolean isOptionalPosition) {
