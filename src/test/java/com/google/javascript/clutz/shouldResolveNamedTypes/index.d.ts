@@ -3,7 +3,7 @@ declare namespace ಠ_ಠ.clutz.namedType {
   }
   class A_Instance < U > {
     private noStructuralTyping_: any;
-    fn (a : ಠ_ಠ.clutz.namedType.D < any > ) : any ;
+    fn (a : ಠ_ಠ.clutz.namedType.D < U > ) : any ;
   }
 }
 declare module 'goog:namedType.A' {
