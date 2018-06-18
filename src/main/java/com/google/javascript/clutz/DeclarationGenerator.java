@@ -2926,8 +2926,21 @@ class DeclarationGenerator {
       if (functionSource != null) {
         // functionSource AST: FUNCTION -> (NAME, PARAM_LIST, BLOCK ...)
         Iterable<Node> parameterNodes = functionSource.getFirstChild().getNext().children();
-        names = transform(parameterNodes, Node::getString).iterator();
+        // TODO(bradfordcsmith): This will need to be updated when transpilation of default
+        //   and destructured parameters stops happening in checks-only compilation.
+        names =
+            transform(
+                    parameterNodes,
+                    (node) -> {
+                      if (node.isRest()) {
+                        return node.getOnlyChild().getString();
+                      } else {
+                        return node.getString();
+                      }
+                    })
+                .iterator();
       }
+
       int paramCount = 0;
       while (parameters.hasNext()) {
         Node param = parameters.next();
