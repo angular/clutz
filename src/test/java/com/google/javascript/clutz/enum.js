@@ -3,6 +3,7 @@ goog.provide('some.ObjectValuedEnum');
 goog.provide('some.setEnvironment');
 goog.provide('some.StringEnum');
 goog.provide('some.StringVariableEnum');
+goog.provide('some.PartialLiteralStringEnum');
 
 /** @enum {number} */
 some.SomeEnum = {
@@ -50,5 +51,12 @@ const MSG_B = returnString();
 /** @enum {string} */
 some.StringVariableEnum = {
   A: MSG_A,
+  B: MSG_B,
+};
+
+
+/** @enum {string} */
+some.PartialLiteralStringEnum = {
+  A: '1',
   B: MSG_B,
 };

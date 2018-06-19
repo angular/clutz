@@ -1809,6 +1809,8 @@ class DeclarationGenerator {
         return;
       }
 
+      // Since this is an enum of type different from string literals or numbers, we cannot emit it
+      // as TS enum. Instead we emit it as a var/type alias pair.
       visitTypeAlias(type.getElementsType().getPrimitiveType(), unqualifiedName, true);
       emit("var");
       emit(unqualifiedName);
@@ -1845,13 +1847,15 @@ class DeclarationGenerator {
       // OBJECTLIT parent.
       Node objectOfAllMembers = node.getNext() != null ? node.getNext() : node.getFirstChild();
 
-      // Peek an enum member. If the Closure string enum's value is not literal don't emit anything
-      // and fall back to the safe conversion.
-      if (primitiveType.equals(stringType)
-          && objectOfAllMembers.getFirstChild() != null
-          && objectOfAllMembers.getFirstFirstChild() != null
-          && !objectOfAllMembers.getFirstFirstChild().isString()) {
-        return false;
+      // Look at all enum members. If any of the Closure string enum's values is not literal don't
+      // emit anything and fall back to the safe conversion.
+      if (primitiveType.equals(stringType)) {
+
+        for (Node c : objectOfAllMembers.children()) {
+          if (!c.getFirstChild().isString()) {
+            return false;
+          }
+        }
       }
 
       emit("enum");

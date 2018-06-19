@@ -10,6 +10,17 @@ declare module 'goog:some.ObjectValuedEnum' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.some {
+  type PartialLiteralStringEnum = string &{clutzEnumBrand: never} ;
+  var PartialLiteralStringEnum : {
+    A : PartialLiteralStringEnum ,
+    B : PartialLiteralStringEnum ,
+  };
+}
+declare module 'goog:some.PartialLiteralStringEnum' {
+  import alias = ಠ_ಠ.clutz.some.PartialLiteralStringEnum;
+  export default alias;
+}
+declare namespace ಠ_ಠ.clutz.some {
   enum SomeEnum {
     A = 1.0 ,
     B = 2.0 ,
