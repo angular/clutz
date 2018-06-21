@@ -7,10 +7,9 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz.module$exports$foo$C {
-  type Enum = string &{clutzEnumBrand: never} ;
-  var Enum : {
-    A : Enum ,
-  };
+  enum Enum {
+    A = '' ,
+  }
 }
 declare module 'goog:foo.C' {
   import alias = ಠ_ಠ.clutz.module$exports$foo$C;

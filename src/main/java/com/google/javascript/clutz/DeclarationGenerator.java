@@ -188,6 +188,7 @@ class DeclarationGenerator {
 
   private JSType unknownType;
   private JSType numberType;
+  private JSType stringType;
   @Nullable private JSType iterableType;
   @Nullable private JSType iteratorIterableType;
 
@@ -396,6 +397,7 @@ class DeclarationGenerator {
 
     unknownType = compiler.getTypeRegistry().getNativeType(JSTypeNative.UNKNOWN_TYPE);
     numberType = compiler.getTypeRegistry().getNativeType(JSTypeNative.NUMBER_TYPE);
+    stringType = compiler.getTypeRegistry().getNativeType(JSTypeNative.STRING_TYPE);
     iterableType = compiler.getTypeRegistry().getGlobalType("Iterable");
     iteratorIterableType = compiler.getTypeRegistry().getGlobalType("IteratorIterable");
     // TODO(rado): replace with null and do not emit file when errors.
@@ -1771,7 +1773,7 @@ class DeclarationGenerator {
       // type MyEnum = EnumValueType;
       // var MyEnum: {A: MyEnum, B: MyEnum, ...};
       // </pre>
-      // We special case "number" enums (and for TS 2.4 should include 'string' enums)
+      // We special case "number" enums and "string" enums.
 
       // TS `type` declarations accept only unqualified names.
       String unqualifiedName = getUnqualifiedName(symbolName);
@@ -1802,58 +1804,89 @@ class DeclarationGenerator {
         return;
       }
 
-      boolean isNumericEnum = type.getElementsType().getPrimitiveType().equals(numberType);
-      if (isNumericEnum) {
-        emit("enum");
-        emit(unqualifiedName);
-        emit("{");
-        emitBreak();
-        indent();
+      JSType primitiveType = type.getElementsType().getPrimitiveType();
+      if (maybeStringOrNumericEnum(primitiveType, unqualifiedName, node)) {
+        return;
+      }
 
-        // The current node points to the enum type declaration, this means that the next node will
-        // be the OBJECTLIT containing all enum key and value pairs. However, globally declared
-        // enums that are indirectly provided will instead be pointing to the parent of the
-        // OBJECTLIT parent.
-        Stream<Node> elementStream =
-            node.getNext() != null
-                ? Streams.stream(node.getNext().children())
-                : Streams.stream(node.getFirstChild().children());
-        Map<String, Node> elements =
-            elementStream.collect(Collectors.toMap(Node::getString, Node::getFirstChild));
-
-        for (String elem : sorted(elements.keySet())) {
-          emit(elem);
-          @Nullable Node n = elements.get(elem);
-          if (n != null && n.isNumber()) {
-            emit("=");
-            emit(String.valueOf(n.getDouble()));
-          }
-          emit(",");
-          emitBreak();
-        }
-        unindent();
-        emit("}");
-        emitBreak();
-      } else {
-        visitTypeAlias(type.getElementsType().getPrimitiveType(), unqualifiedName, true);
-        emit("var");
+      // Since this is an enum of type different from string literals or numbers, we cannot emit it
+      // as TS enum. Instead we emit it as a var/type alias pair.
+      visitTypeAlias(type.getElementsType().getPrimitiveType(), unqualifiedName, true);
+      emit("var");
+      emit(unqualifiedName);
+      emit(": {");
+      emitBreak();
+      indent();
+      for (String elem : sorted(type.getElements())) {
+        emit(elem);
+        emit(":");
+        // No need to use type.getMembersType(), this must match the type alias we just declared.
         emit(unqualifiedName);
-        emit(": {");
-        emitBreak();
-        indent();
-        for (String elem : sorted(type.getElements())) {
-          emit(elem);
-          emit(":");
-          // No need to use type.getMembersType(), this must match the type alias we just declared.
-          emit(unqualifiedName);
-          emit(",");
-          emitBreak();
-        }
-        unindent();
-        emit("}");
-        emitNoSpace(";");
+        emit(",");
         emitBreak();
       }
+      unindent();
+      emit("}");
+      emitNoSpace(";");
+      emitBreak();
+    }
+
+    /**
+     * Attempt to convert the node to a string enum or numeric enum and return a boolean indicating
+     * whether it successfully emitted the enum.
+     */
+    private boolean maybeStringOrNumericEnum(
+        JSType primitiveType, String unqualifiedName, Node node) {
+      if (!primitiveType.equals(numberType) && !primitiveType.equals(stringType)) {
+        return false;
+      }
+
+      // The current node points to the enum type declaration, this means that the next node will
+      // be the OBJECTLIT containing all enum key and value pairs. However, globally declared
+      // enums that are indirectly provided will instead be pointing to the parent of the
+      // OBJECTLIT parent.
+      Node objectOfAllMembers = node.getNext() != null ? node.getNext() : node.getFirstChild();
+
+      // Look at all enum members. If any of the Closure string enum's values is not literal don't
+      // emit anything and fall back to the safe conversion.
+      if (primitiveType.equals(stringType)) {
+
+        for (Node c : objectOfAllMembers.children()) {
+          if (!c.getFirstChild().isString()) {
+            return false;
+          }
+        }
+      }
+
+      emit("enum");
+      emit(unqualifiedName);
+      emit("{");
+      emitBreak();
+      indent();
+
+      Stream<Node> elementStream = Streams.stream(objectOfAllMembers.children());
+      Map<String, Node> elements =
+          elementStream.collect(Collectors.toMap(Node::getString, Node::getFirstChild));
+
+      for (String elem : sorted(elements.keySet())) {
+        emit(elem);
+        @Nullable Node n = elements.get(elem);
+        if (n != null) {
+          if (n.isNumber()) {
+            emit("=");
+            emit(String.valueOf(n.getDouble()));
+          } else if (n.isString()) {
+            emit("=");
+            emit("'" + n.getString() + "'");
+          }
+        }
+        emit(",");
+        emitBreak();
+      }
+      unindent();
+      emit("}");
+      emitBreak();
+      return true;
     }
 
     private void visitTypeDeclaration(JSType type, boolean isVarArgs, boolean isOptionalPosition) {
