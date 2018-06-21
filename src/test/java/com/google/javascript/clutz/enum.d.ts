@@ -12,7 +12,7 @@ declare module 'goog:some.ObjectValuedEnum' {
 declare namespace ಠ_ಠ.clutz.some {
   type PartialLiteralStringEnum = string &{clutzEnumBrand: never} ;
   var PartialLiteralStringEnum : {
-    A : PartialLiteralStringEnum ,
+    A : '1' ,
     B : PartialLiteralStringEnum ,
   };
 }

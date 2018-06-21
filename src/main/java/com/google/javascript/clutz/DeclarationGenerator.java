@@ -1804,8 +1804,17 @@ class DeclarationGenerator {
         return;
       }
 
-      JSType primitiveType = type.getElementsType().getPrimitiveType();
-      if (maybeStringOrNumericEnum(primitiveType, unqualifiedName, node)) {
+      // The current node points to the enum type declaration, this means that the next node will
+      // be the OBJECTLIT containing all enum key and value pairs. However, globally declared
+      // enums that are indirectly provided will instead be pointing to the parent of the
+      // OBJECTLIT parent.
+      Node objectOfAllMembers = node.getNext() != null ? node.getNext() : node.getFirstChild();
+      Stream<Node> elementStream = Streams.stream(objectOfAllMembers.children());
+      Map<String, Node> elements =
+          elementStream.collect(Collectors.toMap(Node::getString, Node::getFirstChild));
+
+      JSType primitiveType = type.getEnumeratedTypeOfEnumObject();
+      if (maybeStringOrNumericEnum(primitiveType, unqualifiedName, objectOfAllMembers, elements)) {
         return;
       }
 
@@ -1820,8 +1829,15 @@ class DeclarationGenerator {
       for (String elem : sorted(type.getElements())) {
         emit(elem);
         emit(":");
-        // No need to use type.getMembersType(), this must match the type alias we just declared.
-        emit(unqualifiedName);
+        // For string enums that have some literal values and some calculated values try to use the
+        // literal values as types as much as possible.
+        Node n = elements.get(elem);
+        if (primitiveType.equals(stringType) && n.isString()) {
+          emit("'" + n.getString() + "'");
+        } else {
+          // No need to use type.getMembersType(), this must match the type alias we just declared.
+          emit(unqualifiedName);
+        }
         emit(",");
         emitBreak();
       }
@@ -1836,21 +1852,17 @@ class DeclarationGenerator {
      * whether it successfully emitted the enum.
      */
     private boolean maybeStringOrNumericEnum(
-        JSType primitiveType, String unqualifiedName, Node node) {
+        JSType primitiveType,
+        String unqualifiedName,
+        Node objectOfAllMembers,
+        Map<String, Node> elements) {
       if (!primitiveType.equals(numberType) && !primitiveType.equals(stringType)) {
         return false;
       }
 
-      // The current node points to the enum type declaration, this means that the next node will
-      // be the OBJECTLIT containing all enum key and value pairs. However, globally declared
-      // enums that are indirectly provided will instead be pointing to the parent of the
-      // OBJECTLIT parent.
-      Node objectOfAllMembers = node.getNext() != null ? node.getNext() : node.getFirstChild();
-
       // Look at all enum members. If any of the Closure string enum's values is not literal don't
       // emit anything and fall back to the safe conversion.
       if (primitiveType.equals(stringType)) {
-
         for (Node c : objectOfAllMembers.children()) {
           if (!c.getFirstChild().isString()) {
             return false;
@@ -1863,10 +1875,6 @@ class DeclarationGenerator {
       emit("{");
       emitBreak();
       indent();
-
-      Stream<Node> elementStream = Streams.stream(objectOfAllMembers.children());
-      Map<String, Node> elements =
-          elementStream.collect(Collectors.toMap(Node::getString, Node::getFirstChild));
 
       for (String elem : sorted(elements.keySet())) {
         emit(elem);
