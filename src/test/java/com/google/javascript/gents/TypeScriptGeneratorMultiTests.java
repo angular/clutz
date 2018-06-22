@@ -144,7 +144,7 @@ public class TypeScriptGeneratorMultiTests extends TypeScriptGeneratorTests {
     private List<File> getTestInputFilesRecursive(FilenameFilter filter, String... dir) {
       ImmutableList.Builder<File> filesBuilder = ImmutableList.builder();
 
-      for (File f : Files.fileTreeTraverser().preOrderTraversal(getTestDirPath(dir).toFile())) {
+      for (File f : Files.fileTraverser().depthFirstPreOrder(getTestDirPath(dir).toFile())) {
         if (filter.accept(f.getParentFile(), f.getName())) {
           filesBuilder.add(f);
         }
