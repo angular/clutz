@@ -407,6 +407,7 @@ public class PlatformSymbols {
           "ArrayLike",
           "AssertionOptions",
           "AssignedNodesOptions",
+          "AsyncGenerator",
           "AsyncIterable",
           "AsyncIterableIterator",
           "AsyncIterator",
