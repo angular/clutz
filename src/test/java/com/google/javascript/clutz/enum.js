@@ -59,4 +59,6 @@ some.StringVariableEnum = {
 some.PartialLiteralStringEnum = {
   A: '1',
   B: MSG_B,
+  C: '2',
+  D: MSG_A,
 };

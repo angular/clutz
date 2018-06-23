@@ -1756,14 +1756,30 @@ class DeclarationGenerator {
 
     private void visitTypeAlias(
         JSType registryType, String unqualifiedName, boolean emitNeverBrand) {
-      emit("type");
-      emit(unqualifiedName);
-      emit("=");
-      visitType(registryType, true, false);
+      visitTypeAliasHelper(registryType, unqualifiedName);
       // emit a brand to prevent accidental compatibility of values with an enum.
       if (emitNeverBrand) emit("&{clutzEnumBrand: never}");
       emit(";");
       emitBreak();
+    }
+
+    private void visitTypeAlias(
+        JSType registryType, String unqualifiedName, Set<String> literalTypes) {
+      visitTypeAliasHelper(registryType, unqualifiedName);
+      emit("&{clutzEnumBrand: never}");
+      // Inline all literal types in the type alias.
+      for (String n : literalTypes) {
+        emit("|'" + n + "'");
+      }
+      emit(";");
+      emitBreak();
+    }
+
+    private void visitTypeAliasHelper(JSType registryType, String unqualifiedName) {
+      emit("type");
+      emit(unqualifiedName);
+      emit("=");
+      visitType(registryType, true, false);
     }
 
     private void visitEnumType(String symbolName, String qualifiedName, EnumType type, Node node) {
@@ -1819,8 +1835,16 @@ class DeclarationGenerator {
       }
 
       // Since this is an enum of type different from string literals or numbers, we cannot emit it
-      // as TS enum. Instead we emit it as a var/type alias pair.
-      visitTypeAlias(type.getElementsType().getPrimitiveType(), unqualifiedName, true);
+      // as TS enum. Instead we emit it as a var/type alias pair. We also inline all literal types
+      // in the type alias so this type can be compared and assigned by the literal types (because
+      // they don't have the clutzEnumBrand).
+      if (primitiveType.equals(stringType)) {
+        Set<String> literalTypes = collectAllLiterals(elements);
+        visitTypeAlias(primitiveType, unqualifiedName, literalTypes);
+      } else {
+        visitTypeAlias(primitiveType, unqualifiedName, true);
+      }
+
       emit("var");
       emit(unqualifiedName);
       emit(": {");
@@ -1845,6 +1869,16 @@ class DeclarationGenerator {
       emit("}");
       emitNoSpace(";");
       emitBreak();
+    }
+
+    private Set<String> collectAllLiterals(Map<String, Node> elements) {
+      Set<String> literalTypes = new HashSet();
+      for (Node n : elements.values()) {
+        if (n.isString()) {
+          literalTypes.add(n.getString());
+        }
+      }
+      return literalTypes;
     }
 
     /**
