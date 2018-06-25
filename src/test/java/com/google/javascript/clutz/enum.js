@@ -4,6 +4,7 @@ goog.provide('some.setEnvironment');
 goog.provide('some.StringEnum');
 goog.provide('some.StringVariableEnum');
 goog.provide('some.PartialLiteralStringEnum');
+goog.provide('some.MixedEnum');
 
 /** @enum {number} */
 some.SomeEnum = {
@@ -61,4 +62,11 @@ some.PartialLiteralStringEnum = {
   B: MSG_B,
   C: '2',
   D: MSG_A,
+};
+
+/** @enum {string|number|boolean} */
+some.MixedEnum = {
+  A: 1,
+  B: true,
+  C: 'C',
 };

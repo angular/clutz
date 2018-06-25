@@ -1756,16 +1756,16 @@ class DeclarationGenerator {
 
     private void visitTypeAlias(
         JSType registryType, String unqualifiedName, boolean emitNeverBrand) {
-      visitTypeAliasHelper(registryType, unqualifiedName);
+      emitTypeAliasPrefix(registryType, unqualifiedName);
       // emit a brand to prevent accidental compatibility of values with an enum.
       if (emitNeverBrand) emit("&{clutzEnumBrand: never}");
       emit(";");
       emitBreak();
     }
 
-    private void visitTypeAlias(
+    private void visitTypeAliasForMixedStringEnums(
         JSType registryType, String unqualifiedName, Set<String> literalTypes) {
-      visitTypeAliasHelper(registryType, unqualifiedName);
+      emitTypeAliasPrefix(registryType, unqualifiedName);
       emit("&{clutzEnumBrand: never}");
       // Inline all literal types in the type alias.
       for (String n : literalTypes) {
@@ -1775,7 +1775,7 @@ class DeclarationGenerator {
       emitBreak();
     }
 
-    private void visitTypeAliasHelper(JSType registryType, String unqualifiedName) {
+    private void emitTypeAliasPrefix(JSType registryType, String unqualifiedName) {
       emit("type");
       emit(unqualifiedName);
       emit("=");
@@ -1834,13 +1834,15 @@ class DeclarationGenerator {
         return;
       }
 
-      // Since this is an enum of type different from string literals or numbers, we cannot emit it
-      // as TS enum. Instead we emit it as a var/type alias pair. We also inline all literal types
-      // in the type alias so this type can be compared and assigned by the literal types (because
-      // they don't have the clutzEnumBrand).
+      // We checked the types of all members in the enums above. Since it's not all string literals
+      // or numbers, we cannot emit a TypeScript enum. Instead, we emit it as a var/type alias pair.
+      // Specially for string enums, we still try to emit as many literal types as possible to make
+      // it close to the original intent from Closure. To do that we also inline all literal types
+      // in the type alias so this type alias can be compared and assigned by the literal types
+      // (because the literal types don't have clutzEnumBrand).
       if (primitiveType.equals(stringType)) {
         Set<String> literalTypes = collectAllLiterals(elements);
-        visitTypeAlias(primitiveType, unqualifiedName, literalTypes);
+        visitTypeAliasForMixedStringEnums(primitiveType, unqualifiedName, literalTypes);
       } else {
         visitTypeAlias(primitiveType, unqualifiedName, true);
       }
@@ -1853,8 +1855,9 @@ class DeclarationGenerator {
       for (String elem : sorted(type.getElements())) {
         emit(elem);
         emit(":");
-        // For string enums that have some literal values and some calculated values try to use the
-        // literal values as types as much as possible.
+        // For string enums that have some literal values and some calculated values, we  try to use
+        // the literal values as types as much as possible. For calculated values there's nothing
+        // much we can do. Just back off and use the type alias.
         Node n = elements.get(elem);
         if (primitiveType.equals(stringType) && n.isString()) {
           emit("'" + n.getString() + "'");
@@ -1871,14 +1874,17 @@ class DeclarationGenerator {
       emitBreak();
     }
 
+    /**
+     * Collect all literalInitializations with string literal values in the enum. Later we use these literal initializers to complete the type alias.
+     */
     private Set<String> collectAllLiterals(Map<String, Node> elements) {
-      Set<String> literalTypes = new HashSet();
+      Set<String> literalInitializers = new HashSet();
       for (Node n : elements.values()) {
         if (n.isString()) {
-          literalTypes.add(n.getString());
+          literalInitializers.add(n.getString());
         }
       }
-      return literalTypes;
+      return literalInitializers;
     }
 
     /**
