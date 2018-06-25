@@ -1875,7 +1875,8 @@ class DeclarationGenerator {
     }
 
     /**
-     * Collect all literalInitializations with string literal values in the enum. Later we use these literal initializers to complete the type alias.
+     * Collect all literalInitializations with string literal values in the enum. Later we use these
+     * literal initializers to complete the type alias.
      */
     private Set<String> collectAllLiterals(Map<String, Node> elements) {
       Set<String> literalInitializers = new HashSet();
