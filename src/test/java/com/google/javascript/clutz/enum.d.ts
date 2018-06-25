@@ -1,4 +1,16 @@
 declare namespace ಠ_ಠ.clutz.some {
+  type MixedEnum = string | number | boolean &{clutzEnumBrand: never} ;
+  var MixedEnum : {
+    A : MixedEnum ,
+    B : MixedEnum ,
+    C : MixedEnum ,
+  };
+}
+declare module 'goog:some.MixedEnum' {
+  import alias = ಠ_ಠ.clutz.some.MixedEnum;
+  export default alias;
+}
+declare namespace ಠ_ಠ.clutz.some {
   type ObjectValuedEnum = X &{clutzEnumBrand: never} ;
   var ObjectValuedEnum : {
     A : ObjectValuedEnum ,
@@ -10,10 +22,12 @@ declare module 'goog:some.ObjectValuedEnum' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.some {
-  type PartialLiteralStringEnum = string &{clutzEnumBrand: never} ;
+  type PartialLiteralStringEnum = string &{clutzEnumBrand: never} |'1' |'2' ;
   var PartialLiteralStringEnum : {
-    A : PartialLiteralStringEnum ,
+    A : '1' ,
     B : PartialLiteralStringEnum ,
+    C : '2' ,
+    D : PartialLiteralStringEnum ,
   };
 }
 declare module 'goog:some.PartialLiteralStringEnum' {
