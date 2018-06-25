@@ -1084,8 +1084,16 @@ class DeclarationGenerator {
           } else {
             emit("function");
           }
+          boolean forcePropDeclaration = false;
+          boolean isStatic = forcePropDeclaration;
+          boolean isNamespace = true;
           treeWalker.visitProperty(
-              propName, oType, false, false, true, Collections.<String>emptyList());
+              propName,
+              oType,
+              isStatic,
+              forcePropDeclaration,
+              isNamespace,
+              Collections.<String>emptyList());
         }
       }
     }
@@ -1608,6 +1616,7 @@ class DeclarationGenerator {
       //
       // Emit original name class before Instance in order to match the already emitted JSDoc.
       final boolean emitInstance = !ftype.isInterface();
+      Set<String> staticProps = getTypePropertyNamesToEmit(ftype, true);
       if (emitInstance) {
         emit("class");
         emit(name);
@@ -1620,7 +1629,19 @@ class DeclarationGenerator {
         emitBreak();
         // we pass an empty set because static function can never refer to a TemplateType defined
         // on the class
-        visitProperties(ftype, true);
+        visitStaticProperties(ftype, staticProps, /* isInNamespace*/ false);
+        unindent();
+        emit("}");
+        emitBreak();
+      } else if (!staticProps.isEmpty()) {
+        // This is an interface, but in Closure, interfaces can still have static properties
+        // defined on them. Emit those in a namespace that matches the interface's name.
+        emit("namespace");
+        emit(name);
+        emit("{");
+        indent();
+        emitBreak();
+        visitStaticProperties(ftype, staticProps, /* isInNamespace*/ true);
         unindent();
         emit("}");
         emitBreak();
@@ -2326,7 +2347,7 @@ class DeclarationGenerator {
 
     private void visitRecordType(ObjectType type) {
       emit("{");
-      Iterator<String> it = getSortedPropertyNamesToEmit(type).iterator();
+      Iterator<String> it = getEmittablePropertyNames(type).iterator();
       while (it.hasNext()) {
         String propName = it.next();
         if (isValidJSProperty(propName)) {
@@ -2352,7 +2373,44 @@ class DeclarationGenerator {
       emit("}");
     }
 
-    private Set<String> getSortedPropertyNamesToEmit(final ObjectType type) {
+    /**
+     * Returns the (sorted) set of properties that should be emitted within types, i.e. on classes,
+     * interfaces, or in object types.
+     *
+     * @param isStatic if true, skips properties that are likely namespaces during extern
+     *     processing.
+     */
+    private Set<String> getTypePropertyNamesToEmit(final ObjectType type, boolean isStatic) {
+      return Sets.filter(
+          getEmittablePropertyNames(type),
+          propName -> {
+            // Extern processing goes through all known symbols, thus statics that are
+            // representable as a namespace, are skipped here and emitted as namespaces only.
+            // (see: extern_static_namespace output.d.ts)
+            if (isExtern && isStatic && isLikelyNamespace(type.getOwnPropertyJSDocInfo(propName))) {
+              return false;
+            }
+            if ("prototype".equals(propName)
+                || "superClass_".equals(propName)
+                // constructors are handled in #visitObjectType
+                || "constructor".equals(propName)) {
+              return false;
+            }
+            // Some symbols might be emitted as provides, so don't duplicate them.
+            String qualifiedName = type.getDisplayName() + "." + propName;
+            if (provides.contains(qualifiedName)) {
+              return false;
+            }
+            JSType propertyType = type.getPropertyType(propName);
+            if (isDefiningType(propertyType)) {
+              // only emit properties here, types are emitted in walkInnerSymbols.
+              return false;
+            }
+            return true;
+          });
+    }
+
+    private Set<String> getEmittablePropertyNames(final ObjectType type) {
       return sorted(
           Sets.filter(
               type.getOwnPropertyNames(),
@@ -2420,7 +2478,7 @@ class DeclarationGenerator {
       // Constructors.
       if (type.isConstructor() && mustEmitConstructor(type) && !isPrivate(type.getJSDocInfo())) {
         maybeEmitJsDoc(type.getJSDocInfo(), /* ignoreParams */ false);
-        // TODO(radokirov): mark constuctor as private when source is annotated with
+        // TODO(radokirov): mark constructor as private when source is annotated with
         // @private for ts v2.0 and greater
         emit("constructor");
         visitFunctionParameters(type, false, classTemplateTypeNames);
@@ -2442,9 +2500,8 @@ class DeclarationGenerator {
       // We were accidentally passing it in for the wrong param, so
       // I "fixed" it by removing it, but maybe we should restore the
       // original intent.
-      visitProperties(
+      visitInstanceProperties(
           (ObjectType) instanceType,
-          false,
           Collections.<String>emptySet(),
           Collections.<String>emptySet(),
           Collections.<String>emptyList());
@@ -2488,9 +2545,8 @@ class DeclarationGenerator {
       maybeEmitSymbolIterator(instanceType);
 
       // Prototype fields (mostly methods).
-      visitProperties(
+      visitInstanceProperties(
           prototype,
-          false,
           ((ObjectType) instanceType).getOwnPropertyNames(),
           superClassFields,
           classTemplateTypeNames);
@@ -2543,42 +2599,43 @@ class DeclarationGenerator {
       }
     }
 
-    private void visitProperties(ObjectType objType, boolean isStatic) {
-      visitProperties(
-          objType,
-          isStatic,
-          Collections.<String>emptySet(),
-          Collections.<String>emptySet(),
-          Collections.<String>emptyList());
-    }
-
-    private void visitProperties(
-        ObjectType objType,
-        boolean isStatic,
-        Set<String> skipNames,
-        Set<String> forceProps,
-        List<String> classTemplateTypeNames) {
-      for (String propName : getSortedPropertyNamesToEmit(objType)) {
-        // Extern processing goes through all known symbols, thus statics that are representable as
-        // a namespace, are skipped here and emitted as namespaces only.
-        // (see: extern_static_namespace output.d.ts)
-        if (isExtern && isStatic && isLikelyNamespace(objType.getOwnPropertyJSDocInfo(propName)))
-          continue;
-        if (skipNames.contains(propName)) continue;
-
-        if ("prototype".equals(propName)
-            || "superClass_".equals(propName)
-            // constructors are handled in #visitObjectType
-            || "constructor".equals(propName)) {
-          continue;
+    /**
+     * Emits the given set of properties.
+     *
+     * @param isInNamespace if true, emit the properties in a form suitable for namespace members
+     *     (e.g. with "var" and "function" prefixes). If false, emit suitable for properties
+     *     declared in a class or interface.
+     */
+    private void visitStaticProperties(
+        ObjectType objType, Set<String> propNames, boolean isInNamespace) {
+      for (String propName : propNames) {
+        if (isInNamespace) {
+          JSType propType = objType.getPropertyType(propName);
+          if (propType.toMaybeFunctionType() == null) {
+            emit("var");
+          } else {
+            emit("function");
+          }
         }
         visitProperty(
             propName,
             objType,
-            isStatic,
-            forceProps.contains(propName),
+            !isInNamespace,
             false,
-            classTemplateTypeNames);
+            isInNamespace,
+            Collections.<String>emptyList());
+      }
+    }
+
+    private void visitInstanceProperties(
+        ObjectType objType,
+        Set<String> skipNames,
+        Set<String> forceProps,
+        List<String> classTemplateTypeNames) {
+      for (String propName : getTypePropertyNamesToEmit(objType, false)) {
+        if (skipNames.contains(propName)) continue;
+        visitProperty(
+            propName, objType, false, forceProps.contains(propName), false, classTemplateTypeNames);
       }
     }
 
@@ -2679,15 +2736,6 @@ class DeclarationGenerator {
         boolean isNamespace,
         List<String> classTemplateTypeNames) {
       JSType propertyType = objType.getPropertyType(propName);
-      // Some symbols might be emitted as provides, so don't duplicate them
-      String qualifiedName = objType.getDisplayName() + "." + propName;
-      if (provides.contains(qualifiedName)) {
-        return;
-      } else if (isDefiningType(propertyType) && !isNamespace) {
-        // if we're not traversing a namepace, inner enums and classes are emitted in a namespace
-        // later.
-        return;
-      }
       // The static methods from the function prototype are provided by lib.d.ts.
       if (isStatic && isFunctionPrototypeProp(propName)) return;
       maybeEmitJsDoc(objType.getOwnPropertyJSDocInfo(propName), /* ignoreParams */ false);
@@ -3080,7 +3128,7 @@ class DeclarationGenerator {
                 .stream()
                 .filter(symbol -> symbol.getName() != null && symbol.getNode() != null)
                 .collect(Collectors.toMap(TypedVar::getName, TypedVar::getNode));
-        for (String propName : getSortedPropertyNamesToEmit(type)) {
+        for (String propName : getEmittablePropertyNames(type)) {
           innerProps.put(
               new NamedTypePair(type.getPropertyType(propName), propName),
               nodes.get(innerNamespace + "." + propName));
@@ -3121,25 +3169,8 @@ class DeclarationGenerator {
                     + propName
                     + " but type not found in Closure type registry.");
           }
-          // An extra pass is required for interfaces, because in Closure they might have
-          // static methods or fields. TS does not support static methods on interfaces, so we
-          // handle
-          // them here.
-        } else if (type.isInterface() && isOrdinaryFunction(pType)) {
-          // Interfaces are "backed" by a function() {} assignment in closure,
-          // which adds some function prototype methods, that are not truely part of the interface.
-          if (isFunctionPrototypeProp(propName)) continue;
-          if (!foundNamespaceMembers) {
-            emitNamespaceBegin(innerNamespace);
-            foundNamespaceMembers = true;
-          }
-          visitFunctionExpression(propName, (FunctionType) pType);
-        } else if (type.isInterface() && !pType.isNoType() && !pType.isFunctionPrototypeType()) {
-          if (!foundNamespaceMembers) {
-            emitNamespaceBegin(innerNamespace);
-            foundNamespaceMembers = true;
-          }
-          visitVarDeclaration(propName, pType);
+          // Non-type defining static properties are handled for provided and unprovided
+          // interfaces in visitClassOrInterface.
         }
       }
       if (foundNamespaceMembers) emitNamespaceEnd();

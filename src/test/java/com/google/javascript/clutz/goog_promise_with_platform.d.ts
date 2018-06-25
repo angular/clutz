@@ -15,14 +15,14 @@ declare module 'goog:goog.Promise' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.goog {
+  namespace Thenable {
+    var IMPLEMENTED_BY_PROP : string ;
+    function addImplementation (ctor : { new ( ...a : any [] ) : ಠ_ಠ.clutz.goog.Thenable < any > } ) : void ;
+    function isImplementedBy (object : any ) : boolean ;
+  }
   interface Thenable < TYPE > extends PromiseLike < TYPE > {
     then < RESULT > (opt_onFulfilled ? : ( (a : TYPE ) => ಠ_ಠ.clutz.goog.Thenable < RESULT > | RESULT ) | null , opt_onRejected ? : ( (a : any ) => any ) | null) : ಠ_ಠ.clutz.goog.Thenable < RESULT > ;
   }
-}
-declare namespace ಠ_ಠ.clutz.goog.Thenable {
-  var IMPLEMENTED_BY_PROP : string ;
-  function addImplementation (ctor : { new ( ...a : any [] ) : ಠ_ಠ.clutz.goog.Thenable < any > } ) : void ;
-  function isImplementedBy (object : any ) : boolean ;
 }
 declare module 'goog:goog.Thenable' {
   import alias = ಠ_ಠ.clutz.goog.Thenable;

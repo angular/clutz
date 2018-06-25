@@ -9,8 +9,6 @@ declare namespace ಠ_ಠ.clutz.interface_exp {
   class SomeClazz_Instance {
     private noStructuralTyping_: any;
   }
-  function staticMethod ( ) : number ;
-  var staticProp : number ;
 }
 declare module 'goog:interface_exp' {
   import alias = ಠ_ಠ.clutz.interface_exp;
