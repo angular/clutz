@@ -27,21 +27,16 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class DeclarationSyntaxTest {
   private static final FilenameFilter JS_MULTIFILE_PARTIAL =
-      new FilenameFilter() {
-        @Override
-        public boolean accept(File dir, String name) {
-          return JS_NO_EXTERNS.accept(dir, name) && dir.getName().equals("multifilePartial");
-        }
-      };
+      (File dir, String name) ->
+          JS_NO_EXTERNS.accept(dir, name) && dir.getName().equals("multifilePartial");
 
   private static final FilenameFilter JS_PARTIAL_CROSS_MODULE_TYPE_IMPORTS =
-      new FilenameFilter() {
-        @Override
-        public boolean accept(File dir, String name) {
-          return JS_NO_EXTERNS.accept(dir, name)
-              && dir.getName().equals("partialCrossModuleTypeImports");
-        }
-      };
+      (File dir, String name) ->
+          JS_NO_EXTERNS.accept(dir, name) && dir.getName().equals("partialCrossModuleTypeImports");
+
+  private static final FilenameFilter JS_ALIASED_INTERFACE =
+      (File dir, String name) ->
+          JS_NO_EXTERNS.accept(dir, name) && dir.getName().equals("aliasedInterface");
 
   public static final Path TSC =
       FileSystems.getDefault().getPath("node_modules", "typescript", "bin", "tsc");
@@ -76,6 +71,24 @@ public class DeclarationSyntaxTest {
     List<File> inputs =
         DeclarationGeneratorTests.getTestInputFiles(JS_PARTIAL_CROSS_MODULE_TYPE_IMPORTS);
     doTestDeclarationSyntax(inputs);
+  }
+
+  @Test
+  public void testAliasedInterfaceDeclarationSyntax() throws Exception {
+    List<File> inputs =
+        DeclarationGeneratorTests.getTestInputFiles(
+            (File dir, String name) ->
+                TS_SOURCES.accept(dir, name) && dir.getName().equals("aliasedInterface"));
+    List<String> tsPaths = new ArrayList<>();
+    for (File input : inputs) {
+      tsPaths.add(input.getPath());
+    }
+
+    List<String> tscCommand = Lists.newArrayList(TSC.toString());
+    tscCommand.addAll(TSC_FLAGS);
+    tscCommand.add("src/resources/closure.lib.d.ts");
+    tscCommand.addAll(tsPaths);
+    runChecked(tscCommand);
   }
 
   private void doTestDeclarationSyntax(List<File> inputs) throws Exception {

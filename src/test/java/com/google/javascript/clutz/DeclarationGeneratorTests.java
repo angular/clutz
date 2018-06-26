@@ -105,7 +105,7 @@ public class DeclarationGeneratorTests {
     // Test files that live in the 'multifilePartial' dir, and run with the --partialInput option
     // The resulting .d.ts files are checked with a DeclarationSyntaxTest, and they're also
     // compiled in a single run in MultiFileTest
-    File[] testMultifilePartailFiles =
+    File[] testMultifilePartialFiles =
         getPackagePath().resolve("multifilePartial").toFile().listFiles(filter);
     // Test files that live in the 'testPartialCrossModuleTypeImportsFiles' dir, and run with the
     // --partialInput and --googProvides options.  The resulting .d.ts files are checked with a
@@ -116,7 +116,7 @@ public class DeclarationGeneratorTests {
     File[] testOutputBaseFiles = getPackagePath().resolve("outputBase").toFile().listFiles(filter);
     List<File> filesList = Lists.newArrayList(testFiles);
     filesList.addAll(Arrays.asList(testPartialFiles));
-    filesList.addAll(Arrays.asList(testMultifilePartailFiles));
+    filesList.addAll(Arrays.asList(testMultifilePartialFiles));
     filesList.addAll(Arrays.asList(testPartialCrossModuleTypeImportsFiles));
     filesList.addAll(Arrays.asList(testOutputBaseFiles));
 

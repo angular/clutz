@@ -1543,9 +1543,11 @@ class DeclarationGenerator {
       visitTemplateTypes(otype, Collections.emptyList(), false);
       emit(";");
       emitBreak();
-      if (!otype.isInterface()) {
+      if (!otype.isInterface() || !getTypePropertyNamesToEmit(otype, true).isEmpty()) {
         // TS type aliases are only useful in type positions.
-        // To emulate closure alias semantics, introduce also an aliased constructor
+        // To emulate closure alias semantics, introduce also an aliased constructor if there is a
+        // value associated with the type (i.e. non-interfaces or interfaces that also have static
+        // properties emitted on them).
         emit("var " + unqualifiedName);
         emit(":");
         emit("typeof");

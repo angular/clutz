@@ -108,6 +108,16 @@ public class MultiFileTest {
         .generatesDeclarations(golden);
   }
 
+  @Test
+  public void aliasedInterface() throws Exception {
+    File golden = input("aliasedInterface.d.ts");
+    assertThatProgram(
+            ImmutableList.of(
+                input("alias_for_interface.js"), input("aliased_interface_with_static.js")),
+            Collections.<File>emptyList())
+        .generatesDeclarations(golden);
+  }
+
   private File input(String filename) {
     Path testDir = FileSystems.getDefault().getPath("src", "test", "java");
     String packageName = ProgramSubject.class.getPackage().getName();
