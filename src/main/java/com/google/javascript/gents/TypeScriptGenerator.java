@@ -225,6 +225,18 @@ public class TypeScriptGenerator {
                 .setOutputTypes(true)
                 .build();
 
+        // For whatever reason closure sometimes prefixes the emit with an empty new line. Strip
+        // newlines not present in the original source.
+        CharSequence originalSourceCode =
+            compiler.getSourceFileContentByName(file.getSourceFileName());
+
+        Integer originalCount = countBeginningNewlines(originalSourceCode);
+        Integer newCount = countBeginningNewlines(tsCode);
+
+        if (newCount > originalCount) {
+          tsCode = tsCode.substring(newCount - originalCount);
+        }
+
         result.sourceFileMap.put(filepath, tryClangFormat(tsCode));
       } catch (Throwable t) {
         System.err.println("Failed while converting " + file.getSourceFileName());
@@ -239,6 +251,18 @@ public class TypeScriptGenerator {
             .generateModuleRewriteLog(filesToConvert, modulePrePass.getNamespaceMap());
     errorManager.doGenerateReport();
     return result;
+  }
+
+  private Integer countBeginningNewlines(CharSequence originalSourceCode) {
+    Integer originalCount = 0;
+    for (Integer i = 0; i < originalSourceCode.length(); i++) {
+      if (originalSourceCode.charAt(i) == '\n') {
+        originalCount += 1;
+      } else {
+        break;
+      }
+    }
+    return originalCount;
   }
 
   /**

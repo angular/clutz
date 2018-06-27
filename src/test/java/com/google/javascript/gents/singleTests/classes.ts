@@ -1,4 +1,3 @@
-
 /**
  * Anonymous class
  */

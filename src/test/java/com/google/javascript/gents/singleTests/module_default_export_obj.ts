@@ -1,4 +1,3 @@
-
 /** some comment */
 export class C {}
 

@@ -1,4 +1,3 @@
-
 /**
  * A non-trivial comment.
  * @enum {number}

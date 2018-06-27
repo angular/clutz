@@ -1,4 +1,3 @@
-
 export class foo {}
 
 export const typC = foo;

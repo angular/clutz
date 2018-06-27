@@ -1,4 +1,3 @@
-
 /**
  * @fileoverview test comment about this file to ensure comments are
  * appropriately placed
