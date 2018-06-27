@@ -154,6 +154,8 @@ class DeclarationGenerator {
 
   private static final String MODULE_PREFIX = "module$exports$";
 
+  private static final Splitter DOT_SPLITTER = Splitter.on('.');
+
   public static void main(String[] args) {
     Options options = null;
     try {
@@ -743,9 +745,9 @@ class DeclarationGenerator {
         String namespace;
         String googModuleStyleName;
         if (e.getKey().contains(".")) {
-          String[] nameParts = e.getKey().split("\\.");
-          namespace = nameParts[0];
-          googModuleStyleName = nameParts[1];
+          List<String> nameParts = DOT_SPLITTER.splitToList(e.getKey());
+          namespace = nameParts.get(0);
+          googModuleStyleName = nameParts.get(1);
         } else {
           namespace = "";
           googModuleStyleName = e.getKey();
@@ -1062,8 +1064,8 @@ class DeclarationGenerator {
         // For inferred symbols there is no matching symbol, so the best we can do is pull the
         // type from the module object type map.
         for (String desiredSymbol : desiredSymbols) {
-          String[] parts = desiredSymbol.split("\\.");
-          String propName = parts[parts.length - 1];
+          List<String> parts = DOT_SPLITTER.splitToList(desiredSymbol);
+          String propName = parts.get(parts.size() - 1);
           if (!isValidJSProperty(propName)) {
             emitComment("skipping property " + propName + " because it is not a valid symbol.");
             continue;
@@ -1902,7 +1904,7 @@ class DeclarationGenerator {
      * literal initializers to complete the type alias.
      */
     private Set<String> collectAllLiterals(Map<String, Node> elements) {
-      Set<String> literalInitializers = new HashSet();
+      Set<String> literalInitializers = new HashSet<>();
       for (Node n : elements.values()) {
         if (n.isString()) {
           literalInitializers.add(n.getString());
@@ -2036,7 +2038,7 @@ class DeclarationGenerator {
      * so just replace the part of the display name before the first period
      */
     private String maybeRewriteImportedName(String displayName) {
-      String baseDisplayName = displayName.split("\\.")[0];
+      String baseDisplayName = DOT_SPLITTER.split(displayName).iterator().next();
       if (importRenameMap.containsKey(baseDisplayName)) {
         displayName = displayName.replace(baseDisplayName, importRenameMap.get(baseDisplayName));
       }
