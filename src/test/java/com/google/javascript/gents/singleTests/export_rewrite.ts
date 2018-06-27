@@ -1,4 +1,3 @@
-
 export function B() {}
 
 export class Klass {
