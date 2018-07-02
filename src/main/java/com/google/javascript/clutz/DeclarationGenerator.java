@@ -2786,7 +2786,7 @@ class DeclarationGenerator {
         }
         // Avoid re-emitting template variables defined on the class level if method is not static.
         List<String> skipTemplateParams =
-            isStatic ? Collections.<String>emptyList() : classTemplateTypeNames;
+            isStatic ? Collections.emptyList() : classTemplateTypeNames;
         JSType typeOfThis = ftype.getTypeOfThis();
         // If a method returns the 'this' object, it needs to be typed to match the type of the
         // instance it is invoked on. That way when called on the subclass it should return the
@@ -2796,6 +2796,8 @@ class DeclarationGenerator {
         // In TypeScript one can use the reserved 'this' type, without templatization.
         // Detect the pattern here and remove the templatized type from the emit.
         if (typeOfThis != null && typeOfThis.isTemplateType()) {
+          // skipTemplateParams might be an immutable list.
+          skipTemplateParams = new ArrayList<>(skipTemplateParams);
           skipTemplateParams.add(typeOfThis.getDisplayName());
         }
         visitFunctionDeclaration(ftype, skipTemplateParams);
