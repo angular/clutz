@@ -69,6 +69,7 @@ dependencies {
 
   compile 'com.google.code.findbugs:jsr305:3.0.1'
   compile 'com.google.guava:guava:20.0'
+  compile 'org.apache.commons:commons-text:1.4'
 
   testCompile 'junit:junit:4.11'
   testCompile 'com.google.truth:truth:0.40'

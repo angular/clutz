@@ -1,4 +1,13 @@
 declare namespace ಠ_ಠ.clutz.some {
+  enum EscapedEnum {
+    A = '\\' ,
+  }
+}
+declare module 'goog:some.EscapedEnum' {
+  import alias = ಠ_ಠ.clutz.some.EscapedEnum;
+  export default alias;
+}
+declare namespace ಠ_ಠ.clutz.some {
   type MixedEnum = string | number | boolean &{clutzEnumBrand: never} ;
   var MixedEnum : {
     A : MixedEnum ,

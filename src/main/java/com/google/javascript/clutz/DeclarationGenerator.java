@@ -9,6 +9,7 @@ import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.STRING_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toCollection;
+import static org.apache.commons.text.StringEscapeUtils.escapeJava;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Joiner;
@@ -1951,7 +1952,7 @@ class DeclarationGenerator {
             emit(String.valueOf(n.getDouble()));
           } else if (n.isString()) {
             emit("=");
-            emit("'" + n.getString() + "'");
+            emit("'" + escapeJava(n.getString()) + "'");
           }
         }
         emit(",");
