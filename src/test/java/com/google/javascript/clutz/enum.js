@@ -5,6 +5,7 @@ goog.provide('some.StringEnum');
 goog.provide('some.StringVariableEnum');
 goog.provide('some.PartialLiteralStringEnum');
 goog.provide('some.MixedEnum');
+goog.provide('some.NumberAsKey');
 
 /** @enum {number} */
 some.SomeEnum = {
@@ -70,3 +71,8 @@ some.MixedEnum = {
   B: true,
   C: 'C',
 };
+
+/** @enum {string} */
+some.NumberAsKey = {
+  1: 'a',
+}
