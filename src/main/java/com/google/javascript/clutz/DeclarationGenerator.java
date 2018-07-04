@@ -1886,7 +1886,7 @@ class DeclarationGenerator {
         // much we can do. Just back off and use the type alias.
         Node n = elements.get(elem);
         if (primitiveType.equals(stringType) && n.isString()) {
-          emit("'" + n.getString() + "'");
+          emit("'" + escapeJava(n.getString()) + "'");
         } else {
           // No need to use type.getMembersType(), this must match the type alias we just declared.
           emit(unqualifiedName);
@@ -1908,7 +1908,7 @@ class DeclarationGenerator {
       Set<String> literalInitializers = new HashSet<>();
       for (Node n : elements.values()) {
         if (n.isString()) {
-          literalInitializers.add(n.getString());
+          literalInitializers.add(escapeJava(n.getString()));
         }
       }
       return literalInitializers;
