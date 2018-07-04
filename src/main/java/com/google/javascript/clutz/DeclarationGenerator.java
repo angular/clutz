@@ -9,7 +9,7 @@ import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.STRING_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toCollection;
-import static org.apache.commons.text.StringEscapeUtils.escapeJava;
+import static org.apache.commons.text.StringEscapeUtils.escapeEcmaScript;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Joiner;
@@ -1886,7 +1886,7 @@ class DeclarationGenerator {
         // much we can do. Just back off and use the type alias.
         Node n = elements.get(elem);
         if (primitiveType.equals(stringType) && n.isString()) {
-          emit("'" + escapeJava(n.getString()) + "'");
+          emit("'" + escapeEcmaScript(n.getString()) + "'");
         } else {
           // No need to use type.getMembersType(), this must match the type alias we just declared.
           emit(unqualifiedName);
@@ -1908,7 +1908,7 @@ class DeclarationGenerator {
       Set<String> literalInitializers = new HashSet<>();
       for (Node n : elements.values()) {
         if (n.isString()) {
-          literalInitializers.add(escapeJava(n.getString()));
+          literalInitializers.add(escapeEcmaScript(n.getString()));
         }
       }
       return literalInitializers;
@@ -1952,7 +1952,7 @@ class DeclarationGenerator {
             emit(String.valueOf(n.getDouble()));
           } else if (n.isString()) {
             emit("=");
-            emit("'" + escapeJava(n.getString()) + "'");
+            emit("'" + escapeEcmaScript(n.getString()) + "'");
           }
         }
         emit(",");
