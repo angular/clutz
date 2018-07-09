@@ -20,6 +20,17 @@ declare module 'goog:some.MixedEnum' {
   export default alias;
 }
 declare namespace ಠ_ಠ.clutz.some {
+  type NumberAsKey = string &{clutzEnumBrand: never} |'a' |'b' ;
+  var NumberAsKey : {
+    1 : 'a' ,
+    2 : 'b' ,
+  };
+}
+declare module 'goog:some.NumberAsKey' {
+  import alias = ಠ_ಠ.clutz.some.NumberAsKey;
+  export default alias;
+}
+declare namespace ಠ_ಠ.clutz.some {
   type ObjectValuedEnum = X &{clutzEnumBrand: never} ;
   var ObjectValuedEnum : {
     A : ObjectValuedEnum ,
