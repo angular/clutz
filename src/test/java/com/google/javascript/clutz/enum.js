@@ -75,4 +75,5 @@ some.MixedEnum = {
 /** @enum {string} */
 some.NumberAsKey = {
   1: 'a',
+  '2': 'b',
 }

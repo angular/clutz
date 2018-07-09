@@ -1928,7 +1928,8 @@ class DeclarationGenerator {
 
       // Look at all enum members. If any of the Closure string enum's values is not literal don't
       // emit anything and fall back to the safe conversion. Also, if any of the Closure string
-      // enum's keys starts with a digit it's invalid in TS.
+      // enum's keys starts with a digit it's invalid in TS. Quoted digits are considered numeric as
+      // well so they cannot be used as enum keys either.
       if (primitiveType.equals(stringType)) {
         for (Node c : objectOfAllMembers.children()) {
           if (Character.isDigit(c.getString().charAt(0))) {
