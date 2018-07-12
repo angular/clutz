@@ -6,6 +6,6 @@ declare module 'goog:ns.reserved.a' {
   export default a.a;
 }
 declare module 'goog:ns.reserved.switch' {
-  import switch = ಠ_ಠ.clutz.ns.reserved;
-  export default switch.switch;
+  import switch_ = ಠ_ಠ.clutz.ns.reserved;
+  export default switch_.switch;
 }
