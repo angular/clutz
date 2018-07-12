@@ -6,6 +6,6 @@ declare namespace ಠ_ಠ.clutz.extend.array {
   }
 }
 declare module 'goog:extend.array.C' {
-  import alias = ಠ_ಠ.clutz.extend.array.C;
-  export default alias;
+  import C = ಠ_ಠ.clutz.extend.array.C;
+  export default C;
 }

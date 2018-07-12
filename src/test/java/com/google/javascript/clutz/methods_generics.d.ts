@@ -26,6 +26,6 @@ declare namespace ಠ_ಠ.clutz.method_generics {
   }
 }
 declare module 'goog:method_generics' {
-  import alias = ಠ_ಠ.clutz.method_generics;
-  export = alias;
+  import method_generics = ಠ_ಠ.clutz.method_generics;
+  export = method_generics;
 }

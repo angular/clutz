@@ -14,6 +14,6 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare module 'goog:abst.method' {
-  import alias = ಠ_ಠ.clutz.module$exports$abst$method;
-  export default alias;
+  import method = ಠ_ಠ.clutz.module$exports$abst$method;
+  export default method;
 }

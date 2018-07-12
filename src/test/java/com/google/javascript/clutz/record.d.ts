@@ -8,8 +8,8 @@ declare namespace ಠ_ಠ.clutz.namespace.I {
   }
 }
 declare module 'goog:namespace.I' {
-  import alias = ಠ_ಠ.clutz.namespace.I;
-  export default alias;
+  import I = ಠ_ಠ.clutz.namespace.I;
+  export default I;
 }
 declare namespace ಠ_ಠ.clutz.namespace {
   interface R {
@@ -18,8 +18,8 @@ declare namespace ಠ_ಠ.clutz.namespace {
   }
 }
 declare module 'goog:namespace.R' {
-  import alias = ಠ_ಠ.clutz.namespace.R;
-  export default alias;
+  import R = ಠ_ಠ.clutz.namespace.R;
+  export default R;
 }
 declare namespace ಠ_ಠ.clutz {
   interface externR {

@@ -6,8 +6,8 @@ declare namespace ಠ_ಠ.clutz.enums {
   }
 }
 declare module 'goog:enums.EnumWithInlineMethod' {
-  import alias = ಠ_ಠ.clutz.enums.EnumWithInlineMethod;
-  export default alias;
+  import EnumWithInlineMethod = ಠ_ಠ.clutz.enums.EnumWithInlineMethod;
+  export default EnumWithInlineMethod;
 }
 declare namespace ಠ_ಠ.clutz.enums {
   enum EnumWithMethod {
@@ -16,6 +16,6 @@ declare namespace ಠ_ಠ.clutz.enums {
   }
 }
 declare module 'goog:enums.EnumWithMethod' {
-  import alias = ಠ_ಠ.clutz.enums.EnumWithMethod;
-  export default alias;
+  import EnumWithMethod = ಠ_ಠ.clutz.enums.EnumWithMethod;
+  export default EnumWithMethod;
 }

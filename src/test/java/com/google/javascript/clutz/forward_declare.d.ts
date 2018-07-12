@@ -10,6 +10,6 @@ declare namespace ಠ_ಠ.clutz.forward {
   }
 }
 declare module 'goog:forward.A' {
-  import alias = ಠ_ಠ.clutz.forward.A;
-  export default alias;
+  import A = ಠ_ಠ.clutz.forward.A;
+  export default A;
 }

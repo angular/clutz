@@ -4,6 +4,6 @@ declare namespace ಠ_ಠ.clutz.union {
   var x : boolean | string ;
 }
 declare module 'goog:union' {
-  import alias = ಠ_ಠ.clutz.union;
-  export = alias;
+  import union = ಠ_ಠ.clutz.union;
+  export = union;
 }

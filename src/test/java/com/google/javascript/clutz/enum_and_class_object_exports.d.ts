@@ -7,8 +7,8 @@ declare namespace ಠ_ಠ.clutz.foo.bar {
   var Enum : ಠ_ಠ.clutz.module$contents$foo$bar_ExportObject.Enum ;
 }
 declare module 'goog:foo.bar' {
-  import alias = ಠ_ಠ.clutz.foo.bar;
-  export = alias;
+  import bar = ಠ_ಠ.clutz.foo.bar;
+  export = bar;
 }
 declare namespace ಠ_ಠ.clutz.module$contents$foo$bar_ExportObject {
   enum Enum {

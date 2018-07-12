@@ -8,8 +8,8 @@ declare namespace ಠ_ಠ.clutz.nsThis {
   }
 }
 declare module 'goog:nsThis.C' {
-  import alias = ಠ_ಠ.clutz.nsThis.C;
-  export default alias;
+  import C = ಠ_ಠ.clutz.nsThis.C;
+  export default C;
 }
 declare namespace ಠ_ಠ.clutz.nsThis {
   class D extends D_Instance {
@@ -18,6 +18,6 @@ declare namespace ಠ_ಠ.clutz.nsThis {
   }
 }
 declare module 'goog:nsThis.D' {
-  import alias = ಠ_ಠ.clutz.nsThis.D;
-  export default alias;
+  import D = ಠ_ಠ.clutz.nsThis.D;
+  export default D;
 }

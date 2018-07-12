@@ -16,6 +16,6 @@ declare namespace ಠ_ಠ.clutz.module$exports$missing$extend {
   }
 }
 declare module 'goog:missing.extend' {
-  import alias = ಠ_ಠ.clutz.module$exports$missing$extend;
-  export = alias;
+  import extend = ಠ_ಠ.clutz.module$exports$missing$extend;
+  export = extend;
 }

@@ -9,8 +9,8 @@ declare namespace ಠ_ಠ.clutz.static_inherit {
   }
 }
 declare module 'goog:static_inherit.Child' {
-  import alias = ಠ_ಠ.clutz.static_inherit.Child;
-  export default alias;
+  import Child = ಠ_ಠ.clutz.static_inherit.Child;
+  export default Child;
 }
 declare namespace ಠ_ಠ.clutz.static_inherit {
   class GrandChild extends GrandChild_Instance {
@@ -21,8 +21,8 @@ declare namespace ಠ_ಠ.clutz.static_inherit {
   }
 }
 declare module 'goog:static_inherit.GrandChild' {
-  import alias = ಠ_ಠ.clutz.static_inherit.GrandChild;
-  export default alias;
+  import GrandChild = ಠ_ಠ.clutz.static_inherit.GrandChild;
+  export default GrandChild;
 }
 declare namespace ಠ_ಠ.clutz.static_inherit {
   class Parent extends Parent_Instance {
@@ -36,6 +36,6 @@ declare namespace ಠ_ಠ.clutz.static_inherit {
   }
 }
 declare module 'goog:static_inherit.Parent' {
-  import alias = ಠ_ಠ.clutz.static_inherit.Parent;
-  export default alias;
+  import Parent = ಠ_ಠ.clutz.static_inherit.Parent;
+  export default Parent;
 }

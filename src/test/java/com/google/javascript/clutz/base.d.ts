@@ -39,6 +39,6 @@ declare namespace ಠ_ಠ.clutz.goog {
   }
 }
 declare module 'goog:goog.Uri' {
-  import alias = ಠ_ಠ.clutz.goog.Uri;
-  export default alias;
+  import Uri = ಠ_ಠ.clutz.goog.Uri;
+  export default Uri;
 }

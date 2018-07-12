@@ -9,8 +9,8 @@ declare namespace ಠ_ಠ.clutz.goog.legacy.namespace.exporter {
   var OriginalName_Instance : typeof ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_OriginalName_Instance ;
 }
 declare module 'goog:goog.legacy.namespace.exporter' {
-  import alias = ಠ_ಠ.clutz.goog.legacy.namespace.exporter;
-  export = alias;
+  import exporter = ಠ_ಠ.clutz.goog.legacy.namespace.exporter;
+  export = exporter;
 }
 declare namespace ಠ_ಠ.clutz {
   class module$contents$goog$legacy$namespace$exporter_LegacyBaseClass extends module$contents$goog$legacy$namespace$exporter_LegacyBaseClass_Instance {

@@ -7,6 +7,6 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare module 'goog:partial.aliased_interface' {
-  import alias = ಠ_ಠ.clutz.module$exports$partial$aliased_interface;
-  export default alias;
+  import aliased_interface = ಠ_ಠ.clutz.module$exports$partial$aliased_interface;
+  export default aliased_interface;
 }

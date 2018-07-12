@@ -2,8 +2,8 @@ declare namespace ಠ_ಠ.clutz.nested_typedef_enum {
   type Bar = { a : string } ;
 }
 declare module 'goog:nested_typedef_enum.Bar' {
-  import alias = ಠ_ಠ.clutz.nested_typedef_enum.Bar;
-  export default alias;
+  import Bar = ಠ_ಠ.clutz.nested_typedef_enum.Bar;
+  export default Bar;
 }
 declare namespace ಠ_ಠ.clutz.nested_typedef_enum.Bar {
   enum Baz {
@@ -11,6 +11,6 @@ declare namespace ಠ_ಠ.clutz.nested_typedef_enum.Bar {
   }
 }
 declare module 'goog:nested_typedef_enum.Bar.Baz' {
-  import alias = ಠ_ಠ.clutz.nested_typedef_enum.Bar.Baz;
-  export default alias;
+  import Baz = ಠ_ಠ.clutz.nested_typedef_enum.Bar.Baz;
+  export default Baz;
 }

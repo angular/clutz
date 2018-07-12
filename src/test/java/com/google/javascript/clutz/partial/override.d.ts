@@ -38,8 +38,8 @@ declare namespace ಠ_ಠ.clutz.module$exports$override {
   }
 }
 declare module 'goog:override' {
-  import alias = ಠ_ಠ.clutz.module$exports$override;
-  export = alias;
+  import override = ಠ_ಠ.clutz.module$exports$override;
+  export = override;
 }
 declare namespace ಠ_ಠ.clutz {
   class module$contents$override_Base extends module$contents$override_Base_Instance {

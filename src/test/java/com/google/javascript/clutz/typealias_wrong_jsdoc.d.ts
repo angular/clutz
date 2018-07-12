@@ -15,6 +15,6 @@ declare namespace ಠ_ಠ.clutz.typedef.C {
   type T = (a : any ) => any ;
 }
 declare module 'goog:typedef.C' {
-  import alias = ಠ_ಠ.clutz.typedef.C;
-  export default alias;
+  import C = ಠ_ಠ.clutz.typedef.C;
+  export default C;
 }

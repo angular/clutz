@@ -4,8 +4,8 @@ declare namespace ಠ_ಠ.clutz.some {
   }
 }
 declare module 'goog:some.EscapedEnum' {
-  import alias = ಠ_ಠ.clutz.some.EscapedEnum;
-  export default alias;
+  import EscapedEnum = ಠ_ಠ.clutz.some.EscapedEnum;
+  export default EscapedEnum;
 }
 declare namespace ಠ_ಠ.clutz.some {
   type MixedEnum = string | number | boolean &{clutzEnumBrand: never} ;
@@ -16,8 +16,8 @@ declare namespace ಠ_ಠ.clutz.some {
   };
 }
 declare module 'goog:some.MixedEnum' {
-  import alias = ಠ_ಠ.clutz.some.MixedEnum;
-  export default alias;
+  import MixedEnum = ಠ_ಠ.clutz.some.MixedEnum;
+  export default MixedEnum;
 }
 declare namespace ಠ_ಠ.clutz.some {
   type NumberAsKey = string &{clutzEnumBrand: never} |'a' |'b' ;
@@ -27,8 +27,8 @@ declare namespace ಠ_ಠ.clutz.some {
   };
 }
 declare module 'goog:some.NumberAsKey' {
-  import alias = ಠ_ಠ.clutz.some.NumberAsKey;
-  export default alias;
+  import NumberAsKey = ಠ_ಠ.clutz.some.NumberAsKey;
+  export default NumberAsKey;
 }
 declare namespace ಠ_ಠ.clutz.some {
   type ObjectValuedEnum = X &{clutzEnumBrand: never} ;
@@ -38,8 +38,8 @@ declare namespace ಠ_ಠ.clutz.some {
   };
 }
 declare module 'goog:some.ObjectValuedEnum' {
-  import alias = ಠ_ಠ.clutz.some.ObjectValuedEnum;
-  export default alias;
+  import ObjectValuedEnum = ಠ_ಠ.clutz.some.ObjectValuedEnum;
+  export default ObjectValuedEnum;
 }
 declare namespace ಠ_ಠ.clutz.some {
   type PartialLiteralStringEnum = string &{clutzEnumBrand: never} |'1' |'2' ;
@@ -51,8 +51,8 @@ declare namespace ಠ_ಠ.clutz.some {
   };
 }
 declare module 'goog:some.PartialLiteralStringEnum' {
-  import alias = ಠ_ಠ.clutz.some.PartialLiteralStringEnum;
-  export default alias;
+  import PartialLiteralStringEnum = ಠ_ಠ.clutz.some.PartialLiteralStringEnum;
+  export default PartialLiteralStringEnum;
 }
 declare namespace ಠ_ಠ.clutz.some {
   enum SomeEnum {
@@ -61,8 +61,8 @@ declare namespace ಠ_ಠ.clutz.some {
   }
 }
 declare module 'goog:some.SomeEnum' {
-  import alias = ಠ_ಠ.clutz.some.SomeEnum;
-  export default alias;
+  import SomeEnum = ಠ_ಠ.clutz.some.SomeEnum;
+  export default SomeEnum;
 }
 declare namespace ಠ_ಠ.clutz.some {
   enum StringEnum {
@@ -71,8 +71,8 @@ declare namespace ಠ_ಠ.clutz.some {
   }
 }
 declare module 'goog:some.StringEnum' {
-  import alias = ಠ_ಠ.clutz.some.StringEnum;
-  export default alias;
+  import StringEnum = ಠ_ಠ.clutz.some.StringEnum;
+  export default StringEnum;
 }
 declare namespace ಠ_ಠ.clutz.some {
   type StringVariableEnum = string &{clutzEnumBrand: never} ;
@@ -82,15 +82,15 @@ declare namespace ಠ_ಠ.clutz.some {
   };
 }
 declare module 'goog:some.StringVariableEnum' {
-  import alias = ಠ_ಠ.clutz.some.StringVariableEnum;
-  export default alias;
+  import StringVariableEnum = ಠ_ಠ.clutz.some.StringVariableEnum;
+  export default StringVariableEnum;
 }
 declare namespace ಠ_ಠ.clutz.some {
   function setEnvironment (a : Environment ) : any ;
 }
 declare module 'goog:some.setEnvironment' {
-  import alias = ಠ_ಠ.clutz.some.setEnvironment;
-  export default alias;
+  import setEnvironment = ಠ_ಠ.clutz.some.setEnvironment;
+  export default setEnvironment;
 }
 declare namespace ಠ_ಠ.clutz {
   class X extends X_Instance {

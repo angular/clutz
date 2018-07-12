@@ -3,6 +3,6 @@ declare namespace ಠ_ಠ.clutz.goog.debug {
   var foo : number ;
 }
 declare module 'goog:goog.debug' {
-  import alias = ಠ_ಠ.clutz.goog.debug;
-  export = alias;
+  import debug = ಠ_ಠ.clutz.goog.debug;
+  export = debug;
 }

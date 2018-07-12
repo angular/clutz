@@ -7,8 +7,8 @@ declare namespace ಠ_ಠ.clutz.rec {
   }
 }
 declare module 'goog:rec.Aclass' {
-  import alias = ಠ_ಠ.clutz.rec.Aclass;
-  export default alias;
+  import Aclass = ಠ_ಠ.clutz.rec.Aclass;
+  export default Aclass;
 }
 declare namespace ಠ_ಠ.clutz.rec.ns {
   type Arr = ಠ_ಠ.clutz.rec.ns.El [] ;
@@ -19,6 +19,6 @@ declare namespace ಠ_ಠ.clutz.rec.ns {
   var tvar : ಠ_ಠ.clutz.rec.ns.T ;
 }
 declare module 'goog:rec.ns' {
-  import alias = ಠ_ಠ.clutz.rec.ns;
-  export = alias;
+  import ns = ಠ_ಠ.clutz.rec.ns;
+  export = ns;
 }

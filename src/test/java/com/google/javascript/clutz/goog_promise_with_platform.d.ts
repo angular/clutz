@@ -11,8 +11,8 @@ declare namespace ಠ_ಠ.clutz.goog {
   }
 }
 declare module 'goog:goog.Promise' {
-  import alias = ಠ_ಠ.clutz.goog.Promise;
-  export default alias;
+  import Promise = ಠ_ಠ.clutz.goog.Promise;
+  export default Promise;
 }
 declare namespace ಠ_ಠ.clutz.goog {
   namespace Thenable {
@@ -25,6 +25,6 @@ declare namespace ಠ_ಠ.clutz.goog {
   }
 }
 declare module 'goog:goog.Thenable' {
-  import alias = ಠ_ಠ.clutz.goog.Thenable;
-  export default alias;
+  import Thenable = ಠ_ಠ.clutz.goog.Thenable;
+  export default Thenable;
 }

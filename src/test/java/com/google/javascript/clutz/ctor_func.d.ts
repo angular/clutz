@@ -10,6 +10,6 @@ declare namespace ಠ_ಠ.clutz.ctor_func {
   function ctorFuncParam (ctor : { new (a : number ) : ಠ_ಠ.clutz.ctor_func.Ctor < any > } ) : void ;
 }
 declare module 'goog:ctor_func' {
-  import alias = ಠ_ಠ.clutz.ctor_func;
-  export = alias;
+  import ctor_func = ಠ_ಠ.clutz.ctor_func;
+  export = ctor_func;
 }

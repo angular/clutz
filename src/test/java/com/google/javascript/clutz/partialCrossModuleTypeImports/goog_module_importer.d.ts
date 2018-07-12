@@ -16,6 +16,6 @@ declare namespace ಠ_ಠ.clutz.module$exports$goog$module$importer {
   }
 }
 declare module 'goog:goog.module.importer' {
-  import alias = ಠ_ಠ.clutz.module$exports$goog$module$importer;
-  export = alias;
+  import importer = ಠ_ಠ.clutz.module$exports$goog$module$importer;
+  export = importer;
 }

@@ -10,6 +10,6 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare module 'goog:map_entries.Map' {
-  import alias = ಠ_ಠ.clutz.module$exports$map_entries$Map;
-  export default alias;
+  import Map = ಠ_ಠ.clutz.module$exports$map_entries$Map;
+  export default Map;
 }

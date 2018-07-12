@@ -5,8 +5,8 @@ declare namespace ಠ_ಠ.clutz.declare.legacy {
   var namespace_Instance : typeof ಠ_ಠ.clutz.module$contents$declare$legacy$namespace_Class_Instance ;
 }
 declare module 'goog:declare.legacy.namespace' {
-  import alias = ಠ_ಠ.clutz.declare.legacy.namespace;
-  export default alias;
+  import namespace = ಠ_ಠ.clutz.declare.legacy.namespace;
+  export default namespace;
 }
 declare namespace ಠ_ಠ.clutz {
   class module$contents$declare$legacy$namespace_Class extends module$contents$declare$legacy$namespace_Class_Instance {

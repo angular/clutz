@@ -3,8 +3,8 @@ declare namespace ಠ_ಠ.clutz.empty_type_args {
   }
 }
 declare module 'goog:empty_type_args.ITemplated' {
-  import alias = ಠ_ಠ.clutz.empty_type_args.ITemplated;
-  export default alias;
+  import ITemplated = ಠ_ಠ.clutz.empty_type_args.ITemplated;
+  export default ITemplated;
 }
 declare namespace ಠ_ಠ.clutz.empty_type_args {
   class NoMoreTemplateArgs extends NoMoreTemplateArgs_Instance {
@@ -14,8 +14,8 @@ declare namespace ಠ_ಠ.clutz.empty_type_args {
   }
 }
 declare module 'goog:empty_type_args.NoMoreTemplateArgs' {
-  import alias = ಠ_ಠ.clutz.empty_type_args.NoMoreTemplateArgs;
-  export default alias;
+  import NoMoreTemplateArgs = ಠ_ಠ.clutz.empty_type_args.NoMoreTemplateArgs;
+  export default NoMoreTemplateArgs;
 }
 declare namespace ಠ_ಠ.clutz.empty_type_args {
   class X extends X_Instance {
@@ -26,6 +26,6 @@ declare namespace ಠ_ಠ.clutz.empty_type_args {
   }
 }
 declare module 'goog:empty_type_args.X' {
-  import alias = ಠ_ಠ.clutz.empty_type_args.X;
-  export default alias;
+  import X = ಠ_ಠ.clutz.empty_type_args.X;
+  export default X;
 }

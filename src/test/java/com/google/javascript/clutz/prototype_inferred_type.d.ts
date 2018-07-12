@@ -10,6 +10,6 @@ declare namespace ಠ_ಠ.clutz.foo {
   }
 }
 declare module 'goog:foo.Klass' {
-  import alias = ಠ_ಠ.clutz.foo.Klass;
-  export default alias;
+  import Klass = ಠ_ಠ.clutz.foo.Klass;
+  export default Klass;
 }

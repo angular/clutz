@@ -1,8 +1,8 @@
 declare namespace ಠ_ಠ.clutz.lends {
 }
 declare module 'goog:lends' {
-  import alias = ಠ_ಠ.clutz.lends;
-  export = alias;
+  import lends = ಠ_ಠ.clutz.lends;
+  export = lends;
 }
 declare namespace ಠ_ಠ.clutz.lends {
   class A extends A_Instance {
@@ -15,6 +15,6 @@ declare namespace ಠ_ಠ.clutz.lends {
   }
 }
 declare module 'goog:lends.A' {
-  import alias = ಠ_ಠ.clutz.lends.A;
-  export default alias;
+  import A = ಠ_ಠ.clutz.lends.A;
+  export default A;
 }

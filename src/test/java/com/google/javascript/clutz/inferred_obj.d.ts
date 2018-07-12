@@ -4,6 +4,6 @@ declare namespace ಠ_ಠ.clutz.inferred.nested.obj {
   var regular : number ;
 }
 declare module 'goog:inferred.nested.obj' {
-  import alias = ಠ_ಠ.clutz.inferred.nested.obj;
-  export = alias;
+  import obj = ಠ_ಠ.clutz.inferred.nested.obj;
+  export = obj;
 }

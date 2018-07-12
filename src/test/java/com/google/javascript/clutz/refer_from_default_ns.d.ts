@@ -2,8 +2,8 @@ declare namespace ಠ_ಠ.clutz {
   function fn ( ) : ಠ_ಠ.clutz.fn.String ;
 }
 declare module 'goog:fn' {
-  import alias = ಠ_ಠ.clutz.fn;
-  export default alias;
+  import fn = ಠ_ಠ.clutz.fn;
+  export default fn;
 }
 declare namespace ಠ_ಠ.clutz.fn {
   class String extends String_Instance {
@@ -13,6 +13,6 @@ declare namespace ಠ_ಠ.clutz.fn {
   }
 }
 declare module 'goog:fn.String' {
-  import alias = ಠ_ಠ.clutz.fn.String;
-  export default alias;
+  import String = ಠ_ಠ.clutz.fn.String;
+  export default String;
 }

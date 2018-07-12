@@ -27,6 +27,6 @@ declare namespace ಠ_ಠ.clutz.x {
   }
 }
 declare module 'goog:x.Y' {
-  import alias = ಠ_ಠ.clutz.x.Y;
-  export default alias;
+  import Y = ಠ_ಠ.clutz.x.Y;
+  export default Y;
 }

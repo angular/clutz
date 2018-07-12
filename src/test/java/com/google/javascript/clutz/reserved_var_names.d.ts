@@ -2,10 +2,10 @@ declare namespace ಠ_ಠ.clutz.ns {
   var reserved : { a : number , switch : number };
 }
 declare module 'goog:ns.reserved.a' {
-  import alias = ಠ_ಠ.clutz.ns.reserved;
-  export default alias.a;
+  import a = ಠ_ಠ.clutz.ns.reserved;
+  export default a.a;
 }
 declare module 'goog:ns.reserved.switch' {
-  import alias = ಠ_ಠ.clutz.ns.reserved;
-  export default alias.switch;
+  import switch_ = ಠ_ಠ.clutz.ns.reserved;
+  export default switch_.switch;
 }

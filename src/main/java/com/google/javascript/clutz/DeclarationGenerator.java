@@ -1286,19 +1286,27 @@ class DeclarationGenerator {
     emitNoSpace("' {");
     indent();
     emitBreak();
+    // Use the proper name as the alias name, so the TypeScript language service
+    // can offer it as an auto-import (auto-imports are offered for the exported
+    // name).
+    String alias = getUnqualifiedName(name);
+
+    // Make sure we don't emit a variable named after a keyword.
+    if (RESERVED_JS_WORDS.contains(alias)) alias += "_";
+
     // workaround for https://github.com/Microsoft/TypeScript/issues/4325
-    emit("import alias = ");
+    emit("import " + alias + " = ");
     emitNoSpace(Constants.INTERNAL_NAMESPACE);
     emitNoSpace(".");
     emitNoSpace(inParentNamespace ? getNamespace(emitName) : emitName);
     emitNoSpace(";");
     emitBreak();
     if (isDefault) {
-      emitNoSpace("export default alias");
+      emitNoSpace("export default " + alias);
       if (inParentNamespace) emitNoSpace("." + getUnqualifiedName(name));
       emitNoSpace(";");
     } else {
-      emitNoSpace("export = alias;");
+      emitNoSpace("export = " + alias + ";");
     }
     emitBreak();
     unindent();

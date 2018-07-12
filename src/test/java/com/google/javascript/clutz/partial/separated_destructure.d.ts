@@ -11,6 +11,6 @@ declare namespace ಠ_ಠ.clutz.module$exports$separated$destructure {
   }
 }
 declare module 'goog:separated.destructure' {
-  import alias = ಠ_ಠ.clutz.module$exports$separated$destructure;
-  export = alias;
+  import destructure = ಠ_ಠ.clutz.module$exports$separated$destructure;
+  export = destructure;
 }

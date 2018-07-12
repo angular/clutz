@@ -14,6 +14,6 @@ declare namespace ಠ_ಠ.clutz.module$exports$interface_static_method {
   }
 }
 declare module 'goog:interface_static_method' {
-  import alias = ಠ_ಠ.clutz.module$exports$interface_static_method;
-  export = alias;
+  import interface_static_method = ಠ_ಠ.clutz.module$exports$interface_static_method;
+  export = interface_static_method;
 }

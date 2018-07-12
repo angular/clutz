@@ -6,8 +6,8 @@ declare namespace ಠ_ಠ.clutz.a.b {
   }
 }
 declare module 'goog:a.b.StaticHolder' {
-  import alias = ಠ_ಠ.clutz.a.b.StaticHolder;
-  export default alias;
+  import StaticHolder = ಠ_ಠ.clutz.a.b.StaticHolder;
+  export default StaticHolder;
 }
 declare namespace ಠ_ಠ.clutz.a.b.StaticHolder {
   enum AnEnum {
@@ -16,13 +16,13 @@ declare namespace ಠ_ಠ.clutz.a.b.StaticHolder {
   }
 }
 declare module 'goog:a.b.StaticHolder.AnEnum' {
-  import alias = ಠ_ಠ.clutz.a.b.StaticHolder.AnEnum;
-  export default alias;
+  import AnEnum = ಠ_ಠ.clutz.a.b.StaticHolder.AnEnum;
+  export default AnEnum;
 }
 declare namespace ಠ_ಠ.clutz.a.b.StaticHolder {
   function aFunction ( ) : boolean ;
 }
 declare module 'goog:a.b.StaticHolder.aFunction' {
-  import alias = ಠ_ಠ.clutz.a.b.StaticHolder.aFunction;
-  export default alias;
+  import aFunction = ಠ_ಠ.clutz.a.b.StaticHolder.aFunction;
+  export default aFunction;
 }

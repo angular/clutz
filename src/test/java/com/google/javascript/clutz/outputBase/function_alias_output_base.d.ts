@@ -39,13 +39,13 @@ declare namespace ಠ_ಠ.clutz.goog {
   }
 }
 declare module 'goog:goog.Uri' {
-  import alias = ಠ_ಠ.clutz.goog.Uri;
-  export default alias;
+  import Uri = ಠ_ಠ.clutz.goog.Uri;
+  export default Uri;
 }
 declare namespace ಠ_ಠ.clutz.partial {
   type FunctionAlias = Function ;
 }
 declare module 'goog:partial.FunctionAlias' {
-  import alias = ಠ_ಠ.clutz.partial.FunctionAlias;
-  export default alias;
+  import FunctionAlias = ಠ_ಠ.clutz.partial.FunctionAlias;
+  export default FunctionAlias;
 }

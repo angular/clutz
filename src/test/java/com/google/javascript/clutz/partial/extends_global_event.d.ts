@@ -7,6 +7,6 @@ declare namespace ಠ_ಠ.clutz.foo.bar {
   }
 }
 declare module 'goog:foo.bar.Baz' {
-  import alias = ಠ_ಠ.clutz.foo.bar.Baz;
-  export default alias;
+  import Baz = ಠ_ಠ.clutz.foo.bar.Baz;
+  export default Baz;
 }

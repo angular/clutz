@@ -6,6 +6,6 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare module 'goog:legacy.namespace.forward.declare' {
-  import alias = ಠ_ಠ.clutz.module$exports$legacy$namespace$forward$declare;
-  export default alias;
+  import declare = ಠ_ಠ.clutz.module$exports$legacy$namespace$forward$declare;
+  export default declare;
 }

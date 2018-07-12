@@ -3,6 +3,6 @@ declare namespace ಠ_ಠ.clutz.nsnull.fn {
   }
 }
 declare module 'goog:nsnull.fn.I' {
-  import alias = ಠ_ಠ.clutz.nsnull.fn.I;
-  export default alias;
+  import I = ಠ_ಠ.clutz.nsnull.fn.I;
+  export default I;
 }

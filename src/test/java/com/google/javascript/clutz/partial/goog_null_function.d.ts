@@ -7,6 +7,6 @@ declare namespace ಠ_ಠ.clutz.nullfunc {
   }
 }
 declare module 'goog:nullfunc.Class' {
-  import alias = ಠ_ಠ.clutz.nullfunc.Class;
-  export default alias;
+  import Class = ಠ_ಠ.clutz.nullfunc.Class;
+  export default Class;
 }

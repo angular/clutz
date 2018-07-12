@@ -3,8 +3,8 @@ declare namespace ಠ_ಠ.clutz.nested.bar {
   const HahaEnum : typeof nested.baz.Enum ;
 }
 declare module 'goog:nested.bar.HahaEnum' {
-  import alias = ಠ_ಠ.clutz.nested.bar.HahaEnum;
-  export default alias;
+  import HahaEnum = ಠ_ಠ.clutz.nested.bar.HahaEnum;
+  export default HahaEnum;
 }
 declare namespace ಠ_ಠ.clutz.nested.baz {
   enum Enum {
@@ -12,6 +12,6 @@ declare namespace ಠ_ಠ.clutz.nested.baz {
   }
 }
 declare module 'goog:nested.baz.Enum' {
-  import alias = ಠ_ಠ.clutz.nested.baz.Enum;
-  export default alias;
+  import Enum = ಠ_ಠ.clutz.nested.baz.Enum;
+  export default Enum;
 }

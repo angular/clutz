@@ -6,8 +6,8 @@ declare namespace ಠ_ಠ.clutz.dep {
   }
 }
 declare module 'goog:dep.D' {
-  import alias = ಠ_ಠ.clutz.dep.D;
-  export default alias;
+  import D = ಠ_ಠ.clutz.dep.D;
+  export default D;
 }
 declare namespace ಠ_ಠ.clutz.main {
   class A extends A_Instance {
@@ -18,6 +18,6 @@ declare namespace ಠ_ಠ.clutz.main {
   }
 }
 declare module 'goog:main.A' {
-  import alias = ಠ_ಠ.clutz.main.A;
-  export default alias;
+  import A = ಠ_ಠ.clutz.main.A;
+  export default A;
 }

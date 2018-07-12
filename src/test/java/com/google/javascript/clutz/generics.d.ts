@@ -30,6 +30,6 @@ declare namespace ಠ_ಠ.clutz.generics {
   function objectWithGenericKeyType < K , V > (obj : { [ /* warning: coerced from K */ key: string ]: V } ) : void ;
 }
 declare module 'goog:generics' {
-  import alias = ಠ_ಠ.clutz.generics;
-  export = alias;
+  import generics = ಠ_ಠ.clutz.generics;
+  export = generics;
 }

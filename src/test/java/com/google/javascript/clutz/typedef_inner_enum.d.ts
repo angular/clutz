@@ -7,6 +7,6 @@ declare namespace ಠ_ಠ.clutz.ns.typedef {
   }
 }
 declare module 'goog:ns.typedef' {
-  import alias = ಠ_ಠ.clutz.ns.typedef;
-  export default alias;
+  import typedef = ಠ_ಠ.clutz.ns.typedef;
+  export default typedef;
 }

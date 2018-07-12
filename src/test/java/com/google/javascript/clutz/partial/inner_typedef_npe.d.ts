@@ -7,8 +7,8 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare module 'goog:odd.npe.typedef' {
-  import alias = ಠ_ಠ.clutz.module$exports$odd$npe$typedef;
-  export default alias;
+  import typedef = ಠ_ಠ.clutz.module$exports$odd$npe$typedef;
+  export default typedef;
 }
 declare namespace ಠ_ಠ.clutz {
   type module$contents$odd$npe$typedef_ATypeDef = { a : string } ;

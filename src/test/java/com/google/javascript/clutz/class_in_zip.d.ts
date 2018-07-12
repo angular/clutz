@@ -13,6 +13,6 @@ declare namespace ಠ_ಠ.clutz.class_in_zip {
   }
 }
 declare module 'goog:class_in_zip' {
-  import alias = ಠ_ಠ.clutz.class_in_zip;
-  export = alias;
+  import class_in_zip = ಠ_ಠ.clutz.class_in_zip;
+  export = class_in_zip;
 }

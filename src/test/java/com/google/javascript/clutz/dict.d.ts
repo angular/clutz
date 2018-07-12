@@ -18,6 +18,6 @@ declare namespace ಠ_ಠ.clutz.dict {
   var untyped : {[key: string]: any} ;
 }
 declare module 'goog:dict' {
-  import alias = ಠ_ಠ.clutz.dict;
-  export = alias;
+  import dict = ಠ_ಠ.clutz.dict;
+  export = dict;
 }

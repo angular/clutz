@@ -2,8 +2,8 @@ declare namespace ಠ_ಠ.clutz.invalid.names {
   var valid : null ;
 }
 declare module 'goog:invalid.names' {
-  import alias = ಠ_ಠ.clutz.invalid.names;
-  export = alias;
+  import names = ಠ_ಠ.clutz.invalid.names;
+  export = names;
 }
 declare namespace ಠ_ಠ.clutz.ext.invalidNames {
   var valid : null ;

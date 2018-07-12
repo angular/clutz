@@ -9,6 +9,6 @@ declare namespace ಠ_ಠ.clutz.module$exports$nested$typedef$mod {
   type T = { a : string } ;
 }
 declare module 'goog:nested.typedef.mod' {
-  import alias = ಠ_ಠ.clutz.module$exports$nested$typedef$mod;
-  export default alias;
+  import mod = ಠ_ಠ.clutz.module$exports$nested$typedef$mod;
+  export default mod;
 }

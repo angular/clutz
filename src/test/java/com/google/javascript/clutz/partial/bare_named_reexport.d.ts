@@ -3,6 +3,6 @@ declare namespace ಠ_ಠ.clutz.module$exports$bare$named$reexport {
   var Class : typeof ಠ_ಠ.clutz.module$exports$original$module ;
 }
 declare module 'goog:bare.named.reexport' {
-  import alias = ಠ_ಠ.clutz.module$exports$bare$named$reexport;
-  export = alias;
+  import reexport = ಠ_ಠ.clutz.module$exports$bare$named$reexport;
+  export = reexport;
 }

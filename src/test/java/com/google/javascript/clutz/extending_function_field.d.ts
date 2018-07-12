@@ -2,8 +2,8 @@ declare namespace ಠ_ಠ.clutz.a {
   function messesWithB (b : ಠ_ಠ.clutz.ns.B ) : void ;
 }
 declare module 'goog:a.messesWithB' {
-  import alias = ಠ_ಠ.clutz.a.messesWithB;
-  export default alias;
+  import messesWithB = ಠ_ಠ.clutz.a.messesWithB;
+  export default messesWithB;
 }
 declare namespace ಠ_ಠ.clutz.ns {
   class A extends A_Instance {
@@ -14,8 +14,8 @@ declare namespace ಠ_ಠ.clutz.ns {
   }
 }
 declare module 'goog:ns.A' {
-  import alias = ಠ_ಠ.clutz.ns.A;
-  export default alias;
+  import A = ಠ_ಠ.clutz.ns.A;
+  export default A;
 }
 declare namespace ಠ_ಠ.clutz.ns {
   class B extends B_Instance {
@@ -28,6 +28,6 @@ declare namespace ಠ_ಠ.clutz.ns {
   }
 }
 declare module 'goog:ns.B' {
-  import alias = ಠ_ಠ.clutz.ns.B;
-  export default alias;
+  import B = ಠ_ಠ.clutz.ns.B;
+  export default B;
 }

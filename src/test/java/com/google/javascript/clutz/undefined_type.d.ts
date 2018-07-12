@@ -17,6 +17,6 @@ declare namespace ಠ_ಠ.clutz.undefinedns {
   function i ( ) : undefined | string ;
 }
 declare module 'goog:undefinedns' {
-  import alias = ಠ_ಠ.clutz.undefinedns;
-  export = alias;
+  import undefinedns = ಠ_ಠ.clutz.undefinedns;
+  export = undefinedns;
 }
