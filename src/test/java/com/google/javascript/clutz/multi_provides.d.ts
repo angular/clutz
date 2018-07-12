@@ -2,15 +2,15 @@ declare namespace ಠ_ಠ.clutz.multi_provides.a {
   var val : number ;
 }
 declare module 'goog:multi_provides.a' {
-  import alias = ಠ_ಠ.clutz.multi_provides.a;
-  export = alias;
+  import a = ಠ_ಠ.clutz.multi_provides.a;
+  export = a;
 }
 declare namespace ಠ_ಠ.clutz.multi_provides.a.b.c {
   var three : string ;
 }
 declare module 'goog:multi_provides.a.b.c' {
-  import alias = ಠ_ಠ.clutz.multi_provides.a.b.c;
-  export = alias;
+  import c = ಠ_ಠ.clutz.multi_provides.a.b.c;
+  export = c;
 }
 declare namespace ಠ_ಠ.clutz.multi_provides.a.b.c {
   class Two extends Two_Instance {
@@ -20,6 +20,6 @@ declare namespace ಠ_ಠ.clutz.multi_provides.a.b.c {
   }
 }
 declare module 'goog:multi_provides.a.b.c.Two' {
-  import alias = ಠ_ಠ.clutz.multi_provides.a.b.c.Two;
-  export default alias;
+  import Two = ಠ_ಠ.clutz.multi_provides.a.b.c.Two;
+  export default Two;
 }

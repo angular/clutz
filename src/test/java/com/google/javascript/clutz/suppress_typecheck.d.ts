@@ -11,6 +11,6 @@ declare namespace ಠ_ಠ.clutz.suppress {
   }
 }
 declare module 'goog:suppress' {
-  import alias = ಠ_ಠ.clutz.suppress;
-  export = alias;
+  import suppress = ಠ_ಠ.clutz.suppress;
+  export = suppress;
 }

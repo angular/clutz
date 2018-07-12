@@ -3,6 +3,6 @@ declare namespace ಠ_ಠ.clutz.inferred {
   var foo : number ;
 }
 declare module 'goog:inferred' {
-  import alias = ಠ_ಠ.clutz.inferred;
-  export = alias;
+  import inferred = ಠ_ಠ.clutz.inferred;
+  export = inferred;
 }

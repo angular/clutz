@@ -6,8 +6,8 @@ declare namespace ಠ_ಠ.clutz.abstract_method {
   }
 }
 declare module 'goog:abstract_method.Child' {
-  import alias = ಠ_ಠ.clutz.abstract_method.Child;
-  export default alias;
+  import Child = ಠ_ಠ.clutz.abstract_method.Child;
+  export default Child;
 }
 declare namespace ಠ_ಠ.clutz.abstract_method {
   class Clazz extends Clazz_Instance {
@@ -19,8 +19,8 @@ declare namespace ಠ_ಠ.clutz.abstract_method {
   }
 }
 declare module 'goog:abstract_method.Clazz' {
-  import alias = ಠ_ಠ.clutz.abstract_method.Clazz;
-  export default alias;
+  import Clazz = ಠ_ಠ.clutz.abstract_method.Clazz;
+  export default Clazz;
 }
 declare namespace ಠ_ಠ.clutz.abstract_method {
   interface Interface {
@@ -29,6 +29,6 @@ declare namespace ಠ_ಠ.clutz.abstract_method {
   }
 }
 declare module 'goog:abstract_method.Interface' {
-  import alias = ಠ_ಠ.clutz.abstract_method.Interface;
-  export default alias;
+  import Interface = ಠ_ಠ.clutz.abstract_method.Interface;
+  export default Interface;
 }

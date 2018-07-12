@@ -7,6 +7,6 @@ declare namespace ಠ_ಠ.clutz.module$exports$tte$Promise$Partial {
   }
 }
 declare module 'goog:tte.Promise.Partial' {
-  import alias = ಠ_ಠ.clutz.module$exports$tte$Promise$Partial;
-  export = alias;
+  import Partial = ಠ_ಠ.clutz.module$exports$tte$Promise$Partial;
+  export = Partial;
 }

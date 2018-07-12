@@ -5,14 +5,14 @@ declare namespace ಠ_ಠ.clutz.enum_from_enum.Bar.bar {
   }
 }
 declare module 'goog:enum_from_enum.Bar.bar.GoodEnum' {
-  import alias = ಠ_ಠ.clutz.enum_from_enum.Bar.bar.GoodEnum;
-  export default alias;
+  import GoodEnum = ಠ_ಠ.clutz.enum_from_enum.Bar.bar.GoodEnum;
+  export default GoodEnum;
 }
 declare namespace ಠ_ಠ.clutz.enum_from_enum.Foo.foo {
   type DeprecatedEnum = enum_from_enum.Bar.bar.GoodEnum ;
   const DeprecatedEnum : typeof enum_from_enum.Bar.bar.GoodEnum ;
 }
 declare module 'goog:enum_from_enum.Foo.foo.DeprecatedEnum' {
-  import alias = ಠ_ಠ.clutz.enum_from_enum.Foo.foo.DeprecatedEnum;
-  export default alias;
+  import DeprecatedEnum = ಠ_ಠ.clutz.enum_from_enum.Foo.foo.DeprecatedEnum;
+  export default DeprecatedEnum;
 }

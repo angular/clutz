@@ -12,6 +12,6 @@ declare namespace ಠ_ಠ.clutz.def.ctor {
   }
 }
 declare module 'goog:def.ctor' {
-  import alias = ಠ_ಠ.clutz.def.ctor;
-  export = alias;
+  import ctor = ಠ_ಠ.clutz.def.ctor;
+  export = ctor;
 }

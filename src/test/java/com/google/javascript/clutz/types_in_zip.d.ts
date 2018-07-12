@@ -9,6 +9,6 @@ declare namespace ಠ_ಠ.clutz.types_in_zip {
   var str : string ;
 }
 declare module 'goog:types_in_zip' {
-  import alias = ಠ_ಠ.clutz.types_in_zip;
-  export = alias;
+  import types_in_zip = ಠ_ಠ.clutz.types_in_zip;
+  export = types_in_zip;
 }

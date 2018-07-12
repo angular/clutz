@@ -11,6 +11,6 @@ declare namespace ಠ_ಠ.clutz.module$exports$named$base$exporter {
   }
 }
 declare module 'goog:named.base.exporter' {
-  import alias = ಠ_ಠ.clutz.module$exports$named$base$exporter;
-  export = alias;
+  import exporter = ಠ_ಠ.clutz.module$exports$named$base$exporter;
+  export = exporter;
 }

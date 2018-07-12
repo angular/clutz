@@ -7,8 +7,8 @@ declare namespace ಠ_ಠ.clutz.somenamespace {
   }
 }
 declare module 'goog:somenamespace.Foo' {
-  import alias = ಠ_ಠ.clutz.somenamespace.Foo;
-  export default alias;
+  import Foo = ಠ_ಠ.clutz.somenamespace.Foo;
+  export default Foo;
 }
 declare namespace ಠ_ಠ.clutz.somenamespace {
   enum MyEnum {

@@ -6,13 +6,13 @@ declare namespace ಠ_ಠ.clutz.provides {
   }
 }
 declare module 'goog:provides.C' {
-  import alias = ಠ_ಠ.clutz.provides.C;
-  export default alias;
+  import C = ಠ_ಠ.clutz.provides.C;
+  export default C;
 }
 declare namespace ಠ_ಠ.clutz.provides {
   var instance : ಠ_ಠ.clutz.provides.C ;
 }
 declare module 'goog:provides.instance' {
-  import alias = ಠ_ಠ.clutz.provides.instance;
-  export default alias;
+  import instance = ಠ_ಠ.clutz.provides.instance;
+  export default instance;
 }

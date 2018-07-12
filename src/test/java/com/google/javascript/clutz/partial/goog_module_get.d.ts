@@ -6,8 +6,8 @@ declare namespace ಠ_ಠ.clutz.goog.scope {
   }
 }
 declare module 'goog:goog.scope.ClassExtendingMissingDestructuredRequire' {
-  import alias = ಠ_ಠ.clutz.goog.scope.ClassExtendingMissingDestructuredRequire;
-  export default alias;
+  import ClassExtendingMissingDestructuredRequire = ಠ_ಠ.clutz.goog.scope.ClassExtendingMissingDestructuredRequire;
+  export default ClassExtendingMissingDestructuredRequire;
 }
 declare namespace ಠ_ಠ.clutz.goog.scope {
   class ClassExtendingMissingGoogModuleGet extends ClassExtendingMissingGoogModuleGet_Instance {
@@ -17,8 +17,8 @@ declare namespace ಠ_ಠ.clutz.goog.scope {
   }
 }
 declare module 'goog:goog.scope.ClassExtendingMissingGoogModuleGet' {
-  import alias = ಠ_ಠ.clutz.goog.scope.ClassExtendingMissingGoogModuleGet;
-  export default alias;
+  import ClassExtendingMissingGoogModuleGet = ಠ_ಠ.clutz.goog.scope.ClassExtendingMissingGoogModuleGet;
+  export default ClassExtendingMissingGoogModuleGet;
 }
 declare namespace ಠ_ಠ.clutz.goog.scope {
   class ClassExtendingRenamedDestructuredRequire extends ClassExtendingRenamedDestructuredRequire_Instance {
@@ -28,6 +28,6 @@ declare namespace ಠ_ಠ.clutz.goog.scope {
   }
 }
 declare module 'goog:goog.scope.ClassExtendingRenamedDestructuredRequire' {
-  import alias = ಠ_ಠ.clutz.goog.scope.ClassExtendingRenamedDestructuredRequire;
-  export default alias;
+  import ClassExtendingRenamedDestructuredRequire = ಠ_ಠ.clutz.goog.scope.ClassExtendingRenamedDestructuredRequire;
+  export default ClassExtendingRenamedDestructuredRequire;
 }

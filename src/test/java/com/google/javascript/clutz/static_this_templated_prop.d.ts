@@ -10,6 +10,6 @@ declare namespace ಠ_ಠ.clutz.static_this_templated_prop {
   }
 }
 declare module 'goog:static_this_templated_prop' {
-  import alias = ಠ_ಠ.clutz.static_this_templated_prop;
-  export = alias;
+  import static_this_templated_prop = ಠ_ಠ.clutz.static_this_templated_prop;
+  export = static_this_templated_prop;
 }

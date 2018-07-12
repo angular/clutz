@@ -5,6 +5,6 @@ declare namespace ಠ_ಠ.clutz.module$exports$record$extending {
   }
 }
 declare module 'goog:record.extending' {
-  import alias = ಠ_ಠ.clutz.module$exports$record$extending;
-  export = alias;
+  import extending = ಠ_ಠ.clutz.module$exports$record$extending;
+  export = extending;
 }

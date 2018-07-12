@@ -7,8 +7,8 @@ declare namespace ಠ_ಠ.clutz.implements_iterable {
   }
 }
 declare module 'goog:implements_iterable.ImplIterable' {
-  import alias = ಠ_ಠ.clutz.implements_iterable.ImplIterable;
-  export default alias;
+  import ImplIterable = ಠ_ಠ.clutz.implements_iterable.ImplIterable;
+  export default ImplIterable;
 }
 declare namespace ಠ_ಠ.clutz.implements_iterable {
   class ImplIterableGeneric < T > extends ImplIterableGeneric_Instance < T > {
@@ -19,8 +19,8 @@ declare namespace ಠ_ಠ.clutz.implements_iterable {
   }
 }
 declare module 'goog:implements_iterable.ImplIterableGeneric' {
-  import alias = ಠ_ಠ.clutz.implements_iterable.ImplIterableGeneric;
-  export default alias;
+  import ImplIterableGeneric = ಠ_ಠ.clutz.implements_iterable.ImplIterableGeneric;
+  export default ImplIterableGeneric;
 }
 declare namespace ಠ_ಠ.clutz.implements_iterable {
   class ImplIterableIterator extends ImplIterableIterator_Instance {
@@ -32,6 +32,6 @@ declare namespace ಠ_ಠ.clutz.implements_iterable {
   }
 }
 declare module 'goog:implements_iterable.ImplIterableIterator' {
-  import alias = ಠ_ಠ.clutz.implements_iterable.ImplIterableIterator;
-  export default alias;
+  import ImplIterableIterator = ಠ_ಠ.clutz.implements_iterable.ImplIterableIterator;
+  export default ImplIterableIterator;
 }

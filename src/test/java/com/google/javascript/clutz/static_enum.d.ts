@@ -12,6 +12,6 @@ declare namespace ಠ_ಠ.clutz.module$exports$foo$C {
   }
 }
 declare module 'goog:foo.C' {
-  import alias = ಠ_ಠ.clutz.module$exports$foo$C;
-  export default alias;
+  import C = ಠ_ಠ.clutz.module$exports$foo$C;
+  export default C;
 }

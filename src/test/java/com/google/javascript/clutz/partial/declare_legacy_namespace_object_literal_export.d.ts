@@ -11,8 +11,8 @@ declare namespace ಠ_ಠ.clutz.object.literal.exports {
   function aFunction ( ) : void ;
 }
 declare module 'goog:object.literal.exports' {
-  import alias = ಠ_ಠ.clutz.object.literal.exports;
-  export = alias;
+  import exports = ಠ_ಠ.clutz.object.literal.exports;
+  export = exports;
 }
 declare namespace ಠ_ಠ.clutz {
   class module$contents$object$literal$exports_Class1 extends module$contents$object$literal$exports_Class1_Instance {

@@ -7,6 +7,6 @@ declare namespace ಠ_ಠ.clutz.module$exports$missing$gen {
   var genericClassUse : ಠ_ಠ.clutz.missing.GenericClass ;
 }
 declare module 'goog:missing.gen' {
-  import alias = ಠ_ಠ.clutz.module$exports$missing$gen;
-  export = alias;
+  import gen = ಠ_ಠ.clutz.module$exports$missing$gen;
+  export = gen;
 }

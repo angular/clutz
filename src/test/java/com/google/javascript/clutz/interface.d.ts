@@ -11,8 +11,8 @@ declare namespace ಠ_ಠ.clutz.interface_exp {
   }
 }
 declare module 'goog:interface_exp' {
-  import alias = ಠ_ಠ.clutz.interface_exp;
-  export default alias;
+  import interface_exp = ಠ_ಠ.clutz.interface_exp;
+  export default interface_exp;
 }
 declare namespace ಠ_ಠ.clutz.interface_exp {
   enum SomeEnum {
@@ -21,6 +21,6 @@ declare namespace ಠ_ಠ.clutz.interface_exp {
   }
 }
 declare module 'goog:interface_exp.SomeEnum' {
-  import alias = ಠ_ಠ.clutz.interface_exp.SomeEnum;
-  export default alias;
+  import SomeEnum = ಠ_ಠ.clutz.interface_exp.SomeEnum;
+  export default SomeEnum;
 }

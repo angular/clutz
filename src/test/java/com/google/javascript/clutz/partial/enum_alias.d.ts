@@ -3,6 +3,6 @@ declare namespace ಠ_ಠ.clutz {
   var module$exports$enum_alias : typeof ಠ_ಠ.clutz.module$exports$enum_alias ;
 }
 declare module 'goog:enum_alias' {
-  import alias = ಠ_ಠ.clutz.module$exports$enum_alias;
-  export default alias;
+  import enum_alias = ಠ_ಠ.clutz.module$exports$enum_alias;
+  export default enum_alias;
 }

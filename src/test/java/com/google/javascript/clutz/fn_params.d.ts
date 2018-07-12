@@ -9,6 +9,6 @@ declare namespace ಠ_ಠ.clutz.fn_params {
   function varargs_fns ( ...var_args : ( Function | null ) [] ) : void ;
 }
 declare module 'goog:fn_params' {
-  import alias = ಠ_ಠ.clutz.fn_params;
-  export = alias;
+  import fn_params = ಠ_ಠ.clutz.fn_params;
+  export = fn_params;
 }

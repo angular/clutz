@@ -26,6 +26,6 @@ declare namespace ಠ_ಠ.clutz.fn.field {
   }
 }
 declare module 'goog:fn.field' {
-  import alias = ಠ_ಠ.clutz.fn.field;
-  export = alias;
+  import field = ಠ_ಠ.clutz.fn.field;
+  export = field;
 }

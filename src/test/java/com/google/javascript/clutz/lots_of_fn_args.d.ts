@@ -7,6 +7,6 @@ declare namespace ಠ_ಠ.clutz.ns.lots.of.args {
   }
 }
 declare module 'goog:ns.lots.of.args' {
-  import alias = ಠ_ಠ.clutz.ns.lots.of.args;
-  export = alias;
+  import args = ಠ_ಠ.clutz.ns.lots.of.args;
+  export = args;
 }

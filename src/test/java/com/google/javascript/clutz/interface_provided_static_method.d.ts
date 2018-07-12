@@ -6,6 +6,6 @@ declare namespace ಠ_ಠ.clutz.interface_provided_static_method {
   }
 }
 declare module 'goog:interface_provided_static_method.FunctionIf' {
-  import alias = ಠ_ಠ.clutz.interface_provided_static_method.FunctionIf;
-  export default alias;
+  import FunctionIf = ಠ_ಠ.clutz.interface_provided_static_method.FunctionIf;
+  export default FunctionIf;
 }

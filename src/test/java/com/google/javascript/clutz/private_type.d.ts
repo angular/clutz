@@ -1,8 +1,8 @@
 declare namespace ಠ_ಠ.clutz.privatetype {
 }
 declare module 'goog:privatetype' {
-  import alias = ಠ_ಠ.clutz.privatetype;
-  export = alias;
+  import privatetype = ಠ_ಠ.clutz.privatetype;
+  export = privatetype;
 }
 declare namespace ಠ_ಠ.clutz.privatetype {
   class Foo extends Foo_Instance {
@@ -17,8 +17,8 @@ declare namespace ಠ_ಠ.clutz.privatetype.Foo {
   type typedef = { a : PrivateType } ;
 }
 declare module 'goog:privatetype.Foo' {
-  import alias = ಠ_ಠ.clutz.privatetype.Foo;
-  export default alias;
+  import Foo = ಠ_ಠ.clutz.privatetype.Foo;
+  export default Foo;
 }
 declare namespace ಠ_ಠ.clutz.privatetype {
   class X_ extends X__Instance {
@@ -30,20 +30,20 @@ declare namespace ಠ_ಠ.clutz.privatetype {
   }
 }
 declare module 'goog:privatetype.X_' {
-  import alias = ಠ_ಠ.clutz.privatetype.X_;
-  export default alias;
+  import X_ = ಠ_ಠ.clutz.privatetype.X_;
+  export default X_;
 }
 declare namespace ಠ_ಠ.clutz.privatetype {
   var enumUser : PrivateType ;
 }
 declare module 'goog:privatetype.enumUser' {
-  import alias = ಠ_ಠ.clutz.privatetype.enumUser;
-  export default alias;
+  import enumUser = ಠ_ಠ.clutz.privatetype.enumUser;
+  export default enumUser;
 }
 declare namespace ಠ_ಠ.clutz.privatetype {
   var user : ಠ_ಠ.clutz.privatetype.X_ ;
 }
 declare module 'goog:privatetype.user' {
-  import alias = ಠ_ಠ.clutz.privatetype.user;
-  export default alias;
+  import user = ಠ_ಠ.clutz.privatetype.user;
+  export default user;
 }

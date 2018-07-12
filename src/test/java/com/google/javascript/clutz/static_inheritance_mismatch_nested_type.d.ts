@@ -10,8 +10,8 @@ declare namespace ಠ_ಠ.clutz.sim_nested.Child {
   }
 }
 declare module 'goog:sim_nested.Child' {
-  import alias = ಠ_ಠ.clutz.sim_nested.Child;
-  export default alias;
+  import Child = ಠ_ಠ.clutz.sim_nested.Child;
+  export default Child;
 }
 declare namespace ಠ_ಠ.clutz.sim_nested.Child {
   enum NestedAndProvided {
@@ -19,8 +19,8 @@ declare namespace ಠ_ಠ.clutz.sim_nested.Child {
   }
 }
 declare module 'goog:sim_nested.Child.NestedAndProvided' {
-  import alias = ಠ_ಠ.clutz.sim_nested.Child.NestedAndProvided;
-  export default alias;
+  import NestedAndProvided = ಠ_ಠ.clutz.sim_nested.Child.NestedAndProvided;
+  export default NestedAndProvided;
 }
 declare namespace ಠ_ಠ.clutz.sim_nested {
   class Parent extends Parent_Instance {
@@ -35,8 +35,8 @@ declare namespace ಠ_ಠ.clutz.sim_nested.Parent {
   }
 }
 declare module 'goog:sim_nested.Parent' {
-  import alias = ಠ_ಠ.clutz.sim_nested.Parent;
-  export default alias;
+  import Parent = ಠ_ಠ.clutz.sim_nested.Parent;
+  export default Parent;
 }
 declare namespace ಠ_ಠ.clutz.sim_nested.Parent {
   enum NestedAndProvided {
@@ -44,6 +44,6 @@ declare namespace ಠ_ಠ.clutz.sim_nested.Parent {
   }
 }
 declare module 'goog:sim_nested.Parent.NestedAndProvided' {
-  import alias = ಠ_ಠ.clutz.sim_nested.Parent.NestedAndProvided;
-  export default alias;
+  import NestedAndProvided = ಠ_ಠ.clutz.sim_nested.Parent.NestedAndProvided;
+  export default NestedAndProvided;
 }

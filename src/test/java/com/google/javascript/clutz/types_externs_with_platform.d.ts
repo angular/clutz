@@ -18,8 +18,8 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
   function topLevelFunction ( ...a : any [] ) : any ;
 }
 declare module 'goog:typesWithExterns' {
-  import alias = ಠ_ಠ.clutz.typesWithExterns;
-  export = alias;
+  import typesWithExterns = ಠ_ಠ.clutz.typesWithExterns;
+  export = typesWithExterns;
 }
 declare namespace ಠ_ಠ.clutz.typesWithExterns {
   class A extends A_Instance {
@@ -31,8 +31,8 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
   }
 }
 declare module 'goog:typesWithExterns.A' {
-  import alias = ಠ_ಠ.clutz.typesWithExterns.A;
-  export default alias;
+  import A = ಠ_ಠ.clutz.typesWithExterns.A;
+  export default A;
 }
 /* skipped emitting type alias typesWithExterns.ArrayLike to avoid collision with existing one in lib.d.ts. */
 declare namespace ಠ_ಠ.clutz.typesWithExterns {
@@ -43,8 +43,8 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
   }
 }
 declare module 'goog:typesWithExterns.B' {
-  import alias = ಠ_ಠ.clutz.typesWithExterns.B;
-  export default alias;
+  import B = ಠ_ಠ.clutz.typesWithExterns.B;
+  export default B;
 }
 declare namespace ಠ_ಠ.clutz.typesWithExterns {
   class C extends C_Instance {
@@ -54,8 +54,8 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
   }
 }
 declare module 'goog:typesWithExterns.C' {
-  import alias = ಠ_ಠ.clutz.typesWithExterns.C;
-  export default alias;
+  import C = ಠ_ಠ.clutz.typesWithExterns.C;
+  export default C;
 }
 /** Insert general_with_platform.d.ts here */
 declare namespace ಠ_ಠ.clutz {

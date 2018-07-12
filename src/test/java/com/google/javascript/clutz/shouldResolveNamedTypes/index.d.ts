@@ -7,8 +7,8 @@ declare namespace ಠ_ಠ.clutz.namedType {
   }
 }
 declare module 'goog:namedType.A' {
-  import alias = ಠ_ಠ.clutz.namedType.A;
-  export default alias;
+  import A = ಠ_ಠ.clutz.namedType.A;
+  export default A;
 }
 declare namespace ಠ_ಠ.clutz.namedType {
   class D < T > extends D_Instance < T > {
@@ -18,6 +18,6 @@ declare namespace ಠ_ಠ.clutz.namedType {
   }
 }
 declare module 'goog:namedType.D' {
-  import alias = ಠ_ಠ.clutz.namedType.D;
-  export default alias;
+  import D = ಠ_ಠ.clutz.namedType.D;
+  export default D;
 }

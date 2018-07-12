@@ -5,8 +5,8 @@ declare namespace ಠ_ಠ.clutz.module$exports$default$object$exporter {
   var BaseClass_Instance : typeof ಠ_ಠ.clutz.module$contents$default$object$exporter_BaseClass_Instance ;
 }
 declare module 'goog:default.object.exporter' {
-  import alias = ಠ_ಠ.clutz.module$exports$default$object$exporter;
-  export = alias;
+  import exporter = ಠ_ಠ.clutz.module$exports$default$object$exporter;
+  export = exporter;
 }
 declare namespace ಠ_ಠ.clutz {
   class module$contents$default$object$exporter_BaseClass extends module$contents$default$object$exporter_BaseClass_Instance {

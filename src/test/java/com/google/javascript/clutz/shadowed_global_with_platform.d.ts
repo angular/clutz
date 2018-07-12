@@ -2,8 +2,8 @@ declare namespace ಠ_ಠ.clutz.goog.ns {
   function fn (a : GlobalEventTarget ) : void ;
 }
 declare module 'goog:goog.ns' {
-  import alias = ಠ_ಠ.clutz.goog.ns;
-  export = alias;
+  import ns = ಠ_ಠ.clutz.goog.ns;
+  export = ns;
 }
 declare namespace ಠ_ಠ.clutz.goog.ns {
   class EventTarget extends EventTarget_Instance {
@@ -13,6 +13,6 @@ declare namespace ಠ_ಠ.clutz.goog.ns {
   }
 }
 declare module 'goog:goog.ns.EventTarget' {
-  import alias = ಠ_ಠ.clutz.goog.ns.EventTarget;
-  export default alias;
+  import EventTarget = ಠ_ಠ.clutz.goog.ns.EventTarget;
+  export default EventTarget;
 }

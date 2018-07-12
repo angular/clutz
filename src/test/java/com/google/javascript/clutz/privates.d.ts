@@ -12,8 +12,8 @@ declare namespace ಠ_ಠ.clutz.priv {
   }
 }
 declare module 'goog:priv' {
-  import alias = ಠ_ಠ.clutz.priv;
-  export = alias;
+  import priv = ಠ_ಠ.clutz.priv;
+  export = priv;
 }
 declare namespace ಠ_ಠ.clutz.priv2 {
   class PublicClass extends PublicClass_Instance {
@@ -30,6 +30,6 @@ declare namespace ಠ_ಠ.clutz.priv2.PublicClass {
   }
 }
 declare module 'goog:priv2.PublicClass' {
-  import alias = ಠ_ಠ.clutz.priv2.PublicClass;
-  export default alias;
+  import PublicClass = ಠ_ಠ.clutz.priv2.PublicClass;
+  export default PublicClass;
 }

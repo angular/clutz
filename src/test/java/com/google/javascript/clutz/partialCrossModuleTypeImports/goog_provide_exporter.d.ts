@@ -6,6 +6,6 @@ declare namespace ಠ_ಠ.clutz.googprovide {
   }
 }
 declare module 'goog:googprovide.exporter' {
-  import alias = ಠ_ಠ.clutz.googprovide.exporter;
-  export default alias;
+  import exporter = ಠ_ಠ.clutz.googprovide.exporter;
+  export default exporter;
 }

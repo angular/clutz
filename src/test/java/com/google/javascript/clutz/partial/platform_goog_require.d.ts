@@ -6,6 +6,6 @@ declare namespace ಠ_ಠ.clutz.module$exports$platform$goog$require {
   }
 }
 declare module 'goog:platform.goog.require' {
-  import alias = ಠ_ಠ.clutz.module$exports$platform$goog$require;
-  export = alias;
+  import require = ಠ_ಠ.clutz.module$exports$platform$goog$require;
+  export = require;
 }

@@ -11,8 +11,8 @@ declare namespace ಠ_ಠ.clutz.tte {
   }
 }
 declare module 'goog:tte.Promise' {
-  import alias = ಠ_ಠ.clutz.tte.Promise;
-  export default alias;
+  import Promise = ಠ_ಠ.clutz.tte.Promise;
+  export default Promise;
 }
 declare namespace ಠ_ಠ.clutz.tte {
   class PromiseService < T > extends PromiseService_Instance < T > {
@@ -27,6 +27,6 @@ declare namespace ಠ_ಠ.clutz.tte.PromiseService {
   }
 }
 declare module 'goog:tte.PromiseService' {
-  import alias = ಠ_ಠ.clutz.tte.PromiseService;
-  export default alias;
+  import PromiseService = ಠ_ಠ.clutz.tte.PromiseService;
+  export default PromiseService;
 }

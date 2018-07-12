@@ -20,6 +20,6 @@ declare namespace ಠ_ಠ.clutz.types {
   var recordTypeOptional : { a : string , optional ? : string } ;
 }
 declare module 'goog:types' {
-  import alias = ಠ_ಠ.clutz.types;
-  export = alias;
+  import types = ಠ_ಠ.clutz.types;
+  export = types;
 }

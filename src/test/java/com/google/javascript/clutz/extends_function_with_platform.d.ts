@@ -6,6 +6,6 @@ declare namespace ಠ_ಠ.clutz.foo {
   }
 }
 declare module 'goog:foo.A' {
-  import alias = ಠ_ಠ.clutz.foo.A;
-  export default alias;
+  import A = ಠ_ಠ.clutz.foo.A;
+  export default A;
 }

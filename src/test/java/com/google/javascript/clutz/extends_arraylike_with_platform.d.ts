@@ -8,8 +8,8 @@ declare namespace ಠ_ಠ.clutz.extend.arraylike {
   }
 }
 declare module 'goog:extend.arraylike.A' {
-  import alias = ಠ_ಠ.clutz.extend.arraylike.A;
-  export default alias;
+  import A = ಠ_ಠ.clutz.extend.arraylike.A;
+  export default A;
 }
 declare namespace ಠ_ಠ.clutz.extend.arraylike {
   class B extends B_Instance {
@@ -21,14 +21,14 @@ declare namespace ಠ_ಠ.clutz.extend.arraylike {
   }
 }
 declare module 'goog:extend.arraylike.B' {
-  import alias = ಠ_ಠ.clutz.extend.arraylike.B;
-  export default alias;
+  import B = ಠ_ಠ.clutz.extend.arraylike.B;
+  export default B;
 }
 declare namespace ಠ_ಠ.clutz.extend.arraylike {
   interface I extends ArrayLike < any > {
   }
 }
 declare module 'goog:extend.arraylike.I' {
-  import alias = ಠ_ಠ.clutz.extend.arraylike.I;
-  export default alias;
+  import I = ಠ_ಠ.clutz.extend.arraylike.I;
+  export default I;
 }

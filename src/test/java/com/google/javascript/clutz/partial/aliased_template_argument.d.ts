@@ -11,8 +11,8 @@ declare namespace ಠ_ಠ.clutz.module$exports$aliased$template$argument {
   type typedef = { field ? : number } ;
 }
 declare module 'goog:aliased.template.argument' {
-  import alias = ಠ_ಠ.clutz.module$exports$aliased$template$argument;
-  export default alias;
+  import argument = ಠ_ಠ.clutz.module$exports$aliased$template$argument;
+  export default argument;
 }
 declare namespace ಠ_ಠ.clutz {
   type module$contents$aliased$template$argument_aliasedtypedef = { field ? : number } ;

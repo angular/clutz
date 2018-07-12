@@ -6,8 +6,8 @@ declare namespace ಠ_ಠ.clutz.googmodule {
   }
 }
 declare module 'goog:googmodule.Required' {
-  import alias = ಠ_ಠ.clutz.googmodule.Required;
-  export default alias;
+  import Required = ಠ_ಠ.clutz.googmodule.Required;
+  export default Required;
 }
 declare namespace ಠ_ಠ.clutz.module$exports$googmodule$TheModule {
   var a : number ;
@@ -16,15 +16,15 @@ declare namespace ಠ_ಠ.clutz.module$exports$googmodule$TheModule {
   var requiredDefault : module$exports$googmodule$requiredModuleDefault ;
 }
 declare module 'goog:googmodule.TheModule' {
-  import alias = ಠ_ಠ.clutz.module$exports$googmodule$TheModule;
-  export = alias;
+  import TheModule = ಠ_ಠ.clutz.module$exports$googmodule$TheModule;
+  export = TheModule;
 }
 declare namespace ಠ_ಠ.clutz.module$exports$googmodule$requiredModule {
   var rm : number ;
 }
 declare module 'goog:googmodule.requiredModule' {
-  import alias = ಠ_ಠ.clutz.module$exports$googmodule$requiredModule;
-  export = alias;
+  import requiredModule = ಠ_ಠ.clutz.module$exports$googmodule$requiredModule;
+  export = requiredModule;
 }
 declare namespace ಠ_ಠ.clutz {
   class module$exports$googmodule$requiredModuleDefault extends module$exports$googmodule$requiredModuleDefault_Instance {
@@ -34,6 +34,6 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare module 'goog:googmodule.requiredModuleDefault' {
-  import alias = ಠ_ಠ.clutz.module$exports$googmodule$requiredModuleDefault;
-  export default alias;
+  import requiredModuleDefault = ಠ_ಠ.clutz.module$exports$googmodule$requiredModuleDefault;
+  export default requiredModuleDefault;
 }

@@ -6,8 +6,8 @@ declare namespace ಠ_ಠ.clutz.module$exports$module$tsickle$like {
   var moduleId : string ;
 }
 declare module 'goog:module.tsickle.like' {
-  import alias = ಠ_ಠ.clutz.module$exports$module$tsickle$like;
-  export = alias;
+  import like = ಠ_ಠ.clutz.module$exports$module$tsickle$like;
+  export = like;
 }
 declare namespace ಠ_ಠ.clutz {
   class module$contents$module$tsickle$like_A extends module$contents$module$tsickle$like_A_Instance {

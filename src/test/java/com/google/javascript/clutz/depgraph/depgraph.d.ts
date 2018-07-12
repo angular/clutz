@@ -8,8 +8,8 @@ declare namespace ಠ_ಠ.clutz.root {
   }
 }
 declare module 'goog:root.Z' {
-  import alias = ಠ_ಠ.clutz.root.Z;
-  export default alias;
+  import Z = ಠ_ಠ.clutz.root.Z;
+  export default Z;
 }
 declare namespace ಠ_ಠ.clutz.transitive {
   class Y extends Y_Instance {

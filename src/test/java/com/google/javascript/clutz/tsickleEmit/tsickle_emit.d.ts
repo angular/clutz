@@ -6,6 +6,6 @@ declare namespace ಠ_ಠ.clutz.module$exports$uses_tsickle_emit {
   var k : ಠ_ಠ.clutz.module$exports$tsickle$emit.KlosureKlass | null ;
 }
 declare module 'goog:uses_tsickle_emit' {
-  import alias = ಠ_ಠ.clutz.module$exports$uses_tsickle_emit;
-  export = alias;
+  import uses_tsickle_emit = ಠ_ಠ.clutz.module$exports$uses_tsickle_emit;
+  export = uses_tsickle_emit;
 }

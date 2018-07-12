@@ -8,6 +8,6 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare module 'goog:asyncawait' {
-  import alias = ಠ_ಠ.clutz.module$exports$asyncawait;
-  export default alias;
+  import asyncawait = ಠ_ಠ.clutz.module$exports$asyncawait;
+  export default asyncawait;
 }

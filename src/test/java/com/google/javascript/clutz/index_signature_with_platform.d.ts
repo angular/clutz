@@ -58,6 +58,6 @@ declare namespace ಠ_ಠ.clutz.index_signature {
   }
 }
 declare module 'goog:index_signature' {
-  import alias = ಠ_ಠ.clutz.index_signature;
-  export = alias;
+  import index_signature = ಠ_ಠ.clutz.index_signature;
+  export = index_signature;
 }

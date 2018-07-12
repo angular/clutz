@@ -23,6 +23,6 @@ declare namespace ಠ_ಠ.clutz.module$exports$missing$imported$base {
   function FuncWithMissingRequireParam (c : ಠ_ಠ.clutz.module$exports$default$base$exporter | null ) : void ;
 }
 declare module 'goog:missing.imported.base' {
-  import alias = ಠ_ಠ.clutz.module$exports$missing$imported$base;
-  export = alias;
+  import base = ಠ_ಠ.clutz.module$exports$missing$imported$base;
+  export = base;
 }
