@@ -1286,19 +1286,21 @@ class DeclarationGenerator {
     emitNoSpace("' {");
     indent();
     emitBreak();
+    // This name is offered for auto-import.
+    String alias = getUnqualifiedName(name);
     // workaround for https://github.com/Microsoft/TypeScript/issues/4325
-    emit("import alias = ");
+    emit("import " + alias + " = ");
     emitNoSpace(Constants.INTERNAL_NAMESPACE);
     emitNoSpace(".");
     emitNoSpace(inParentNamespace ? getNamespace(emitName) : emitName);
     emitNoSpace(";");
     emitBreak();
     if (isDefault) {
-      emitNoSpace("export default alias");
+      emitNoSpace("export default " + alias);
       if (inParentNamespace) emitNoSpace("." + getUnqualifiedName(name));
       emitNoSpace(";");
     } else {
-      emitNoSpace("export = alias;");
+      emitNoSpace("export = " + alias + ";");
     }
     emitBreak();
     unindent();
