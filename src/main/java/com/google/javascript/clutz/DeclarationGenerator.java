@@ -3058,6 +3058,23 @@ class DeclarationGenerator {
       visitFunctionParameters(ftype, true, Collections.<String>emptyList());
     }
 
+    /** Gets the string name from a function parameter node, or "" if we cannot find one. */
+    private String getParameterName(Node node) {
+      if (node.isDefaultValue()) {
+        node = node.getFirstChild();
+      }
+      if (node.isRest()) {
+        node = node.getOnlyChild();
+      }
+
+      if (node.isName()) {
+        return node.getString();
+      } else {
+        // Use a simple invalid name for complex parameters.
+        return "";
+      }
+    }
+
     private void visitFunctionParameters(
         FunctionType ftype, boolean emitTemplatizedTypes, List<String> alreadyEmittedTemplateType) {
       if (emitTemplatizedTypes) {
@@ -3073,22 +3090,21 @@ class DeclarationGenerator {
       Iterator<Node> parameters = ftype.getParameters().iterator();
       Iterator<String> names = null;
       Node functionSource = ftype.getSource();
-      if (functionSource != null) {
+      if (functionSource != null && functionSource.isClass()) {
+        Node members = functionSource.getLastChild();
+        for (Node member : members.children()) {
+          if (member.isMemberFunctionDef() && member.getString().equals("constructor")) {
+            functionSource = member.getOnlyChild();
+            break;
+          }
+        }
+      }
+      if (functionSource != null && functionSource.isFunction()) {
         // functionSource AST: FUNCTION -> (NAME, PARAM_LIST, BLOCK ...)
         Iterable<Node> parameterNodes = functionSource.getFirstChild().getNext().children();
         // TODO(bradfordcsmith): This will need to be updated when transpilation of default
         //   and destructured parameters stops happening in checks-only compilation.
-        names =
-            transform(
-                    parameterNodes,
-                    (node) -> {
-                      if (node.isRest()) {
-                        return node.getOnlyChild().getString();
-                      } else {
-                        return node.getString();
-                      }
-                    })
-                .iterator();
+        names = transform(parameterNodes, (node) -> this.getParameterName(node)).iterator();
       }
 
       int paramCount = 0;
@@ -3097,18 +3113,22 @@ class DeclarationGenerator {
         if (param.isVarArgs()) {
           emit("...");
         }
+
+        String pName = "";
         if (names != null && names.hasNext()) {
-          emitNoSpace(names.next());
-        } else {
-          String pName;
+          pName = names.next();
+        }
+        if (pName.isEmpty()) {
+          // If we cannot find a name for the parameter, just generate one.
           if (paramCount < 26) {
             pName = Character.toString((char) (97 + paramCount));
           } else {
             pName = "p" + (paramCount - 26);
           }
-          emitNoSpace("" + pName);
-          paramCount++;
         }
+        emitNoSpace(pName);
+        paramCount++;
+
         // In TypeScript ...a?: any[] is illegal, so we can only make non-varargs optional.
         if ((param.isOptionalArg() || makeAllParametersOptional) && !param.isVarArgs()) {
           emit("?");
