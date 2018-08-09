@@ -3,6 +3,7 @@ declare namespace ಠ_ಠ.clutz {
   }
   class module$exports$module$Foo_Instance {
     private noStructuralTyping_: any;
+    constructor (x : string ,  ...rest : string [] ) ;
   }
 }
 declare module 'goog:module.Foo' {
