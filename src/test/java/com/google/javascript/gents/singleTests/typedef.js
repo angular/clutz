@@ -1,16 +1,14 @@
+const foo = {};
+
 /**
- * Comment
- * @typedef {string}
+ * @constructor
  */
-var MyString;
+foo.Bar = function() {
+};
 
 /**
  * @typedef {{
- *   x: string,
- *   y: number
+ *   baz: string,
  * }}
  */
-var MyInterface;
-
-/** @type {MyString} */
-var x = 'x';
+foo.Bar.Bat;
