@@ -1,4 +1,4 @@
-import Promise from 'goog:tte.Promise';
+import Promise from 'goog:angular.$q.Promise';
 
 let x = new Promise<string>();
 let y: Promise<string> = x.then(x => x).then(x => x + 'foo');

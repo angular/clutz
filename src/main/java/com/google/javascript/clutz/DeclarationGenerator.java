@@ -2945,14 +2945,28 @@ class DeclarationGenerator {
       String classTemplatizedType =
           className.equals("ಠ_ಠ.clutz.goog.Promise") ? " any" : className + " < RESULT >";
       if (propName.equals("then")) {
-        return "then < RESULT > (opt_onFulfilled ? : ( (a : "
-            + templateVarName
-            + " ) => "
-            + classTemplatizedType
-            + " | RESULT ) | null , "
-            + "opt_onRejected ? : ( (a : any ) => any ) | null) : "
-            + classTemplatizedType
-            + " ;";
+        // Prune promise<never> off AngularJS IPromise.then return type.
+        if (className.equals("ಠ_ಠ.clutz.angular.$q.Promise")) {
+          return "then < RESULT > (opt_onFulfilled ? : ( (a : "
+              + templateVarName
+              + " ) => "
+              + classTemplatizedType
+              + " | RESULT | "
+              + className
+              + "<never>) | null , "
+              + "opt_onRejected ? : ( (a : any ) => any ) | null) : "
+              + classTemplatizedType
+              + " ;";
+        } else {
+          return "then < RESULT > (opt_onFulfilled ? : ( (a : "
+              + templateVarName
+              + " ) => "
+              + classTemplatizedType
+              + " | RESULT ) | null , "
+              + "opt_onRejected ? : ( (a : any ) => any ) | null) : "
+              + classTemplatizedType
+              + " ;";
+        }
       }
       if (propName.equals("when")) {
         return "when < RESULT, T > (value: T, successCallback: (promiseValue: T) => "

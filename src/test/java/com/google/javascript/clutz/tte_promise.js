@@ -1,5 +1,5 @@
-goog.provide('tte.Promise');
-goog.provide('tte.PromiseService');
+goog.provide('angular.$q.Promise');
+goog.provide('angular.$q.PromiseService');
 
 /**
  * The examples below come from closure's typings of angular and es6 promise
@@ -12,7 +12,7 @@ goog.provide('tte.PromiseService');
  * @constructor
  * @template T
  */
-tte.Promise = function() {};
+angular.$q.Promise = function() {};
 
 /**
  *
@@ -27,12 +27,12 @@ tte.Promise = function() {};
  *       mapunion(VALUE, (V) =>
  *         cond(isTemplatized(V) && sub(rawTypeOf(V), 'IThenable'),
  *           templateTypeOf(V, 0),
- *           cond(sub(V, 'tte.Promise'),
+ *           cond(sub(V, 'angular.$q.Promise'),
  *              unknown(),
  *              V)))))
  *  =:
  */
-tte.Promise.prototype.then =
+angular.$q.Promise.prototype.then =
     function(opt_onFulfilled, opt_onRejected, opt_notifyCallback) {};
 
 /**
@@ -61,7 +61,7 @@ tte.Promise.prototype.then =
  *           'Object')))))
  * =:
  */
-tte.Promise.all = function(promises) {};
+angular.$q.Promise.all = function(promises) {};
 
 /**
  * @param {VALUE=} opt_value
@@ -77,11 +77,11 @@ tte.Promise.all = function(promises) {};
  *              V)))))
  * =:
  */
-tte.Promise.resolve = function(opt_value) {};
+angular.$q.Promise.resolve = function(opt_value) {};
 
 /**
  * @param {!Array<VALUE>} values
- * @return {!tte.Promise<RESULT>}
+ * @return {!angular.$q.Promise<RESULT>}
  * @template VALUE
  * @template RESULT := mapunion(VALUE, (V) =>
  *     cond(isUnknown(V),
@@ -91,7 +91,7 @@ tte.Promise.resolve = function(opt_value) {};
  *             cond(sub(V, 'Thenable'), unknown(), V))))
  * =:
  */
-tte.Promise.race = function(values) {};
+angular.$q.Promise.race = function(values) {};
 
 /**
  * @see "https://github.com/google/closure-compiler/commit/be3f15e58812b0843ad0ccc0bcddb5a1506d56e8"
@@ -112,7 +112,7 @@ tte.Promise.race = function(values) {};
  *              V)))))
  * =:
  */
-tte.Promise.prototype.when = function(
+angular.$q.Promise.prototype.when = function(
     opt_value, opt_successCallback, opt_errorCallback, opt_progressCallback) {};
 
 //!! In angular 'all' is a instance method on the $q service, and not a static
@@ -121,7 +121,7 @@ tte.Promise.prototype.when = function(
  * @constructor
  * @template T
  */
-tte.PromiseService = function() {};
+angular.$q.PromiseService = function() {};
 
 /**
  *
@@ -149,10 +149,10 @@ tte.PromiseService = function() {};
  *           'Object')))))
  * =:
  */
-tte.PromiseService.prototype.all = function(promises) {};
+angular.$q.PromiseService.prototype.all = function(promises) {};
 
 /**
  * @record
  * @template T
  */
-tte.PromiseService.Promise = function() {};
+angular.$q.PromiseService.Promise = function() {};
