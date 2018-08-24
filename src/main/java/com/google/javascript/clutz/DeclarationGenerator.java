@@ -2944,15 +2944,30 @@ class DeclarationGenerator {
       // fixed.
       String classTemplatizedType =
           className.equals("ಠ_ಠ.clutz.goog.Promise") ? " any" : className + " < RESULT >";
+      // The AngularJS promise type should match the TypeScript type declaration since they describe
+      // the same runtime.
       if (propName.equals("then")) {
-        return "then < RESULT > (opt_onFulfilled ? : ( (a : "
-            + templateVarName
-            + " ) => "
-            + classTemplatizedType
-            + " | RESULT ) | null , "
-            + "opt_onRejected ? : ( (a : any ) => any ) | null) : "
-            + classTemplatizedType
-            + " ;";
+        if (className.equals("ಠ_ಠ.clutz.angular.$q.Promise")) {
+          return "then < RESULT > (opt_onFulfilled ? : ( (a : "
+              + templateVarName
+              + " ) => "
+              + classTemplatizedType
+              + " | RESULT | "
+              + className
+              + "<never>) | null , "
+              + "opt_onRejected ? : ( (a : any ) => any ) | null) : "
+              + classTemplatizedType
+              + " ;";
+        } else {
+          return "then < RESULT > (opt_onFulfilled ? : ( (a : "
+              + templateVarName
+              + " ) => "
+              + classTemplatizedType
+              + " | RESULT ) | null , "
+              + "opt_onRejected ? : ( (a : any ) => any ) | null) : "
+              + classTemplatizedType
+              + " ;";
+        }
       }
       if (propName.equals("when")) {
         return "when < RESULT, T > (value: T, successCallback: (promiseValue: T) => "
