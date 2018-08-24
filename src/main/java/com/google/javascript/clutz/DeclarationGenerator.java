@@ -2944,8 +2944,9 @@ class DeclarationGenerator {
       // fixed.
       String classTemplatizedType =
           className.equals("ಠ_ಠ.clutz.goog.Promise") ? " any" : className + " < RESULT >";
+      // The AngularJS promise type should match the TypeScript type declaration since they describe
+      // the same runtime.
       if (propName.equals("then")) {
-        // Prune promise<never> off AngularJS IPromise.then return type.
         if (className.equals("ಠ_ಠ.clutz.angular.$q.Promise")) {
           return "then < RESULT > (opt_onFulfilled ? : ( (a : "
               + templateVarName
