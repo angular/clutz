@@ -93,7 +93,7 @@ public final class TypeConversionPass implements CompilerPass {
           // has its members converted in TypeAnnotationPass; or (2) a type alias.
           // Most class inner @typedef meant @record in closure but they were added before @record
           // was supported. Also in TypeScript interfaces are preferred to type alias because of
-          // better error reporting and ability to extend. However simple types such as string are
+          // better error reporting and extendability. However simple types such as string are
           // still type aliases.
           bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
           if (bestJSDocInfo == null || !bestJSDocInfo.hasTypedefType()) {
@@ -482,8 +482,11 @@ public final class TypeConversionPass implements CompilerPass {
       String newTypeName = entry.getValue();
       String filename = typesToFilename.get(oldTypeName);
       FileModule module = fileMap.get(filename);
-      // TypeAnnotationPass will convert the global type name to the local type name using this mapping.
-      module.importedNamespacesToSymbols.put(oldTypeName, newTypeName);
+      if (module != null) {
+        // TypeAnnotationPass will convert the global type name to the local type name using this
+        // mapping.
+        module.importedNamespacesToSymbols.put(oldTypeName, newTypeName);
+      }
     }
   }
 
