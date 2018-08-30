@@ -203,6 +203,35 @@ public abstract class ImportBasedMapBuilder {
     return statement.getFirstChild().getFirstChild().getFirstChild().getString().equals("exports");
   }
 
+  /** Matches `exports.foo = foo.bar;` */
+  protected boolean isNamedExportPropAssignment(Node statement) {
+    if (!statement.isExprResult()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().isAssign()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().getFirstChild().isGetProp()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().getFirstChild().getFirstChild().isName()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().getSecondChild().isGetProp()) {
+      return false;
+    }
+
+    if (!statement.getFirstChild().getSecondChild().getFirstChild().isName()) {
+      return false;
+    }
+
+    return statement.getFirstChild().getFirstChild().getFirstChild().getString().equals("exports");
+  }
+
   /** Returns `foo` from 'exports.foo = bar` */
   protected String getNamedExportName(Node statement) {
     return statement.getFirstChild().getFirstChild().getChildAtIndex(1).getString();
@@ -210,7 +239,17 @@ public abstract class ImportBasedMapBuilder {
 
   /** Returns `foo` from `exports = foo` or `exports.foo = foo` */
   protected String getExportsAssignmentRHS(Node statement) {
-    return statement.getFirstChild().getChildAtIndex(1).getString();
+    return statement.getFirstChild().getSecondChild().getString();
+  }
+
+  /** Returns `foo` from `exports = foo.bar` or `exports.foo = foo.bar` */
+  protected String getExportsAssignmentPropRootName(Node statement) {
+    return statement.getFirstChild().getSecondChild().getFirstChild().getString();
+  }
+
+  /** Returns `bar` from `exports = foo.bar` or `exports.foo = foo.bar` */
+  protected String getExportsAssignmentPropName(Node statement) {
+    return statement.getFirstChild().getSecondChild().getSecondChild().getString();
   }
 
   protected Map<String, String> objectLiteralASTToStringMap(Node objectLiteral) {

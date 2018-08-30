@@ -79,7 +79,7 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
               localVariableToImportedSymbolNameMap.get(localVariableName));
         }
       } else if (isNamedExportAssignment(statement)) {
-        // `exports.foo = foo`
+        // `exports.foo = foo;`
         String localVariableName = getExportsAssignmentRHS(statement);
         String exportName = getNamedExportName(statement);
 
@@ -88,6 +88,14 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
               buildNamedExportSymbolName(localModuleId, exportName),
               localVariableToImportedSymbolNameMap.get(localVariableName));
         }
+      } else if (isNamedExportPropAssignment(statement)) {
+        // `exports.foo = foo.bar;`
+        String localVariableName = getExportsAssignmentPropRootName(statement);
+        String localPropName = getExportsAssignmentPropName(statement);
+        String exportName = getNamedExportName(statement);
+        aliasMap.put(
+            buildNamedExportSymbolName(localModuleId, exportName),
+            localVariableToImportedSymbolNameMap.get(localVariableName) + "." + localPropName);
       }
     }
 
