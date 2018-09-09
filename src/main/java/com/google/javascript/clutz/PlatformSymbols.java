@@ -309,6 +309,7 @@ public class PlatformSymbols {
           "WebKitBlobBuilder",
           "WebKitNamespace",
           "WebWorker",
+          "WorkerOptions",
           "WorkerPerformance",
           "XDomainRequest",
           "XMLDOMDocument",
