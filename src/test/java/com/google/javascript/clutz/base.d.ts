@@ -7,7 +7,7 @@ declare namespace goog {
   }
   class DebugLoader_Instance {
     private noStructuralTyping_: any;
-    getTranspiler ( ) : goog.Transpiler ;
+    protected getTranspiler ( ) : goog.Transpiler ;
   }
   class Transpiler extends Transpiler_Instance {
   }

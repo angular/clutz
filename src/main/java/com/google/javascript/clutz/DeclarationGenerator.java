@@ -1008,7 +1008,7 @@ class DeclarationGenerator {
       for (String property : propertyNames) {
         // When parsing externs namespaces are explicitly declared with a var of Object type
         // Do not emit the var declaration, as it will conflict with the namespace.
-        if (!((isEmittableProperty(objType, property) && isValidJSProperty(property))
+        if (!((!isEmittableProperty(objType, property) && isValidJSProperty(property))
             || (isExtern && isLikelyNamespace(objType.getOwnPropertyJSDocInfo(property))))) {
           desiredSymbols.add(symbol.getName() + "." + property);
         }
@@ -1228,9 +1228,12 @@ class DeclarationGenerator {
 
   private boolean isEmittableProperty(ObjectType obj, String propName) {
     JSDocInfo info = obj.getOwnPropertyJSDocInfo(propName);
+    if (info == null) {
+      return true;  // properties without JSDoc are public and emittable.
+    }
     // Skip emitting private properties, but do emit constructors because they introduce a
     // type that can be used in type contexts.
-    return isPrivate(info) && !isConstructor(info);
+    return !isPrivate(info) || isConstructor(info);
   }
 
   private boolean isTypeCheckSuppressedProperty(ObjectType obj, String propName) {
@@ -1264,7 +1267,15 @@ class DeclarationGenerator {
   }
 
   private boolean isPrivate(@Nullable JSDocInfo docInfo) {
-    return docInfo != null && docInfo.getVisibility() == Visibility.PRIVATE;
+    if (docInfo == null) {
+      return false;
+    }
+    // Closure Compiler has @package visibility, which makes symbols accessible to code in the same
+    // package. ES6 modules do not have this concept at all, as there are no packages to begin with.
+    // As TypeScript code can never be in the same package as JavaScript code, because TS code is in
+    // no package at all, Clutz considers @package visible fields to be private.
+    return docInfo.getVisibility() == Visibility.PRIVATE
+        || docInfo.getVisibility() == Visibility.PACKAGE;
   }
 
   private boolean isConstructor(@Nullable JSDocInfo docInfo) {
@@ -2433,7 +2444,7 @@ class DeclarationGenerator {
           Sets.filter(
               type.getOwnPropertyNames(),
               propName ->
-                  !isEmittableProperty(type, propName)
+                  isEmittableProperty(type, propName)
                       && !isTypeCheckSuppressedProperty(type, propName)));
     }
 
@@ -2756,11 +2767,14 @@ class DeclarationGenerator {
       JSType propertyType = objType.getPropertyType(propName);
       // The static methods from the function prototype are provided by lib.d.ts.
       if (isStatic && isFunctionPrototypeProp(propName)) return;
-      maybeEmitJsDoc(objType.getOwnPropertyJSDocInfo(propName), /* ignoreParams */ false);
+      JSDocInfo jsdoc = objType.getOwnPropertyJSDocInfo(propName);
+      maybeEmitJsDoc(jsdoc, /* ignoreParams */ false);
+      boolean isProtected = jsdoc != null && jsdoc.getVisibility() == Visibility.PROTECTED;
       emitProperty(
           propName,
           propertyType,
           isStatic,
+          isProtected,
           forcePropDeclaration,
           isNamespace,
           classTemplateTypeNames);
@@ -2770,12 +2784,14 @@ class DeclarationGenerator {
         String propName,
         JSType propertyType,
         boolean isStatic,
+        boolean isProtected,
         boolean forcePropDeclaration,
         boolean isNamespace,
         List<String> classTemplateTypeNames) {
       if (handleSpecialTTEFunctions(propertyType, propName, isStatic, classTemplateTypeNames))
         return;
 
+      if (isProtected) emit("protected");
       if (isStatic) emit("static");
       emit(propName);
       if (!propertyType.isFunctionType() || forcePropDeclaration) {
