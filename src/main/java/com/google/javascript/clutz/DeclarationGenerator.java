@@ -1006,12 +1006,18 @@ class DeclarationGenerator {
       Set<String> propertyNames =
           objType != null ? objType.getOwnPropertyNames() : Collections.<String>emptySet();
       for (String property : propertyNames) {
-        // When parsing externs namespaces are explicitly declared with a var of Object type
+        // When parsing externs, namespaces are explicitly declared with a var of Object type
         // Do not emit the var declaration, as it will conflict with the namespace.
-        if (!((!isEmittableProperty(objType, property) && isValidJSProperty(property))
-            || (isExtern && isLikelyNamespace(objType.getOwnPropertyJSDocInfo(property))))) {
-          desiredSymbols.add(symbol.getName() + "." + property);
+        if (isExtern && isLikelyNamespace(objType.getOwnPropertyJSDocInfo(property))) {
+          continue;
         }
+        if (!isEmittableProperty(objType, property)) {
+          continue; // skip private properties.
+        }
+        if (!isValidJSProperty(property)) {
+          continue; // skip properties whose name is not a valid JS/TS identifier.
+        }
+        desiredSymbols.add(symbol.getName() + "." + property);
       }
       // Any provides have their own namespace and should not be emitted in this namespace.
       for (String provide : provides) {
@@ -1226,11 +1232,12 @@ class DeclarationGenerator {
     return false;
   }
 
+  /**
+   * Returns true if the given property on the given object should be emitted. That is, it is
+   * visible or a constructor.
+   */
   private boolean isEmittableProperty(ObjectType obj, String propName) {
     JSDocInfo info = obj.getOwnPropertyJSDocInfo(propName);
-    if (info == null) {
-      return true;  // properties without JSDoc are public and emittable.
-    }
     // Skip emitting private properties, but do emit constructors because they introduce a
     // type that can be used in type contexts.
     return !isPrivate(info) || isConstructor(info);
