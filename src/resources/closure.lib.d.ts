@@ -12,12 +12,14 @@ declare namespace ಠ_ಠ.clutz {
   var GlobalEvent: typeof Event;
   type GlobalEventTarget = EventTarget;
   var GlobalEventTarget: typeof EventTarget;
-  type GlobalObject = Object;
-  var GlobalObject: typeof Object;
   type GlobalFloat32Array = Float32Array;
   var GlobalFloat32Array: typeof Float32Array;
   type GlobalFloat64Array = Float64Array;
   var GlobalFloat64Array: typeof Float64Array;
+  type GlobalObject = Object;
+  var GlobalObject: typeof Object;
+  type GlobalStorage = Storage;
+  var GlobalStorage: typeof Storage;
 
   /** Represents the type returned when goog.require-ing an unknown symbol */
   type ClosureSymbolNotGoogProvided = void;

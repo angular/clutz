@@ -71,7 +71,8 @@ public class PlatformSymbols {
           "EventTarget",
           "Float32Array",
           "Float64Array",
-          "Object");
+          "Object",
+          "Storage");
 
   /**
    * Set of symbols that are defined in a platform externs.js that we don't need a matching
