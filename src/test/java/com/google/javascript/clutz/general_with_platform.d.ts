@@ -164,6 +164,11 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  interface NavigatorStorage {
+    storage : StorageManager ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   interface ShareData {
     text ? : string ;
     title ? : string ;
