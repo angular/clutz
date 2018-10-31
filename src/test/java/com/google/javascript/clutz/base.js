@@ -1,3 +1,11 @@
+/**
+ * @fileoverview This file contains a portion of the Closure library's
+ * base.js, for the purpose of testing some of the patterns found
+ * there.  The following annotation is necessary for the compiler to recognize
+ * this file as one that may provide symbols like goog.require().
+ * @provideGoog
+ */
+
 // Changing this definition to false or removing or renaming it will cause closure to remove
 // goog from the list of provided symbols, thus breaking the output.
 /**
