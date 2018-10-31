@@ -62,7 +62,7 @@ dependencies {
   // clutz runs against closure head inside google, so default to that, but also test against
   // the latest release for external users
   if (System.getenv().get('CI_MODE') == 'Released') {
-    compile 'com.google.javascript:closure-compiler:v20180204'
+    compile 'com.google.javascript:closure-compiler:v20181008'
   } else {
     compile 'com.google.javascript:closure-compiler:1.0-SNAPSHOT'
   }
