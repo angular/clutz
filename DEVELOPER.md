@@ -20,7 +20,17 @@ Run `gradle assemble` to build, `gradle test` to, well, test.
 
 Run `gradle eclipse` to generate Eclipse project configuration.
 
-## Running tests from an IDE
+## Tests
+
+You can run the test suite with:
+
+```shell
+$ ./gradlew test
+```
+
+Pass the environment variable `UPDATE_GOLDENS=y` to update the golden files.
+
+### Running tests from an IDE
 
 The `gradle` configuration makes sure that tests use the locally installed
 `clang-format` by setting the system property `gents.clangFormat`, see
