@@ -14,6 +14,16 @@ type-checking in the TypeScript compiler and IDE tooling (for highlighting
 errors and type-sensitive auto-complete) as if the imported code was written in
 TypeScript.
 
+## Supported versions
+
+We lack the resources to make Clutz releases or support multiple versions of
+dependent tools simultaneously. You'll have the most success with Clutz if you
+use it with:
+
+-   Closure Compiler at HEAD: whatever maven thinks -SNAPSHOT is.
+-   A recent version of TypeScript: the test suite runs against the version of
+    `typescript` in `npm-shrinkwrap.json`, so that is always a good choice.
+
 ## Example usage
 
 We don't offer a binary distribution, so first you need to build from source:
@@ -53,23 +63,6 @@ compiler flags that clutz passes to Closure Compiler in
 `src/main/java/com/google/javascript/clutz/Options.java`. If the failure is
 reproducible this way, then you have a closure type error in your code (or a bug
 in Closure Compiler).
-
-## Supported Version of TypeScript
-
-Clutz produces declaration files that are guaranteed to be accepted by a version
-of TypeScript [2.7.2](https://github.com/Microsoft/TypeScript/tree/v2.7.2). The
-current test suite runs against the version of `typescript` in
-`npm-shrinkwrap.json`, so that is always a good choice.
-
-## Tests
-
-You can run the test suite with:
-
-```shell
-$ ./gradlew test
-```
-
-Pass the environment variable `UPDATE_GOLDENS=y` to update the golden files.
 
 # Gents - Closure to TypeScript converter
 
