@@ -3,7 +3,7 @@
 //!! TODO(rado): Add Syntax tests for MultiFile and add an extra .d.ts to match
 //!! the TypeScript compiler output .d.ts.
 declare namespace ಠ_ಠ.clutz.module$exports$uses_tsickle_emit {
-  var k : ಠ_ಠ.clutz.module$exports$tsickle$emit.KlosureKlass | null ;
+  let k : ಠ_ಠ.clutz.module$exports$tsickle$emit.KlosureKlass | null ;
 }
 declare module 'goog:uses_tsickle_emit' {
   import uses_tsickle_emit = ಠ_ಠ.clutz.module$exports$uses_tsickle_emit;

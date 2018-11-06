@@ -13,7 +13,7 @@ rec.Aclass.prototype.foo = [];
 rec.ns.T;
 
 /** @const {rec.ns.T} */
-rec.ns.tvar = {t: 0};
+rec.ns.tconst = {t: 0};
 
 // Mutually recursive example.
 /** @typedef {{arr: (!rec.ns.Arr)}} */

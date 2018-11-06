@@ -1,17 +1,17 @@
 declare namespace ಠ_ಠ.clutz.nullable {
-  var w : boolean | null ;
+  let w : boolean | null ;
   /**
    * Explicitly non-nullable.
    */
-  var x : GlobalObject ;
+  let x : GlobalObject ;
   /**
    * Implicitly nullable.
    */
-  var y : GlobalObject | null ;
+  let y : GlobalObject | null ;
   /**
    * Explicitly nullable.
    */
-  var z : GlobalObject | null ;
+  let z : GlobalObject | null ;
 }
 declare module 'goog:nullable' {
   import nullable = ಠ_ಠ.clutz.nullable;

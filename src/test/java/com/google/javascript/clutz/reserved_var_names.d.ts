@@ -1,5 +1,5 @@
 declare namespace ಠ_ಠ.clutz.ns {
-  var reserved : { a : number , switch : number };
+  let reserved : { a : number , switch : number };
 }
 declare module 'goog:ns.reserved.a' {
   import a = ಠ_ಠ.clutz.ns.reserved;

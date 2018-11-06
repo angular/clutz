@@ -13,7 +13,7 @@ declare module 'goog:aliasT.I2' {
   export default I2;
 }
 declare namespace ಠ_ಠ.clutz.aliasT {
-  var iboom : ಠ_ಠ.clutz.$jscomp.scope.I < string > | null ;
+  let iboom : ಠ_ಠ.clutz.$jscomp.scope.I < string > | null ;
 }
 declare module 'goog:aliasT.iboom' {
   import iboom = ಠ_ಠ.clutz.aliasT.iboom;

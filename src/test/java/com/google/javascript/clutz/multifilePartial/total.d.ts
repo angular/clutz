@@ -18,7 +18,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$missing$imported$base {
   }
   class ClassExtendingRenamedDestructuredRequire_Instance extends ಠ_ಠ.clutz.module$exports$named$base$exporter.OriginalName_Instance {
   }
-  var DeclarationOfMissingRequire : module$exports$default$base$exporter | null ;
+  let DeclarationOfMissingRequire : module$exports$default$base$exporter | null ;
   function FuncWithMissingRequireParam (c : module$exports$default$base$exporter | null ) : void ;
 }
 declare module 'goog:missing.imported.base' {

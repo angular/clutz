@@ -7,7 +7,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$interface_static_method {
   }
   namespace FunctionIf {
     function staticMethod ( ) : string ;
-    var staticProperty : string ;
+    let staticProperty : string ;
   }
   interface FunctionIf {
     method ( ) : string ;

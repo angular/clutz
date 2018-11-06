@@ -34,14 +34,14 @@ declare module 'goog:privatetype.X_' {
   export default X_;
 }
 declare namespace ಠ_ಠ.clutz.privatetype {
-  var enumUser : PrivateType ;
+  let enumUser : PrivateType ;
 }
 declare module 'goog:privatetype.enumUser' {
   import enumUser = ಠ_ಠ.clutz.privatetype.enumUser;
   export default enumUser;
 }
 declare namespace ಠ_ಠ.clutz.privatetype {
-  var user : ಠ_ಠ.clutz.privatetype.X_ ;
+  let user : ಠ_ಠ.clutz.privatetype.X_ ;
 }
 declare module 'goog:privatetype.user' {
   import user = ಠ_ಠ.clutz.privatetype.user;

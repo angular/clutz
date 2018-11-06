@@ -10,7 +10,7 @@ declare module 'goog:provides.C' {
   export default C;
 }
 declare namespace ಠ_ಠ.clutz.provides {
-  var instance : ಠ_ಠ.clutz.provides.C ;
+  let instance : ಠ_ಠ.clutz.provides.C ;
 }
 declare module 'goog:provides.instance' {
   import instance = ಠ_ಠ.clutz.provides.instance;

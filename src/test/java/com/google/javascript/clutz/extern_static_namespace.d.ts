@@ -11,11 +11,11 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz.ExternStaticC.fn {
-  var a : string ;
+  let a : string ;
 }
 declare namespace ಠ_ಠ.clutz.ExternStaticC.ns {
-  var a : number ;
+  let a : number ;
 }
 declare namespace ಠ_ಠ.clutz.ExternStaticC.objNsLike {
-  var a : string ;
+  let a : string ;
 }

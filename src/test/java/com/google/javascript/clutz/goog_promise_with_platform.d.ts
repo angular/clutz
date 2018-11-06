@@ -16,7 +16,7 @@ declare module 'goog:goog.Promise' {
 }
 declare namespace ಠ_ಠ.clutz.goog {
   namespace Thenable {
-    var IMPLEMENTED_BY_PROP : string ;
+    let IMPLEMENTED_BY_PROP : string ;
     function addImplementation (ctor : { new ( ...a : any [] ) : ಠ_ಠ.clutz.goog.Thenable < any > } ) : void ;
     function isImplementedBy (object : any ) : boolean ;
   }
