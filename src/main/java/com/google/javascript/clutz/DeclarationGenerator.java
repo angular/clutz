@@ -1872,11 +1872,11 @@ class DeclarationGenerator {
         return;
       }
 
-      // The current node points to the enum type declaration, this means that the next node will
-      // be the OBJECTLIT containing all enum key and value pairs. However, globally declared
-      // enums that are indirectly provided will instead be pointing to the parent of the
-      // OBJECTLIT parent.
-      Node objectOfAllMembers = node.getNext() != null ? node.getNext() : node.getFirstChild();
+      // The current node points to either:
+      // 1) The GETPROP node for a goog.provide style export - a.b.MyEnum = {...};
+      // 2) The STRINGLIT node for a goog.module style export - exports = { MyEnum: {...}, ...}
+      // For case 1) we need to get the next node, while for 2) we need to get the first child.
+      Node objectOfAllMembers = node.getParent().isAssign() ? node.getNext() : node.getFirstChild();
       Stream<Node> elementStream = Streams.stream(objectOfAllMembers.children());
       Map<String, Node> elements =
           elementStream.collect(Collectors.toMap(Node::getString, Node::getFirstChild));
