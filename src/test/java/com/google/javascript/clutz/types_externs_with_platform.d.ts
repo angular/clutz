@@ -10,11 +10,11 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
   }
   class ExtendsXMLHttpRequest_Instance extends XMLHttpRequest {
   }
-  var a : { a : number } ;
-  var b : IArguments ;
-  var c : NodeList ;
+  let a : { a : number } ;
+  let b : IArguments ;
+  let c : NodeList ;
   function elementMaybe ( ) : GlobalElement | null ;
-  var myScope : ಠ_ಠ.clutz.namespace.Foo ;
+  let myScope : ಠ_ಠ.clutz.namespace.Foo ;
   function topLevelFunction ( ...a : any [] ) : any ;
 }
 declare module 'goog:typesWithExterns' {

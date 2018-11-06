@@ -26,7 +26,7 @@ declare namespace goog {
   function inherits (childCtor : ಠ_ಠ.clutz.partial.FunctionAlias , parentCtor : ಠ_ಠ.clutz.partial.FunctionAlias ) : void ;
   function isDef (val : any ) : boolean ;
   function require (name : string ) : ಠ_ಠ.clutz.ClosureSymbolNotGoogProvided;
-  var /**
+  let /**
    * Reference to the global context.  In most cases this will be 'window'.
    */
   global : any ;

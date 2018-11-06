@@ -22,9 +22,9 @@ declare namespace ಠ_ಠ.clutz.generics {
   class ImplementsGenericInterface_Instance < TYPE > implements ಠ_ಠ.clutz.generics.GenericInterface < TYPE > {
     private noStructuralTyping_: any;
   }
-  var arrayMissingTypeParam : any [] ;
-  var fooMissingAllTypeParams : ಠ_ಠ.clutz.generics.Foo < any , any > ;
-  var fooMissingOneTypeParam : ಠ_ಠ.clutz.generics.Foo < string , any > ;
+  let arrayMissingTypeParam : any [] ;
+  let fooMissingAllTypeParams : ಠ_ಠ.clutz.generics.Foo < any , any > ;
+  let fooMissingOneTypeParam : ಠ_ಠ.clutz.generics.Foo < string , any > ;
   function genericFunction < T > (a : T ) : T ;
   function identity < T > (a : T ) : T ;
   function objectWithGenericKeyType < K , V > (obj : { [ /* warning: coerced from K */ key: string ]: V } ) : void ;

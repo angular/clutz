@@ -10,17 +10,17 @@ declare module 'goog:googmodule.Required' {
   export default Required;
 }
 declare namespace ಠ_ಠ.clutz.module$exports$googmodule$TheModule {
-  var a : number ;
-  var b : number ;
-  var required : ಠ_ಠ.clutz.googmodule.Required ;
-  var requiredDefault : module$exports$googmodule$requiredModuleDefault ;
+  let a : number ;
+  let b : number ;
+  let required : ಠ_ಠ.clutz.googmodule.Required ;
+  let requiredDefault : module$exports$googmodule$requiredModuleDefault ;
 }
 declare module 'goog:googmodule.TheModule' {
   import TheModule = ಠ_ಠ.clutz.module$exports$googmodule$TheModule;
   export = TheModule;
 }
 declare namespace ಠ_ಠ.clutz.module$exports$googmodule$requiredModule {
-  var rm : number ;
+  let rm : number ;
 }
 declare module 'goog:googmodule.requiredModule' {
   import requiredModule = ಠ_ಠ.clutz.module$exports$googmodule$requiredModule;

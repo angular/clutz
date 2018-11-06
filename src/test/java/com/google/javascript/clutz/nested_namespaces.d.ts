@@ -34,7 +34,7 @@ declare module 'goog:nested.PrivateC.Enum' {
   export default Enum;
 }
 declare namespace ಠ_ಠ.clutz.nested {
-  var foo__clutz_alias : ಠ_ಠ.clutz.nested.PrivateC ;
+  let foo__clutz_alias : ಠ_ಠ.clutz.nested.PrivateC ;
 }
 declare module 'goog:nested.foo' {
   import foo = ಠ_ಠ.clutz.nested.foo__clutz_alias;

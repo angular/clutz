@@ -1,12 +1,12 @@
 declare namespace ಠ_ಠ.clutz.multi_provides.a {
-  var val : number ;
+  let val : number ;
 }
 declare module 'goog:multi_provides.a' {
   import a = ಠ_ಠ.clutz.multi_provides.a;
   export = a;
 }
 declare namespace ಠ_ಠ.clutz.multi_provides.a.b.c {
-  var three : string ;
+  let three : string ;
 }
 declare module 'goog:multi_provides.a.b.c' {
   import c = ಠ_ಠ.clutz.multi_provides.a.b.c;

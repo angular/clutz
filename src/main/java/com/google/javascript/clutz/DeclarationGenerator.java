@@ -99,7 +99,7 @@ class DeclarationGenerator {
           "case",
           "catch",
           "class",
-          "const",
+          "let",
           "continue",
           "debugger",
           "default",
@@ -491,7 +491,7 @@ class DeclarationGenerator {
         // Sometimes goog.provide statements are used as pure markers for dependency management, or
         // the defined provides do not get a symbol because they don't have a proper type.
         emitNamespaceBegin(getNamespace(emitName));
-        emit("var");
+        emit("let");
         emit(getUnqualifiedName(emitName));
         emit(": any;");
         emitBreak();
@@ -617,7 +617,7 @@ class DeclarationGenerator {
         collapsedNamespaces.add(namespace);
         Set<String> properties = getSubNamespace(provides, namespace);
         emitNamespaceBegin(getNamespace(namespace));
-        emit("var");
+        emit("let");
         emit(getUnqualifiedName(namespace));
         emit(": {");
         Iterator<String> bundledIt = properties.iterator();
@@ -1089,7 +1089,7 @@ class DeclarationGenerator {
           }
 
           if (propType.toMaybeFunctionType() == null) {
-            emit("var");
+            emit("let");
           } else {
             emit("function");
           }
@@ -1133,7 +1133,7 @@ class DeclarationGenerator {
     emit(emitName);
     emit(";");
     emitBreak();
-    emit("var " + unqualifiedName);
+    emit("let " + unqualifiedName);
     emit(":");
     emit("typeof");
     emit(emitName);
@@ -1577,7 +1577,7 @@ class DeclarationGenerator {
         // To emulate closure alias semantics, introduce also an aliased constructor if there is a
         // value associated with the type (i.e. non-interfaces or interfaces that also have static
         // properties emitted on them).
-        emit("var " + unqualifiedName);
+        emit("let " + unqualifiedName);
         emit(":");
         emit("typeof");
         emit(emitName);
@@ -1596,7 +1596,7 @@ class DeclarationGenerator {
         visitTemplateTypes(otype, Collections.emptyList(), false);
         emit(";");
         emitBreak();
-        emit("var " + instanceUnqualifiedName);
+        emit("let " + instanceUnqualifiedName);
         emit(":");
         emit("typeof");
         emit(instanceEmitName);
@@ -1730,7 +1730,7 @@ class DeclarationGenerator {
     }
 
     private void visitVarDeclaration(String name, JSType type) {
-      emit("var");
+      emit("let");
       emit(name);
       visitTypeDeclaration(type, false, false);
       emit(";");
@@ -1863,7 +1863,7 @@ class DeclarationGenerator {
         emit(elementsTypeName);
         emit(";");
         emitBreak();
-        emit("const");
+        emit("let");
         emit(unqualifiedName);
         emit(": typeof");
         emit(elementsTypeName);
@@ -1899,7 +1899,7 @@ class DeclarationGenerator {
         visitTypeAlias(primitiveType, unqualifiedName, true);
       }
 
-      emit("var");
+      emit("let");
       emit(unqualifiedName);
       emit(": {");
       emitBreak();
@@ -2639,7 +2639,7 @@ class DeclarationGenerator {
      * Emits the given set of properties.
      *
      * @param isInNamespace if true, emit the properties in a form suitable for namespace members
-     *     (e.g. with "var" and "function" prefixes). If false, emit suitable for properties
+     *     (e.g. with "let" and "function" prefixes). If false, emit suitable for properties
      *     declared in a class or interface.
      */
     private void visitStaticProperties(
@@ -2648,7 +2648,7 @@ class DeclarationGenerator {
         if (isInNamespace) {
           JSType propType = objType.getPropertyType(propName);
           if (propType.toMaybeFunctionType() == null) {
-            emit("var");
+            emit("let");
           } else {
             emit("function");
           }
@@ -3263,7 +3263,7 @@ class DeclarationGenerator {
     }
 
     public void emitPrivateValue(String emitName) {
-      emit("var");
+      emit("let");
       emit(getUnqualifiedName(emitName));
       emit(":");
       emit(getGlobalSymbolNamespacePrefix() + "PrivateType;");

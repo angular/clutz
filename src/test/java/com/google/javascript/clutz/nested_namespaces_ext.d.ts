@@ -1,9 +1,9 @@
 declare namespace ಠ_ಠ.clutz.nestedNs.constNs {
-  var a : number ;
+  let a : number ;
 }
 declare namespace ಠ_ಠ.clutz.nestedNs.subNamespace {
-  var fieldA : string ;
+  let fieldA : string ;
 }
 declare namespace ಠ_ಠ.clutz.nestedNs.subNamespace {
-  var fieldB : number ;
+  let fieldB : number ;
 }

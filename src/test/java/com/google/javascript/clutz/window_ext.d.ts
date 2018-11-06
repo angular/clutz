@@ -1,5 +1,5 @@
 declare namespace ಠ_ಠ.clutz.nswindow {
-  var c : ಠ_ಠ.clutz.window.C ;
+  let c : ಠ_ಠ.clutz.window.C ;
 }
 declare module 'goog:nswindow.c' {
   import c = ಠ_ಠ.clutz.nswindow.c;
@@ -13,5 +13,5 @@ declare namespace ಠ_ಠ.clutz.window {
   }
 }
 declare namespace ಠ_ಠ.clutz.window {
-  var a : number ;
+  let a : number ;
 }

@@ -14,8 +14,8 @@ declare namespace ಠ_ಠ.clutz.dict {
     [ key: string ]: any ;
     foo ( ) : void ;
   }
-  var typed : { a : Function | null } ;
-  var untyped : {[key: string]: any} ;
+  let typed : { a : Function | null } ;
+  let untyped : {[key: string]: any} ;
 }
 declare module 'goog:dict' {
   import dict = ಠ_ಠ.clutz.dict;

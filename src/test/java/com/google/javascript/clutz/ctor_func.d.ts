@@ -5,8 +5,8 @@ declare namespace ಠ_ಠ.clutz.ctor_func {
     private noStructuralTyping_: any;
     constructor (a : string , b : number ) ;
   }
-  var ctorFuncField : { new (a : string , b : number ) : ಠ_ಠ.clutz.ctor_func.Ctor < any > } ;
-  var ctorFuncFieldAlias : { new (a : string , b : number ) : ಠ_ಠ.clutz.ctor_func.Ctor < any > } ;
+  let ctorFuncField : { new (a : string , b : number ) : ಠ_ಠ.clutz.ctor_func.Ctor < any > } ;
+  let ctorFuncFieldAlias : { new (a : string , b : number ) : ಠ_ಠ.clutz.ctor_func.Ctor < any > } ;
   function ctorFuncParam (ctor : { new (a : number ) : ಠ_ಠ.clutz.ctor_func.Ctor < any > } ) : void ;
 }
 declare module 'goog:ctor_func' {

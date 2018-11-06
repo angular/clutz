@@ -1,4 +1,4 @@
-//!! emitting var ns: any inside namespace ಠ_ಠ.clutz would be an error here.
+//!! emitting let ns: any inside namespace ಠ_ಠ.clutz would be an error here.
 declare namespace ಠ_ಠ.clutz.ns {
   interface I {
   }

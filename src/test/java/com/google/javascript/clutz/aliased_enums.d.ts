@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.nested.bar {
   type HahaEnum = nested.baz.Enum ;
-  const HahaEnum : typeof nested.baz.Enum ;
+  let HahaEnum : typeof nested.baz.Enum ;
 }
 declare module 'goog:nested.bar.HahaEnum' {
   import HahaEnum = ಠ_ಠ.clutz.nested.bar.HahaEnum;

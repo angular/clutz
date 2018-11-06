@@ -7,10 +7,10 @@ declare namespace ಠ_ಠ.clutz.undefinedns {
     //!! string | void.
     constructor (f : ( ) => void , g : ( ) => string | undefined ) ;
   }
-  var a : undefined ;
+  let a : undefined ;
   type alias = { foo ? : boolean } ;
-  var b : undefined ;
-  var c : undefined | string ;
+  let b : undefined ;
+  let c : undefined | string ;
   function f (a : undefined , b : undefined | string , c ? : string ) : void ;
   function g ( ) : void ;
   function h ( ) : void ;

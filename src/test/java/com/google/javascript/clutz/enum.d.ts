@@ -9,7 +9,7 @@ declare module 'goog:some.EscapedEnum' {
 }
 declare namespace ಠ_ಠ.clutz.some {
   type MixedEnum = string | number | boolean &{clutzEnumBrand: never} ;
-  var MixedEnum : {
+  let MixedEnum : {
     A : MixedEnum ,
     B : MixedEnum ,
     C : MixedEnum ,
@@ -21,7 +21,7 @@ declare module 'goog:some.MixedEnum' {
 }
 declare namespace ಠ_ಠ.clutz.some {
   type NumberAsKey = string &{clutzEnumBrand: never} |'a' |'b' ;
-  var NumberAsKey : {
+  let NumberAsKey : {
     1 : 'a' ,
     2 : 'b' ,
   };
@@ -32,7 +32,7 @@ declare module 'goog:some.NumberAsKey' {
 }
 declare namespace ಠ_ಠ.clutz.some {
   type ObjectValuedEnum = X &{clutzEnumBrand: never} ;
-  var ObjectValuedEnum : {
+  let ObjectValuedEnum : {
     A : ObjectValuedEnum ,
     B : ObjectValuedEnum ,
   };
@@ -43,7 +43,7 @@ declare module 'goog:some.ObjectValuedEnum' {
 }
 declare namespace ಠ_ಠ.clutz.some {
   type PartialLiteralStringEnum = string &{clutzEnumBrand: never} |'1' |'2' ;
-  var PartialLiteralStringEnum : {
+  let PartialLiteralStringEnum : {
     A : '1' ,
     B : PartialLiteralStringEnum ,
     C : '2' ,
@@ -76,7 +76,7 @@ declare module 'goog:some.StringEnum' {
 }
 declare namespace ಠ_ಠ.clutz.some {
   type StringVariableEnum = string &{clutzEnumBrand: never} ;
-  var StringVariableEnum : {
+  let StringVariableEnum : {
     A : StringVariableEnum ,
     B : StringVariableEnum ,
   };

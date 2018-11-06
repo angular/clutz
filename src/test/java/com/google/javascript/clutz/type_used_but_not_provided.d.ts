@@ -1,5 +1,5 @@
 declare namespace ಠ_ಠ.clutz.used.not.provided {
-  var a : ಠ_ಠ.clutz.used.not.provided.C ;
+  let a : ಠ_ಠ.clutz.used.not.provided.C ;
 }
 declare module 'goog:used.not.provided.a' {
   import a = ಠ_ಠ.clutz.used.not.provided.a;
