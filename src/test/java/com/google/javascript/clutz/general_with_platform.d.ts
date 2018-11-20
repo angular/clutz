@@ -352,6 +352,12 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  interface Clipboard {
+    readText ( ) : Promise < string > ;
+    writeText (text : string ) : Promise < undefined > ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   interface RTCRtpTransceiverInit {
     /**
      * The direction of the `RTCRtpTransceiver`. Defaults to "sendrecv".
