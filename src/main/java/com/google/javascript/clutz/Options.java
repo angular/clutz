@@ -1,14 +1,13 @@
 package com.google.javascript.clutz;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
-import com.google.javascript.jscomp.CheckLevel;
-import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.*;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
-import com.google.javascript.jscomp.DependencyOptions;
-import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.parsing.Config;
 import java.io.File;
 import java.io.IOException;
@@ -167,12 +166,13 @@ public class Options {
     options.setClosurePass(true);
     options.setTracerMode(this.tracerMode);
 
-    DependencyOptions deps = new DependencyOptions();
-    deps.setDependencySorting(true);
-    options.setDependencyOptions(deps);
-
-    if (!this.entryPoints.isEmpty()) {
-      options.setManageClosureDependencies(this.entryPoints);
+    if (this.entryPoints.isEmpty()) {
+      options.setDependencyOptions(DependencyOptions.sortOnly());
+    } else {
+      ImmutableList<ModuleIdentifier> entryPointIdentifiers =
+          this.entryPoints.stream().map(ModuleIdentifier::forClosure).collect(toImmutableList());
+      options.setDependencyOptions(
+          DependencyOptions.pruneLegacyForEntryPoints(entryPointIdentifiers));
     }
 
     // All diagnostics are WARNINGs (or off) and thus ignored unless debug == true.
