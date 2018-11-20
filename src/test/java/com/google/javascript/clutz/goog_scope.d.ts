@@ -1,8 +1,6 @@
 declare namespace ಠ_ಠ.clutz.foo {
   type Bar = ಠ_ಠ.clutz.$jscomp.scope.Bar ;
   let Bar : typeof ಠ_ಠ.clutz.$jscomp.scope.Bar ;
-  type Bar_Instance = ಠ_ಠ.clutz.$jscomp.scope.Bar_Instance ;
-  let Bar_Instance : typeof ಠ_ಠ.clutz.$jscomp.scope.Bar_Instance ;
 }
 declare module 'goog:foo.Bar' {
   import Bar = ಠ_ಠ.clutz.foo.Bar;
@@ -30,9 +28,7 @@ declare module 'goog:foo.iboom' {
   export default iboom;
 }
 declare namespace ಠ_ಠ.clutz.$jscomp.scope {
-  class Bar extends Bar_Instance {
-  }
-  class Bar_Instance {
+  class Bar {
     private noStructuralTyping_: any;
   }
 }

@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz.googprovide {
-  class exporter extends exporter_Instance {
-  }
-  class exporter_Instance {
+  class exporter {
     private noStructuralTyping_: any;
   }
 }

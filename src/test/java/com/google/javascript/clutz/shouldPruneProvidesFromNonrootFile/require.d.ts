@@ -1,8 +1,6 @@
 //!! a.b.ShouldNotAppear must be absent here, it is provide'd in a non-root
 declare namespace ಠ_ಠ.clutz.a.b {
-  class Thing extends Thing_Instance {
-  }
-  class Thing_Instance {
+  class Thing {
     private noStructuralTyping_: any;
   }
 }

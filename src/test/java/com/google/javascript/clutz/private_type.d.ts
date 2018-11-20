@@ -5,9 +5,7 @@ declare module 'goog:privatetype' {
   export = privatetype;
 }
 declare namespace ಠ_ಠ.clutz.privatetype {
-  class Foo extends Foo_Instance {
-  }
-  class Foo_Instance {
+  class Foo {
     private noStructuralTyping_: any;
     constructor (a : any ) ;
     foo ( ) : PrivateType ;
@@ -21,12 +19,10 @@ declare module 'goog:privatetype.Foo' {
   export default Foo;
 }
 declare namespace ಠ_ಠ.clutz.privatetype {
-  class X_ extends X__Instance {
-    static staticMethod ( ) : ಠ_ಠ.clutz.privatetype.X_ | null ;
-  }
-  class X__Instance {
+  class X_ {
     private noStructuralTyping_: any;
     method ( ) : void ;
+    static staticMethod ( ) : ಠ_ಠ.clutz.privatetype.X_ | null ;
   }
 }
 declare module 'goog:privatetype.X_' {

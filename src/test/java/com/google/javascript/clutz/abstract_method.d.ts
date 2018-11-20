@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz.abstract_method {
-  class Child extends Child_Instance {
-  }
-  class Child_Instance extends ಠ_ಠ.clutz.abstract_method.Clazz_Instance {
+  class Child extends ಠ_ಠ.clutz.abstract_method.Clazz {
     bar (a : number ) : string ;
   }
 }
@@ -10,9 +8,7 @@ declare module 'goog:abstract_method.Child' {
   export default Child;
 }
 declare namespace ಠ_ಠ.clutz.abstract_method {
-  class Clazz extends Clazz_Instance {
-  }
-  class Clazz_Instance implements ಠ_ಠ.clutz.abstract_method.Interface {
+  class Clazz implements ಠ_ಠ.clutz.abstract_method.Interface {
     private noStructuralTyping_: any;
     bar ( ...a : any [] ) : any ;
     foo ( ) : string ;

@@ -1,12 +1,10 @@
 declare namespace ಠ_ಠ.clutz.foo {
-  class Klass extends Klass_Instance {
+  class Klass {
+    private noStructuralTyping_: any;
     /**
      * Crazy pattern, I have only seen it used by jquery.fn = jquery.prototype
      */
     static foo : any ;
-  }
-  class Klass_Instance {
-    private noStructuralTyping_: any;
   }
 }
 declare module 'goog:foo.Klass' {

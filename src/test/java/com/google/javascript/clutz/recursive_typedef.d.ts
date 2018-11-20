@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz.rec {
-  class Aclass extends Aclass_Instance {
-  }
-  class Aclass_Instance {
+  class Aclass {
     private noStructuralTyping_: any;
     foo : ಠ_ಠ.clutz.rec.ns.Arr ;
   }

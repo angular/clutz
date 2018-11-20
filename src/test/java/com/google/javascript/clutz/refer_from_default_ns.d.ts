@@ -6,9 +6,7 @@ declare module 'goog:fn' {
   export default fn;
 }
 declare namespace ಠ_ಠ.clutz.fn {
-  class String extends String_Instance {
-  }
-  class String_Instance {
+  class String {
     private noStructuralTyping_: any;
   }
 }

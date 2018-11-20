@@ -6,9 +6,7 @@ declare module 'goog:used.not.provided.a' {
   export default a;
 }
 declare namespace ಠ_ಠ.clutz.used.not.provided {
-  class C extends C_Instance {
-  }
-  class C_Instance implements ಠ_ಠ.clutz.used.not.provided.I < number > {
+  class C implements ಠ_ಠ.clutz.used.not.provided.I < number > {
     private noStructuralTyping_: any;
   }
 }

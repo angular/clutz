@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz {
-  class module$exports$nested$typedef$mod extends module$exports$nested$typedef$mod_Instance {
-  }
-  class module$exports$nested$typedef$mod_Instance {
+  class module$exports$nested$typedef$mod {
     private noStructuralTyping_: any;
   }
 }

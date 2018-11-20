@@ -6,9 +6,7 @@ declare module 'goog:a.messesWithB' {
   export default messesWithB;
 }
 declare namespace ಠ_ಠ.clutz.ns {
-  class A extends A_Instance {
-  }
-  class A_Instance {
+  class A {
     private noStructuralTyping_: any;
     fn ( ) : void ;
   }
@@ -18,12 +16,7 @@ declare module 'goog:ns.A' {
   export default A;
 }
 declare namespace ಠ_ಠ.clutz.ns {
-  class B extends B_Instance {
-  }
-  class B_Instance extends ಠ_ಠ.clutz.ns.A_Instance {
-    //!! IMHO, it is a bug in closure that this property even appears.
-    //!! But we have to emit a field here, instead of method, to match
-    //!! the super type.
+  class B extends ಠ_ಠ.clutz.ns.A {
     fn ( ) : void ;
   }
 }

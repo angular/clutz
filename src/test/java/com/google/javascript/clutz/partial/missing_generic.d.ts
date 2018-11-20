@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz.module$exports$missing$gen {
-  class GenericClassDefaultsTypeParamToAny < T = any > extends GenericClassDefaultsTypeParamToAny_Instance < T > {
-  }
-  class GenericClassDefaultsTypeParamToAny_Instance < T = any > {
+  class GenericClassDefaultsTypeParamToAny < T = any > {
     private noStructuralTyping_: any;
   }
   let genericClassUse : ಠ_ಠ.clutz.missing.GenericClass ;

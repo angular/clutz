@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz {
-  class module$exports$default$base$exporter extends module$exports$default$base$exporter_Instance {
-  }
-  class module$exports$default$base$exporter_Instance {
+  class module$exports$default$base$exporter {
     private noStructuralTyping_: any;
   }
 }

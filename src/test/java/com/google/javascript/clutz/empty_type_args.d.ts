@@ -7,9 +7,7 @@ declare module 'goog:empty_type_args.ITemplated' {
   export default ITemplated;
 }
 declare namespace ಠ_ಠ.clutz.empty_type_args {
-  class NoMoreTemplateArgs extends NoMoreTemplateArgs_Instance {
-  }
-  class NoMoreTemplateArgs_Instance implements ಠ_ಠ.clutz.empty_type_args.ITemplated < number > {
+  class NoMoreTemplateArgs implements ಠ_ಠ.clutz.empty_type_args.ITemplated < number > {
     private noStructuralTyping_: any;
   }
 }
@@ -18,9 +16,7 @@ declare module 'goog:empty_type_args.NoMoreTemplateArgs' {
   export default NoMoreTemplateArgs;
 }
 declare namespace ಠ_ಠ.clutz.empty_type_args {
-  class X extends X_Instance {
-  }
-  class X_Instance {
+  class X {
     private noStructuralTyping_: any;
     constructor (a : ಠ_ಠ.clutz.empty_type_args.NoMoreTemplateArgs ) ;
   }

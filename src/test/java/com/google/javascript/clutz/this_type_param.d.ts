@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz.nsThis {
-  class C extends C_Instance {
-  }
-  class C_Instance {
+  class C {
     private noStructuralTyping_: any;
     bar ( ) : ಠ_ಠ.clutz.nsThis.C ;
     foo ( ) : this ;
@@ -12,9 +10,7 @@ declare module 'goog:nsThis.C' {
   export default C;
 }
 declare namespace ಠ_ಠ.clutz.nsThis {
-  class D extends D_Instance {
-  }
-  class D_Instance extends ಠ_ಠ.clutz.nsThis.C_Instance {
+  class D extends ಠ_ಠ.clutz.nsThis.C {
   }
 }
 declare module 'goog:nsThis.D' {

@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz.somenamespace {
-  class Foo extends Foo_Instance {
-  }
-  class Foo_Instance {
+  class Foo {
     private noStructuralTyping_: any;
     bar : ಠ_ಠ.clutz.somenamespace.MyEnum ;
   }

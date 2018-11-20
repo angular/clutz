@@ -93,9 +93,7 @@ declare module 'goog:some.setEnvironment' {
   export default setEnvironment;
 }
 declare namespace ಠ_ಠ.clutz {
-  class X extends X_Instance {
-  }
-  class X_Instance {
+  class X {
     private noStructuralTyping_: any;
   }
 }

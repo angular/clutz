@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz.nullfunc {
-  class Class extends Class_Instance {
-  }
-  class Class_Instance {
+  class Class {
     private noStructuralTyping_: any;
     nullfunc ( ) : void ;
   }

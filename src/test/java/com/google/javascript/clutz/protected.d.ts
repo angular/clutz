@@ -1,10 +1,8 @@
 declare namespace ಠ_ಠ.clutz.module$exports$protected {
-  class MyClass extends MyClass_Instance {
-    protected static staticProtected : number ;
-  }
-  class MyClass_Instance {
+  class MyClass {
     private noStructuralTyping_: any;
     protected protectedVisibility : string ;
+    protected static staticProtected : number ;
   }
 }
 declare module 'goog:protected' {

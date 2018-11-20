@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz.fn.field {
-  class A extends A_Instance {
-  }
-  class A_Instance {
+  class A {
     private noStructuralTyping_: any;
     f : any ;
     g : any ;
@@ -10,17 +8,13 @@ declare namespace ಠ_ಠ.clutz.fn.field {
     pg : any ;
     ph ( ) : number ;
   }
-  class B extends B_Instance {
-  }
-  class B_Instance extends ಠ_ಠ.clutz.fn.field.A_Instance {
+  class B extends ಠ_ಠ.clutz.fn.field.A {
     f : ( ) => number ;
     h ( ) : number ;
     pf : ( ) => number ;
     ph ( ) : number ;
   }
-  class C extends C_Instance {
-  }
-  class C_Instance extends ಠ_ಠ.clutz.fn.field.B_Instance {
+  class C extends ಠ_ಠ.clutz.fn.field.B {
     g : ( ) => number ;
     pg : ( ) => number ;
   }

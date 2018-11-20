@@ -13,9 +13,7 @@ declare module 'goog:multi_provides.a.b.c' {
   export = c;
 }
 declare namespace ಠ_ಠ.clutz.multi_provides.a.b.c {
-  class Two extends Two_Instance {
-  }
-  class Two_Instance {
+  class Two {
     private noStructuralTyping_: any;
   }
 }

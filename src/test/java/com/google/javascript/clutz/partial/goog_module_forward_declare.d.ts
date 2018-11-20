@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz {
-  class module$exports$legacy$namespace$forward$declare extends module$exports$legacy$namespace$forward$declare_Instance {
-  }
-  class module$exports$legacy$namespace$forward$declare_Instance extends ಠ_ಠ.clutz.module$exports$missing$forward$Declare_Instance {
+  class module$exports$legacy$namespace$forward$declare extends ಠ_ಠ.clutz.module$exports$missing$forward$Declare {
     constructor ( ) ;
   }
 }

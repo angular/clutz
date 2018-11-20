@@ -32,9 +32,7 @@ declare namespace ಠ_ಠ.clutz.u2f {
   function sign (appId : string , challenge : string , registeredKeys : ಠ_ಠ.clutz.u2f.RegisteredKey [] , callback : (a : ಠ_ಠ.clutz.u2f.Error | ಠ_ಠ.clutz.u2f.SignResponse ) => any , opt_timeoutSeconds ? : number ) : any ;
 }
 declare namespace ಠ_ಠ.clutz {
-  class DirectoryEntry extends DirectoryEntry_Instance {
-  }
-  class DirectoryEntry_Instance extends Entry_Instance {
+  class DirectoryEntry extends Entry {
     createReader ( ) : DirectoryReader ;
     getDirectory (path : string , options ? : FileSystemFlags , successCallback ? : (a : DirectoryEntry ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
     getFile (path : string , options ? : FileSystemFlags , successCallback ? : (a : FileEntry ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
@@ -42,17 +40,13 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class DirectoryReader extends DirectoryReader_Instance {
-  }
-  class DirectoryReader_Instance {
+  class DirectoryReader {
     private noStructuralTyping_: any;
     readEntries (successCallback : (a : Entry [] ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class Entry extends Entry_Instance {
-  }
-  class Entry_Instance {
+  class Entry {
     private noStructuralTyping_: any;
     copyTo (parent : DirectoryEntry , newName ? : string , successCallback ? : (a : Entry ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
     filesystem : FileSystem ;
@@ -68,29 +62,13 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class FileEntry extends FileEntry_Instance {
-  }
-  class FileEntry_Instance extends Entry_Instance {
+  class FileEntry extends Entry {
     createWriter (successCallback : (a : FileWriter ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
     file (successCallback : (a : File ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class FileError extends FileError_Instance {
-    static ABORT_ERR : number ;
-    static ENCODING_ERR : number ;
-    static INVALID_MODIFICATION_ERR : number ;
-    static INVALID_STATE_ERR : number ;
-    static NOT_FOUND_ERR : number ;
-    static NOT_READABLE_ERR : number ;
-    static NO_MODIFICATION_ALLOWED_ERR : number ;
-    static PATH_EXISTS_ERR : number ;
-    static QUOTA_EXCEEDED_ERR : number ;
-    static SECURITY_ERR : number ;
-    static SYNTAX_ERR : number ;
-    static TYPE_MISMATCH_ERR : number ;
-  }
-  class FileError_Instance extends DOMError {
+  class FileError extends DOMError {
     ABORT_ERR : number ;
     ENCODING_ERR : number ;
     INVALID_MODIFICATION_ERR : number ;
@@ -104,12 +82,22 @@ declare namespace ಠ_ಠ.clutz {
     SYNTAX_ERR : number ;
     TYPE_MISMATCH_ERR : number ;
     code : number ;
+    static ABORT_ERR : number ;
+    static ENCODING_ERR : number ;
+    static INVALID_MODIFICATION_ERR : number ;
+    static INVALID_STATE_ERR : number ;
+    static NOT_FOUND_ERR : number ;
+    static NOT_READABLE_ERR : number ;
+    static NO_MODIFICATION_ALLOWED_ERR : number ;
+    static PATH_EXISTS_ERR : number ;
+    static QUOTA_EXCEEDED_ERR : number ;
+    static SECURITY_ERR : number ;
+    static SYNTAX_ERR : number ;
+    static TYPE_MISMATCH_ERR : number ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class FileSaver extends FileSaver_Instance {
-  }
-  class FileSaver_Instance {
+  class FileSaver {
     private noStructuralTyping_: any;
     DONE : number ;
     INIT : number ;
@@ -126,9 +114,7 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class FileSystem extends FileSystem_Instance {
-  }
-  class FileSystem_Instance {
+  class FileSystem {
     private noStructuralTyping_: any;
     name : string ;
     root : DirectoryEntry ;
@@ -141,9 +127,7 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class FileWriter extends FileWriter_Instance {
-  }
-  class FileWriter_Instance extends FileSaver_Instance {
+  class FileWriter extends FileSaver {
     length : number ;
     position : number ;
     seek (offset : number ) : void ;
@@ -155,9 +139,7 @@ declare namespace ಠ_ಠ.clutz {
   /**
    * Metadata interface.
    */
-  class Metadata extends Metadata_Instance {
-  }
-  class Metadata_Instance {
+  class Metadata {
     private noStructuralTyping_: any;
     modificationTime : GlobalDate ;
     size : number ;
@@ -176,9 +158,7 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class StorageManager extends StorageManager_Instance {
-  }
-  class StorageManager_Instance {
+  class StorageManager {
     private noStructuralTyping_: any;
     estimate ( ) : Promise < { quota : number , usage : number } > ;
     persist ( ) : Promise < boolean > ;
@@ -189,9 +169,7 @@ declare namespace ಠ_ಠ.clutz.window {
   type StorageEstimate = { quota : number , usage : number } ;
 }
 declare namespace ಠ_ಠ.clutz {
-  class ByteLengthQueuingStrategy extends ByteLengthQueuingStrategy_Instance {
-  }
-  class ByteLengthQueuingStrategy_Instance {
+  class ByteLengthQueuingStrategy {
     private noStructuralTyping_: any;
     constructor (config : { highWaterMark : number } ) ;
     /**
@@ -202,9 +180,7 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class CountQueuingStrategy extends CountQueuingStrategy_Instance {
-  }
-  class CountQueuingStrategy_Instance {
+  class CountQueuingStrategy {
     private noStructuralTyping_: any;
     constructor (config : { highWaterMark : number } ) ;
     size (chunk : any ) : number ;
@@ -298,9 +274,7 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class WritableStream extends WritableStream_Instance {
-  }
-  class WritableStream_Instance {
+  class WritableStream {
     private noStructuralTyping_: any;
     constructor (opt_underlyingSink ? : WritableStreamSink , opt_queuingStrategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark : number , size ? : (a : any ) => number } ) ;
     abort (reason : any ) : Promise < undefined > ;
@@ -337,9 +311,7 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class AbortController extends AbortController_Instance {
-  }
-  class AbortController_Instance {
+  class AbortController {
     private noStructuralTyping_: any;
     abort ( ) : any ;
     signal : AbortSignal ;

@@ -3,15 +3,11 @@ declare namespace goog {
    * A debug loader is responsible for downloading and executing javascript
    * files in an unbundled, uncompiled environment.
    */
-  class DebugLoader extends DebugLoader_Instance {
-  }
-  class DebugLoader_Instance {
+  class DebugLoader {
     private noStructuralTyping_: any;
     protected getTranspiler ( ) : goog.Transpiler ;
   }
-  class Transpiler extends Transpiler_Instance {
-  }
-  class Transpiler_Instance {
+  class Transpiler {
     private noStructuralTyping_: any;
   }
   /**
@@ -32,9 +28,7 @@ declare namespace goog {
   global : any ;
 }
 declare namespace ಠ_ಠ.clutz.goog {
-  class Uri extends Uri_Instance {
-  }
-  class Uri_Instance {
+  class Uri {
     private noStructuralTyping_: any;
   }
 }

@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz.typedef {
-  class C extends C_Instance {
-  }
-  class C_Instance {
+  class C {
     private noStructuralTyping_: any;
     /**
      * These types should *not* be emitted as PrivateType as typedef.C.T is public.

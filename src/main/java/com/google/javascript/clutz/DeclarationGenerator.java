@@ -81,7 +81,6 @@ import org.kohsuke.args4j.CmdLineException;
 
 /** A tool that generates {@code .d.ts} declarations from a Google Closure JavaScript program. */
 class DeclarationGenerator {
-  static final String INSTANCE_CLASS_SUFFIX = "_Instance";
 
   /**
    * Words for which we cannot generate 'namespace foo.Word {}'; Instead clutz tries to roll them up
@@ -1584,25 +1583,6 @@ class DeclarationGenerator {
         emit(";");
         emitBreak();
       }
-      if (!otype.isInterface() && otype.isFunctionType()) {
-        // otype is a class, so also emit the alias for the instance side of the class
-        String instanceEmitName = emitName + INSTANCE_CLASS_SUFFIX;
-        String instanceUnqualifiedName = unqualifiedName + INSTANCE_CLASS_SUFFIX;
-        emit("type");
-        emit(instanceUnqualifiedName);
-        visitTemplateTypes(otype);
-        emit("=");
-        emit(instanceEmitName);
-        visitTemplateTypes(otype, Collections.emptyList(), false);
-        emit(";");
-        emitBreak();
-        emit("let " + instanceUnqualifiedName);
-        emit(":");
-        emit("typeof");
-        emit(instanceEmitName);
-        emit(";");
-        emitBreak();
-      }
       typesUsed.add(otype.getDisplayName());
     }
 
@@ -1635,36 +1615,8 @@ class DeclarationGenerator {
     }
 
     private void visitClassOrInterface(String name, FunctionType ftype) {
-      // TypeScript classes (like ES6 classes) have prototypal inheritance on the static side,
-      // which means that if A extends B, A.foo and B.foo cannot be of incompatible types.
-      // Closure (ES5) classes have no such restriction.
-      // To avoid collisions on the static side, emit all statics in the original class name A,
-      // and emit instance fields in another class A_Instance. As such:
-      // class A extends A_Instance { <static fields and methods> }
-      // class B extends B_Instance { <static fields and methods> }
-      // class A_Instance extends B_Instance { <instance fields and methods> }
-      // class B_Instance { <instance fields and methods> }
-      //
-      // Emit original name class before Instance in order to match the already emitted JSDoc.
-      final boolean emitInstance = !ftype.isInterface();
       Set<String> staticProps = getTypePropertyNamesToEmit(ftype, true);
-      if (emitInstance) {
-        emit("class");
-        emit(name);
-        visitTemplateTypes(ftype);
-        emit("extends");
-        emit(name + INSTANCE_CLASS_SUFFIX);
-        visitTemplateTypes(ftype, Collections.emptyList(), false);
-        emit("{");
-        indent();
-        emitBreak();
-        // we pass an empty set because static function can never refer to a TemplateType defined
-        // on the class
-        visitStaticProperties(ftype, staticProps, /* isInNamespace*/ false);
-        unindent();
-        emit("}");
-        emitBreak();
-      } else if (!staticProps.isEmpty()) {
+      if (!staticProps.isEmpty() && ftype.isInterface()) {
         // This is an interface, but in Closure, interfaces can still have static properties
         // defined on them. Emit those in a namespace that matches the interface's name.
         emit("namespace");
@@ -1685,7 +1637,7 @@ class DeclarationGenerator {
       } else {
         checkState(false, "Unexpected function type " + ftype);
       }
-      emit(emitInstance ? name + INSTANCE_CLASS_SUFFIX : name);
+      emit(name);
 
       visitTemplateTypes(ftype);
 
@@ -1699,7 +1651,7 @@ class DeclarationGenerator {
       ObjectType superType = getSuperType(ftype);
       if (superType != null) {
         emit("extends");
-        boolean emitInstanceForObject = emitInstance && !shouldAvoidGeneratingExterns(superType);
+        boolean emitInstanceForObject = !shouldAvoidGeneratingExterns(superType);
         Visitor<Void> visitor = new ExtendsImplementsTypeVisitor(emitInstanceForObject);
         superType.visit(visitor);
       }
@@ -2015,13 +1967,8 @@ class DeclarationGenerator {
      * are assuming forward declarations or not) we either emit the defaultEmit string passed, or
      * the literal string that was in the original code. Special care is taken for templatized
      * types.
-     *
-     * <p>emitInstanceForObject controls whether to append _Instance to the end of the name. Used
-     * when referring to a class, which are split into an instance half and a static half to model
-     * closure's inheritance.
      */
-    private void emitNoResolvedTypeOrDefault(
-        NoType type, String defaultEmit, boolean emitInstanceForObject) {
+    private void emitNoResolvedTypeOrDefault(NoType type, String defaultEmit) {
       if (!opts.partialInput || !type.isNoResolvedType()) {
         emit(defaultEmit);
         return;
@@ -2036,23 +1983,19 @@ class DeclarationGenerator {
         return;
       }
 
-      emitNoResolvedTypeAsumingForwardDeclare(type, emitInstanceForObject);
+      emitNoResolvedTypeAsumingForwardDeclare(type);
     }
 
     /**
      * Emits a type that is not resolved by closure, as the literal string that was in the original
      * code. Special care is taken for templatized types.
      */
-    private void emitNoResolvedTypeAsumingForwardDeclare(
-        ObjectType type, boolean emitInstanceForObject) {
+    private void emitNoResolvedTypeAsumingForwardDeclare(ObjectType type) {
       String displayName = maybeRewriteImportedName(type.getDisplayName());
       String maybeGlobalName = maybeRenameGlobalType(displayName);
       if (maybeGlobalName == null) {
         typesUsed.add(displayName);
         displayName = Constants.INTERNAL_NAMESPACE + "." + displayName;
-        if (emitInstanceForObject) {
-          displayName = displayName + INSTANCE_CLASS_SUFFIX;
-        }
       } else {
         displayName = maybeGlobalName;
       }
@@ -2177,7 +2120,7 @@ class DeclarationGenerator {
               // compilation
               // unit - A ends up as NoType, while B ends up as NamedType.
               if (opts.partialInput && refType.isUnknownType()) {
-                emitNoResolvedTypeAsumingForwardDeclare(type, false);
+                emitNoResolvedTypeAsumingForwardDeclare(type);
                 return null;
               }
               visitType(refType);
@@ -2186,7 +2129,7 @@ class DeclarationGenerator {
 
             @Override
             public Void caseTemplatizedType(TemplatizedType type) {
-              return emitTemplatizedType(type, false, false);
+              return emitTemplatizedType(type, false);
             }
 
             @Override
@@ -2197,7 +2140,7 @@ class DeclarationGenerator {
 
             @Override
             public Void caseNoType(NoType type) {
-              emitNoResolvedTypeOrDefault(type, "any", false);
+              emitNoResolvedTypeOrDefault(type, "any");
               return null;
             }
 
@@ -2291,13 +2234,9 @@ class DeclarationGenerator {
       return type.equals(typeRegistry.getNativeType(JSTypeNative.FUNCTION_INSTANCE_TYPE));
     }
 
-    private Void emitTemplatizedType(
-        TemplatizedType type, boolean extendingInstanceClass, boolean inImplementsExtendsPosition) {
+    private Void emitTemplatizedType(TemplatizedType type, boolean inImplementsExtendsPosition) {
       ObjectType referencedType = type.getReferencedType();
-      String templateTypeName =
-          extendingInstanceClass
-              ? getAbsoluteName(type) + INSTANCE_CLASS_SUFFIX
-              : getAbsoluteName(type);
+      String templateTypeName = getAbsoluteName(type);
       if (typeRegistry.getNativeType(ARRAY_TYPE).equals(referencedType)
           && type.getTemplateTypes().size() == 1) {
         // As per TS type grammar, array types require primary types.
@@ -2605,7 +2544,15 @@ class DeclarationGenerator {
           ((ObjectType) instanceType).getOwnPropertyNames(),
           superClassFields,
           classTemplateTypeNames);
-      // Statics are handled in INSTANCE_CLASS_SUFFIX class.
+
+      // Static fields and methods
+      // Note that for interfaces we cannot emit emit them here, as that is invalid TS.
+      // Instead we emit them in an auxilary namespace that shares the same name.
+      // That happens in the visitClassOrInterface method.
+      if (!type.isInterface()) {
+        Set<String> staticProps = getTypePropertyNamesToEmit(type, true);
+        visitStaticProperties(type, staticProps, /* isInNamespace*/ false);
+      }
       unindent();
       emit("}");
       emitBreak();
@@ -3295,7 +3242,7 @@ class DeclarationGenerator {
       if (!type.getTemplateTypeMap().isEmpty()
           && !typeRegistry.getNativeType(OBJECT_TYPE).equals(type)) {
         return emitTemplatizedType(
-            typeRegistry.createTemplatizedType(type), false, inExtendsImplementsPosition);
+            typeRegistry.createTemplatizedType(type), inExtendsImplementsPosition);
       }
       String maybeGlobalName = maybeRenameGlobalType(type.getDisplayName());
       if (maybeGlobalName != null) {
@@ -3316,7 +3263,7 @@ class DeclarationGenerator {
           emit("any");
           return null;
         }
-        emit(extendingInstanceClass ? name + INSTANCE_CLASS_SUFFIX : name);
+        emit(name);
         if (!type.getDisplayName().equals("Object")) {
           typesUsed.add(type.getDisplayName());
         }
@@ -3411,7 +3358,7 @@ class DeclarationGenerator {
 
       @Override
       public Void caseTemplatizedType(TemplatizedType type) {
-        emitTemplatizedType(type, emitInstanceForObject, true);
+        emitTemplatizedType(type, true);
         return null;
       }
 
@@ -3422,7 +3369,7 @@ class DeclarationGenerator {
 
       @Override
       public Void caseNoType(NoType type) {
-        emitNoResolvedTypeOrDefault(type, "ClutzMissingBase", emitInstanceForObject);
+        emitNoResolvedTypeOrDefault(type, "ClutzMissingBase");
         return null;
       }
 

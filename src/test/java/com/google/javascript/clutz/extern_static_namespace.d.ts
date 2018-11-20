@@ -1,13 +1,11 @@
 declare namespace ಠ_ಠ.clutz {
-  class ExternStaticC extends ExternStaticC_Instance {
+  class ExternStaticC {
     //!! static ns: Object; is intentionally not emitted here
     //!! not to collide with namespace ಠ_ಠ.clutz.ExternStaticC.ns.
     //!! same for objNsLike, fn.
     //!! TODO(rado): Find a work-around so that the function fn is also available.
-    static literal : { foo : string } ;
-  }
-  class ExternStaticC_Instance {
     private noStructuralTyping_: any;
+    static literal : { foo : string } ;
   }
 }
 declare namespace ಠ_ಠ.clutz.ExternStaticC.fn {

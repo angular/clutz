@@ -4,9 +4,7 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz.interface_exp {
-  class SomeClazz extends SomeClazz_Instance {
-  }
-  class SomeClazz_Instance {
+  class SomeClazz {
     private noStructuralTyping_: any;
   }
 }
