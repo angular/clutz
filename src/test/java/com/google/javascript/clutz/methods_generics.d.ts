@@ -1,11 +1,5 @@
 declare namespace ಠ_ಠ.clutz.method_generics {
-  class Foo < T > extends Foo_Instance < T > {
-    /**
-     * Static method: T and R must be defined on the method in the resulting typescript code
-     */
-    static staticBar < T , R > (bar : R ) : T ;
-  }
-  class Foo_Instance < T > {
+  class Foo < T > {
     private noStructuralTyping_: any;
     constructor (a : T ) ;
     /**
@@ -23,6 +17,10 @@ declare namespace ಠ_ಠ.clutz.method_generics {
      * typescript code.
      */
     push (value : T ) : void ;
+    /**
+     * Static method: T and R must be defined on the method in the resulting typescript code
+     */
+    static staticBar < T , R > (bar : R ) : T ;
   }
 }
 declare module 'goog:method_generics' {

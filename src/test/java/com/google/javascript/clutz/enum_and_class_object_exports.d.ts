@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz.foo.bar {
-  class Class extends Class_Instance {
-  }
-  class Class_Instance {
+  class Class {
     private noStructuralTyping_: any;
   }
   let Enum : ಠ_ಠ.clutz.module$contents$foo$bar_ExportObject.Enum ;

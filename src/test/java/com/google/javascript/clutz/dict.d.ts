@@ -1,14 +1,10 @@
 declare namespace ಠ_ಠ.clutz.dict {
-  class ClassWithDottedProperties extends ClassWithDottedProperties_Instance {
-  }
-  class ClassWithDottedProperties_Instance {
+  class ClassWithDottedProperties {
     private noStructuralTyping_: any;
     [ key: string ]: any ;
     foo : number ;
   }
-  class DictClass extends DictClass_Instance {
-  }
-  class DictClass_Instance {
+  class DictClass {
     private noStructuralTyping_: any;
     constructor (n : any ) ;
     [ key: string ]: any ;

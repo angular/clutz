@@ -1,8 +1,5 @@
 declare namespace ಠ_ಠ.clutz.foo.bar {
-  class Baz extends Baz_Instance {
-  }
-  //!! GlobalEvent isn't a closure type, so it doesn't have an _Instance half
-  class Baz_Instance extends GlobalEvent {
+  class Baz extends GlobalEvent {
     constructor ( ) ;
   }
 }

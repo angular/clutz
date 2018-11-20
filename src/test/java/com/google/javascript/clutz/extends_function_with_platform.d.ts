@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz.foo {
-  class A extends A_Instance {
-  }
-  class A_Instance extends Function {
+  class A extends Function {
     constructor ( ) ;
   }
 }

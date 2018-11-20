@@ -1,17 +1,11 @@
 declare namespace ಠ_ಠ.clutz.module$exports$missing$extend {
-  class ClassExtendingMissing extends ClassExtendingMissing_Instance {
-  }
-  class ClassExtendingMissing_Instance extends ಠ_ಠ.clutz.direct.ref.A_Instance {
+  class ClassExtendingMissing extends ಠ_ಠ.clutz.direct.ref.A {
     constructor ( ) ;
   }
-  class ClassExtendingMissingTemplated extends ClassExtendingMissingTemplated_Instance {
-  }
-  class ClassExtendingMissingTemplated_Instance extends ಠ_ಠ.clutz.direct.ref.ATemplated_Instance < string , number > {
+  class ClassExtendingMissingTemplated extends ಠ_ಠ.clutz.direct.ref.ATemplated < string , number > {
     constructor ( ) ;
   }
-  class ClassExtendingMissingWithParam extends ClassExtendingMissingWithParam_Instance {
-  }
-  class ClassExtendingMissingWithParam_Instance extends ಠ_ಠ.clutz.direct.ref.A_Instance {
+  class ClassExtendingMissingWithParam extends ಠ_ಠ.clutz.direct.ref.A {
     constructor (x : number ) ;
   }
 }

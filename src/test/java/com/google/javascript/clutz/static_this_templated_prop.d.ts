@@ -2,11 +2,9 @@ declare namespace ಠ_ಠ.clutz.static_this_templated_prop {
   /**
    * Some container to hold the static property.
    */
-  class SomeContainer extends SomeContainer_Instance {
-    static nestedClass ( ) : void ;
-  }
-  class SomeContainer_Instance {
+  class SomeContainer {
     private noStructuralTyping_: any;
+    static nestedClass ( ) : void ;
   }
 }
 declare module 'goog:static_this_templated_prop' {

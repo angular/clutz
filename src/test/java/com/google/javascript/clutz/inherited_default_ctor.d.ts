@@ -1,13 +1,9 @@
 declare namespace ಠ_ಠ.clutz.def.ctor {
-  class A extends A_Instance {
-  }
-  class A_Instance {
+  class A {
     private noStructuralTyping_: any;
     constructor (a : string ) ;
   }
-  class B extends B_Instance {
-  }
-  class B_Instance extends ಠ_ಠ.clutz.def.ctor.A_Instance {
+  class B extends ಠ_ಠ.clutz.def.ctor.A {
     constructor ( ) ;
   }
 }

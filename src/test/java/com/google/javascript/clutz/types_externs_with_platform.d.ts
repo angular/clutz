@@ -1,14 +1,10 @@
 declare namespace ಠ_ಠ.clutz.typesWithExterns {
-  class Error extends Error_Instance {
-  }
-  class Error_Instance extends GlobalError {
+  class Error extends GlobalError {
     constructor ( ) ;
   }
   interface ExtendsIThenable extends PromiseLike < any > {
   }
-  class ExtendsXMLHttpRequest extends ExtendsXMLHttpRequest_Instance {
-  }
-  class ExtendsXMLHttpRequest_Instance extends XMLHttpRequest {
+  class ExtendsXMLHttpRequest extends XMLHttpRequest {
   }
   let a : { a : number } ;
   let b : IArguments ;
@@ -22,9 +18,7 @@ declare module 'goog:typesWithExterns' {
   export = typesWithExterns;
 }
 declare namespace ಠ_ಠ.clutz.typesWithExterns {
-  class A extends A_Instance {
-  }
-  class A_Instance {
+  class A {
     private noStructuralTyping_: any;
     constructor (n : number ) ;
     apply : number ;
@@ -36,9 +30,7 @@ declare module 'goog:typesWithExterns.A' {
 }
 /* skipped emitting type alias typesWithExterns.ArrayLike to avoid collision with existing one in lib.d.ts. */
 declare namespace ಠ_ಠ.clutz.typesWithExterns {
-  class B extends B_Instance {
-  }
-  class B_Instance extends ಠ_ಠ.clutz.typesWithExterns.A_Instance {
+  class B extends ಠ_ಠ.clutz.typesWithExterns.A {
     constructor ( ) ;
   }
 }
@@ -47,9 +39,7 @@ declare module 'goog:typesWithExterns.B' {
   export default B;
 }
 declare namespace ಠ_ಠ.clutz.typesWithExterns {
-  class C extends C_Instance {
-  }
-  class C_Instance extends ಠ_ಠ.clutz.typesWithExterns.A_Instance {
+  class C extends ಠ_ಠ.clutz.typesWithExterns.A {
     constructor ( ) ;
   }
 }
@@ -65,37 +55,29 @@ declare namespace ಠ_ಠ.clutz.functionNamespace {
   function dom (nodeOrEvent : Node | null | GlobalEvent ) : functionNamespaceHelperClass ;
 }
 declare namespace ಠ_ಠ.clutz.functionNamespace {
-  class privateClass extends privateClass_Instance {
-  }
-  class privateClass_Instance {
+  class privateClass {
     private noStructuralTyping_: any;
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  class functionNamespaceHelperClass extends functionNamespaceHelperClass_Instance {
-  }
-  class functionNamespaceHelperClass_Instance {
+  class functionNamespaceHelperClass {
     private noStructuralTyping_: any;
   }
 }
 declare namespace ಠ_ಠ.clutz.namespace {
-  class Foo extends Foo_Instance {
-    static staticField : string ;
-    static staticMethod ( ) : string ;
-  }
-  class Foo_Instance {
+  class Foo {
     private noStructuralTyping_: any;
     member : string ;
     method (opt_exp ? : (a : ಠ_ಠ.clutz.namespace.Foo ) => any ) : any ;
+    static staticField : string ;
+    static staticMethod ( ) : string ;
   }
 }
 declare namespace ಠ_ಠ.clutz.namespace {
   type atypedef = (a : string , b ? : ಠ_ಠ.clutz.namespace.atypedef.Options ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > ;
 }
 declare namespace ಠ_ಠ.clutz.namespace.atypedef {
-  class Cache < T > extends Cache_Instance < T > {
-  }
-  class Cache_Instance < T > {
+  class Cache < T > {
     private noStructuralTyping_: any;
     destroy ( ) : any ;
     get (key : string ) : T ;

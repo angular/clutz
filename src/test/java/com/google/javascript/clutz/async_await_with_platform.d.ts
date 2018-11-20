@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz {
-  class module$exports$asyncawait extends module$exports$asyncawait_Instance {
-  }
-  class module$exports$asyncawait_Instance {
+  class module$exports$asyncawait {
     private noStructuralTyping_: any;
     bar ( ) : any ;
     foo ( ) : any ;

@@ -6,9 +6,7 @@ declare module 'goog:goog.ns' {
   export = ns;
 }
 declare namespace ಠ_ಠ.clutz.goog.ns {
-  class EventTarget extends EventTarget_Instance {
-  }
-  class EventTarget_Instance {
+  class EventTarget {
     private noStructuralTyping_: any;
   }
 }

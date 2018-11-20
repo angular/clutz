@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz.module$exports$package_visible {
-  class MyClass extends MyClass_Instance {
-  }
-  class MyClass_Instance {
+  class MyClass {
     private noStructuralTyping_: any;
   }
 }

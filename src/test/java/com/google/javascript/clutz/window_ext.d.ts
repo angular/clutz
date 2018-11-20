@@ -6,9 +6,7 @@ declare module 'goog:nswindow.c' {
   export default c;
 }
 declare namespace ಠ_ಠ.clutz.window {
-  class C extends C_Instance {
-  }
-  class C_Instance {
+  class C {
     private noStructuralTyping_: any;
   }
 }

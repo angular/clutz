@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz.typedefs {
-  class Aclass extends Aclass_Instance {
-  }
-  class Aclass_Instance {
+  class Aclass {
     private noStructuralTyping_: any;
   }
   /* skipped emitting type alias typedefs.ArrayLike to avoid collision with existing one in lib.d.ts. */

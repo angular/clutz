@@ -15,9 +15,7 @@ declare module 'goog:nested.NotNestedEither' {
   export default NotNestedEither;
 }
 declare namespace ಠ_ಠ.clutz.nested {
-  class PrivateC extends PrivateC_Instance {
-  }
-  class PrivateC_Instance {
+  class PrivateC {
     private noStructuralTyping_: any;
   }
 }
@@ -41,9 +39,7 @@ declare module 'goog:nested.foo' {
   export default foo;
 }
 declare namespace ಠ_ಠ.clutz.nested.foo {
-  class Klass extends Klass_Instance {
-  }
-  class Klass_Instance {
+  class Klass {
     private noStructuralTyping_: any;
   }
 }

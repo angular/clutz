@@ -1,22 +1,14 @@
 declare namespace ಠ_ಠ.clutz.module$exports$missing$imported$base {
-  class ClassExtendingDefaultObjectExporterBaseClass extends ClassExtendingDefaultObjectExporterBaseClass_Instance {
-  }
-  class ClassExtendingDefaultObjectExporterBaseClass_Instance extends ಠ_ಠ.clutz.module$exports$default$object$exporter.BaseClass_Instance {
+  class ClassExtendingDefaultObjectExporterBaseClass extends ಠ_ಠ.clutz.module$exports$default$object$exporter.BaseClass {
     constructor ( ) ;
   }
-  class ClassExtendingMissingDestructuredRequire extends ClassExtendingMissingDestructuredRequire_Instance {
-  }
-  class ClassExtendingMissingDestructuredRequire_Instance extends ಠ_ಠ.clutz.module$exports$named$base$exporter.MissingDestructuredRequire_Instance {
+  class ClassExtendingMissingDestructuredRequire extends ಠ_ಠ.clutz.module$exports$named$base$exporter.MissingDestructuredRequire {
     constructor ( ) ;
   }
-  class ClassExtendingMissingRequire extends ClassExtendingMissingRequire_Instance {
-  }
-  class ClassExtendingMissingRequire_Instance extends ಠ_ಠ.clutz.module$exports$default$base$exporter_Instance {
+  class ClassExtendingMissingRequire extends ಠ_ಠ.clutz.module$exports$default$base$exporter {
     constructor ( ) ;
   }
-  class ClassExtendingRenamedDestructuredRequire extends ClassExtendingRenamedDestructuredRequire_Instance {
-  }
-  class ClassExtendingRenamedDestructuredRequire_Instance extends ಠ_ಠ.clutz.module$exports$named$base$exporter.OriginalName_Instance {
+  class ClassExtendingRenamedDestructuredRequire extends ಠ_ಠ.clutz.module$exports$named$base$exporter.OriginalName {
     constructor ( ) ;
   }
   let DeclarationOfMissingRequire : ಠ_ಠ.clutz.module$exports$default$base$exporter | null ;

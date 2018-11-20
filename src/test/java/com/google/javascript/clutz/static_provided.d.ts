@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz.a.b {
-  class StaticHolder extends StaticHolder_Instance {
-  }
-  class StaticHolder_Instance {
+  class StaticHolder {
     private noStructuralTyping_: any;
   }
 }

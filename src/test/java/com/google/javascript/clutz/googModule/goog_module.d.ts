@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz.googmodule {
-  class Required extends Required_Instance {
-  }
-  class Required_Instance {
+  class Required {
     private noStructuralTyping_: any;
   }
 }
@@ -27,9 +25,7 @@ declare module 'goog:googmodule.requiredModule' {
   export = requiredModule;
 }
 declare namespace ಠ_ಠ.clutz {
-  class module$exports$googmodule$requiredModuleDefault extends module$exports$googmodule$requiredModuleDefault_Instance {
-  }
-  class module$exports$googmodule$requiredModuleDefault_Instance {
+  class module$exports$googmodule$requiredModuleDefault {
     private noStructuralTyping_: any;
   }
 }

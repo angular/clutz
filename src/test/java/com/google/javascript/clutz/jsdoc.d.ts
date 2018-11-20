@@ -4,9 +4,7 @@ declare namespace ಠ_ಠ.clutz.x {
    *
    * Across multiple paragraphs.
    */
-  class Y extends Y_Instance {
-  }
-  class Y_Instance {
+  class Y {
     private noStructuralTyping_: any;
     /**
      * Docs on a ctor.

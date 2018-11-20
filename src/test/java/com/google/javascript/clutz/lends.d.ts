@@ -5,13 +5,11 @@ declare module 'goog:lends' {
   export = lends;
 }
 declare namespace ಠ_ಠ.clutz.lends {
-  class A extends A_Instance {
-    static b : number ;
-  }
-  class A_Instance {
+  class A {
     private noStructuralTyping_: any;
     a : string ;
     c : boolean ;
+    static b : number ;
   }
 }
 declare module 'goog:lends.A' {

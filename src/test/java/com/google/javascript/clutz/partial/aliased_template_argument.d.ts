@@ -1,7 +1,5 @@
 declare namespace ಠ_ಠ.clutz {
-  class module$exports$aliased$template$argument extends module$exports$aliased$template$argument_Instance {
-  }
-  class module$exports$aliased$template$argument_Instance {
+  class module$exports$aliased$template$argument {
     private noStructuralTyping_: any;
     methodWithBareArg ( ) : ಠ_ಠ.clutz.module$exports$aliased$template$argument.typedef ;
     methodWithTemplateArg ( ) : ಠ_ಠ.clutz.unknown.extern.type < ಠ_ಠ.clutz.module$contents$aliased$template$argument_aliasedtypedef > ;

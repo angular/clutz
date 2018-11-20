@@ -1,13 +1,9 @@
 declare namespace ಠ_ಠ.clutz.suppress {
-  class A extends A_Instance {
-  }
-  class A_Instance {
+  class A {
     private noStructuralTyping_: any;
     foo ( ) : number ;
   }
-  class B extends B_Instance {
-  }
-  class B_Instance extends ಠ_ಠ.clutz.suppress.A_Instance {
+  class B extends ಠ_ಠ.clutz.suppress.A {
   }
 }
 declare module 'goog:suppress' {
