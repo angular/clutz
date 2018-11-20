@@ -2381,32 +2381,51 @@ class DeclarationGenerator {
       }
     }
 
+    /**
+     * One can create recursive record types in closure using type inference. Since we emit them
+     * inline, we cannot express that without introducing aliases. To avoid infinite recursion, we
+     * store the types that we see during the traversal in this object.
+     */
+    Set<JSType> visitedRecordTypes = new HashSet<>();
+
     private void visitRecordType(ObjectType type) {
+      visitedRecordTypes.add(type);
       emit("{");
       Iterator<String> it = getEmittablePropertyNames(type).iterator();
       while (it.hasNext()) {
+
         String propName = it.next();
+        JSType propType = type.getPropertyType(propName);
+
+        if (visitedRecordTypes.contains(propType)) {
+          emitComment("Unsupported circular reference for prop name: " + propName);
+          continue;
+        }
+
         if (isValidJSProperty(propName)) {
           emit(propName);
         } else {
           emit("'" + propName + "'");
         }
-        UnionType unionType = type.getPropertyType(propName).toMaybeUnionType();
+        UnionType unionType = propType.toMaybeUnionType();
         if (unionType != null
             && unionType
                 .getAlternatesWithoutStructuralTyping()
                 .stream()
                 .anyMatch(JSType::isVoidType)) {
           emit("?");
-          visitTypeDeclaration(type.getPropertyType(propName), false, true);
+
+          visitTypeDeclaration(propType, false, true);
         } else {
-          visitTypeDeclaration(type.getPropertyType(propName), false, false);
+          visitTypeDeclaration(propType, false, false);
         }
+
         if (it.hasNext()) {
           emit(",");
         }
       }
       emit("}");
+      visitedRecordTypes.remove(type);
     }
 
     /**
