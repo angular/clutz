@@ -25,6 +25,7 @@ import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
+import org.kohsuke.args4j.spi.StopOptionHandler;
 import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 
 /**
@@ -106,7 +107,9 @@ public class Options {
   )
   String absolutePathPrefix = "google3";
 
-  @Argument List<String> arguments = new ArrayList<>();
+  @Argument
+  @Option(name = "--", handler = StopOptionHandler.class)
+  List<String> arguments = new ArrayList<>();
 
   Set<String> srcFiles = new LinkedHashSet<>();
   Map<String, String> externsMap = null;
