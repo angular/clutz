@@ -1,8 +1,8 @@
 declare namespace ಠ_ಠ.clutz {
   class module$exports$asyncawait {
     private noStructuralTyping_: any;
-    bar ( ) : any ;
-    foo ( ) : any ;
+    bar ( ) : Promise < undefined > ;
+    foo ( ) : Promise < undefined > ;
   }
 }
 declare module 'goog:asyncawait' {
