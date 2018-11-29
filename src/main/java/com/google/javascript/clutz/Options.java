@@ -186,6 +186,7 @@ public class Options {
     // Late Provides are errors by default, but they do not prevent clutz from transpiling.
     options.setWarningLevel(DiagnosticGroups.LATE_PROVIDE, CheckLevel.OFF);
 
+    // Always parse and analyze the latest language features closure supports.
     options.setLanguage(LanguageMode.ECMASCRIPT_NEXT);
     options.setLanguageOut(LanguageMode.ECMASCRIPT5);
     options.setCheckTypes(true);
