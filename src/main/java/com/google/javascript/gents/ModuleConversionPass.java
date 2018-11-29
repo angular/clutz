@@ -790,7 +790,7 @@ public final class ModuleConversionPass implements CompilerPass {
   }
 
   /** Metadata about an exported symbol. */
-  private static class ExportedSymbol {
+  private static final class ExportedSymbol {
     /** The name of the file exporting the symbol. */
     final String fileName;
 

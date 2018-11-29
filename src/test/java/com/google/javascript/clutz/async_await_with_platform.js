@@ -3,7 +3,7 @@ goog.module('asyncawait');
 class C {
   async foo() {}
   async bar() {
-     const x = await this.foo();
+    const x = await this.foo();
   }
 }
 

@@ -200,7 +200,7 @@ public final class TypeConversionPass implements CompilerPass {
       }
 
       if ((typedefToken == Token.QMARK || typedefToken == Token.BANG)
-          && (typedefNode.hasOneChild())) {
+          && typedefNode.hasOneChild()) {
         // child Node is a simple type or a LC
         return containsObject(typedefNode.getFirstChild());
       }
