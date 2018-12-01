@@ -81,6 +81,14 @@ public class Options {
   List<String> externs = new ArrayList<>();
 
   @Option(
+    name = "--env",
+    usage =
+        "Determines the set of builtin externs to load. Options: BROWSER, CUSTOM. "
+            + "Default: no builtin externs"
+  )
+  CompilerOptions.Environment env = null;
+
+  @Option(
     name = "--depgraphs",
     usage = "only generate output for files listed as a root in the given depgraphs",
     metaVar = "file.depgraph...",
@@ -189,6 +197,9 @@ public class Options {
     // Always parse and analyze the latest language features closure supports.
     options.setLanguage(LanguageMode.ECMASCRIPT_NEXT);
     options.setLanguageOut(LanguageMode.ECMASCRIPT5);
+    if (env != null) {
+      options.setEnvironment(env);
+    }
     options.setCheckTypes(true);
     options.setInferTypes(true);
     // turns off optimizations.
