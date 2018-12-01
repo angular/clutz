@@ -6,6 +6,7 @@ declare namespace ಠ_ಠ.clutz.ctor_func {
   let ctorFuncField : { new (a : string , b : number ) : ಠ_ಠ.clutz.ctor_func.Ctor < any > } ;
   let ctorFuncFieldAlias : { new (a : string , b : number ) : ಠ_ಠ.clutz.ctor_func.Ctor < any > } ;
   function ctorFuncParam (ctor : { new (a : number ) : ಠ_ಠ.clutz.ctor_func.Ctor < any > } ) : void ;
+  function ctorFuncParamTemplatized < T > (ctor : { new (a : number ) : T } ) : T ;
 }
 declare module 'goog:ctor_func' {
   import ctor_func = ಠ_ಠ.clutz.ctor_func;
