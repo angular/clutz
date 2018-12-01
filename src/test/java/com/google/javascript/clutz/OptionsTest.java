@@ -3,6 +3,7 @@ package com.google.javascript.clutz;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.*;
 
+import com.google.javascript.jscomp.CompilerOptions;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import org.junit.Test;
@@ -147,6 +148,40 @@ public class OptionsTest {
               DepgraphTest.DEPGRAPH_PATH.toFile().toString(),
             });
     assertThat(opts.externs).isEmpty();
+  }
+
+  @Test
+  public void testEnvDefault() throws Exception {
+    Options opts =
+        new Options(
+            new String[] {
+              "my/thing/static/js/0-bootstrap.js",
+            });
+    assertThat(opts.env).isEqualTo(null);
+  }
+
+  @Test
+  public void testEnvBrowser() throws Exception {
+    Options opts =
+        new Options(
+            new String[] {
+              "my/thing/static/js/0-bootstrap.js", "--env", "BROWSER",
+            });
+    assertThat(opts.env).isEqualTo(CompilerOptions.Environment.BROWSER);
+    assertThat(opts.getCompilerOptions().getEnvironment())
+        .isEqualTo(CompilerOptions.Environment.BROWSER);
+  }
+
+  @Test
+  public void testEnvCustom() throws Exception {
+    Options opts =
+        new Options(
+            new String[] {
+              "my/thing/static/js/0-bootstrap.js", "--env", "CUSTOM",
+            });
+    assertThat(opts.env).isEqualTo(CompilerOptions.Environment.CUSTOM);
+    assertThat(opts.getCompilerOptions().getEnvironment())
+        .isEqualTo(CompilerOptions.Environment.CUSTOM);
   }
 
   @Test
