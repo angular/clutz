@@ -3134,7 +3134,7 @@ class DeclarationGenerator {
     /**
      * Emit a this parameter like `func(this: Foo)` in a function parameters.
      *
-     * TODO: emit for non-templatized this like `function(this: HTMLElement)`
+     * <p>TODO: emit for non-templatized this like `function(this: HTMLElement)`
      */
     private void emitThisParameter(FunctionType ftype, Iterator<Node> parameters) {
       final JSType typeOfThis = ftype.getTypeOfThis();
