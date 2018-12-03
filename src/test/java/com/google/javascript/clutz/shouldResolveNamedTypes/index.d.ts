@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.namedType {
   class A < U > {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_namedType_A : any;
     fn (a : ಠ_ಠ.clutz.namedType.D < U > ) : any ;
   }
 }
@@ -10,7 +10,7 @@ declare module 'goog:namedType.A' {
 }
 declare namespace ಠ_ಠ.clutz.namedType {
   class D < T > {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_namedType_D : any;
   }
 }
 declare module 'goog:namedType.D' {

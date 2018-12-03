@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.extend.arraylike {
   class A implements ArrayLike < any > {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_extend_arraylike_A : any;
     [ key: number ]: any ;
     length : number ;
   }
@@ -11,7 +11,7 @@ declare module 'goog:extend.arraylike.A' {
 }
 declare namespace ಠ_ಠ.clutz.extend.arraylike {
   class B implements ಠ_ಠ.clutz.extend.arraylike.I {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_extend_arraylike_B : any;
     [ key: number ]: any ;
     length : number ;
   }

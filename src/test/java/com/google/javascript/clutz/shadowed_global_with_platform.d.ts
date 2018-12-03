@@ -7,7 +7,7 @@ declare module 'goog:goog.ns' {
 }
 declare namespace ಠ_ಠ.clutz.goog.ns {
   class EventTarget {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_goog_ns_EventTarget : any;
   }
 }
 declare module 'goog:goog.ns.EventTarget' {

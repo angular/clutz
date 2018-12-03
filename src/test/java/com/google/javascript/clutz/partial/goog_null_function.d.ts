@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.nullfunc {
   class Class {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_nullfunc_Class : any;
     nullfunc ( ) : void ;
   }
 }

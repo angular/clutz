@@ -12,12 +12,12 @@ declare module 'goog:object.literal.exports' {
 }
 declare namespace ಠ_ಠ.clutz {
   class module$contents$object$literal$exports_Class1 {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$contents$object$literal$exports_Class1 : any;
   }
 }
 declare namespace ಠ_ಠ.clutz {
   class module$contents$object$literal$exports_Class2 {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$contents$object$literal$exports_Class2 : any;
   }
 }
 declare namespace ಠ_ಠ.clutz.module$exports$object$literal$exports {

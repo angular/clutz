@@ -1144,10 +1144,17 @@ class DeclarationGenerator {
     typesUsed.add(alternativeAliasName);
   }
 
+  // Ignoring Unicode symbols for now.
+  // see: http://stackoverflow.com/questions/2008279/validate-a-javascript-function-name
+  private static final Pattern JS_IDENTIFIER = Pattern.compile("^[$a-zA-Z_][0-9a-zA-Z_$]*$");
+  private static final Pattern NON_JS_IDENT_CHAR = Pattern.compile("[^0-9a-zA-Z_$]");
+
   private boolean isValidJSProperty(String name) {
-    // Ignoring Unicode symbols for now.
-    // see: http://stackoverflow.com/questions/2008279/validate-a-javascript-function-name
-    return Pattern.matches("^[$a-zA-Z_][0-9a-zA-Z_$]*$", name);
+    return JS_IDENTIFIER.matcher(name).matches();
+  }
+
+  private String escapeForJSProperty(String name) {
+    return NON_JS_IDENT_CHAR.matcher(name).replaceAll("_");
   }
 
   /**
@@ -2465,11 +2472,13 @@ class DeclarationGenerator {
       indent();
       emitBreak();
       // Prevent accidental structural typing - emit every class with a private field.
-      if (type.isNominalConstructor()
-          && !type.isInterface()
-          // But only for non-extending classes (TypeScript doesn't like overriding private fields)
-          && getSuperType(type) == null) {
-        emit("private noStructuralTyping_: any;");
+      if (type.isNominalConstructor() && !type.isInterface()) {
+        emit("private noStructuralTyping_");
+        // TypeScript does not allow overriding private properties from superclasses, so make sure
+        // to emit a private property name that's specific to this type.
+        String suffix = type.hasDisplayName() ? escapeForJSProperty(type.getDisplayName()) : "";
+        emitNoSpace(suffix);
+        emit(": any;");
         emitBreak();
       }
       // Constructors.

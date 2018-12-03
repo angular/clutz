@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.a.b {
   class StaticHolder {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_a_b_StaticHolder : any;
   }
 }
 declare module 'goog:a.b.StaticHolder' {

@@ -7,7 +7,7 @@ declare module 'goog:fn' {
 }
 declare namespace ಠ_ಠ.clutz.fn {
   class String {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_fn_String : any;
   }
 }
 declare module 'goog:fn.String' {

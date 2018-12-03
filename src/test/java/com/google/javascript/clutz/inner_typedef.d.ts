@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.innerTypeDef {
   class Foo {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_innerTypeDef_Foo : any;
   }
 }
 declare namespace ಠ_ಠ.clutz.innerTypeDef.Foo {

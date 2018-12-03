@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.typedefs {
   class Aclass {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_typedefs_Aclass : any;
   }
   /* skipped emitting type alias typedefs.ArrayLike to avoid collision with existing one in lib.d.ts. */
   let a : ಠ_ಠ.clutz.typedefs.Aclass ;

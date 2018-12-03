@@ -5,7 +5,7 @@ declare namespace ಠ_ಠ.clutz {
 }
 declare namespace ಠ_ಠ.clutz.interface_exp {
   class SomeClazz {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_interface_exp_SomeClazz : any;
   }
 }
 declare module 'goog:interface_exp' {

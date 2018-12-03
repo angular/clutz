@@ -8,7 +8,7 @@ declare module 'goog:declare.legacy.namespace' {
 }
 declare namespace ಠ_ಠ.clutz {
   class module$contents$declare$legacy$namespace_Class {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$contents$declare$legacy$namespace_Class : any;
   }
 }
 declare namespace ಠ_ಠ.clutz {

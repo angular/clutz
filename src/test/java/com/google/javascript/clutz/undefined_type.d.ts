@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.undefinedns {
   class C {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_undefinedns_C : any;
     constructor (f : ( ) => void , g : ( ) => string | undefined ) ;
   }
   let a : undefined ;

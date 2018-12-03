@@ -7,7 +7,7 @@ declare module 'goog:nswindow.c' {
 }
 declare namespace ಠ_ಠ.clutz.window {
   class C {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_window_C : any;
   }
 }
 declare namespace ಠ_ಠ.clutz.window {

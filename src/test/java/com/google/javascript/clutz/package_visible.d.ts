@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.module$exports$package_visible {
   class MyClass {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$exports$package_visible_MyClass : any;
   }
 }
 declare module 'goog:package_visible' {

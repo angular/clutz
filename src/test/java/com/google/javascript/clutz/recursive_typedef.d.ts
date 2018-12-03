@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.rec {
   class Aclass {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_rec_Aclass : any;
     foo : ಠ_ಠ.clutz.rec.ns.Arr ;
   }
 }

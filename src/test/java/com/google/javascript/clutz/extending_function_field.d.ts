@@ -7,7 +7,7 @@ declare module 'goog:a.messesWithB' {
 }
 declare namespace ಠ_ಠ.clutz.ns {
   class A {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_ns_A : any;
     fn ( ) : void ;
   }
 }
@@ -17,6 +17,7 @@ declare module 'goog:ns.A' {
 }
 declare namespace ಠ_ಠ.clutz.ns {
   class B extends ಠ_ಠ.clutz.ns.A {
+    private noStructuralTyping_ns_B : any;
     fn ( ) : void ;
   }
 }

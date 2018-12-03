@@ -1,5 +1,6 @@
 declare namespace ಠ_ಠ.clutz.module$exports$override {
   class ExtendsBase extends module$contents$override_Base {
+    private noStructuralTyping_module$exports$override_ExtendsBase : any;
     /**
      * This function has no type information, but its base class is visible, so it should inherit
      * the types from the base.
@@ -7,6 +8,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$override {
     method (x : number ) : void ;
   }
   class ExtendsInvisible extends ಠ_ಠ.clutz.module$exports$override.Invisible {
+    private noStructuralTyping_module$exports$override_ExtendsInvisible : any;
     constructor ( ) ;
     /**
      * This function has no known type, so its parameter should be optional.
@@ -39,7 +41,7 @@ declare module 'goog:override' {
 }
 declare namespace ಠ_ಠ.clutz {
   class module$contents$override_Base {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$contents$override_Base : any;
     method (x : number ) : void ;
   }
 }

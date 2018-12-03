@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.googmodule {
   class Required {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_googmodule_Required : any;
   }
 }
 declare module 'goog:googmodule.Required' {
@@ -26,7 +26,7 @@ declare module 'goog:googmodule.requiredModule' {
 }
 declare namespace ಠ_ಠ.clutz {
   class module$exports$googmodule$requiredModuleDefault {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$exports$googmodule$requiredModuleDefault : any;
   }
 }
 declare module 'goog:googmodule.requiredModuleDefault' {

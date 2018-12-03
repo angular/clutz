@@ -1,5 +1,6 @@
 declare namespace ಠ_ಠ.clutz.foo {
   class A extends Function {
+    private noStructuralTyping_foo_A : any;
     constructor ( ) ;
   }
 }

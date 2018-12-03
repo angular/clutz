@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.method_generics {
   class Foo < T > {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_method_generics_Foo : any;
     constructor (a : T ) ;
     /**
      * T is defined on the constructor and should not be redefined on the method level in the resulting

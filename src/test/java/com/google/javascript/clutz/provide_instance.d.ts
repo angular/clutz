@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.provides {
   class C {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_provides_C : any;
   }
 }
 declare module 'goog:provides.C' {

@@ -1,10 +1,12 @@
 declare namespace ಠ_ಠ.clutz.typesWithExterns {
   class Error extends GlobalError {
+    private noStructuralTyping_typesWithExterns_Error : any;
     constructor ( ) ;
   }
   interface ExtendsIThenable extends PromiseLike < any > {
   }
   class ExtendsXMLHttpRequest extends XMLHttpRequest {
+    private noStructuralTyping_typesWithExterns_ExtendsXMLHttpRequest : any;
   }
   let a : { a : number } ;
   let b : IArguments ;
@@ -19,7 +21,7 @@ declare module 'goog:typesWithExterns' {
 }
 declare namespace ಠ_ಠ.clutz.typesWithExterns {
   class A {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_typesWithExterns_A : any;
     constructor (n : number ) ;
     apply : number ;
   }
@@ -31,6 +33,7 @@ declare module 'goog:typesWithExterns.A' {
 /* skipped emitting type alias typesWithExterns.ArrayLike to avoid collision with existing one in lib.d.ts. */
 declare namespace ಠ_ಠ.clutz.typesWithExterns {
   class B extends ಠ_ಠ.clutz.typesWithExterns.A {
+    private noStructuralTyping_typesWithExterns_B : any;
     constructor ( ) ;
   }
 }
@@ -40,6 +43,7 @@ declare module 'goog:typesWithExterns.B' {
 }
 declare namespace ಠ_ಠ.clutz.typesWithExterns {
   class C extends ಠ_ಠ.clutz.typesWithExterns.A {
+    private noStructuralTyping_typesWithExterns_C : any;
     constructor ( ) ;
   }
 }
@@ -56,17 +60,17 @@ declare namespace ಠ_ಠ.clutz.functionNamespace {
 }
 declare namespace ಠ_ಠ.clutz.functionNamespace {
   class privateClass {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_functionNamespace_privateClass : any;
   }
 }
 declare namespace ಠ_ಠ.clutz {
   class functionNamespaceHelperClass {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_functionNamespaceHelperClass : any;
   }
 }
 declare namespace ಠ_ಠ.clutz.namespace {
   class Foo {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_namespace_Foo : any;
     member : string ;
     method (opt_exp ? : (a : ಠ_ಠ.clutz.namespace.Foo ) => any ) : any ;
     static staticField : string ;
@@ -78,7 +82,7 @@ declare namespace ಠ_ಠ.clutz.namespace {
 }
 declare namespace ಠ_ಠ.clutz.namespace.atypedef {
   class Cache < T > {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_namespace_atypedef_Cache : any;
     destroy ( ) : any ;
     get (key : string ) : T ;
     info ( ) : ಠ_ಠ.clutz.namespace.atypedef.Cache.Info ;

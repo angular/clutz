@@ -15,6 +15,12 @@ plugins {
   id 'net.ltgt.errorprone' version '0.0.11'
 }
 
+eclipse {
+    classpath {
+       downloadSources=true
+    }
+}
+
 def createScript(project, mainClass, name) {
   project.tasks.create(name: name, type: CreateStartScripts) {
     outputDir       = new File(project.buildDir, 'scripts')

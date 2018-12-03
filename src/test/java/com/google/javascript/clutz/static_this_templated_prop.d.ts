@@ -3,7 +3,7 @@ declare namespace ಠ_ಠ.clutz.static_this_templated_prop {
    * Some container to hold the static property.
    */
   class SomeContainer {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_static_this_templated_prop_SomeContainer : any;
     static nestedClass < SCOPE > (this : SCOPE ) : void ;
   }
 }

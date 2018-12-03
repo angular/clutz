@@ -10,12 +10,12 @@ declare module 'goog:goog.legacy.namespace.exporter' {
 }
 declare namespace ಠ_ಠ.clutz {
   class module$contents$goog$legacy$namespace$exporter_LegacyBaseClass {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$contents$goog$legacy$namespace$exporter_LegacyBaseClass : any;
   }
 }
 declare namespace ಠ_ಠ.clutz {
   class module$contents$goog$legacy$namespace$exporter_OriginalName {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$contents$goog$legacy$namespace$exporter_OriginalName : any;
   }
 }
 declare namespace ಠ_ಠ.clutz.module$exports$goog$legacy$namespace$exporter {

@@ -6,7 +6,7 @@ declare module 'goog:lends' {
 }
 declare namespace ಠ_ಠ.clutz.lends {
   class A {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_lends_A : any;
     a : string ;
     c : boolean ;
     static b : number ;

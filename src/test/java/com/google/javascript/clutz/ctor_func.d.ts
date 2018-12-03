@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.ctor_func {
   class Ctor < T > {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_ctor_func_Ctor : any;
     constructor (a : string , b : number ) ;
   }
   let ctorFuncField : { new (a : string , b : number ) : ಠ_ಠ.clutz.ctor_func.Ctor < any > } ;

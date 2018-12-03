@@ -4,11 +4,11 @@ declare namespace goog {
    * files in an unbundled, uncompiled environment.
    */
   class DebugLoader {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_goog_DebugLoader : any;
     protected getTranspiler ( ) : goog.Transpiler ;
   }
   class Transpiler {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_goog_Transpiler : any;
   }
   /**
    * Exports a property unobfuscated into the object's namespace.
@@ -29,7 +29,7 @@ declare namespace goog {
 }
 declare namespace ಠ_ಠ.clutz.goog {
   class Uri {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_goog_Uri : any;
   }
 }
 declare module 'goog:goog.Uri' {

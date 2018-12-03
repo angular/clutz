@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.module$exports$protected {
   class MyClass {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$exports$protected_MyClass : any;
     protected protectedVisibility : string ;
     protected static staticProtected : number ;
   }

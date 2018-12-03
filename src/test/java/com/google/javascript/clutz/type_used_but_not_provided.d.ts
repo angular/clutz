@@ -7,7 +7,7 @@ declare module 'goog:used.not.provided.a' {
 }
 declare namespace ಠ_ಠ.clutz.used.not.provided {
   class C implements ಠ_ಠ.clutz.used.not.provided.I < number > {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_used_not_provided_C : any;
   }
 }
 declare namespace ಠ_ಠ.clutz.used.not.provided {

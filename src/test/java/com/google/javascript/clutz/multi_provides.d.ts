@@ -14,7 +14,7 @@ declare module 'goog:multi_provides.a.b.c' {
 }
 declare namespace ಠ_ಠ.clutz.multi_provides.a.b.c {
   class Two {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_multi_provides_a_b_c_Two : any;
   }
 }
 declare module 'goog:multi_provides.a.b.c.Two' {

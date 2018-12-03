@@ -1,5 +1,6 @@
 declare namespace ಠ_ಠ.clutz {
   class module$exports$legacy$namespace$forward$declare extends ಠ_ಠ.clutz.module$exports$missing$forward$Declare {
+    private noStructuralTyping_module$exports$legacy$namespace$forward$declare : any;
     constructor ( ) ;
   }
 }

@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz {
   class module$exports$nested$typedef$mod {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$exports$nested$typedef$mod : any;
   }
 }
 declare namespace ಠ_ಠ.clutz.module$exports$nested$typedef$mod {

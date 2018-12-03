@@ -9,6 +9,6 @@ declare module 'goog:module.tsickle.like' {
 }
 declare namespace ಠ_ಠ.clutz {
   class module$contents$module$tsickle$like_A {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$contents$module$tsickle$like_A : any;
   }
 }

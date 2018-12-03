@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz {
   class module$exports$asyncawait {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$exports$asyncawait : any;
     bar ( ) : Promise < undefined > ;
     foo ( ) : Promise < undefined > ;
   }

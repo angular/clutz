@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz {
   class module$exports$abst$method {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$exports$abst$method : any;
     /**
      * It appears that this one is emitted correctly without partial_goog_base.js
      */

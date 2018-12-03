@@ -1,9 +1,10 @@
 declare namespace ಠ_ಠ.clutz.def.ctor {
   class A {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_def_ctor_A : any;
     constructor (a : string ) ;
   }
   class B extends ಠ_ಠ.clutz.def.ctor.A {
+    private noStructuralTyping_def_ctor_B : any;
     constructor ( ) ;
   }
 }

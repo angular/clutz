@@ -1,9 +1,9 @@
 declare namespace ಠ_ಠ.clutz.priv {
   class PrivateClazz {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_priv_PrivateClazz : any;
   }
   class PublicClass {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_priv_PublicClass : any;
     publicField : number ;
   }
 }
@@ -13,12 +13,12 @@ declare module 'goog:priv' {
 }
 declare namespace ಠ_ಠ.clutz.priv2 {
   class PublicClass {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_priv2_PublicClass : any;
   }
 }
 declare namespace ಠ_ಠ.clutz.priv2.PublicClass {
   class PrivateNestedClass_ {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_priv2_PublicClass_PrivateNestedClass_ : any;
   }
 }
 declare module 'goog:priv2.PublicClass' {

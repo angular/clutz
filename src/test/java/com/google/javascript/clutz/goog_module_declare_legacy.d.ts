@@ -8,6 +8,6 @@ declare module 'goog:module.Foo.Legacy' {
 }
 declare namespace ಠ_ಠ.clutz {
   class module$contents$module$Foo$Legacy_A {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$contents$module$Foo$Legacy_A : any;
   }
 }

@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.somenamespace {
   class Foo {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_somenamespace_Foo : any;
     bar : ಠ_ಠ.clutz.somenamespace.MyEnum ;
   }
 }

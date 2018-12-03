@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz {
   class module$exports$aliased$template$argument {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$exports$aliased$template$argument : any;
     methodWithBareArg ( ) : ಠ_ಠ.clutz.module$exports$aliased$template$argument.typedef ;
     methodWithTemplateArg ( ) : ಠ_ಠ.clutz.unknown.extern.type < ಠ_ಠ.clutz.module$contents$aliased$template$argument_aliasedtypedef > ;
   }

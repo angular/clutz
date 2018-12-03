@@ -8,6 +8,6 @@ declare module 'goog:default.object.exporter' {
 }
 declare namespace ಠ_ಠ.clutz {
   class module$contents$default$object$exporter_BaseClass {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$contents$default$object$exporter_BaseClass : any;
   }
 }

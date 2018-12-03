@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz {
   class module$exports$odd$npe$typedef {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$exports$odd$npe$typedef : any;
     foo ( ) : ಠ_ಠ.clutz.some.type < ಠ_ಠ.clutz.module$contents$odd$npe$typedef_ATypeDef > ;
   }
 }

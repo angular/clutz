@@ -16,7 +16,7 @@ declare module 'goog:nested.NotNestedEither' {
 }
 declare namespace ಠ_ಠ.clutz.nested {
   class PrivateC {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_nested_PrivateC : any;
   }
 }
 declare module 'goog:nested.PrivateC' {
@@ -40,7 +40,7 @@ declare module 'goog:nested.foo' {
 }
 declare namespace ಠ_ಠ.clutz.nested.foo {
   class Klass {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_nested_foo_Klass : any;
   }
 }
 declare module 'goog:nested.foo.Klass' {

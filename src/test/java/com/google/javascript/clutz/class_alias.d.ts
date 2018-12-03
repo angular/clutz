@@ -8,12 +8,12 @@ declare module 'goog:alias.A' {
 }
 declare namespace ಠ_ಠ.clutz.original {
   class A {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_original_A : any;
   }
 }
 declare namespace ಠ_ಠ.clutz.original.A {
   class InnerC {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_original_A_InnerC : any;
   }
 }
 declare module 'goog:original.A' {

@@ -5,7 +5,7 @@ declare namespace ಠ_ಠ.clutz.x {
    * Across multiple paragraphs.
    */
   class Y {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_x_Y : any;
     /**
      * Docs on a ctor.
      *

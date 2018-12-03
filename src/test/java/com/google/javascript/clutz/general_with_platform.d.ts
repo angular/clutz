@@ -33,6 +33,7 @@ declare namespace ಠ_ಠ.clutz.u2f {
 }
 declare namespace ಠ_ಠ.clutz {
   class DirectoryEntry extends Entry {
+    private noStructuralTyping_DirectoryEntry : any;
     createReader ( ) : DirectoryReader ;
     getDirectory (path : string , options ? : FileSystemFlags , successCallback ? : (a : DirectoryEntry ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
     getFile (path : string , options ? : FileSystemFlags , successCallback ? : (a : FileEntry ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
@@ -41,13 +42,13 @@ declare namespace ಠ_ಠ.clutz {
 }
 declare namespace ಠ_ಠ.clutz {
   class DirectoryReader {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_DirectoryReader : any;
     readEntries (successCallback : (a : Entry [] ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
   class Entry {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_Entry : any;
     copyTo (parent : DirectoryEntry , newName ? : string , successCallback ? : (a : Entry ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
     filesystem : FileSystem ;
     fullPath : string ;
@@ -63,12 +64,14 @@ declare namespace ಠ_ಠ.clutz {
 }
 declare namespace ಠ_ಠ.clutz {
   class FileEntry extends Entry {
+    private noStructuralTyping_FileEntry : any;
     createWriter (successCallback : (a : FileWriter ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
     file (successCallback : (a : File ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
   class FileError extends DOMError {
+    private noStructuralTyping_FileError : any;
     ABORT_ERR : number ;
     ENCODING_ERR : number ;
     INVALID_MODIFICATION_ERR : number ;
@@ -98,7 +101,7 @@ declare namespace ಠ_ಠ.clutz {
 }
 declare namespace ಠ_ಠ.clutz {
   class FileSaver {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_FileSaver : any;
     DONE : number ;
     INIT : number ;
     WRITING : number ;
@@ -115,7 +118,7 @@ declare namespace ಠ_ಠ.clutz {
 }
 declare namespace ಠ_ಠ.clutz {
   class FileSystem {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_FileSystem : any;
     name : string ;
     root : DirectoryEntry ;
   }
@@ -128,6 +131,7 @@ declare namespace ಠ_ಠ.clutz {
 }
 declare namespace ಠ_ಠ.clutz {
   class FileWriter extends FileSaver {
+    private noStructuralTyping_FileWriter : any;
     length : number ;
     position : number ;
     seek (offset : number ) : void ;
@@ -140,7 +144,7 @@ declare namespace ಠ_ಠ.clutz {
    * Metadata interface.
    */
   class Metadata {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_Metadata : any;
     modificationTime : GlobalDate ;
     size : number ;
   }
@@ -159,7 +163,7 @@ declare namespace ಠ_ಠ.clutz {
 }
 declare namespace ಠ_ಠ.clutz {
   class StorageManager {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_StorageManager : any;
     estimate ( ) : Promise < { quota : number , usage : number } > ;
     persist ( ) : Promise < boolean > ;
     persisted ( ) : Promise < boolean > ;
@@ -170,7 +174,7 @@ declare namespace ಠ_ಠ.clutz.window {
 }
 declare namespace ಠ_ಠ.clutz {
   class ByteLengthQueuingStrategy {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_ByteLengthQueuingStrategy : any;
     constructor (config : { highWaterMark : number } ) ;
     /**
      * If we don't want to be strict we can define chunk as {*}
@@ -181,7 +185,7 @@ declare namespace ಠ_ಠ.clutz {
 }
 declare namespace ಠ_ಠ.clutz {
   class CountQueuingStrategy {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_CountQueuingStrategy : any;
     constructor (config : { highWaterMark : number } ) ;
     size (chunk : any ) : number ;
   }
@@ -275,7 +279,7 @@ declare namespace ಠ_ಠ.clutz {
 }
 declare namespace ಠ_ಠ.clutz {
   class WritableStream {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_WritableStream : any;
     constructor (opt_underlyingSink ? : WritableStreamSink , opt_queuingStrategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark : number , size ? : (a : any ) => number } ) ;
     abort (reason : any ) : Promise < undefined > ;
     getWriter ( ) : WritableStreamDefaultWriter ;
@@ -312,7 +316,7 @@ declare namespace ಠ_ಠ.clutz {
 }
 declare namespace ಠ_ಠ.clutz {
   class AbortController {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_AbortController : any;
     abort ( ) : any ;
     signal : AbortSignal ;
   }

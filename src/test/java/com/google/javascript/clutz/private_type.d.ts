@@ -6,7 +6,7 @@ declare module 'goog:privatetype' {
 }
 declare namespace ಠ_ಠ.clutz.privatetype {
   class Foo {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_privatetype_Foo : any;
     constructor (a : any ) ;
     foo ( ) : PrivateType ;
   }
@@ -20,7 +20,7 @@ declare module 'goog:privatetype.Foo' {
 }
 declare namespace ಠ_ಠ.clutz.privatetype {
   class X_ {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_privatetype_X_ : any;
     method ( ) : void ;
     static staticMethod ( ) : ಠ_ಠ.clutz.privatetype.X_ | null ;
   }

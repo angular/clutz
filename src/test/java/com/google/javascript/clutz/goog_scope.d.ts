@@ -29,7 +29,7 @@ declare module 'goog:foo.iboom' {
 }
 declare namespace ಠ_ಠ.clutz.$jscomp.scope {
   class Bar {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_$jscomp_scope_Bar : any;
   }
 }
 declare namespace ಠ_ಠ.clutz.$jscomp.scope {

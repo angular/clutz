@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -130,7 +131,9 @@ public class DeclarationGeneratorTests {
             .flatMap(List::stream)
             .map(Path::toFile);
 
-    return Stream.concat(jsFiles, zipFiles).collect(Collectors.toList());
+    List<File> fileList = Stream.concat(jsFiles, zipFiles).collect(Collectors.toList());
+    Collections.sort(fileList);
+    return fileList;
   }
 
   public static List<File> getTestInputFilesNoPartial(FilenameFilter filter) {

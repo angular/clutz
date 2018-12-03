@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz {
   class module$exports$module$Foo {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$exports$module$Foo : any;
     constructor (x : string ,  ...rest : string [] ) ;
   }
 }

@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.angular.$q {
   class Promise < T > {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_angular_$q_Promise : any;
     then < RESULT > (opt_onFulfilled ? : ( (a : T ) => ಠ_ಠ.clutz.angular.$q.Promise < RESULT > | RESULT | ಠ_ಠ.clutz.angular.$q.Promise<never>) | null , opt_onRejected ? : ( (a : any ) => any ) | null) : ಠ_ಠ.clutz.angular.$q.Promise < RESULT > ;
     when < RESULT, T > (value: T, successCallback: (promiseValue: T) => ಠ_ಠ.clutz.angular.$q.Promise < RESULT >|RESULT, errorCallback: null | undefined |  ((reason: any) => any), notifyCallback?: (state: any) => any): ಠ_ಠ.clutz.angular.$q.Promise < RESULT >;
     static all(promises : ಠ_ಠ.clutz.angular.$q.Promise < any > [] ) : ಠ_ಠ.clutz.angular.$q.Promise < any [] > ;
@@ -14,7 +14,7 @@ declare module 'goog:angular.$q.Promise' {
 }
 declare namespace ಠ_ಠ.clutz.angular.$q {
   class PromiseService < T > {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_angular_$q_PromiseService : any;
     all(promises : ಠ_ಠ.clutz.angular.$q.PromiseService.Promise < any > [] ) : ಠ_ಠ.clutz.angular.$q.PromiseService.Promise < any [] > ;
   }
 }

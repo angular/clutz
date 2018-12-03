@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.googprovide {
   class exporter {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_googprovide_exporter : any;
   }
 }
 declare module 'goog:googprovide.exporter' {

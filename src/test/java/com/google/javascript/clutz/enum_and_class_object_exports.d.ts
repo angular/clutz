@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.foo.bar {
   class Class {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$contents$foo$bar_ExportObject_Class : any;
   }
   let Enum : ಠ_ಠ.clutz.module$contents$foo$bar_ExportObject.Enum ;
 }

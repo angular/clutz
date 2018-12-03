@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz.dep {
   class D {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_dep_D : any;
   }
 }
 declare module 'goog:dep.D' {
@@ -9,7 +9,7 @@ declare module 'goog:dep.D' {
 }
 declare namespace ಠ_ಠ.clutz.main {
   class A {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_main_A : any;
     fn (a : ಠ_ಠ.clutz.dep.D ) : void ;
   }
 }

@@ -1,6 +1,6 @@
 declare namespace ಠ_ಠ.clutz {
   class module$exports$map_entries$Map < K , V > {
-    private noStructuralTyping_: any;
+    private noStructuralTyping_module$exports$map_entries$Map : any;
     /**
      * Closure compiler sadly doesn't support tuples, ie. Iterator<[K,V]>.
      */
