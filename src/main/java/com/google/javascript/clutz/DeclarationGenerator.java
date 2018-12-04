@@ -3140,16 +3140,18 @@ class DeclarationGenerator {
       final JSType typeOfThis = ftype.getTypeOfThis();
       // Don't emit for a constructor like `function(new: T)`.
       // A `this` parameter in a constructor is not allowed in TypeScript.
-      if (typeOfThis != null && !ftype.isConstructor()) {
-        final JSDocInfo jsDocInfo = ftype.getJSDocInfo();
-        // Emit for templatized this like `function(this: T)` or JSDoc `@this` type.
-        if (typeOfThis.isTemplateType() || (jsDocInfo != null && jsDocInfo.getThisType() != null)) {
-          emitNoSpace("this :");
-          visitType(typeOfThis);
-          if (parameters.hasNext()) {
-            emit(", ");
-          }
-        }
+      if (typeOfThis == null || ftype.isConstructor()) {
+        return;
+      }
+      final JSDocInfo jsDocInfo = ftype.getJSDocInfo();
+      // Emit for templatized this param like `function(this: T)` or JSDoc `@this` type.
+      if (!typeOfThis.isTemplateType() && (jsDocInfo == null || jsDocInfo.getThisType() == null)) {
+        return;
+      }
+      emitNoSpace("this :");
+      visitType(typeOfThis);
+      if (parameters.hasNext()) {
+        emit(", ");
       }
     }
 
