@@ -2,8 +2,9 @@ declare namespace ಠ_ಠ.clutz.nsThis {
   class C {
     private noStructuralTyping_: any;
     bar ( ) : ಠ_ಠ.clutz.nsThis.C ;
-    foo < THIS > (this : THIS ) : THIS ;
-    foo2 < THIS > (this : THIS , str : string ) : THIS ;
+    foo ( ) : this ;
+    foo2 (str : string ) : this ;
+    foo3 < THIS > (this : THIS , arr : THIS [] ) : this ;
   }
 }
 declare module 'goog:nsThis.C' {
