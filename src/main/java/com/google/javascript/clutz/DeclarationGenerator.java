@@ -3006,6 +3006,7 @@ class DeclarationGenerator {
     private void visitFunctionDeclaration(FunctionType ftype, List<String> skipTemplateParams) {
       visitFunctionParameters(ftype, true, skipTemplateParams);
       JSType type = ftype.getReturnType();
+      final JSType typeOfThis = ftype.getTypeOfThis();
 
       if (type == null) return;
       emit(":");
@@ -3015,6 +3016,9 @@ class DeclarationGenerator {
       // "undefined" types are not the same.
       if (type.isVoidType()) {
         emit("void");
+      } else if (typeOfThis != null && typeOfThis.isTemplateType() && typeOfThis.equals(type)) {
+        // Special case: prefer polymorphic `this` type to templatized `this` param
+        emit("this");
       } else {
         visitType(type);
       }
@@ -3064,6 +3068,12 @@ class DeclarationGenerator {
 
     private void visitFunctionParameters(
         FunctionType ftype, boolean emitTemplatizedTypes, List<String> alreadyEmittedTemplateType) {
+      final boolean shouldSkipEmittingThis = shouldSkipEmittingThisTemplateAndParam(ftype);
+      if (shouldSkipEmittingThis) {
+        // alreadyEmittedTemplateType might be an immutable list.
+        alreadyEmittedTemplateType = new ArrayList<>(alreadyEmittedTemplateType);
+        alreadyEmittedTemplateType.add(ftype.getTypeOfThis().getDisplayName());
+      }
       if (emitTemplatizedTypes) {
         visitTemplateTypes(ftype, alreadyEmittedTemplateType, true);
       }
@@ -3075,7 +3085,9 @@ class DeclarationGenerator {
       boolean makeAllParametersOptional = opts.partialInput && allParametersUnknown(ftype);
       emit("(");
       Iterator<Node> parameters = ftype.getParameters().iterator();
-      emitThisParameter(ftype, parameters);
+      if (!shouldSkipEmittingThis) {
+        emitThisParameter(ftype, parameters);
+      }
       Iterator<String> names = null;
       Node functionSource = ftype.getSource();
       if (functionSource != null && functionSource.isClass()) {
@@ -3129,6 +3141,33 @@ class DeclarationGenerator {
         }
       }
       emit(")");
+    }
+
+    /**
+     * Special handling for simple typing returning polymorphic this type in TypeScript. Prefer
+     * `func(): this` instead of `func&lt;T&gt;(this: T): T` when any params are not templatized.
+     */
+    private boolean shouldSkipEmittingThisTemplateAndParam(FunctionType ftype) {
+      final JSType typeOfThis = ftype.getTypeOfThis();
+      if (typeOfThis == null
+          || !typeOfThis.isTemplateType()
+          || !typeOfThis.equals(ftype.getReturnType())) {
+        return false;
+      }
+      Iterator<Node> parameters = ftype.getParameters().iterator();
+      while (parameters.hasNext()) {
+        final JSType paramType = parameters.next().getJSType();
+        if (!paramType.isTemplatizedType()) {
+          continue;
+        }
+        final TemplateTypeMap templateTypeMap = paramType.getTemplateTypeMap();
+        for (TemplateType key : templateTypeMap.getTemplateKeys()) {
+          if (templateTypeMap.getResolvedTemplateType(key).equals(typeOfThis)) {
+            return false;
+          }
+        }
+      }
+      return true;
     }
 
     /**

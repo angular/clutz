@@ -25,6 +25,15 @@ nsThis.C.prototype.foo2 = function(str) {
   return this;
 };
 
+/**
+ * @param {!Array<THIS>} arr
+ * @return {THIS}
+ * @this {THIS}
+ * @template THIS
+ */
+nsThis.C.prototype.foo3 = function(arr) {
+  return this;
+};
 
 /**
  * @return {!nsThis.C}
