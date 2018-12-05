@@ -346,7 +346,7 @@ class DeclarationGenerator {
     for (String extern : opts.externs) {
       externFiles.add(SourceFile.fromPath(Paths.get(extern), UTF_8));
     }
-    if (opts.env != null) {
+    if (opts.closureEnv != null) {
       externFiles.addAll(getDefaultExterns(opts));
     }
     String result = generateDeclarations(sourceFiles, externFiles, opts.depgraph);

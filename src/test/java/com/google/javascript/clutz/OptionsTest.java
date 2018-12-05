@@ -151,35 +151,13 @@ public class OptionsTest {
   }
 
   @Test
-  public void testEnvDefault() throws Exception {
+  public void testClosureEnvCustom() throws Exception {
     Options opts =
         new Options(
             new String[] {
-              "my/thing/static/js/0-bootstrap.js",
+              "my/thing/static/js/0-bootstrap.js", "--closure_env", "CUSTOM",
             });
-    assertThat(opts.env).isEqualTo(null);
-  }
-
-  @Test
-  public void testEnvBrowser() throws Exception {
-    Options opts =
-        new Options(
-            new String[] {
-              "my/thing/static/js/0-bootstrap.js", "--env", "BROWSER",
-            });
-    assertThat(opts.env).isEqualTo(CompilerOptions.Environment.BROWSER);
-    assertThat(opts.getCompilerOptions().getEnvironment())
-        .isEqualTo(CompilerOptions.Environment.BROWSER);
-  }
-
-  @Test
-  public void testEnvCustom() throws Exception {
-    Options opts =
-        new Options(
-            new String[] {
-              "my/thing/static/js/0-bootstrap.js", "--env", "CUSTOM",
-            });
-    assertThat(opts.env).isEqualTo(CompilerOptions.Environment.CUSTOM);
+    assertThat(opts.closureEnv).isEqualTo(CompilerOptions.Environment.CUSTOM);
     assertThat(opts.getCompilerOptions().getEnvironment())
         .isEqualTo(CompilerOptions.Environment.CUSTOM);
   }
