@@ -4,7 +4,7 @@ declare namespace ಠ_ಠ.clutz.static_this_templated_prop {
    */
   class SomeContainer {
     private noStructuralTyping_: any;
-    static nestedClass ( ) : void ;
+    static nestedClass < SCOPE > (this : SCOPE ) : void ;
   }
 }
 declare module 'goog:static_this_templated_prop' {

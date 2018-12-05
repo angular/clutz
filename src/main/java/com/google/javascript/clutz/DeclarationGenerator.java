@@ -2793,19 +2793,6 @@ class DeclarationGenerator {
         // Avoid re-emitting template variables defined on the class level if method is not static.
         List<String> skipTemplateParams =
             isStatic ? Collections.emptyList() : classTemplateTypeNames;
-        JSType typeOfThis = ftype.getTypeOfThis();
-        // If a method returns the 'this' object, it needs to be typed to match the type of the
-        // instance it is invoked on. That way when called on the subclass it should return the
-        // subclass type.
-        // Unfortunately, TypeScript and closure disagree how to type this pattern.
-        // In closure it is a templatized method, together with the @this {T} annotation.
-        // In TypeScript one can use the reserved 'this' type, without templatization.
-        // Detect the pattern here and remove the templatized type from the emit.
-        if (typeOfThis != null && typeOfThis.isTemplateType()) {
-          // skipTemplateParams might be an immutable list.
-          skipTemplateParams = new ArrayList<>(skipTemplateParams);
-          skipTemplateParams.add(typeOfThis.getDisplayName());
-        }
         visitFunctionDeclaration(ftype, skipTemplateParams);
       }
       emit(";");
@@ -3022,7 +3009,7 @@ class DeclarationGenerator {
     private void visitFunctionDeclaration(FunctionType ftype, List<String> skipTemplateParams) {
       visitFunctionParameters(ftype, true, skipTemplateParams);
       JSType type = ftype.getReturnType();
-      JSType typeOfThis = ftype.getTypeOfThis();
+      final JSType typeOfThis = ftype.getTypeOfThis();
 
       if (type == null) return;
       emit(":");
@@ -3033,7 +3020,7 @@ class DeclarationGenerator {
       if (type.isVoidType()) {
         emit("void");
       } else if (typeOfThis != null && typeOfThis.isTemplateType() && typeOfThis.equals(type)) {
-        // This type is reserved in TypeScript, but a template param in closure.
+        // Special case: prefer polymorphic `this` type to templatized `this` param
         emit("this");
       } else {
         visitType(type);
@@ -3084,6 +3071,12 @@ class DeclarationGenerator {
 
     private void visitFunctionParameters(
         FunctionType ftype, boolean emitTemplatizedTypes, List<String> alreadyEmittedTemplateType) {
+      final boolean shouldSkipEmittingThis = shouldSkipEmittingThisTemplateAndParam(ftype);
+      if (shouldSkipEmittingThis) {
+        // alreadyEmittedTemplateType might be an immutable list.
+        alreadyEmittedTemplateType = new ArrayList<>(alreadyEmittedTemplateType);
+        alreadyEmittedTemplateType.add(ftype.getTypeOfThis().getDisplayName());
+      }
       if (emitTemplatizedTypes) {
         visitTemplateTypes(ftype, alreadyEmittedTemplateType, true);
       }
@@ -3095,6 +3088,9 @@ class DeclarationGenerator {
       boolean makeAllParametersOptional = opts.partialInput && allParametersUnknown(ftype);
       emit("(");
       Iterator<Node> parameters = ftype.getParameters().iterator();
+      if (!shouldSkipEmittingThis) {
+        emitThisParameter(ftype, parameters);
+      }
       Iterator<String> names = null;
       Node functionSource = ftype.getSource();
       if (functionSource != null && functionSource.isClass()) {
@@ -3148,6 +3144,57 @@ class DeclarationGenerator {
         }
       }
       emit(")");
+    }
+
+    /**
+     * Special handling for simple typing returning polymorphic this type in TypeScript. Prefer
+     * `func(): this` instead of `func&lt;T&gt;(this: T): T` when any params are not templatized.
+     */
+    private boolean shouldSkipEmittingThisTemplateAndParam(FunctionType ftype) {
+      final JSType typeOfThis = ftype.getTypeOfThis();
+      if (typeOfThis == null
+          || !typeOfThis.isTemplateType()
+          || !typeOfThis.equals(ftype.getReturnType())) {
+        return false;
+      }
+      Iterator<Node> parameters = ftype.getParameters().iterator();
+      while (parameters.hasNext()) {
+        final JSType paramType = parameters.next().getJSType();
+        if (!paramType.isTemplatizedType()) {
+          continue;
+        }
+        final TemplateTypeMap templateTypeMap = paramType.getTemplateTypeMap();
+        for (TemplateType key : templateTypeMap.getTemplateKeys()) {
+          if (templateTypeMap.getResolvedTemplateType(key).equals(typeOfThis)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
+    /**
+     * Emit a this parameter like `func(this: Foo)` in a function parameters.
+     *
+     * <p>TODO: emit for non-templatized this like `function(this: HTMLElement)`
+     */
+    private void emitThisParameter(FunctionType ftype, Iterator<Node> parameters) {
+      final JSType typeOfThis = ftype.getTypeOfThis();
+      // Don't emit for a constructor like `function(new: T)`.
+      // A `this` parameter in a constructor is not allowed in TypeScript.
+      if (typeOfThis == null || ftype.isConstructor()) {
+        return;
+      }
+      final JSDocInfo jsDocInfo = ftype.getJSDocInfo();
+      // Emit for templatized this param like `function(this: T)` or JSDoc `@this` type.
+      if (!typeOfThis.isTemplateType() && (jsDocInfo == null || jsDocInfo.getThisType() == null)) {
+        return;
+      }
+      emitNoSpace("this :");
+      visitType(typeOfThis);
+      if (parameters.hasNext()) {
+        emit(", ");
+      }
     }
 
     void walkInnerSymbols(ObjectType type, String innerNamespace) {

@@ -16,3 +16,12 @@ ctor_func.ctorFuncFieldAlias = ctor_func.ctorFuncField;
 
 /** @param {function(new:ctor_func.Ctor, number)} ctor */
 ctor_func.ctorFuncParam = function(ctor) {};
+
+/**
+  * @param {function(new:T, number)} ctor
+  * @return {T}
+  * @template T
+  */
+ctor_func.ctorFuncParamTemplatized = function(ctor) {
+  return new ctor(0);
+};
