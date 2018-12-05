@@ -2259,30 +2259,20 @@ class DeclarationGenerator {
         return null;
       }
 
-      switch (type.getDisplayName()) {
-          // Arguments<?> and NodeList<?> in es3 externs are correspondingly
-          // IArguments and NodeList interfaces (not-parametrized) in lib.d.ts.
-        case "Arguments":
-          emit("IArguments");
-          return null;
-        case "NodeList":
-          emit("NodeList");
-          return null;
-        case "MessageEvent":
-          emit("MessageEvent");
-          return null;
-        default:
-          break;
+      final String displayName = type.getDisplayName();
+      if (PlatformSymbols.NOT_TEMPLATIZED_IN_TYPESCRIPT.contains(displayName)) {
+        emit(PlatformSymbols.CLOSURE_TO_TYPESCRIPT.getOrDefault(displayName, displayName));
+        return null;
       }
 
-      String maybeGlobalName = maybeRenameGlobalType(type.getDisplayName());
+      String maybeGlobalName = maybeRenameGlobalType(displayName);
       templateTypeName = maybeGlobalName == null ? templateTypeName : maybeGlobalName;
 
       if (type.getTemplateTypes().isEmpty()) {
         // In Closure, subtypes of `TemplatizedType`s that do not take type arguments are still
         // represented by templatized types.
         emit(templateTypeName);
-        typesUsed.add(type.getDisplayName());
+        typesUsed.add(displayName);
         return null;
       }
       Iterator<JSType> it = type.getTemplateTypes().iterator();
@@ -2293,7 +2283,7 @@ class DeclarationGenerator {
         return null;
       }
       emit(templateTypeName);
-      typesUsed.add(type.getDisplayName());
+      typesUsed.add(displayName);
       emitGenericTypeArguments(it);
       return null;
     }
