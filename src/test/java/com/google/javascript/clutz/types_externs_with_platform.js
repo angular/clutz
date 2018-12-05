@@ -45,11 +45,17 @@ typesWithExterns.C = function() {
 };
 goog.inherits(typesWithExterns.C, typesWithExterns.A);
 
-/** @type {!Arguments} */
+/** @type {!Arguments<*>} */
 typesWithExterns.b;
 
-/** @type {!NodeList} */
+/** @type {!NodeList<*>} */
 typesWithExterns.c;
+
+/** @type {!MessageEvent<*>} */
+typesWithExterns.d;
+
+/** @type {!NamedNodeMap<*>} */
+typesWithExterns.e;
 
 /** @typedef {IArrayLike} */
 typesWithExterns.ArrayLike;

@@ -32,6 +32,15 @@ public class PlatformSymbols {
           .put("IIterableResult", "IteratorResult")
           .build();
 
+  /** Closure symbols that are templatized in Closure but not in TypeScript. */
+  public static final ImmutableSet<String> NOT_TEMPLATIZED_IN_TYPESCRIPT =
+      new ImmutableSet.Builder<String>()
+          .add("Arguments")
+          .add("NodeList")
+          .add("MessageEvent")
+          .add("NamedNodeMap")
+          .build();
+
   /**
    * List of global platform symbols that are redirected through an alias in closure.lib.d.ts. This
    * allows the following pattern to work:
