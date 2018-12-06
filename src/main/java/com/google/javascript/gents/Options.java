@@ -19,6 +19,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -113,6 +115,12 @@ public class Options {
     final CompilerOptions options = new CompilerOptions();
     options.setClosurePass(true);
 
+    // Turns off common warning messages, when PhaseOptimizer decides to skip some passes due to
+    // unsupported code constructs. They are not very actionable to users and do not matter to
+    // gents.
+    Logger phaseLogger = Logger.getLogger("com.google.javascript.jscomp.PhaseOptimizer");
+    phaseLogger.setLevel(Level.OFF);
+
     options.setCheckGlobalNamesLevel(CheckLevel.ERROR);
     // Report duplicate definitions, e.g. for accidentally duplicated externs.
     options.setWarningLevel(DiagnosticGroups.DUPLICATE_VARS, CheckLevel.ERROR);
@@ -132,6 +140,8 @@ public class Options {
     options.setChecksOnly(true);
     options.setPreserveDetailedSourceInfo(true);
     options.setParseJsDocDocumentation(Config.JsDocParsing.INCLUDE_DESCRIPTIONS_NO_WHITESPACE);
+
+    options.clearConformanceConfigs();
 
     return options;
   }

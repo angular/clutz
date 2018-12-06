@@ -16,6 +16,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -183,6 +185,12 @@ public class Options {
           DependencyOptions.pruneLegacyForEntryPoints(entryPointIdentifiers));
     }
 
+    // Turns off common warning messages, when PhaseOptimizer decides to skip some passes due to
+    // unsupported code constructs. They are not very actionable to users, and do not seem to
+    // affect the quality of produced .d.ts.
+    Logger phaseLogger = Logger.getLogger("com.google.javascript.jscomp.PhaseOptimizer");
+    phaseLogger.setLevel(Level.OFF);
+
     // All diagnostics are WARNINGs (or off) and thus ignored unless debug == true.
     // Only report issues (and fail for them) that are specifically causing problems for Clutz.
     // The idea is to not do a general sanity check of Closure code, just make sure Clutz works.
@@ -206,6 +214,7 @@ public class Options {
     options.setChecksOnly(true);
     options.setPreserveDetailedSourceInfo(true);
     options.setParseJsDocDocumentation(Config.JsDocParsing.INCLUDE_DESCRIPTIONS_NO_WHITESPACE);
+    options.clearConformanceConfigs();
     if (partialInput) {
       options.setAssumeForwardDeclaredForMissingTypes(true);
       options.setWarningLevel(DiagnosticGroups.MISSING_SOURCES_WARNINGS, CheckLevel.OFF);
