@@ -2749,7 +2749,7 @@ class DeclarationGenerator {
       if (isStatic && isFunctionPrototypeProp(propName)) return;
       JSDocInfo jsdoc = objType.getOwnPropertyJSDocInfo(propName);
       maybeEmitJsDoc(jsdoc, /* ignoreParams */ false);
-      boolean isProtected = jsdoc != null && jsdoc.getVisibility() == Visibility.PROTECTED;
+      boolean isProtected = isProtectedProperty(objType, propName);
       emitProperty(
           propName,
           propertyType,
@@ -2758,6 +2758,25 @@ class DeclarationGenerator {
           forcePropDeclaration,
           isNamespace,
           classTemplateTypeNames);
+    }
+
+    /**
+     * Look up the visibility of the overridden property recursively. In Closure, a child class can
+     * override an implicit public property with tighter visibility, but it is not allowed in
+     * TypeScript. So clutz ignores and emits it as a public property.
+     */
+    private boolean isProtectedProperty(ObjectType prototype, final String propName) {
+      Visibility visibility = Visibility.INHERITED;
+      while (prototype != null) {
+        if (prototype.hasOwnProperty(propName)) {
+          final JSDocInfo jsDocInfo = prototype.getOwnPropertyJSDocInfo(propName);
+          if (jsDocInfo != null) {
+            visibility = jsDocInfo.getVisibility();
+          }
+        }
+        prototype = prototype.getImplicitPrototype();
+      }
+      return visibility == Visibility.PROTECTED;
     }
 
     private void emitProperty(
