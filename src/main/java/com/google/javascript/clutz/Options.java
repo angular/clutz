@@ -27,6 +27,7 @@ import org.kohsuke.args4j.OptionDef;
 import org.kohsuke.args4j.spi.OptionHandler;
 import org.kohsuke.args4j.spi.Parameters;
 import org.kohsuke.args4j.spi.Setter;
+import org.kohsuke.args4j.spi.StopOptionHandler;
 
 public class Options {
   /**
@@ -162,7 +163,9 @@ public class Options {
   )
   private CompilerOptions.TracerMode tracerMode = CompilerOptions.TracerMode.OFF;
 
-  @Argument List<String> arguments = new ArrayList<>();
+  @Argument
+  @Option(name = "--", handler = StopOptionHandler.class)
+  List<String> arguments = new ArrayList<>();
 
   Depgraph depgraph;
   // TODO(martinprobst): Remove when internal Google is upgraded to a more recent args4j

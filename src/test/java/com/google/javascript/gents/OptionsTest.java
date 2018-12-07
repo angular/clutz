@@ -47,4 +47,13 @@ public class OptionsTest {
       System.setErr(stdErr);
     }
   }
+
+  @Test
+  public void testStopOption() throws Exception {
+    Options opts =
+        new Options(
+            new String[] {"--externs", "extern1.js", "extern2.js", "--", "foo.js", "bar.js"});
+    assertThat(opts.arguments).containsExactly("foo.js", "bar.js").inOrder();
+    assertThat(opts.externs).containsExactly("extern1.js", "extern2.js").inOrder();
+  }
 }
