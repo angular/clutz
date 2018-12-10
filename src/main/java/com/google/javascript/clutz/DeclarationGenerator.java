@@ -2979,9 +2979,8 @@ class DeclarationGenerator {
       String templateVarName = templateTypeNames.next();
 
       // TODO(lucassloan): goog.Promise has bad types (caused by an inconsistent number of generic
-      // type
-      // params) that are coerced to any, so explicitly emit any and fix when the callers have been
-      // fixed.
+      // type params) that are coerced to any, so explicitly emit any for the return type and
+      // fix when the callers have been fixed.
       String classTemplatizedType =
           className.equals("ಠ_ಠ.clutz.goog.Promise") ? " any" : className + " < RESULT >";
       // The AngularJS promise type should match the TypeScript type declaration since they describe
@@ -3001,9 +3000,7 @@ class DeclarationGenerator {
         } else {
           return "then < RESULT > (opt_onFulfilled ? : ( (a : "
               + templateVarName
-              + " ) => "
-              + classTemplatizedType
-              + " | RESULT ) | null , "
+              + " ) => PromiseLike < RESULT > | RESULT ) | null , "
               + "opt_onRejected ? : ( (a : any ) => any ) | null) : "
               + classTemplatizedType
               + " ;";
