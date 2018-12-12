@@ -229,6 +229,7 @@ public class PlatformSymbols {
           "OES_depth_texture",
           "OES_vertex_array_object",
           "ObjectPropertyDescriptor",
+          "OffscreenCanvas",
           "PerformanceLongTaskTiming",
           "PerformanceObserver",
           "PerformanceObserverCallback",
