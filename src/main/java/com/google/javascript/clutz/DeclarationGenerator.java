@@ -69,6 +69,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -155,6 +156,9 @@ class DeclarationGenerator {
   private static final String MODULE_PREFIX = "module$exports$";
 
   private static final Splitter DOT_SPLITTER = Splitter.on('.');
+
+  private static final ImmutableList<String> PACKAGES_TO_IGNORE =
+      ImmutableList.of("third_party/javascript/polymer/v2");
 
   public static void main(String[] args) {
     Options options = null;
@@ -430,12 +434,16 @@ class DeclarationGenerator {
     TreeSet<String> provides = new TreeSet<>();
     Set<String> rewrittenProvides = new TreeSet<>();
     Set<String> transitiveProvides = new TreeSet<>();
+    Map<String, String> renamedProvides = new HashMap<>();
+    Set<String> providesThatShouldBeEmpty = new HashSet<>();
     out = new StringWriter();
 
     for (CompilerInput compilerInput : compiler.getInputsById().values()) {
       if (shouldSkipSourceFile(compilerInput.getSourceFile())) {
         continue;
       }
+      String originalPath = compilerInput.getSourceFile().getOriginalPath();
+      Optional<String> maybeEsmGoogModuleId = depgraph.getGoogModuleIdForEsModule(originalPath);
       Collection<String> inputProvides = compilerInput.getProvides();
       Collection<String> filteredProvides = new ArrayList<>();
       // It appears closure reports 'module$src$...filepath...' provides
@@ -443,13 +451,31 @@ class DeclarationGenerator {
       // Such files cannot be really imported by typescript, so we do not
       // produce a .d.ts for them.
       for (String p : inputProvides) {
-        if (!p.startsWith("module$src$")) {
-          filteredProvides.add(p);
+        if (p.startsWith("module$src$")) {
+          continue;
         }
+        // For an ES Module with goog.declareModuleId, there is a provide for the file itself,
+        // which has a mangled internal name, and the actual provide that the user would do a
+        // `import 'goog:thatProvide'` for.
+        //
+        // We'll generate the declarations based on the infor for the mangled name, but we want to
+        // give it the name from the goog.declareModuleId call.
+        if (maybeEsmGoogModuleId.isPresent()) {
+          if (p.equals(maybeEsmGoogModuleId.get())) {
+            continue;
+          }
+          renamedProvides.put(p, maybeEsmGoogModuleId.get());
+        }
+
+        filteredProvides.add(p);
       }
       transitiveProvides.addAll(filteredProvides);
-      String originalPath = compilerInput.getSourceFile().getOriginalPath();
       if (depgraph.isRoot(originalPath)) {
+        for (String packageToIgnore : PACKAGES_TO_IGNORE) {
+          if (originalPath.startsWith(packageToIgnore)) {
+            providesThatShouldBeEmpty.addAll(filteredProvides);
+          }
+        }
         provides.addAll(filteredProvides);
         emitComment(
             String.format(
@@ -530,7 +556,9 @@ class DeclarationGenerator {
         namespace = getNamespace(symbol.getName());
       }
       declareNamespace(namespace, symbol, emitName, isDefault, transitiveProvides, false);
-      declareModule(provide, isDefault, emitName);
+      String emitProvide = renamedProvides.getOrDefault(provide, provide);
+      boolean isEmpty = providesThatShouldBeEmpty.contains(provide);
+      declareModule(emitProvide, isDefault, emitName, /* inParent */ false, /* isEmpty */ isEmpty);
     }
     // In order to typecheck in the presence of third-party externs, emit all extern symbols.
     processExternSymbols();
@@ -1304,6 +1332,11 @@ class DeclarationGenerator {
 
   private void declareModule(
       String name, boolean isDefault, String emitName, boolean inParentNamespace) {
+    declareModule(name, isDefault, emitName, inParentNamespace, false);
+  }
+
+  private void declareModule(
+      String name, boolean isDefault, String emitName, boolean inParentNamespace, boolean isEmpty) {
     if (GOOG_BASE_NAMESPACE.equals(name)) {
       // goog:goog cannot be imported.
       return;
@@ -1313,29 +1346,32 @@ class DeclarationGenerator {
     emitNoSpace("' {");
     indent();
     emitBreak();
-    // Use the proper name as the alias name, so the TypeScript language service
-    // can offer it as an auto-import (auto-imports are offered for the exported
-    // name).
-    String alias = getUnqualifiedName(name);
+    if (!isEmpty) {
+      // Use the proper name as the alias name, so the TypeScript language service
+      // can offer it as an auto-import (auto-imports are offered for the exported
+      // name).
+      String alias = getUnqualifiedName(name);
 
-    // Make sure we don't emit a variable named after a keyword.
-    if (RESERVED_JS_WORDS.contains(alias)) alias += "_";
+      // Make sure we don't emit a variable named after a keyword.
+      if (RESERVED_JS_WORDS.contains(alias)) alias += "_";
 
-    // workaround for https://github.com/Microsoft/TypeScript/issues/4325
-    emit("import " + alias + " = ");
-    emitNoSpace(Constants.INTERNAL_NAMESPACE);
-    emitNoSpace(".");
-    emitNoSpace(inParentNamespace ? getNamespace(emitName) : emitName);
-    emitNoSpace(";");
-    emitBreak();
-    if (isDefault) {
-      emitNoSpace("export default " + alias);
-      if (inParentNamespace) emitNoSpace("." + getUnqualifiedName(name));
+      // workaround for https://github.com/Microsoft/TypeScript/issues/4325
+      emit("import " + alias + " = ");
+      emitNoSpace(Constants.INTERNAL_NAMESPACE);
+      emitNoSpace(".");
+      emitNoSpace(inParentNamespace ? getNamespace(emitName) : emitName);
       emitNoSpace(";");
-    } else {
-      emitNoSpace("export = " + alias + ";");
+      emitBreak();
+      if (isDefault) {
+        emitNoSpace("export default " + alias);
+        if (inParentNamespace) emitNoSpace("." + getUnqualifiedName(name));
+        emitNoSpace(";");
+      } else {
+        emitNoSpace("export = " + alias + ";");
+      }
+      emitBreak();
     }
-    emitBreak();
+
     unindent();
     emit("}");
     emitBreak();
