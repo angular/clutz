@@ -11,9 +11,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -36,6 +39,8 @@ class Depgraph {
    * out of the depgraph, and later passed to ImportBasedMapBuilder to resolve the ambiguity.
    */
   private final Set<String> googProvides = new HashSet<>();
+
+  private final Map<String, String> esModulesToGoogModuleId = new HashMap<>();
 
   private Depgraph() {}
 
@@ -71,6 +76,13 @@ class Depgraph {
 
   Set<String> getGoogProvides() {
     return Collections.unmodifiableSet(googProvides);
+  }
+
+  Optional<String> getGoogModuleIdForEsModule(String fileName) {
+    if (esModulesToGoogModuleId.containsKey(fileName)) {
+      return Optional.of(esModulesToGoogModuleId.get(fileName));
+    }
+    return Optional.empty();
   }
 
   static Depgraph forRoots(Set<String> roots, Set<String> nonroots) {
@@ -132,6 +144,7 @@ class Depgraph {
       List<List<?>> fileProperties = (List<List<?>>) rootDescriptor.get(1);
       boolean isExterns = false;
       boolean isGoogProvide = true;
+      boolean isEsModule = false;
       List<String> provides = new ArrayList<>();
       for (List<?> tuple : fileProperties) {
         String key = (String) tuple.get(0);
@@ -145,6 +158,9 @@ class Depgraph {
           List<List<String>> loadFlags = (List<List<String>>) tuple.get(1);
           if (loadFlags.contains(ImmutableList.of("module", "goog"))) {
             isGoogProvide = false;
+          }
+          if (loadFlags.contains(ImmutableList.of("module", "es6"))) {
+            isEsModule = true;
           }
         }
         if ("provides".equals(key)) {
@@ -167,9 +183,38 @@ class Depgraph {
       } else {
         nonroots.add(fileName);
       }
-      if (isGoogProvide) {
+      if (isEsModule) {
+        if (provides.size() == 1) {
+          esModulesToGoogModuleId.put(fileName, provides.get(0));
+        } else if (provides.size() > 1) {
+          throw new RuntimeException(
+              "Expected an ES Module to have at most one provide (from a goog.declareModuleId). "
+                  + "Instead got: "
+                  + provides);
+        } else {
+          // We don't have any way to import an ES Module from TypeScript that does not use
+          // goog.declareModuleId, so there's nothing for us to do here.
+        }
+      } else if (isGoogProvide) {
         googProvides.addAll(provides);
       }
     }
+  }
+
+  @Override
+  public String toString() {
+    return "<Depgraph \n  roots: "
+        + roots
+        + "\n  nonroots: "
+        + nonroots
+        + "\n  rootExterns: "
+        + rootExterns
+        + "\n  nonrootExterns: "
+        + nonrootExterns
+        + "\n  googProvides: "
+        + googProvides
+        + "\n  esModulesToGoogModuleId: "
+        + esModulesToGoogModuleId
+        + "\n>";
   }
 }
