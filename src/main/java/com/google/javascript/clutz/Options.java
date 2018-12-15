@@ -4,10 +4,12 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.javascript.jscomp.*;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
+import com.google.javascript.jscomp.deps.ModuleLoader.ResolutionMode;
 import com.google.javascript.jscomp.parsing.Config;
 import java.io.File;
 import java.io.IOException;
@@ -201,6 +203,11 @@ public class Options {
     options.setCheckGlobalNamesLevel(CheckLevel.ERROR);
     // Report duplicate definitions, e.g. for accidentally duplicated externs.
     options.setWarningLevel(DiagnosticGroups.DUPLICATE_VARS, CheckLevel.ERROR);
+
+    // Handle modules in the same way the production compiler does by default.
+    // See com/google/javascript/jscomp/FlagBasedOptions.java
+    options.setModuleResolutionMode(ResolutionMode.BROWSER_WITH_TRANSFORMED_PREFIXES);
+    options.setBrowserResolverPrefixReplacements(ImmutableMap.of("google3/", "/"));
 
     // Late Provides are errors by default, but they do not prevent clutz from transpiling.
     options.setWarningLevel(DiagnosticGroups.LATE_PROVIDE, CheckLevel.OFF);
