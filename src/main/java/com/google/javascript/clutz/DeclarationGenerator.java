@@ -2133,6 +2133,11 @@ class DeclarationGenerator {
                 emitNoResolvedTypeAsumingForwardDeclare(type);
                 return null;
               }
+              // Handle "typeof expr" constructions, which translate directly to TypeScript.
+              if (type.hasReferenceName() && type.getReferenceName().startsWith("typeof ")) {
+                emit(type.getReferenceName());
+                return null;
+              }
               visitType(refType);
               return null;
             }
