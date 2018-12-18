@@ -294,6 +294,7 @@ public class PlatformSymbols {
           "StorageInfo",
           "StorageQuota",
           "TaskAttributionTiming",
+          "TexImageSource",
           "TextDecoder",
           "TextEncoder",
           "TextRange",
