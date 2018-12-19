@@ -153,6 +153,7 @@ public class PlatformSymbols {
           "EventSourceInit",
           "ExceptionCode",
           "FetchRequestType",
+          "FullscreenOptions",
           "FontFace",
           "FontFaceDescriptors",
           "FontFaceLoadStatus",
