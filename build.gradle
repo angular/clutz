@@ -9,10 +9,10 @@ plugins {
   id 'application'
 
   // enforces consistent formatting
-  id 'com.github.sherter.google-java-format' version '0.6'
+  id 'com.github.sherter.google-java-format' version '0.8'
 
   // enforces java style
-  id 'net.ltgt.errorprone' version '0.0.11'
+  id 'net.ltgt.errorprone' version '0.6'
 }
 
 eclipse {
@@ -64,7 +64,6 @@ dependencies {
     // Forced, as Closure Compiler depends on the wrong version.
     force = true
   }
-  compile 'com.google.code.gson:gson:2.7'
   // clutz runs against closure head inside google, so default to that, but also test against
   // the latest release for external users
   if (System.getenv().get('CI_MODE') == 'Released') {
@@ -73,9 +72,14 @@ dependencies {
     compile 'com.google.javascript:closure-compiler:1.0-SNAPSHOT'
   }
 
+  compile 'com.google.code.gson:gson:2.7'
   compile 'com.google.code.findbugs:jsr305:3.0.1'
   compile 'com.google.guava:guava:20.0'
   compile 'org.apache.commons:commons-text:1.4'
+
+  // ErrorProne itself, plus its javac integration.
+  errorprone("com.google.errorprone:error_prone_core:2.3.2")
+  errorproneJavac('com.google.errorprone:javac:9+181-r4173-1')
 
   testCompile 'junit:junit:4.11'
   testCompile 'com.google.truth:truth:0.40'
