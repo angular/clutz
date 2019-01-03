@@ -30,7 +30,7 @@ We don't offer a binary distribution, so first you need to build from source:
 
 ```shell
 $ npm install
-$ gradle build installDist
+$ ./gradlew build installDist # or just "gradlew" on Windows
 ...
 BUILD SUCCESSFUL
 ```
