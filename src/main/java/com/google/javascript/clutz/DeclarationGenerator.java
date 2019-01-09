@@ -3272,6 +3272,19 @@ class DeclarationGenerator {
         }
       }
       if (foundNamespaceMembers) emitNamespaceEnd();
+
+      // Recursively repeat the process for inner types of inner types.
+      for (NamedTypePair namedType : innerProps.keySet()) {
+        JSType pType = namedType.type;
+        String qualifiedName = innerNamespace + '.' + namedType.name;
+
+        // This probably could be extended to enums and interfaces, but I rather wait for for some
+        // real world use-cases before supporting what seems like a bad way to organize closure code
+        // layout.
+        if (isClassLike(pType)) {
+          walkInnerSymbols((FunctionType) pType, qualifiedName);
+        }
+      }
     }
 
     private void visitFunctionExpression(String propName, FunctionType ftype) {
