@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 
 /** Code generator for gents to add TypeScript specific code generation. */
 public class GentsCodeGenerator extends CodeGenerator {
+
   private final NodeComments nodeComments;
   private final Map<String, String> externsMap;
 
@@ -32,8 +33,13 @@ public class GentsCodeGenerator extends CodeGenerator {
 
     String comment = nodeComments.getComment(n);
     if (comment != null) {
-      add(comment);
-      add("\n");
+      // CodeGernator.add("\n") doesn't append anything. Fixing the actual bug in Closure Compiler
+      // is difficult. Works around the bug by passing " \n". The extra whitespace is stripped by
+      // Closure and not emitted in the final output of Gents. An exception is when this is the
+      // first line of file Closure doesn't strip the whitespace. TypeScriptGenerator has the
+      // handling logic that removes leading empty lines, including "\n" and " \n".
+      add(" " + comment);
+      add(" \n");
     }
 
     if (maybeOverrideCodeGen(n)) {
@@ -80,7 +86,12 @@ public class GentsCodeGenerator extends CodeGenerator {
             || (n.getParent() != null && isPreviousEmptyAndHasComment(n.getParent()));
 
     if (!hasComment && TOKENS_TO_ADD_NEWLINES_BEFORE.contains(n.getToken())) {
-      add("\n");
+      // CodeGernator.add("\n") doesn't append anything. Fixing the actual bug in Closure Compiler
+      // is difficult. Works around the bug by passing " \n". The extra whitespace is stripped by
+      // Closure and not emitted in the final output of Gents. An exception is when this is the
+      // first line of file Closure doesn't strip the whitespace. TypeScriptGenerator has the
+      // handling logic that removes leading empty lines, including "\n" and " \n".
+      add(" \n");
     }
   }
 

@@ -37,6 +37,7 @@ import org.kohsuke.args4j.CmdLineException;
  * TypeScript.
  */
 public class TypeScriptGenerator {
+
   /** Diagnostic that indicates Gents somehow produced an incorrect AST structure. */
   private static final DiagnosticType GENTS_INTERNAL_ERROR =
       DiagnosticType.error("CLUTZ_INTERNAL_ERROR", "Gents failed: {0}");
@@ -256,7 +257,12 @@ public class TypeScriptGenerator {
   private Integer countBeginningNewlines(CharSequence originalSourceCode) {
     Integer originalCount = 0;
     for (Integer i = 0; i < originalSourceCode.length(); i++) {
-      if (originalSourceCode.charAt(i) == '\n') {
+      // There's a terrible hack in GentsCodeGenerator that it sometimes adds " \n" instead of "\n".
+      // Count and strip that too.
+      if (originalSourceCode.charAt(i) == '\n'
+          || (originalSourceCode.charAt(i) == ' '
+              && i + 1 < originalSourceCode.length()
+              && originalSourceCode.charAt(i + 1) == '\n')) {
         originalCount += 1;
       } else {
         break;
@@ -332,6 +338,7 @@ public class TypeScriptGenerator {
   }
 
   static class GentsResult {
+
     public Map<String, String> sourceFileMap = new LinkedHashMap<>();
     public String moduleRewriteLog = "";
   }
