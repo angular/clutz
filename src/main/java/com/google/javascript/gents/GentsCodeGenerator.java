@@ -32,6 +32,8 @@ public class GentsCodeGenerator extends CodeGenerator {
 
     String comment = nodeComments.getComment(n);
     if (comment != null) {
+      // CodeGernator.add("\n") doesn't append anything. Fixing the actual bug in Closure Compiler
+      // is difficult. Works around the bug by passing " \n".
       add(" " + comment);
       add(" \n");
     }
@@ -80,6 +82,8 @@ public class GentsCodeGenerator extends CodeGenerator {
             || (n.getParent() != null && isPreviousEmptyAndHasComment(n.getParent()));
 
     if (!hasComment && TOKENS_TO_ADD_NEWLINES_BEFORE.contains(n.getToken())) {
+      // CodeGernator.add("\n") doesn't append anything. Fixing the actual bug in Closure Compiler
+      // is difficult. Works around the bug by passing " \n".
       add(" \n");
     }
   }

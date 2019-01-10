@@ -256,7 +256,10 @@ public class TypeScriptGenerator {
   private Integer countBeginningNewlines(CharSequence originalSourceCode) {
     Integer originalCount = 0;
     for (Integer i = 0; i < originalSourceCode.length(); i++) {
-      if (originalSourceCode.charAt(i) == '\n') {
+      // There's a terrible hack in GentsCodeGenerator that it sometimes adds " \n" instead of "\n".
+      // Count and strip that too.
+      if (originalSourceCode.charAt(i) == '\n' || (originalSourceCode.charAt(i) == ' '
+          && i + 1 < originalSourceCode.length() && originalSourceCode.charAt(i + 1) == '\n')) {
         originalCount += 1;
       } else {
         break;

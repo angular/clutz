@@ -1,4 +1,3 @@
-
 /**
  * Some non-trivial comments.
  */

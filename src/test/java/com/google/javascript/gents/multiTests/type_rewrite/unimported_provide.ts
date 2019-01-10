@@ -1,4 +1,3 @@
-
 class foo {}
 
 export const typD = foo;

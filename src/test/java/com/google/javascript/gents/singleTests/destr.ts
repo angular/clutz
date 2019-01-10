@@ -1,4 +1,3 @@
-
 class C {
   private a: number;
   private b: number;

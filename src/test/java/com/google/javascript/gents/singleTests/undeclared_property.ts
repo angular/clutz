@@ -1,4 +1,3 @@
-
 export class Bar {
   undeclaredProperty: any;
 

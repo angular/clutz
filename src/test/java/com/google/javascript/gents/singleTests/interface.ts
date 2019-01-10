@@ -1,4 +1,3 @@
-
 interface Interface {
   bar(a: string): number;
 }

@@ -1,4 +1,3 @@
-
 interface Foo {}
 let foo: Foo = {};
 const x: string = 'fruit';
