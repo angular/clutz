@@ -38,9 +38,7 @@ import org.kohsuke.args4j.CmdLineException;
  */
 public class TypeScriptGenerator {
 
-  /**
-   * Diagnostic that indicates Gents somehow produced an incorrect AST structure.
-   */
+  /** Diagnostic that indicates Gents somehow produced an incorrect AST structure. */
   private static final DiagnosticType GENTS_INTERNAL_ERROR =
       DiagnosticType.error("CLUTZ_INTERNAL_ERROR", "Gents failed: {0}");
 
@@ -49,7 +47,7 @@ public class TypeScriptGenerator {
    * clang-format of the file type (TS).
    */
   private static final String[] CLANG_FORMAT = {
-      "./node_modules/.bin/clang-format", "-assume-filename=a.ts", "-style=Google"
+    "./node_modules/.bin/clang-format", "-assume-filename=a.ts", "-style=Google"
   };
 
   static {
@@ -155,9 +153,7 @@ public class TypeScriptGenerator {
     }
   }
 
-  /**
-   * Returns a map from the basename to the TypeScript code generated for the file.
-   */
+  /** Returns a map from the basename to the TypeScript code generated for the file. */
   public GentsResult generateTypeScript(
       Set<String> filesToConvert, List<SourceFile> srcFiles, List<SourceFile> externs)
       throws AssertionError {
@@ -197,13 +193,13 @@ public class TypeScriptGenerator {
     new TypeConversionPass(compiler, modulePrePass, comments).process(externRoot, srcRoot);
 
     new TypeAnnotationPass(
-        compiler,
-        pathUtil,
-        nameUtil,
-        modulePrePass.getSymbolMap(),
-        modulePass.getTypeRewrite(),
-        comments,
-        opts.externsMap)
+            compiler,
+            pathUtil,
+            nameUtil,
+            modulePrePass.getSymbolMap(),
+            modulePass.getTypeRewrite(),
+            comments,
+            opts.externsMap)
         .process(externRoot, srcRoot);
 
     new StyleFixPass(compiler, comments).process(externRoot, srcRoot);
@@ -263,8 +259,10 @@ public class TypeScriptGenerator {
     for (Integer i = 0; i < originalSourceCode.length(); i++) {
       // There's a terrible hack in GentsCodeGenerator that it sometimes adds " \n" instead of "\n".
       // Count and strip that too.
-      if (originalSourceCode.charAt(i) == '\n' || (originalSourceCode.charAt(i) == ' '
-          && i + 1 < originalSourceCode.length() && originalSourceCode.charAt(i + 1) == '\n')) {
+      if (originalSourceCode.charAt(i) == '\n'
+          || (originalSourceCode.charAt(i) == ' '
+              && i + 1 < originalSourceCode.length()
+              && originalSourceCode.charAt(i + 1) == '\n')) {
         originalCount += 1;
       } else {
         break;
@@ -286,7 +284,7 @@ public class TypeScriptGenerator {
       final InputStream stdout = process.getInputStream();
 
       // Write TypeScript code to stdin of the process
-      try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdin, UTF_8));) {
+      try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdin, UTF_8)); ) {
         writer.write(code);
         writer.close();
       }
@@ -300,7 +298,7 @@ public class TypeScriptGenerator {
           System.err.println(readStream(process.getErrorStream()));
         } catch (
             @SuppressWarnings("unused")
-                IOException ignored) {
+            IOException ignored) {
           // Ignored.
         }
         // TODO(renez): Use .waitFor(n, TimeUnit.SECONDS) and .destroyForcibly() once we moved to
@@ -321,9 +319,7 @@ public class TypeScriptGenerator {
     return byteSource.asCharSource(UTF_8).read();
   }
 
-  /**
-   * Removes the root nodes for all the library files from the source node.
-   */
+  /** Removes the root nodes for all the library files from the source node. */
   private static void stripNonCompiledNodes(Node n, Set<String> filesToCompile) {
     for (Node child : n.children()) {
       if (!filesToCompile.contains(child.getSourceFileName())) {
@@ -332,9 +328,7 @@ public class TypeScriptGenerator {
     }
   }
 
-  /**
-   * Returns a list of source files from a list of file names.
-   */
+  /** Returns a list of source files from a list of file names. */
   private static List<SourceFile> getFiles(Collection<String> fileNames) {
     List<SourceFile> files = new ArrayList<>(fileNames.size());
     for (String fileName : fileNames) {
