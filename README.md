@@ -172,3 +172,4 @@ infer the types of every variable and generate giant type declarations.
 [Github issues](https://github.com/angular/clutz/issues?q=is%3Aopen+is%3Aissue+label%3Agents)
 
 ## Travis Test
+t2
