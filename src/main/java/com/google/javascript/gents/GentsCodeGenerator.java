@@ -36,7 +36,10 @@ public class GentsCodeGenerator extends CodeGenerator {
     String comment = nodeComments.getComment(n);
     if (comment != null) {
       // CodeGernator.add("\n") doesn't append anything. Fixing the actual bug in Closure Compiler
-      // is difficult. Works around the bug by passing " \n".
+      // is difficult. Works around the bug by passing " \n". The extra whitespace is stripped by
+      // Closure and not emitted in the final output of Gents. An exception is when this is the
+      // first line of file Closure doesn't strip the whitespace. TypeScriptGenerator has the
+      // handling logic that removes leading empty lines, including "\n" and " \n".
       add(" " + comment);
       add(" \n");
     }
@@ -88,7 +91,10 @@ public class GentsCodeGenerator extends CodeGenerator {
 
     if (!hasComment && TOKENS_TO_ADD_NEWLINES_BEFORE.contains(n.getToken())) {
       // CodeGernator.add("\n") doesn't append anything. Fixing the actual bug in Closure Compiler
-      // is difficult. Works around the bug by passing " \n".
+      // is difficult. Works around the bug by passing " \n". The extra whitespace is stripped by
+      // Closure and not emitted in the final output of Gents. An exception is when this is the
+      // first line of file Closure doesn't strip the whitespace. TypeScriptGenerator has the
+      // handling logic that removes leading empty lines, including "\n" and " \n".
       add(" \n");
     }
   }
