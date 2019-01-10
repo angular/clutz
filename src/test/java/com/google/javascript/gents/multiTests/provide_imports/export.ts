@@ -1,3 +1,4 @@
+
 export function B() {}
 
 export const x = 4;

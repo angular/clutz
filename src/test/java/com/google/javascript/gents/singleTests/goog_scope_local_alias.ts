@@ -1,3 +1,4 @@
+
 export class Base1 {}
 
 export class Base2 {}

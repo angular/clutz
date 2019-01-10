@@ -1,3 +1,4 @@
+
 // 'Function' type
 let nop: Function = function() {};
 let foo: Function = function(a, b, c) {

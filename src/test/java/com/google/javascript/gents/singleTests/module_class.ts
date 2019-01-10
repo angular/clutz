@@ -1,3 +1,4 @@
+
 export class Klass {
   static x: number = 4;
 

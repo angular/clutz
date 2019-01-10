@@ -1,3 +1,4 @@
+
 export class A {}
 
 // This test is testing the case where the exported class is also repeated in

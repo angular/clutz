@@ -1,3 +1,4 @@
+
 export class MyClass {
   /** @export type property*/
   type: InnerTypedefWithAssignment;

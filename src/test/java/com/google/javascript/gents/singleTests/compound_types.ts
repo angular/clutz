@@ -1,3 +1,4 @@
+
 // Non-nullable types
 // We ignore the non-nullability as we transpile to TS with --strictNullChecks
 let n: number = 5;

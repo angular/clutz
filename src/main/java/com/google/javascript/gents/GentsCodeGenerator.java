@@ -32,8 +32,8 @@ public class GentsCodeGenerator extends CodeGenerator {
 
     String comment = nodeComments.getComment(n);
     if (comment != null) {
-      add(comment);
-      add("\n");
+      add(" " + comment);
+      add(" \n");
     }
 
     if (maybeOverrideCodeGen(n)) {
@@ -80,7 +80,7 @@ public class GentsCodeGenerator extends CodeGenerator {
             || (n.getParent() != null && isPreviousEmptyAndHasComment(n.getParent()));
 
     if (!hasComment && TOKENS_TO_ADD_NEWLINES_BEFORE.contains(n.getToken())) {
-      add("\n");
+      add(" \n");
     }
   }
 

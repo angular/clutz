@@ -1,3 +1,4 @@
+
 export class C {
   static x: any = '';
 

@@ -1,3 +1,4 @@
+
 // Optional Parameters
 let optParams = function(n: number, s?: string, b?: boolean) {};
 

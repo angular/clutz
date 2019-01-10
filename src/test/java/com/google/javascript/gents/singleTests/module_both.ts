@@ -1,3 +1,4 @@
+
 /**
  * Note: As written in .js if num is reassigned by a consumer of the goog.module
  * L and C will still return the original value of '4'.
