@@ -10,8 +10,11 @@ import com.google.javascript.rhino.Token;
 import java.util.Map;
 import javax.annotation.Nullable;
 
-/** Code generator for gents to add TypeScript specific code generation. */
+/**
+ * Code generator for gents to add TypeScript specific code generation.
+ */
 public class GentsCodeGenerator extends CodeGenerator {
+
   private final NodeComments nodeComments;
   private final Map<String, String> externsMap;
 
@@ -73,7 +76,9 @@ public class GentsCodeGenerator extends CodeGenerator {
       ImmutableSet.of(
           Token.CLASS, Token.EXPORT, Token.FUNCTION, Token.INTERFACE, Token.MEMBER_FUNCTION_DEF);
 
-  /** Add newlines to the generated source. */
+  /**
+   * Add newlines to the generated source.
+   */
   private void maybeAddNewline(Node n) {
     boolean hasComment =
         nodeComments.hasComment(n)
