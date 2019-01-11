@@ -30,11 +30,21 @@ import javax.annotation.Nullable;
 class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
 
   /**
+   * A global root for all file access for testing in clutz. Intentionally left empty here, so that
+   * some forks (like google's internal environment) can overwrite it with a non-empty value.
+   */
+  static final String SOURCE_ROOT = "";
+
+  static String resource(String path) {
+    return SOURCE_ROOT + path;
+  }
+
+  /**
    * A stripped down version of Closure's base.js for Clutz tests. In real total clutz runs we
    * always pass the real closure's base.js.
    */
   private static final SourceFile CLUTZ_GOOG_BASE_TOTAL =
-      SourceFile.fromFile("src/test/java/com/google/javascript/clutz/base.js", UTF_8);
+      SourceFile.fromFile(resource("src/test/java/com/google/javascript/clutz/base.js"), UTF_8);
 
   /**
    * A even more stripped down version of Closure's base.js for incremental Clutz tests. In
@@ -42,7 +52,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
    * passed in.
    */
   private static final SourceFile CLUTZ_GOOG_BASE_INCR =
-      SourceFile.fromFile("src/resources/partial_goog_base.js", UTF_8);
+      SourceFile.fromFile(resource("src/resources/partial_goog_base.js"), UTF_8);
 
   public boolean withPlatform = false;
   public boolean partialInput = false;
@@ -159,7 +169,8 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       // Clutz is very permissive in its inputs, thus supporting ES6 code. Closure refuses
       // to compile ES6 unless es6.js extern is passed in. To speed up test exectution we
       // pass a thin shim instead of the real es6.js extern.
-      externFiles = Lists.newArrayList(SourceFile.fromFile("src/resources/es6_min.js", UTF_8));
+      externFiles =
+          Lists.newArrayList(SourceFile.fromFile(resource("src/resources/es6_min.js"), UTF_8));
     }
 
     if (depgraph != null) {
