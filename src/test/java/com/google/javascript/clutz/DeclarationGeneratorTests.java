@@ -146,7 +146,8 @@ public class DeclarationGeneratorTests {
   }
 
   private static Path getPackagePath() {
-    Path testDir = FileSystems.getDefault().getPath("src", "test", "java");
+    Path root = FileSystems.getDefault().getPath(ProgramSubject.SOURCE_ROOT);
+    Path testDir = root.resolve("src").resolve("test").resolve("java");
     String packageName = DeclarationGeneratorTests.class.getPackage().getName();
     return testDir.resolve(packageName.replace('.', File.separatorChar));
   }
