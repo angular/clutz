@@ -438,12 +438,15 @@ class DeclarationGenerator {
       }
       Collection<String> inputProvides = compilerInput.getProvides();
       Collection<String> filteredProvides = new ArrayList<>();
-      // It appears closure reports 'module$src$...filepath...' provides
+      // It appears closure reports 'module$...filepath...' provides
       // for files that have no goog.provide or goog.module.
       // Such files cannot be really imported by typescript, so we do not
       // produce a .d.ts for them.
+      // Note: It appears that in the github test environment these provides start with
+      // `module$src$<filepath>`, while internally they miss the "src" and it is just
+      // `module$<filepath>.
       for (String p : inputProvides) {
-        if (!p.startsWith("module$src$")) {
+        if (!p.startsWith("module$")) {
           filteredProvides.add(p);
         }
       }
@@ -944,6 +947,8 @@ class DeclarationGenerator {
 
     // Don't emit externs for Closure types that nobody uses.
     if (PlatformSymbols.CLOSURE_EXTERNS_NOT_USED_IN_TYPESCRIPT.contains(symbolName)) return true;
+    if (PlatformSymbols.ADDITIONAL_CLOSURE_EXTERNS_NOT_USED_IN_TYPESCRIPT.contains(symbolName))
+      return true;
     // Don't emit externs for Closure types that have TypeScript equivalents.
     if (PlatformSymbols.CLOSURE_TO_TYPESCRIPT.containsKey(symbolName)) return true;
     // Don't emit externs for Closure types that exist in TypeScript already.

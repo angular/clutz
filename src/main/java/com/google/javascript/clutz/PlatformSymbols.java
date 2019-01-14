@@ -1772,4 +1772,11 @@ public class PlatformSymbols {
           "webkitRTCPeerConnection",
           "webkitRequestAnimationFrame",
           "window");
+
+  /**
+   * Intentionally empty, this list exists, so that one can add symbols to it in forks for other
+   * environments - like the google internal environment.
+   */
+  public static final ImmutableSet<String> ADDITIONAL_CLOSURE_EXTERNS_NOT_USED_IN_TYPESCRIPT =
+      ImmutableSet.of();
 }

@@ -119,7 +119,8 @@ public class MultiFileTest {
   }
 
   private File input(String filename) {
-    Path testDir = FileSystems.getDefault().getPath("src", "test", "java");
+    Path root = FileSystems.getDefault().getPath(ProgramSubject.SOURCE_ROOT);
+    Path testDir = root.resolve("src").resolve("test").resolve("java");
     String packageName = ProgramSubject.class.getPackage().getName();
     Path myPackage = testDir.resolve(packageName.replace('.', File.separatorChar));
     return myPackage.resolve(name.getMethodName()).resolve(filename).toAbsolutePath().toFile();
