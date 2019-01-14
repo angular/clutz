@@ -3296,6 +3296,7 @@ class DeclarationGenerator {
       for (NamedTypePair namedType : innerProps.keySet()) {
         JSType pType = namedType.type;
         String qualifiedName = innerNamespace + '.' + namedType.name;
+        if (provides.contains(qualifiedName)) continue;
 
         // This probably could be extended to enums and interfaces, but I rather wait for for some
         // real world use-cases before supporting what seems like a bad way to organize closure
