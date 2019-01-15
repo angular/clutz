@@ -11,11 +11,14 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.List;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * A test that uses {@code tsc} to compile the generated {@code .ts} files as a sanity check to make
  * sure that we actually output valid TypeScript.
  */
+@RunWith(JUnit4.class)
 public class GeneratedSyntaxTest {
   /*
    * Ideally we want to generate both idiomatic and valid TypeScript code. But in some cases we
