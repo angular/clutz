@@ -6,8 +6,11 @@ import static org.junit.Assert.fail;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.kohsuke.args4j.CmdLineException;
 
+@RunWith(JUnit4.class)
 public class OptionsTest {
 
   @Test
