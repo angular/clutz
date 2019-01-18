@@ -1,0 +1,59 @@
+# Cache key for CircleCI. We want to invalidate the cache whenever the gradle build
+# configuration changed.
+var_1: &cache_key angular-clutz-{{ checksum "build.gradle" }}
+# Use the CircleCI browsers image that comes with JDK8 and NodeJS installed. We need NodeJS
+# besides Java and Gradle because tests depend on the NPM modules that need to be installed.
+var_2: &default_docker_image circleci/node:10.12-browsers
+
+# Settings common to each job
+var_3: &job_defaults
+  working_directory: ~/clutz
+  docker:
+  - image: *default_docker_image
+
+var_4: &save_cache
+  save_cache:
+    key: *cache_key
+    paths:
+    - "~/.gradle"
+
+var_5: &npm_install
+  run: npm install
+
+jobs:
+  # Job that runs the gradle tests with snapshot builds of Google closure compiler.
+  test_snapshot:
+    <<: *job_defaults
+    environment:
+      CI_MODE: Nightly
+    steps:
+      - checkout
+      - restore_cache:
+          key: *cache_key
+      - *npm_install
+      - run: ./gradlew assemble
+      - run: ./gradlew check
+      - *save_cache
+
+  # Job that runs the gradle tests using a released Google closure compiler version.
+  test_released_optional:
+    <<: *job_defaults
+    environment:
+      CI_MODE: Released
+    steps:
+      - checkout
+      - restore_cache:
+          key: *cache_key
+      - *npm_install
+      # In case Gradle fails for the released version of Google closure compiler, we don't want
+      # to exit the CI job with an error. Manually ensure that this command runs with failures
+      # allowed. Related CircleCI issue: https://ideas.circleci.com/ideas/CCI-I-646
+      - run: ./gradlew assemble || true
+      - run: ./gradlew check || true
+
+workflows:
+  version: 2
+  default_workflow:
+    jobs:
+      - test_snapshot
+      - test_released_optional
