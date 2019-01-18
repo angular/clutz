@@ -191,8 +191,27 @@ class DeclarationGenerator {
   private JSType unknownType;
   private JSType numberType;
   private JSType stringType;
+
+  /**
+   * Iterator is the basic type that describes iteration - .next method. Iterable is the interface
+   * with the one property - [Symbol.iterator]: Iterator.
+   *
+   * <p>Both TS and JS agree up to here. However, they have two different solutions for how to mix
+   * those.
+   *
+   * <p>In TypeScript there is IterableIterator that extends Iterator and has: [Symbol.iterator]:
+   * IterableIterator.
+   *
+   * <p>In Closure there is IterableIterator that simply extends Iterator and Iterable.
+   *
+   * <p>Apart from the name swap - IterableIterator and IterableIterator disagree on the
+   * [Symbol.iterator] type.
+   */
   @Nullable private JSType iterableType;
+
   @Nullable private JSType iteratorIterableType;
+
+  @Nullable private JSType arrayType;
 
   private final Options opts;
   private final InitialParseRetainingCompiler compiler;
@@ -403,8 +422,11 @@ class DeclarationGenerator {
     unknownType = compiler.getTypeRegistry().getNativeType(JSTypeNative.UNKNOWN_TYPE);
     numberType = compiler.getTypeRegistry().getNativeType(JSTypeNative.NUMBER_TYPE);
     stringType = compiler.getTypeRegistry().getNativeType(JSTypeNative.STRING_TYPE);
+
     iterableType = compiler.getTypeRegistry().getGlobalType("Iterable");
     iteratorIterableType = compiler.getTypeRegistry().getGlobalType("IteratorIterable");
+
+    arrayType = compiler.getTypeRegistry().getGlobalType("Array");
     // TODO(rado): replace with null and do not emit file when errors.
     String dts = "";
     // If there is an error top scope is null.
@@ -2654,7 +2676,8 @@ class DeclarationGenerator {
     }
 
     /**
-     * Emits a [Symbol.iterator] property on the class if it extends Iterator.
+     * Emits a [Symbol.iterator] property on the class if it implements the Iterable interface or
+     * IteratorIterable.
      *
      * <p>JSCompiler does not understand nor represent Symbol properties, so we cannot just emit the
      * property in the loop above, and must guess on the actual return type of the iterator method.
@@ -2666,6 +2689,16 @@ class DeclarationGenerator {
       // iteratorIterableType will be null if not found in the current run's externs definitions.
       JSType implemented;
       String returnType;
+
+      // Unfortunately, this method of detecting whether a class implements Iterator, is error-prone
+      // in cases where the extension goes through another extends clause. Consider, C extends D,
+      // and D implements Iterable.
+      // In such cases C doesn't need to emit anything new, because D's emit would have handled that.
+      // Here we detect one such case - D being the always-present Array type and skip unnecessary
+      // custom emit.
+      if (instanceType.isSubtype(arrayType)) {
+        return;
+      }
 
       // It appears that iterableType is always defined. Moreover, in partial mode when extending
       // an unknown base, the isSubtype check always returns true. This is not that surprising,

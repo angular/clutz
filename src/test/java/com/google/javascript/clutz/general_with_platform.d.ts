@@ -334,6 +334,17 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  interface RTCRtpSendParameters {
+    /**
+     * Possible string values are "maintain-framerate", "maintain-resolution", and
+     * "balanced".
+     */
+    degradationPreference ? : string ;
+    encodings : RTCRtpEncodingParameters [] ;
+    transactionId ? : string ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   interface RTCRtpTransceiverInit {
     /**
      * The direction of the `RTCRtpTransceiver`. Defaults to "sendrecv".
