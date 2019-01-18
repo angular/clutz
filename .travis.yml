@@ -4,7 +4,7 @@ language: java
 sudo: false
 cache:
   directories:
-  - $HOME/.gradle
+    - $HOME/.gradle
 jdk:
   - oraclejdk8
 env:
@@ -17,4 +17,3 @@ matrix:
   fast_finish: true
   allow_failures:
     - env: "CI_MODE=Released"
-

@@ -1,6 +1,6 @@
 # Clutz - Closure to TypeScript Declarations (`.d.ts`) generator.
 
-[![Build Status](https://travis-ci.org/angular/clutz.svg?branch=master)](https://travis-ci.org/angular/clutz)
+[![Build Status](https://circleci.com/gh/angular/clutz.svg?style=svg)](https://circleci.com/gh/angular/clutz)
 
 This project uses the
 [Closure Compiler](https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler)
