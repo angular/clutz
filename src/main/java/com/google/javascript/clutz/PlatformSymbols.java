@@ -260,6 +260,7 @@ public class PlatformSymbols {
           "RTCDataChannelInitRecord_",
           "RTCIceServerInterface_",
           "RTCIceServerRecord_",
+          "RTCRtpSendParameters",
           "RTCRtpTransceiver",
           "RTCStatsElement",
           "RTCStatsResponse",
