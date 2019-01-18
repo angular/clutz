@@ -2677,7 +2677,9 @@ class DeclarationGenerator {
       // in the case of unknown base.
       // For unknown reasons instanceType.isInterface() return false, so we turn off the emit for
       // all partial input compilations.
-      if (iteratorIterableType != null && instanceType.isSubtype(iteratorIterableType)) {
+      if (instanceType.isSubtype(typeRegistry.getNativeType(ARRAY_TYPE))) {
+        return;
+      } else if (iteratorIterableType != null && instanceType.isSubtype(iteratorIterableType)) {
         implemented = iteratorIterableType;
         returnType = "IterableIterator";
       } else if (iterableType != null
