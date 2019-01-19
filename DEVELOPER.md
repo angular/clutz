@@ -6,6 +6,7 @@
 - gradle 3.0
 - NodeJS 5 or later, including NPM
 
+test
 ## NPM dependencies
 
 Clutz and Gents use some tools that are installed using npm (`clang-format` and
