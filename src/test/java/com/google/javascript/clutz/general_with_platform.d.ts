@@ -317,7 +317,7 @@ declare namespace ಠ_ಠ.clutz {
 declare namespace ಠ_ಠ.clutz {
   class AbortController {
     private noStructuralTyping_AbortController : any;
-    abort ( ) : any ;
+    abort ( ) : void ;
     signal : AbortSignal ;
   }
 }
