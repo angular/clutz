@@ -363,3 +363,43 @@ declare namespace ಠ_ಠ.clutz.window {
    */
   type RTCRtpTransceiverDirection = string ;
 }
+declare namespace ಠ_ಠ.clutz {
+  class TrustedHTML {
+    private noStructuralTyping_TrustedHTML : any;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class TrustedScript {
+    private noStructuralTyping_TrustedScript : any;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class TrustedScriptURL {
+    private noStructuralTyping_TrustedScriptURL : any;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class TrustedTypePolicy {
+    private noStructuralTyping_TrustedTypePolicy : any;
+    createHTML (s : string ) : TrustedHTML ;
+    createScript (s : string ) : TrustedScript ;
+    createScriptURL (s : string ) : TrustedScriptURL ;
+    createURL (s : string ) : TrustedURL ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class TrustedTypePolicyFactory {
+    private noStructuralTyping_TrustedTypePolicyFactory : any;
+    createPolicy (name : string , policy : { createHTML : (a : string ) => string , createScript : (a : string ) => string , createScriptURL : (a : string ) => string , createURL : (a : string ) => string } , opt_expose ? : boolean ) : TrustedTypePolicy ;
+    getExposedPolicy (name : string ) : TrustedTypePolicy ;
+    getPolicyNames ( ) : string [] ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  let TrustedTypes : TrustedTypePolicyFactory ;
+}
+declare namespace ಠ_ಠ.clutz {
+  class TrustedURL {
+    private noStructuralTyping_TrustedURL : any;
+  }
+}
