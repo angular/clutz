@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -124,6 +125,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
       opts.partialInput = true;
     }
     opts.collidingProvides = ImmutableSet.of("colliding_provide.aliased");
+    opts.browserResolverStrippedPrefixes = Arrays.asList("abs_strip_for_testing");
 
     List<SourceFile> sourceFiles = new ArrayList<>();
 

@@ -4,10 +4,12 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.javascript.jscomp.*;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
+import com.google.javascript.jscomp.deps.ModuleLoader;
 import com.google.javascript.jscomp.parsing.Config;
 import java.io.File;
 import java.io.IOException;
@@ -163,6 +165,13 @@ public class Options {
   )
   private CompilerOptions.TracerMode tracerMode = CompilerOptions.TracerMode.OFF;
 
+  @Option(
+    name = "--browserResolverStrippedPrefixes",
+    usage = "A list of prefixes for absolute ES6 module paths, that would be replaced by '/'",
+    handler = StringArrayOptionHandler.class
+  )
+  List<String> browserResolverStrippedPrefixes = new ArrayList<>();
+
   @Argument
   @Option(name = "--", handler = StopOptionHandler.class)
   List<String> arguments = new ArrayList<>();
@@ -208,6 +217,14 @@ public class Options {
     // Always parse and analyze the latest language features closure supports.
     options.setLanguage(LanguageMode.ECMASCRIPT_NEXT);
     options.setLanguageOut(LanguageMode.ECMASCRIPT5);
+
+    options.setModuleResolutionMode(ModuleLoader.ResolutionMode.BROWSER_WITH_TRANSFORMED_PREFIXES);
+    ImmutableMap.Builder builder = ImmutableMap.builder();
+    for (String str : browserResolverStrippedPrefixes) {
+      builder.put(str, "/");
+    }
+    options.setBrowserResolverPrefixReplacements(builder.build());
+
     if (closureEnv != null) {
       options.setEnvironment(closureEnv);
     }
