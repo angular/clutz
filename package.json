@@ -6,6 +6,6 @@
   "description": "Clutz is not on npm, and technically not a node package. \n This is needed only for testing Clutz's output against the TypeScript compiler, and to install some development dependencies from npm.",
   "devDependencies": {
     "clang-format": "^1.2.3",
-    "typescript": "^3.0.3"
+    "typescript": "^3.3.1"
   }
 }
