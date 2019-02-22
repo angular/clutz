@@ -314,6 +314,9 @@ declare namespace ಠ_ಠ.clutz {
     write ? : (a : any , b : WritableStreamDefaultController ) => PromiseLike < any > | undefined ;
   }
 }
+declare namespace ಠ_ಠ.clutz.window {
+  type URLSearchParamsTupleType = string [] | null ;
+}
 declare namespace ಠ_ಠ.clutz {
   class AbortController {
     private noStructuralTyping_AbortController : any;
