@@ -1458,6 +1458,8 @@ public class PlatformSymbols {
           "TransitionEventInit",
           "Transport",
           "TreeWalker",
+
+          // https://github.com/WICG/trusted-types
           "TrustedHTML",
           "TrustedScript",
           "TrustedScriptURL",
@@ -1465,6 +1467,7 @@ public class PlatformSymbols {
           "TrustedTypePolicyFactory",
           "TrustedTypes",
           "TrustedURL",
+
           "TypeError",
           "TypeErrorConstructor",
           "TypedPropertyDescriptor",
