@@ -1459,7 +1459,15 @@ public class PlatformSymbols {
           "Transport",
           "TreeWalker",
 
-          // https://github.com/WICG/trusted-types
+          // The Trusted Types browser API is experimental, but there is an implementation in
+          // Chrome. Closure's platform externs will be made to unconditionally depend on Trusted
+          // Types, and similarly all TypeScript compilations will depend on
+          // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/trusted-types/index.d.ts.
+          // In that sense, Trusted Types can be seen by Clutz as a platform API (albeit
+          // experimental). By adding it to this list, we guarantee that the symbols are emitted
+          // without the Clutz prefix and transparently mapped between the hand-written externs and
+          // .d.ts.
+          // For more info see https://github.com/WICG/trusted-types
           "TrustedHTML",
           "TrustedScript",
           "TrustedScriptURL",
