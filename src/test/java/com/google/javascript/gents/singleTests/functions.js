@@ -61,19 +61,17 @@ var retVoid = function() {};
  */
 var retUndef = function() {};
 
-// These tests are disabled, because they are broken by recent Closure change.
-// See https://github.com/angular/clutz/issues/853
 /**
  * @param {number} a
  * @return {number}
  */
-// const arrowWithJsDoc = a => { return a; };
+const arrowWithJsDoc = a => { return a; };
 
 /**
  * @param {number} a
  * @return {number}
  */
-// const arrowWithJsDocAndParens = (a) => { return a; };
+const arrowWithJsDocAndParens = (a) => { return a; };
 
 /**
  * @param {number} a

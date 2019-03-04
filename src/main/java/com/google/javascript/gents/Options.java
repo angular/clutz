@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.parsing.Config;
 import java.io.IOException;
@@ -129,7 +130,8 @@ public class Options {
     options.setWarningLevel(DiagnosticGroups.DUPLICATE_VARS, CheckLevel.ERROR);
 
     options.setLanguage(CompilerOptions.LanguageMode.ECMASCRIPT_NEXT);
-    options.setLanguageOut(CompilerOptions.LanguageMode.NO_TRANSPILE);
+    // For unknown to me reason, NO_TRANSPILE changes how arrow functions are emitted.
+    options.setLanguageOut(LanguageMode.ECMASCRIPT6_TYPED);
 
     // Do not transpile module declarations
     options.setWrapGoogModulesForWhitespaceOnly(false);
