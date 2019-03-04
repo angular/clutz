@@ -31,16 +31,16 @@ let paramUndef = function(u: undefined, v: undefined) {};
 // Void returns
 let retVoid = function(): void {};
 let retUndef = function(): void {};
-
-// These tests are disabled, because they are broken by recent Closure change.
-// See https://github.com/angular/clutz/issues/853
-// const arrowWithJsDoc = a => { return a; };
-
-// const arrowWithJsDocAndParens = (a) => { return a; };
+const arrowWithJsDoc = (a: number): number => {
+  return a;
+};
+const arrowWithJsDocAndParens = (a: number): number => {
+  return a;
+};
 const arrowWithJsDocMultiArg = (a: number, b: number): number => {
   return a;
 };
-const arrowNoJsDoc = a => {
+const arrowNoJsDoc = (a) => {
   return a;
 };
-const implicitReturnArrow = a => a;
+const implicitReturnArrow = (a) => a;
