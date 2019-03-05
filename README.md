@@ -27,7 +27,7 @@ use it with:
 ## Example usage
 
 We don't offer a binary distribution, so first you need to build from source.
-From top level run:
+From the root directory run:
 
 ```shell
 $ npm install
