@@ -43,6 +43,25 @@ class RExtendsUsingEs6 extends IBase {
 
 }
 
+/**
+ * @record
+ */
+class RecordClass {
+    constructor() {
+        /** @type {number} The number of attempts before giving up. */
+        this.attempts;
+        /** @type {boolean} */
+        this.foo;
+    }
+
+    /**
+     * Performs the frobnication according to the given strategy.
+     * @param {!string} strategy
+     * @return {boolean}
+     */
+    frobnicate(strategy) {}
+}
+
 /** @const {number} */
 RExtendsUsingEs6.prototype.c;
 
