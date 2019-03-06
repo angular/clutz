@@ -708,7 +708,7 @@ public final class TypeConversionPass implements CompilerPass {
     nodeComments.moveComment(declaration.exprRoot, memberFunc);
     compiler.reportChangeToEnclosingScope(memberFunc);
   }
-  
+
   Node createMemberVariableDef(ClassMemberDeclaration declaration) {
     Node fieldNode = Node.newString(Token.MEMBER_VARIABLE_DEF, declaration.memberName);
     fieldNode.setJSDocInfo(declaration.jsDoc);
