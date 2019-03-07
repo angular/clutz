@@ -34,7 +34,7 @@ const EnumWithArithmetics = {
     B: 2
 };
 
-/** @enum {string} */
+/** @enum {string} My useful comment */
 const StrEnum = {
   A: 'foo',
   B: 'bar'

@@ -1,13 +1,11 @@
 /**
  * A non-trivial comment.
- * @enum {number}
  */
 export enum NumEnum {
   A,
   B
 }
 
-/** @enum {number} */
 export enum NonConseqNumEnum {
 
   // Comment A
@@ -20,7 +18,6 @@ export enum NonConseqNumEnum {
   E
 }
 
-/** @enum {number} */
 export enum RepeatedNumEnum {
   A,
   B = 0,
@@ -28,13 +25,12 @@ export enum RepeatedNumEnum {
   D = 2
 }
 
-/** @enum {number} */
 export enum EnumWithArithmetics {
   A = 10 * 10 + 2,
   B = 2
 }
 
-/** @enum {string} */
+/** @enum My useful comment */
 export enum StrEnum {
   A = 'foo',
   B = 'bar'

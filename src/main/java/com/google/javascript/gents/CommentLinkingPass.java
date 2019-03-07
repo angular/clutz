@@ -28,26 +28,32 @@ public final class CommentLinkingPass implements CompilerPass {
   private static final String EOL = "([ \t]*\n)?";
 
   /**
-   * These jsdocs delete everything except for the `keep` capture group Some regexes contain an
+   * These jsdocs delete everything except for the `keep` capture group. Some regexes contain an
    * empty capture group for uniform handling.
    */
   private static final Pattern[] JSDOC_REPLACEMENTS = {
+    // The <?keep> capture group is intentionally empty because it's not needed.
     Pattern.compile(
-        BEGIN_JSDOC_LINE + "@(extends|implements|type)[ \t]*(\\{[^@]*\\})[ \t]*(?<keep>)" + EOL,
-        Pattern.DOTALL),
+        BEGIN_JSDOC_LINE + "@(extends|implements|type)[ \t]*(\\{[^@]*\\})[ \t]*(?<keep>)" + EOL),
+    // The <?keep> capture group is intentionally empty because it's not needed.
     Pattern.compile(BEGIN_JSDOC_LINE + "@(constructor|interface|record)[ \t]*(?<keep>)" + EOL),
+    // The <?keep> capture group is intentionally empty because it's not needed.
     Pattern.compile(
         BEGIN_JSDOC_LINE
             + "@(private|protected|public|package|const)[ \t]*(\\{.*\\})?[ \t]*(?<keep>)"
             + EOL),
+    // Removes @enum {number} and @enum {string} without a description.
+    Pattern.compile(BEGIN_JSDOC_LINE + "@enum[ \t]*\\{(string|number)\\}[ \t]*(?<keep>\\*\\/|\n)"),
+    // Removes {number} or {string} type from @enum
+    Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@enum)[ \t]*\\{(string|number)\\}"),
     // Removes @param and @return if there is no description
     Pattern.compile(
-        BEGIN_JSDOC_LINE + "@param[ \t]*(\\{.*\\})[ \t]*[\\w\\$]+[ \t]*(?<keep>\\*\\/|\n)"),
+        BEGIN_JSDOC_LINE + "@param[ \t]*(\\{.*\\})[ \t]*[\\w$]+[ \t]*(?<keep>\\*\\/|\n)"),
     Pattern.compile(BEGIN_JSDOC_LINE + "@returns?[ \t]*(\\{.*\\})[ \t]*(?<keep>\\*\\/|\n)"),
     Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@(param|returns?))[ \t]*(\\{.*\\})"),
     // Remove type annotation from @export
     Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@export)[ \t]*(\\{.*\\})"),
-    // Remove @typedef if there is no description
+    // Remove @typedef if there is no description. <keep> intentionally matches nothing.
     Pattern.compile(BEGIN_JSDOC_LINE + "@typedef[ \t]*(\\{.*\\})(?<keep>)" + EOL, Pattern.DOTALL)
   };
 
