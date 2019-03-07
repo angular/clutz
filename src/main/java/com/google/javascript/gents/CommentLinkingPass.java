@@ -48,7 +48,7 @@ public final class CommentLinkingPass implements CompilerPass {
     Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@enum)[ \t]*\\{(string|number)\\}"),
     // Removes @param and @return if there is no description
     Pattern.compile(
-        BEGIN_JSDOC_LINE + "@param[ \t]*(\\{.*\\})[ \t]*[\\w$]+[ \t]*(?<keep>\\*\\/|\n)"),
+        BEGIN_JSDOC_LINE + "@param[ \t]*(\\{.*\\})[ \t]*[\\w\\$]+[ \t]*(?<keep>\\*\\/|\n)"),
     Pattern.compile(BEGIN_JSDOC_LINE + "@returns?[ \t]*(\\{.*\\})[ \t]*(?<keep>\\*\\/|\n)"),
     Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@(param|returns?))[ \t]*(\\{.*\\})"),
     // Remove type annotation from @export
