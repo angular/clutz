@@ -28,20 +28,10 @@ public final class CommentLinkingPass implements CompilerPass {
   private static final String EOL = "([ \t]*\n)?";
 
   /**
-   * These jsdocs delete everything except for the `keep` capture group. Some regexes contain an
-   * empty capture group for uniform handling.
+   * These RegExes delete everything except for the `block` and `keep` capture groups.
    */
-  private static final Pattern[] JSDOC_REPLACEMENTS = {
-    // The <?keep> capture group is intentionally empty because it's not needed.
-    Pattern.compile(
-        BEGIN_JSDOC_LINE + "@(extends|implements|type)[ \t]*(\\{[^@]*\\})[ \t]*(?<keep>)" + EOL),
-    // The <?keep> capture group is intentionally empty because it's not needed.
-    Pattern.compile(BEGIN_JSDOC_LINE + "@(constructor|interface|record)[ \t]*(?<keep>)" + EOL),
-    // The <?keep> capture group is intentionally empty because it's not needed.
-    Pattern.compile(
-        BEGIN_JSDOC_LINE
-            + "@(private|protected|public|package|const)[ \t]*(\\{.*\\})?[ \t]*(?<keep>)"
-            + EOL),
+  private static final Pattern[] JSDOC_REPLACEMENTS_WITH_KEEP = {
+
     // Removes @enum {number} and @enum {string} without a description.
     Pattern.compile(BEGIN_JSDOC_LINE + "@enum[ \t]*\\{(string|number)\\}[ \t]*(?<keep>\\*\\/|\n)"),
     // Removes {number} or {string} type from @enum
@@ -53,12 +43,27 @@ public final class CommentLinkingPass implements CompilerPass {
     Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@(param|returns?))[ \t]*(\\{.*\\})"),
     // Remove type annotation from @export
     Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@export)[ \t]*(\\{.*\\})"),
-    // Remove @typedef if there is no description. <keep> intentionally matches nothing.
-    Pattern.compile(BEGIN_JSDOC_LINE + "@typedef[ \t]*(\\{.*\\})(?<keep>)" + EOL, Pattern.DOTALL)
+
   };
 
+  /**
+   * These RegExes delete everything that's matched by them.
+   */
+  private static final Pattern[] JSDOC_REPLACEMENTS_NO_KEEP = {
+      Pattern.compile(
+          BEGIN_JSDOC_LINE + "@(extends|implements|type)[ \t]*(\\{[^@]*\\})[ \t]*" + EOL),
+      Pattern.compile(BEGIN_JSDOC_LINE + "@(constructor|interface|record)[ \t]*" + EOL),
+      Pattern.compile(
+          BEGIN_JSDOC_LINE
+              + "@(private|protected|public|package|const)[ \t]*(\\{.*\\})?[ \t]*"
+              + EOL),
+      // Remove @typedef if there is no description.
+      Pattern.compile(BEGIN_JSDOC_LINE + "@typedef[ \t]*(\\{.*\\})" + EOL, Pattern.DOTALL)
+  };
+
+
   private static final Pattern[] COMMENT_REPLACEMENTS = {
-    Pattern.compile("//\\s*goog.scope\\s*(?<keep>)")
+    Pattern.compile("//\\s*goog.scope\\s*")
   };
 
   /**
@@ -182,17 +187,27 @@ public final class CommentLinkingPass implements CompilerPass {
 
     /** Removes unneeded tags and markers from the comment. */
     private String filterCommentContent(Type type, String comment) {
-      Pattern[] replacements = (type == Type.JSDOC) ? JSDOC_REPLACEMENTS : COMMENT_REPLACEMENTS;
-      for (Pattern p : replacements) {
-        Matcher m = p.matcher(comment);
-        if (m.find() && m.group("keep") != null && m.group("keep").trim().length() > 0) {
-          // keep documentation, if any
-          comment = m.replaceAll("${block}${keep}");
-        } else {
-          // nothing to keep, remove the line
-          comment = m.replaceAll("");
+      if (type == Type.JSDOC) {
+        for (Pattern p : JSDOC_REPLACEMENTS_WITH_KEEP) {
+          Matcher m = p.matcher(comment);
+          if (m.find() && m.group("keep") != null && m.group("keep").trim().length() > 0) {
+            // keep documentation, if any
+            comment = m.replaceAll("${block}${keep}");
+          } else {
+            // nothing to keep, remove the line
+            comment = m.replaceAll("");
+          }
+        }
+
+        for (Pattern p: JSDOC_REPLACEMENTS_NO_KEEP) {
+          comment = p.matcher(comment).replaceAll("");
+        }
+      } else {
+        for (Pattern p: COMMENT_REPLACEMENTS) {
+          comment = p.matcher(comment).replaceAll("");
         }
       }
+
       return isWhitespaceOnly(comment) ? "" : comment;
     }
 
