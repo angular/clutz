@@ -30,13 +30,12 @@ export enum EnumWithArithmetics {
   B = 2
 }
 
-/** @enum My useful comment */
+/** My useful comment */
 export enum StrEnum {
   A = 'foo',
   B = 'bar'
 }
 
-/** @enum {{a: number}} */
 export const OtherEnum = {
   A: {a: 0},
   B: {a: 1}
