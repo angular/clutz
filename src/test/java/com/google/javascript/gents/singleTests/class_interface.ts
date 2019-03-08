@@ -1,7 +1,6 @@
 /**
  * Some non-trivial comments.
  */
-//!! Missing field declared in the ctor.
 export interface IBase {
   a: number;
 
