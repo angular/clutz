@@ -73,6 +73,11 @@ class B {
      * }}
      */
     this.twoParams = {param3: "param3", param4: "param4"};
+
+    /**
+     * @private @const {number} My special number.
+     */
+    this.privateConstParam = 3;
   }
 }
 

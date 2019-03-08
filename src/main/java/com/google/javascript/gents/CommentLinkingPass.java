@@ -25,17 +25,13 @@ public final class CommentLinkingPass implements CompilerPass {
   private static final String BEGIN_JSDOC_LINE = "(?<block>[ \t]*\\*[ \t]*)?";
 
   /** Regex fragment to optionally match end-of-line */
-  private static final String EOL = "([ \t]*\n)?";
+  private static final String EOL = "(?<eol>[ \t]*\n)?";
 
   /**
-   * These RegExes delete everything except for the `block` and `keep` capture groups.
+   * These RegExes delete everything except for the `block` (see BEGIN_JSDOC_LINE) and `keep`
+   * capture groups. These RegExes must contain a `keep` group.
    */
   private static final Pattern[] JSDOC_REPLACEMENTS_WITH_KEEP = {
-
-    // Removes @enum {number} and @enum {string} without a description.
-    Pattern.compile(BEGIN_JSDOC_LINE + "@enum[ \t]*\\{(string|number)\\}[ \t]*(?<keep>\\*\\/|\n)"),
-    // Removes {number} or {string} type from @enum
-    Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@enum)[ \t]*\\{(string|number)\\}"),
     // Removes @param and @return if there is no description
     Pattern.compile(
         BEGIN_JSDOC_LINE + "@param[ \t]*(\\{.*\\})[ \t]*[\\w\\$]+[ \t]*(?<keep>\\*\\/|\n)"),
@@ -43,28 +39,24 @@ public final class CommentLinkingPass implements CompilerPass {
     Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@(param|returns?))[ \t]*(\\{.*\\})"),
     // Remove type annotation from @export
     Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@export)[ \t]*(\\{.*\\})"),
-
   };
 
   /**
-   * These RegExes delete everything that's matched by them.
+   * These RegExes delete everything that's matched by them, they must begin with BEGIN_JSDOC_LINE
+   * and finish with EOL.
    */
   private static final Pattern[] JSDOC_REPLACEMENTS_NO_KEEP = {
-      Pattern.compile(
-          BEGIN_JSDOC_LINE + "@(extends|implements|type)[ \t]*(\\{[^@]*\\})[ \t]*" + EOL),
-      Pattern.compile(BEGIN_JSDOC_LINE + "@(constructor|interface|record)[ \t]*" + EOL),
-      Pattern.compile(
-          BEGIN_JSDOC_LINE
-              + "@(private|protected|public|package|const)[ \t]*(\\{.*\\})?[ \t]*"
-              + EOL),
-      // Remove @typedef if there is no description.
-      Pattern.compile(BEGIN_JSDOC_LINE + "@typedef[ \t]*(\\{.*\\})" + EOL, Pattern.DOTALL)
+    Pattern.compile(BEGIN_JSDOC_LINE + "@(extends|implements|type)[ \t]*(\\{[^@]*\\})[ \t]*" + EOL),
+    Pattern.compile(BEGIN_JSDOC_LINE + "@(constructor|interface|record)[ \t]*" + EOL),
+    Pattern.compile(
+        BEGIN_JSDOC_LINE
+            + "@(private|protected|public|package|const|enum)[ \t]*(\\{.*\\})?[ \t]*"
+            + EOL),
+    // Remove @typedef if there is no description.
+    Pattern.compile(BEGIN_JSDOC_LINE + "@typedef[ \t]*(\\{.*\\})" + EOL, Pattern.DOTALL)
   };
 
-
-  private static final Pattern[] COMMENT_REPLACEMENTS = {
-    Pattern.compile("//\\s*goog.scope\\s*")
-  };
+  private static final Pattern[] COMMENT_REPLACEMENTS = {Pattern.compile("//\\s*goog.scope\\s*")};
 
   /**
    * These nodes can expand their children with new EMPTY nodes. We will use that as a placeholder
@@ -199,11 +191,22 @@ public final class CommentLinkingPass implements CompilerPass {
           }
         }
 
-        for (Pattern p: JSDOC_REPLACEMENTS_NO_KEEP) {
-          comment = p.matcher(comment).replaceAll("");
+        for (Pattern p : JSDOC_REPLACEMENTS_NO_KEEP) {
+          Matcher m = p.matcher(comment);
+          boolean hasAMatch = m.find();
+          if (hasAMatch) {
+            if (m.group("eol") != null && m.group("eol").trim().length() == 0) {
+              // if the end of the line was matched, then there's nothing to keep, remove the line
+              comment = m.replaceAll("");
+            } else {
+              // If something is still left on the line after the match was removed, keep
+              // `block` around since it matches the comment * for the beginning of the line.
+              comment = p.matcher(comment).replaceAll("${block}");
+            }
+          }
         }
       } else {
-        for (Pattern p: COMMENT_REPLACEMENTS) {
+        for (Pattern p : COMMENT_REPLACEMENTS) {
           comment = p.matcher(comment).replaceAll("");
         }
       }
