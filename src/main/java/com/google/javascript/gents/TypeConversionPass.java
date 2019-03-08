@@ -157,13 +157,36 @@ public final class TypeConversionPass implements CompilerPass {
               interfaceExtends.addChildToBack(extendedInterface.getRoot());
             }
 
+            // Collect MEMBER_VARIABLE_DEF's and MEMBER_FUNCTION_DEF's and use those as the new interface members.
             Node interfaceMembers = new Node(Token.INTERFACE_MEMBERS);
-            for (Node member : classMembers.detach().children()) {
-              // TODO(rado): handle ctor better. Right now, ctor fields disappear (see class_interface.js test).
-              if (member.isMemberFunctionDef() && member.getFirstChild().isFunction()) {
-                stripFunctionBody(member);
+            for (Node member : classMembers.children()) {
+              if (!member.isMemberFunctionDef()) {
+                continue;
               }
-              interfaceMembers.addChildToBack(member.detach());
+
+              Node functionNode = member.getFirstChild();
+              if (!functionNode.isFunction()) {
+                continue;
+              }
+
+              // MEMBER_VARIABLE_DEF is in the constructor.
+              if (getEnclosingFunctionName(functionNode).equals("constructor")) {
+                Node blockNode = functionNode.getLastChild();
+                if (!blockNode.isBlock()) {
+                  continue;
+                }
+
+                for (Node exprResult : blockNode.children()) {
+                  ClassMemberDeclaration declaration =
+                      ClassMemberDeclaration.newDeclarationOnThis(exprResult);
+                  if (declaration != null && declaration.jsDoc != null) {
+                    interfaceMembers.addChildToBack(createMemberVariableDef(declaration));
+                  }
+                }
+              } else {
+                stripFunctionBody(member);
+                interfaceMembers.addChildToBack(member.detach());
+              }
             }
 
             Node newNode =
@@ -686,18 +709,22 @@ public final class TypeConversionPass implements CompilerPass {
     compiler.reportChangeToEnclosingScope(memberFunc);
   }
 
+  Node createMemberVariableDef(ClassMemberDeclaration declaration) {
+    Node fieldNode = Node.newString(Token.MEMBER_VARIABLE_DEF, declaration.memberName);
+    fieldNode.setJSDocInfo(declaration.jsDoc);
+    fieldNode.setStaticMember(declaration.isStatic);
+    nodeComments.moveComment(declaration.exprRoot, fieldNode);
+    return fieldNode;
+  }
+
   /**
    * Attempts to move a field declaration into a class definition. This generates a new
    * MEMBER_VARIABLE_DEF Node while persisting the old node in the AST.
    */
   void moveFieldsIntoClasses(ClassMemberDeclaration declaration) {
     Node classMembers = declaration.classNode.getLastChild();
-    String fieldName = declaration.memberName;
 
-    Node fieldNode = Node.newString(Token.MEMBER_VARIABLE_DEF, fieldName);
-    fieldNode.setJSDocInfo(declaration.jsDoc);
-    fieldNode.setStaticMember(declaration.isStatic);
-    nodeComments.moveComment(declaration.exprRoot, fieldNode);
+    Node fieldNode = createMemberVariableDef(declaration);
 
     if (declaration.rhs == null) {
       declaration.exprRoot.detach();
