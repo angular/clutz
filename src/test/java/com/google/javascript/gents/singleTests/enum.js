@@ -1,12 +1,20 @@
 goog.module('an.enum');
 
 /**
+ * @enum {number}
+ */
+const NumEnumNoExport = {
+  A: 0,
+  B: 1000
+};
+
+/**
  * A non-trivial comment.
  * @enum {number}
  */
 const NumEnum = {
-  A: 0,
-  B: 1
+  C: 0,
+  D: 1000
 };
 
 /** @enum {number} */

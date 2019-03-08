@@ -760,7 +760,7 @@ public final class ModuleConversionPass implements CompilerPass {
     declarationNode.detach();
 
     Node export = new Node(Token.EXPORT, declarationNode);
-    export.useSourceInfoFromForTree(assignmentNode);
+    export.useSourceInfoFrom(assignmentNode);
 
     nodeComments.moveComment(declarationNode, export);
     parent.addChildBefore(export, next);
