@@ -193,8 +193,7 @@ public final class CommentLinkingPass implements CompilerPass {
 
         for (Pattern p : JSDOC_REPLACEMENTS_NO_KEEP) {
           Matcher m = p.matcher(comment);
-          boolean hasAMatch = m.find();
-          if (hasAMatch) {
+          if (m.find()) {
             if (m.group("eol") != null && m.group("eol").trim().length() == 0) {
               // if the end of the line was matched, then there's nothing to keep, remove the line
               comment = m.replaceAll("");
