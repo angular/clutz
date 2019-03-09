@@ -1,9 +1,13 @@
+enum NumEnumNoExport {
+  A,
+  B = 1000
+}
 /**
  * A non-trivial comment.
  */
 export enum NumEnum {
-  A,
-  B
+  C,
+  D = 1000
 }
 
 export enum NonConseqNumEnum {
