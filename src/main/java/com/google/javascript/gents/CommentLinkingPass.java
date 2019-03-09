@@ -28,8 +28,8 @@ public final class CommentLinkingPass implements CompilerPass {
   private static final String EOL = "(?<eol>[ \t]*\n)?";
 
   /**
-   * These RegExes delete everything except for the `block` (see BEGIN_JSDOC_LINE)
-   * and `keep` capture groups. These RegExes must contain a `keep` group.
+   * These RegExes delete everything except for the `block` (see BEGIN_JSDOC_LINE) and `keep`
+   * capture groups. These RegExes must contain a `keep` group.
    */
   private static final Pattern[] JSDOC_REPLACEMENTS_WITH_KEEP = {
     // Removes @param and @return if there is no description
@@ -46,15 +46,14 @@ public final class CommentLinkingPass implements CompilerPass {
    * and finish with EOL.
    */
   private static final Pattern[] JSDOC_REPLACEMENTS_NO_KEEP = {
-      Pattern.compile(
-          BEGIN_JSDOC_LINE + "@(extends|implements|type)[ \t]*(\\{[^@]*\\})[ \t]*" + EOL),
-      Pattern.compile(BEGIN_JSDOC_LINE + "@(constructor|interface|record)[ \t]*" + EOL),
-      Pattern.compile(
-          BEGIN_JSDOC_LINE
-              + "@(private|protected|public|package|const|enum)[ \t]*(\\{.*\\})?[ \t]*"
-              + EOL),
-      // Remove @typedef if there is no description.
-      Pattern.compile(BEGIN_JSDOC_LINE + "@typedef[ \t]*(\\{.*\\})" + EOL, Pattern.DOTALL)
+    Pattern.compile(BEGIN_JSDOC_LINE + "@(extends|implements|type)[ \t]*(\\{[^@]*\\})[ \t]*" + EOL),
+    Pattern.compile(BEGIN_JSDOC_LINE + "@(constructor|interface|record)[ \t]*" + EOL),
+    Pattern.compile(
+        BEGIN_JSDOC_LINE
+            + "@(private|protected|public|package|const|enum)[ \t]*(\\{.*\\})?[ \t]*"
+            + EOL),
+    // Remove @typedef if there is no description.
+    Pattern.compile(BEGIN_JSDOC_LINE + "@typedef[ \t]*(\\{.*\\})" + EOL, Pattern.DOTALL)
   };
 
   private static final Pattern[] COMMENT_REPLACEMENTS = {Pattern.compile("//\\s*goog.scope\\s*")};
