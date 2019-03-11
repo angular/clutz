@@ -41,6 +41,11 @@ class B {
   multipleLines: {param2: string|undefined} = {param2: 'param2'};
   twoParams: {param3: string|undefined,
               param4: string|undefined} = {param3: 'param3', param4: 'param4'};
+
+  /**
+   * My special number.
+   */
+  private privateConstParam: number = 3;
 }
 
 /** @export */

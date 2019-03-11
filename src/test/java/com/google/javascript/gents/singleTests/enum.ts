@@ -4,14 +4,12 @@ enum NumEnumNoExport {
 }
 /**
  * A non-trivial comment.
- * @enum {number}
  */
 export enum NumEnum {
   C,
   D = 1000
 }
 
-/** @enum {number} */
 export enum NonConseqNumEnum {
 
   // Comment A
@@ -24,7 +22,6 @@ export enum NonConseqNumEnum {
   E
 }
 
-/** @enum {number} */
 export enum RepeatedNumEnum {
   A,
   B = 0,
@@ -32,19 +29,17 @@ export enum RepeatedNumEnum {
   D = 2
 }
 
-/** @enum {number} */
 export enum EnumWithArithmetics {
   A = 10 * 10 + 2,
   B = 2
 }
 
-/** @enum {string} */
+/** My useful comment */
 export enum StrEnum {
   A = 'foo',
   B = 'bar'
 }
 
-/** @enum {{a: number}} */
 export const OtherEnum = {
   A: {a: 0},
   B: {a: 1}

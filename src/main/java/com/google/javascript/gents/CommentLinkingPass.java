@@ -25,21 +25,13 @@ public final class CommentLinkingPass implements CompilerPass {
   private static final String BEGIN_JSDOC_LINE = "(?<block>[ \t]*\\*[ \t]*)?";
 
   /** Regex fragment to optionally match end-of-line */
-  private static final String EOL = "([ \t]*\n)?";
+  private static final String EOL = "(?<eol>[ \t]*\n)?";
 
   /**
-   * These jsdocs delete everything except for the `keep` capture group Some regexes contain an
-   * empty capture group for uniform handling.
+   * These RegExes delete everything except for the `block` (see BEGIN_JSDOC_LINE) and `keep`
+   * capture groups. These RegExes must contain a `keep` group.
    */
-  private static final Pattern[] JSDOC_REPLACEMENTS = {
-    Pattern.compile(
-        BEGIN_JSDOC_LINE + "@(extends|implements|type)[ \t]*(\\{[^@]*\\})[ \t]*(?<keep>)" + EOL,
-        Pattern.DOTALL),
-    Pattern.compile(BEGIN_JSDOC_LINE + "@(constructor|interface|record)[ \t]*(?<keep>)" + EOL),
-    Pattern.compile(
-        BEGIN_JSDOC_LINE
-            + "@(private|protected|public|package|const)[ \t]*(\\{.*\\})?[ \t]*(?<keep>)"
-            + EOL),
+  private static final Pattern[] JSDOC_REPLACEMENTS_WITH_KEEP = {
     // Removes @param and @return if there is no description
     Pattern.compile(
         BEGIN_JSDOC_LINE + "@param[ \t]*(\\{.*\\})[ \t]*[\\w\\$]+[ \t]*(?<keep>\\*\\/|\n)"),
@@ -47,13 +39,24 @@ public final class CommentLinkingPass implements CompilerPass {
     Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@(param|returns?))[ \t]*(\\{.*\\})"),
     // Remove type annotation from @export
     Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@export)[ \t]*(\\{.*\\})"),
-    // Remove @typedef if there is no description
-    Pattern.compile(BEGIN_JSDOC_LINE + "@typedef[ \t]*(\\{.*\\})(?<keep>)" + EOL, Pattern.DOTALL)
   };
 
-  private static final Pattern[] COMMENT_REPLACEMENTS = {
-    Pattern.compile("//\\s*goog.scope\\s*(?<keep>)")
+  /**
+   * These RegExes delete everything that's matched by them, they must begin with BEGIN_JSDOC_LINE
+   * and finish with EOL.
+   */
+  private static final Pattern[] JSDOC_REPLACEMENTS_NO_KEEP = {
+    Pattern.compile(BEGIN_JSDOC_LINE + "@(extends|implements|type)[ \t]*(\\{[^@]*\\})[ \t]*" + EOL),
+    Pattern.compile(BEGIN_JSDOC_LINE + "@(constructor|interface|record)[ \t]*" + EOL),
+    Pattern.compile(
+        BEGIN_JSDOC_LINE
+            + "@(private|protected|public|package|const|enum)[ \t]*(\\{.*\\})?[ \t]*"
+            + EOL),
+    // Remove @typedef if there is no description.
+    Pattern.compile(BEGIN_JSDOC_LINE + "@typedef[ \t]*(\\{.*\\})" + EOL, Pattern.DOTALL)
   };
+
+  private static final Pattern[] COMMENT_REPLACEMENTS = {Pattern.compile("//\\s*goog.scope\\s*")};
 
   /**
    * These nodes can expand their children with new EMPTY nodes. We will use that as a placeholder
@@ -176,17 +179,37 @@ public final class CommentLinkingPass implements CompilerPass {
 
     /** Removes unneeded tags and markers from the comment. */
     private String filterCommentContent(Type type, String comment) {
-      Pattern[] replacements = (type == Type.JSDOC) ? JSDOC_REPLACEMENTS : COMMENT_REPLACEMENTS;
-      for (Pattern p : replacements) {
-        Matcher m = p.matcher(comment);
-        if (m.find() && m.group("keep") != null && m.group("keep").trim().length() > 0) {
-          // keep documentation, if any
-          comment = m.replaceAll("${block}${keep}");
-        } else {
-          // nothing to keep, remove the line
-          comment = m.replaceAll("");
+      if (type == Type.JSDOC) {
+        for (Pattern p : JSDOC_REPLACEMENTS_WITH_KEEP) {
+          Matcher m = p.matcher(comment);
+          if (m.find() && m.group("keep") != null && m.group("keep").trim().length() > 0) {
+            // keep documentation, if any
+            comment = m.replaceAll("${block}${keep}");
+          } else {
+            // nothing to keep, remove the line
+            comment = m.replaceAll("");
+          }
+        }
+
+        for (Pattern p : JSDOC_REPLACEMENTS_NO_KEEP) {
+          Matcher m = p.matcher(comment);
+          if (m.find()) {
+            if (m.group("eol") != null && m.group("eol").trim().length() == 0) {
+              // if the end of the line was matched, then there's nothing to keep, remove the line
+              comment = m.replaceAll("");
+            } else {
+              // If something is still left on the line after the match was removed, keep
+              // `block` around since it matches the comment * for the beginning of the line.
+              comment = p.matcher(comment).replaceAll("${block}");
+            }
+          }
+        }
+      } else {
+        for (Pattern p : COMMENT_REPLACEMENTS) {
+          comment = p.matcher(comment).replaceAll("");
         }
       }
+
       return isWhitespaceOnly(comment) ? "" : comment;
     }
 

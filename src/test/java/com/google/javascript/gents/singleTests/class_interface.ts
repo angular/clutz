@@ -18,7 +18,7 @@ export interface RExtendsUsingEs6 extends IBase {
 }
 
 interface RecordClass {
-  /*The number of attempts before giving up. */
+  /** The number of attempts before giving up. */
   attempts: number;
   foo: boolean;
 
