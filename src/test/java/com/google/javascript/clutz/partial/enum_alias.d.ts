@@ -1,6 +1,11 @@
 declare namespace ಠ_ಠ.clutz {
-  type module$exports$enum_alias = ಠ_ಠ.clutz.module$exports$enum_alias ;
-  let module$exports$enum_alias : typeof ಠ_ಠ.clutz.module$exports$enum_alias ;
+  //!! Closure will begin emitting this soon:
+  //!! enum module$exports$enum_alias { }
+  //!!
+  //!! That is incorrect, wait until closure starts emitting it
+  //!! at head and then reenable the test and fix properly.
+  //!! https://github.com/angular/clutz/issues/862
+  let module$exports$enum_alias : any ;
 }
 declare module 'goog:enum_alias' {
   import enum_alias = ಠ_ಠ.clutz.module$exports$enum_alias;
