@@ -337,6 +337,14 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  class BlobEvent extends GlobalEvent {
+    private noStructuralTyping_BlobEvent : any;
+    constructor (type : string , eventInitDict : { data : Blob , timecode ? : number } ) ;
+    data : Blob ;
+    timecode : number ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   interface RTCRtpSendParameters {
     /**
      * Possible string values are "maintain-framerate", "maintain-resolution", and
