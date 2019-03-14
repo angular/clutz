@@ -27,6 +27,7 @@ public class ImportRenameMapBuilder extends ImportBasedMapBuilder {
     Map<String, String> importRenameMap = new HashMap<>();
 
     for (Node statement : moduleBody.children()) {
+      // Here and below goog.require and goog.requireType are treated identically.
       if (isImportAssignment(statement)) {
         // `const C = goog.require()` or
         // `const C = goog.module.get()`
