@@ -28,3 +28,7 @@ export class G {
 export function Z() {}
 
 export function fun() {}
+
+export function W() {}
+
+export function V() {}
