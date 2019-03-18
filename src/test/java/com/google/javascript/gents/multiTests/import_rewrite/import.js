@@ -7,7 +7,7 @@ goog.require("nested.E.F");
 var stuff = goog.require("nested.E.F.Z");
 /** @suppress {extraRequire} My comment */
 goog.require("unused.W");
-/** @suppress  {extraRequire}  */
+/** @suppress {extraRequire}  */
 goog.require("unused.V");
 
 value.B();
