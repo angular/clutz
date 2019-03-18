@@ -1002,6 +1002,7 @@ class DeclarationGenerator {
       boolean isDefault,
       Set<String> provides,
       boolean isExtern) {
+
     if (!isValidJSProperty(getUnqualifiedName(symbol))) {
       emit("// skipping property " + symbol.getName() + " because it is not a valid symbol.");
       emitBreak();
@@ -1017,11 +1018,16 @@ class DeclarationGenerator {
     }
     TreeWalker treeWalker =
         new TreeWalker(compiler.getTypeRegistry(), provides, isExtern, isGoogNamespace);
+
+    // See maybeQueueForInnerWalk comment.
+    Map<String, ObjectType> symbolsToInnerWalk = new TreeMap<>();
+
     if (isDefault) {
       if (isPrivate(symbol.getJSDocInfo()) && !isConstructor(symbol.getJSDocInfo())) {
         treeWalker.emitPrivateValue(emitName);
       } else {
         treeWalker.walk(symbol, emitName);
+        maybeQueueForInnerWalk(isExtern, symbolsToInnerWalk, symbol, emitName);
       }
     } else {
       // JSCompiler treats "foo.x" as one variable name, so collect all provides that start with
@@ -1086,6 +1092,7 @@ class DeclarationGenerator {
           }
           try {
             treeWalker.walk(propertySymbol, propertyName);
+            maybeQueueForInnerWalk(isExtern, symbolsToInnerWalk, propertySymbol, propertyName);
           } catch (RuntimeException e) {
             // Do not throw DeclarationGeneratorException - this is an unexpected runtime error.
             throw new RuntimeException("Failed to emit for " + propertySymbol, e);
@@ -1137,14 +1144,25 @@ class DeclarationGenerator {
     }
     emitNamespaceEnd();
 
-    // extra walk required for inner classes and inner enums. They are allowed in closure,
-    // but not in TS, so we have to generate a namespace-class pair in TS.
-    // In the case of the externs, however we *do* go through all symbols so this pass is not
-    // needed.
-    // In the case of aliased classes, we cannot emit inner classes, due to a var-namespace clash.
-    ObjectType otype = symbol.getType().toMaybeObjectType();
-    if (isDefault && !isExtern && otype != null && !isAliasedClassOrInterface(symbol, otype)) {
-      treeWalker.walkInnerSymbols(otype, symbol.getName());
+    for (Map.Entry<String, ObjectType> entry : symbolsToInnerWalk.entrySet()) {
+      treeWalker.walkInnerSymbols(entry.getValue(), entry.getKey());
+    }
+  }
+
+  /**
+   * Extra walk is required for inner classes and inner enums. They are allowed in closure, but not
+   * in TS, so we have to generate a namespace-class pair in TS. In the case of the externs, however
+   * we *do* go through all symbols so this pass is not needed. In the case of aliased classes, we
+   * cannot emit inner classes, due to a var-namespace clash.
+   */
+  private void maybeQueueForInnerWalk(
+      boolean isExtern,
+      Map<String, ObjectType> symbolsToInnerWalk,
+      TypedVar propertySymbol,
+      String propertyName) {
+    ObjectType oType = propertySymbol.getType().toMaybeObjectType();
+    if (!isExtern && oType != null && !isAliasedClassOrInterface(propertySymbol, oType)) {
+      symbolsToInnerWalk.put(propertyName, oType);
     }
   }
 
