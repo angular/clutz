@@ -5,6 +5,10 @@ var D = goog.require("both.D");
 goog.require("nested.E");
 goog.require("nested.E.F");
 var stuff = goog.require("nested.E.F.Z");
+/** @suppress {extraRequire} My comment */
+goog.require("unused.W");
+/** @suppress {extraRequire}  */
+goog.require("unused.V");
 
 value.B();
 var num = obj.C.x + obj.C.y;

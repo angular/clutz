@@ -52,6 +52,7 @@ public final class CommentLinkingPass implements CompilerPass {
         BEGIN_JSDOC_LINE
             + "@(private|protected|public|package|const|enum)[ \t]*(\\{.*\\})?[ \t]*"
             + EOL),
+    Pattern.compile(BEGIN_JSDOC_LINE + "@suppress[ \t]*\\{extraRequire\\}[ \t]*" + EOL),
     // Remove @typedef if there is no description.
     Pattern.compile(BEGIN_JSDOC_LINE + "@typedef[ \t]*(\\{.*\\})" + EOL, Pattern.DOTALL)
   };

@@ -10,6 +10,8 @@ goog.provide("both.D");
 goog.provide("nested.E");
 goog.provide("nested.E.F");
 goog.provide("nested.E.F.Z");
+goog.provide("unused.W");
+goog.provide("unused.V");
 
 /** test comment about value to ensure that comments are appropriately placed */ 
 value.B = function() {};
@@ -31,3 +33,6 @@ nested.E.F.G.baz = function() {};
 
 nested.E.F.Z = function() {};
 nested.E.F.Z.fun = function() {};
+
+unused.W = function() {};
+unused.V = function() {};
