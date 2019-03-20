@@ -3055,9 +3055,9 @@ class DeclarationGenerator {
           // any>`
           // when the callers have been fixed.
           if (className.equals("ಠ_ಠ.clutz.goog.Promise")) {
-            return "resolve < T >(value: " + className + " < T , any > | T): any;";
+            return "resolve < T >(value: PromiseLike < T > | T): any;";
           } else {
-            return "resolve < T >(value: " + className + " < T > | T): " + className + " < T >;";
+            return "resolve < T >(value: PromiseLike < T > | T): " + className + " < T >;";
           }
         case "race":
           return "race < T > (values : T [] ) : " + className + " < T > ;";

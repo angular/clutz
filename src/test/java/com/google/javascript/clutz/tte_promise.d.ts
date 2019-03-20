@@ -5,7 +5,7 @@ declare namespace ಠ_ಠ.clutz.angular.$q {
     when < RESULT, T > (value: T, successCallback: (promiseValue: T) => ಠ_ಠ.clutz.angular.$q.Promise < RESULT >|RESULT, errorCallback: null | undefined |  ((reason: any) => any), notifyCallback?: (state: any) => any): ಠ_ಠ.clutz.angular.$q.Promise < RESULT >;
     static all(promises : ಠ_ಠ.clutz.angular.$q.Promise < any > [] ) : ಠ_ಠ.clutz.angular.$q.Promise < any [] > ;
     static race < T > (values : T [] ) : ಠ_ಠ.clutz.angular.$q.Promise < T > ;
-    static resolve < T >(value: ಠ_ಠ.clutz.angular.$q.Promise < T > | T): ಠ_ಠ.clutz.angular.$q.Promise < T >;
+    static resolve < T >(value: PromiseLike < T > | T): ಠ_ಠ.clutz.angular.$q.Promise < T >;
   }
 }
 declare module 'goog:angular.$q.Promise' {
