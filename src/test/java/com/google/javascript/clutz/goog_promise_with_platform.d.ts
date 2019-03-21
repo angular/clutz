@@ -5,7 +5,7 @@ declare namespace ಠ_ಠ.clutz.goog {
     then < RESULT > (opt_onFulfilled ? : ( (a : TYPE ) => PromiseLike < RESULT > | RESULT ) | null , opt_onRejected ? : ( (a : any ) => any ) | null) :  any ;
     static all < TYPE > (promises : any [] ) : ಠ_ಠ.clutz.goog.Promise < TYPE [] , any > ;
     static race < TYPE > (promises : any [] ) : ಠ_ಠ.clutz.goog.Promise < TYPE , any > ;
-    static resolve < T >(value: ಠ_ಠ.clutz.goog.Promise < T , any > | T): any;
+    static resolve < T >(value: PromiseLike < T > | T): any;
   }
 }
 declare module 'goog:goog.Promise' {
