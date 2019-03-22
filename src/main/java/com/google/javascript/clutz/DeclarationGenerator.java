@@ -728,6 +728,11 @@ class DeclarationGenerator {
             || (!transitiveProvides.contains(name) && provides.contains(namespace))) {
           continue;
         }
+        // skip emit for provided inner symbols too as they are covered by the walkInnerSymbols
+        // pass.
+        if (isInnerSymbol(provides, name)) {
+          continue;
+        }
 
         // Skip extern symbols (they have a separate pass) and skip built-ins.
         // Built-ins can be indentified by having null as input file.
@@ -762,6 +767,22 @@ class DeclarationGenerator {
       if (typesUsed.size() == typesUsedCount) break;
       maxTypeUsedDepth--;
     }
+  }
+
+  /**
+   * Returns whether this is an inner symbol of at least one of the given goog.provides.
+   *
+   * @param provides A collection of goog.provide symbols
+   * @param name Fully qualified name of a symbol
+   * @return Whether this is an inner symbol
+   */
+  private boolean isInnerSymbol(Collection<String> provides, String name) {
+    for (String p : provides) {
+      if (name.startsWith(p + '.')) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
