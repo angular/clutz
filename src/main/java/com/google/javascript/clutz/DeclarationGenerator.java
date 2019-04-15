@@ -185,8 +185,9 @@ class DeclarationGenerator {
   static final DiagnosticType CLUTZ_MISSING_TYPES =
       DiagnosticType.error(
           "CLUTZ_MISSING_TYPES",
-          "A dependency does not compile because it is missing some types. This is often caused by "
-              + "the referenced code missing dependencies or by missing externs in your build rule.");
+          "A dependency does not compile because it is missing some types. This is often caused by"
+              + " the referenced code missing dependencies or by missing externs in your build"
+              + " rule.");
 
   private JSType unknownType;
   private JSType numberType;
@@ -2418,11 +2419,7 @@ class DeclarationGenerator {
           emit("'" + propName + "'");
         }
         UnionType unionType = propType.toMaybeUnionType();
-        if (unionType != null
-            && unionType
-                .getAlternatesWithoutStructuralTyping()
-                .stream()
-                .anyMatch(JSType::isVoidType)) {
+        if (unionType != null && unionType.getAlternates().stream().anyMatch(JSType::isVoidType)) {
           emit("?");
 
           visitTypeDeclaration(propType, false, true);
@@ -2489,15 +2486,15 @@ class DeclarationGenerator {
     }
 
     private void visitUnionType(UnionType ut, boolean inOptionalPosition) {
-      // We intentionally use getAlternatesWithoutStructuralTyping instead of getAlternates because
+      // We intentionally use getAlternates instead of getAlternates because
       // the former unifies some types like Function into supertypes. The rules are murky as usual
-      // but it appears that getAlternatesWithoutStructuralTyping does less collapsing, see
+      // but it appears that getAlternates does less collapsing, see
       // all_optional_type test.
       // This is very far from perfect, because Closure still unifies some type
       // unions.
       // For example, if one writes <code>{a: string|undefined} | {b:string}</code>, at this point
       // we only see <code>{a: string|undefined}</code>.
-      Collection<JSType> alts = ut.getAlternatesWithoutStructuralTyping();
+      Collection<JSType> alts = ut.getAlternates();
 
       // When visiting an optional function argument or optional field (`foo?` syntax),
       // TypeScript will augment the provided type with an union of undefined, i.e. `foo?: T` will
@@ -2876,10 +2873,7 @@ class DeclarationGenerator {
         // emitProperty is used to emit properties on object, as well as namespaces.  The ? optional
         // syntax is only valid for objects.
         if (unionType != null
-            && unionType
-                .getAlternatesWithoutStructuralTyping()
-                .stream()
-                .anyMatch(JSType::isVoidType)
+            && unionType.getAlternates().stream().anyMatch(JSType::isVoidType)
             && !isNamespace) {
           emit("?");
           isOptionalProperty = true;
@@ -2931,12 +2925,11 @@ class DeclarationGenerator {
       }
       JSType arrayMembers = ttypes.get(0).toMaybeTemplatizedType().getTemplateTypes().get(0);
       if (!arrayMembers.isUnionType()
-          || arrayMembers.toMaybeUnionType().getAlternatesWithoutStructuralTyping().size() != 2) {
+          || arrayMembers.toMaybeUnionType().getAlternates().size() != 2) {
         return false;
       }
       emit("(): IterableIterator<[");
-      Iterator<JSType> it =
-          arrayMembers.toMaybeUnionType().getAlternatesWithoutStructuralTyping().iterator();
+      Iterator<JSType> it = arrayMembers.toMaybeUnionType().getAlternates().iterator();
       visitType(it.next());
       emit(",");
       visitType(it.next());
