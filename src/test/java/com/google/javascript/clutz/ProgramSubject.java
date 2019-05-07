@@ -107,7 +107,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
           && expected.equals(expectedClean)) {
         Files.asCharSink(golden, Charsets.UTF_8).write(stripped);
       } else {
-        check().that(stripped).isEqualTo(expected);
+        check("generatedDeclarations()").that(stripped).isEqualTo(expected);
       }
     }
   }

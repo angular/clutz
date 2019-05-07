@@ -32,6 +32,29 @@ declare namespace ಠ_ಠ.clutz.u2f {
   function sign (appId : string , challenge : string , registeredKeys : ಠ_ಠ.clutz.u2f.RegisteredKey [] , callback : (a : ಠ_ಠ.clutz.u2f.Error | ಠ_ಠ.clutz.u2f.SignResponse ) => any , opt_timeoutSeconds ? : number ) : any ;
 }
 declare namespace ಠ_ಠ.clutz {
+  interface NavigatorStorage {
+    storage : StorageManager ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface ShareData {
+    text ? : string ;
+    title ? : string ;
+    url ? : string ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  type StorageEstimate = { quota : number , usage : number } ;
+}
+declare namespace ಠ_ಠ.clutz {
+  class StorageManager {
+    private noStructuralTyping_StorageManager : any;
+    estimate ( ) : Promise < ಠ_ಠ.clutz.StorageEstimate > ;
+    persist ( ) : Promise < boolean > ;
+    persisted ( ) : Promise < boolean > ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   class DirectoryEntry extends Entry {
     private noStructuralTyping_DirectoryEntry : any;
     createReader ( ) : DirectoryReader ;
@@ -41,9 +64,24 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  class DirectoryEntrySync extends EntrySync {
+    private noStructuralTyping_DirectoryEntrySync : any;
+    createReader ( ) : DirectoryReaderSync ;
+    getDirectory (path : string , options ? : GlobalObject | null ) : DirectoryEntrySync ;
+    getFile (path : string , options ? : GlobalObject | null ) : FileEntrySync ;
+    removeRecursively ( ) : void ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   class DirectoryReader {
     private noStructuralTyping_DirectoryReader : any;
     readEntries (successCallback : (a : Entry [] ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class DirectoryReaderSync {
+    private noStructuralTyping_DirectoryReaderSync : any;
+    readEntries ( ) : EntrySync [] ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -63,6 +101,22 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  class EntrySync {
+    private noStructuralTyping_EntrySync : any;
+    copyTo (parent : DirectoryEntrySync , newName ? : string ) : EntrySync ;
+    filesystem : FileSystemSync ;
+    fullPath : string ;
+    getMetadata ( ) : Metadata ;
+    getParent ( ) : DirectoryEntrySync ;
+    isDirectory : boolean ;
+    isFile : boolean ;
+    moveTo (parent : DirectoryEntrySync , newName ? : string ) : EntrySync ;
+    name : string ;
+    remove ( ) : void ;
+    toURL (mimeType ? : string ) : string ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   class FileEntry extends Entry {
     private noStructuralTyping_FileEntry : any;
     createWriter (successCallback : (a : FileWriter ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
@@ -70,8 +124,45 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  class FileEntrySync extends EntrySync {
+    private noStructuralTyping_FileEntrySync : any;
+    createWriter ( ) : FileWriterSync ;
+    file ( ) : File ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   class FileError extends DOMError {
     private noStructuralTyping_FileError : any;
+    ABORT_ERR : number ;
+    ENCODING_ERR : number ;
+    INVALID_MODIFICATION_ERR : number ;
+    INVALID_STATE_ERR : number ;
+    NOT_FOUND_ERR : number ;
+    NOT_READABLE_ERR : number ;
+    NO_MODIFICATION_ALLOWED_ERR : number ;
+    PATH_EXISTS_ERR : number ;
+    QUOTA_EXCEEDED_ERR : number ;
+    SECURITY_ERR : number ;
+    SYNTAX_ERR : number ;
+    TYPE_MISMATCH_ERR : number ;
+    code : number ;
+    static ABORT_ERR : number ;
+    static ENCODING_ERR : number ;
+    static INVALID_MODIFICATION_ERR : number ;
+    static INVALID_STATE_ERR : number ;
+    static NOT_FOUND_ERR : number ;
+    static NOT_READABLE_ERR : number ;
+    static NO_MODIFICATION_ALLOWED_ERR : number ;
+    static PATH_EXISTS_ERR : number ;
+    static QUOTA_EXCEEDED_ERR : number ;
+    static SECURITY_ERR : number ;
+    static SYNTAX_ERR : number ;
+    static TYPE_MISMATCH_ERR : number ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class FileException {
+    private noStructuralTyping_FileException : any;
     ABORT_ERR : number ;
     ENCODING_ERR : number ;
     INVALID_MODIFICATION_ERR : number ;
@@ -130,6 +221,13 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  class FileSystemSync {
+    private noStructuralTyping_FileSystemSync : any;
+    name : string ;
+    root : DirectoryEntrySync ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   class FileWriter extends FileSaver {
     private noStructuralTyping_FileWriter : any;
     length : number ;
@@ -137,6 +235,24 @@ declare namespace ಠ_ಠ.clutz {
     seek (offset : number ) : void ;
     truncate (size : number ) : void ;
     write (blob : Blob ) : void ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class FileWriterSync {
+    private noStructuralTyping_FileWriterSync : any;
+    length : number ;
+    position : number ;
+    seek (offset : number ) : void ;
+    truncate (size : number ) : void ;
+    write (blob : Blob ) : void ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * LocalFileSystemSync interface, implemented by WorkerGlobalScope.
+   */
+  class LocalFileSystemSync {
+    private noStructuralTyping_LocalFileSystemSync : any;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -150,27 +266,10 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  interface NavigatorStorage {
-    storage : StorageManager ;
-  }
+  function requestFileSystemSync (type : number , size : number ) : FileSystemSync ;
 }
 declare namespace ಠ_ಠ.clutz {
-  interface ShareData {
-    text ? : string ;
-    title ? : string ;
-    url ? : string ;
-  }
-}
-declare namespace ಠ_ಠ.clutz {
-  class StorageManager {
-    private noStructuralTyping_StorageManager : any;
-    estimate ( ) : Promise < { quota : number , usage : number } > ;
-    persist ( ) : Promise < boolean > ;
-    persisted ( ) : Promise < boolean > ;
-  }
-}
-declare namespace ಠ_ಠ.clutz.window {
-  type StorageEstimate = { quota : number , usage : number } ;
+  function webkitRequestFileSystemSync (type : number , size : number ) : FileSystemSync ;
 }
 declare namespace ಠ_ಠ.clutz {
   class ByteLengthQueuingStrategy {
@@ -188,6 +287,15 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_CountQueuingStrategy : any;
     constructor (config : { highWaterMark : number } ) ;
     size (chunk : any ) : number ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * A transform stream (https://streams.spec.whatwg.org/#transform-stream).
+   */
+  interface ITransformStream {
+    readable : ReadableStream ;
+    writable : WritableStream ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -314,7 +422,7 @@ declare namespace ಠ_ಠ.clutz {
     write ? : (a : any , b : WritableStreamDefaultController ) => PromiseLike < any > | undefined ;
   }
 }
-declare namespace ಠ_ಠ.clutz.window {
+declare namespace ಠ_ಠ.clutz {
   type URLSearchParamsTupleType = string [] | null ;
 }
 declare namespace ಠ_ಠ.clutz {
@@ -356,6 +464,12 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  /**
+   * Possible values are "sendrecv", "sendonly", "recvonly", and "inactive".
+   */
+  type RTCRtpTransceiverDirection = string ;
+}
+declare namespace ಠ_ಠ.clutz {
   interface RTCRtpTransceiverInit {
     /**
      * The direction of the `RTCRtpTransceiver`. Defaults to "sendrecv".
@@ -367,10 +481,4 @@ declare namespace ಠ_ಠ.clutz {
      */
     streams ? : MediaStream [] | null ;
   }
-}
-declare namespace ಠ_ಠ.clutz.window {
-  /**
-   * Possible values are "sendrecv", "sendonly", "recvonly", and "inactive".
-   */
-  type RTCRtpTransceiverDirection = string ;
 }
