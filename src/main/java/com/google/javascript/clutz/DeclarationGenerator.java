@@ -320,7 +320,9 @@ class DeclarationGenerator {
       JSType realType = compiler.getTypeRegistry().getGlobalType(var.getName());
       if (realType != null
           && shouldEmitTypedefByName(realType)
-          && !typedefs.containsKey(realType)) {
+          && !typedefs.containsKey(realType)
+          && !PlatformSymbols.TYPESCRIPT_LIB_D_TS.contains(var.getName())
+          && !PlatformSymbols.CLOSURE_EXTERNS_NOT_USED_IN_TYPESCRIPT.contains(var.getName())) {
         typedefs.put(realType, var.getName());
       }
     }
