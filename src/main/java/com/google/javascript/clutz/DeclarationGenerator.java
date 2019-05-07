@@ -2867,7 +2867,7 @@ class DeclarationGenerator {
         return;
 
       if (isProtected) emit("protected");
-      // "static abstract" is illegal TypeScript
+      // "static abstract" is illegal TypeScript, drop "abstract"
       if (isStatic) {
         emit("static");
       } else if (isAbstract) {

@@ -10,6 +10,13 @@ class AbstractClass {
    * @abstract
    */
   myAbstractMethod() {}
+
+  /**
+   * @return {string}
+   * @static
+   * @abstract
+   */
+  myStaticAbstractMethod() {}
 }
 
 exports = AbstractClass;

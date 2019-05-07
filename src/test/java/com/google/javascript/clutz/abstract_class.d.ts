@@ -2,6 +2,7 @@ declare namespace ಠ_ಠ.clutz {
   abstract class module$exports$foo$AbstractClass {
     private noStructuralTyping_module$exports$foo$AbstractClass : any;
     protected abstract myAbstractMethod ( ) : string ;
+    abstract myStaticAbstractMethod ( ) : string ;
   }
 }
 declare module 'goog:foo.AbstractClass' {
