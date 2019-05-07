@@ -2488,14 +2488,7 @@ class DeclarationGenerator {
     }
 
     private void visitUnionType(UnionType ut, boolean inOptionalPosition) {
-      // We intentionally use getAlternates instead of getAlternates because
-      // the former unifies some types like Function into supertypes. The rules are murky as usual
-      // but it appears that getAlternates does less collapsing, see
-      // all_optional_type test.
-      // This is very far from perfect, because Closure still unifies some type
-      // unions.
-      // For example, if one writes <code>{a: string|undefined} | {b:string}</code>, at this point
-      // we only see <code>{a: string|undefined}</code>.
+
       Collection<JSType> alts = ut.getAlternates();
 
       // When visiting an optional function argument or optional field (`foo?` syntax),
