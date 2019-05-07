@@ -55,6 +55,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
   private static final SourceFile CLUTZ_GOOG_BASE_INCR =
       SourceFile.fromFile(resource("src/resources/partial_goog_base.js"), UTF_8);
 
+  private final ProgramSubject.Program actual;
   public boolean withPlatform = false;
   public boolean partialInput = false;
   public String extraExternFile = null;
@@ -87,6 +88,7 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
 
   ProgramSubject(FailureMetadata failureMetadata, ProgramSubject.Program subject) {
     super(failureMetadata, subject);
+    this.actual = subject;
   }
 
   void generatesDeclarations(File golden) throws IOException {
@@ -131,10 +133,10 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
 
     // base.js is needed for the type declaration of goog.require for
     // all total tests, except the base.js one itself.
-    if (actual().roots.isEmpty()) {
+    if (actual.roots.isEmpty()) {
       sourceFiles.add(CLUTZ_GOOG_BASE_TOTAL);
     } else {
-      File firstFile = actual().roots.get(0);
+      File firstFile = actual.roots.get(0);
       if (firstFile.getParentFile().getName().equals("partial")) {
         sourceFiles.add(CLUTZ_GOOG_BASE_INCR);
       } else if (!firstFile.getName().equals("base.js")) {
@@ -143,20 +145,20 @@ class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
     }
 
     Set<String> nonroots = new LinkedHashSet<>();
-    for (File nonroot : actual().nonroots) {
+    for (File nonroot : actual.nonroots) {
       sourceFiles.add(SourceFile.fromPath(nonroot.toPath(), UTF_8));
       nonroots.add(nonroot.getPath().replace(System.getProperty("file.separator"), "/"));
     }
 
     Set<String> roots = new LinkedHashSet<>();
 
-    for (File root : actual().roots) {
+    for (File root : actual.roots) {
       sourceFiles.add(SourceFile.fromPath(root.toPath(), UTF_8));
       roots.add(root.getPath().replace(System.getProperty("file.separator"), "/"));
     }
 
-    if (actual().sourceText != null) {
-      sourceFiles.add(SourceFile.fromCode("main.js", actual().sourceText));
+    if (actual.sourceText != null) {
+      sourceFiles.add(SourceFile.fromCode("main.js", actual.sourceText));
       roots.add("main.js");
     }
 
