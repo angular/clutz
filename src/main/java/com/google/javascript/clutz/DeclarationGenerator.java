@@ -1709,6 +1709,9 @@ class DeclarationGenerator {
         emitBreak();
       }
       if (ftype.isConstructor()) {
+        if (ftype.isAbstract()) {
+          emit("abstract");
+        }
         // "proper" class constructor
         emit("class");
       } else if (ftype.isInterface()) {
@@ -2819,11 +2822,14 @@ class DeclarationGenerator {
       JSDocInfo jsdoc = objType.getOwnPropertyJSDocInfo(propName);
       maybeEmitJsDoc(jsdoc, /* ignoreParams */ false);
       boolean isProtected = isProtectedProperty(objType, propName);
+      JSDocInfo jsDocInfo = objType.getOwnPropertyJSDocInfo(propName);
+      boolean isAbstract = jsDocInfo != null && jsDocInfo.isAbstract();
       emitProperty(
           propName,
           propertyType,
           isStatic,
           isProtected,
+          isAbstract,
           forcePropDeclaration,
           isNamespace,
           classTemplateTypeNames);
@@ -2853,6 +2859,7 @@ class DeclarationGenerator {
         JSType propertyType,
         boolean isStatic,
         boolean isProtected,
+        boolean isAbstract,
         boolean forcePropDeclaration,
         boolean isNamespace,
         List<String> classTemplateTypeNames) {
@@ -2860,7 +2867,12 @@ class DeclarationGenerator {
         return;
 
       if (isProtected) emit("protected");
-      if (isStatic) emit("static");
+      // "static abstract" is illegal TypeScript, drop "abstract"
+      if (isStatic) {
+        emit("static");
+      } else if (isAbstract) {
+        emit("abstract");
+      }
       emit(propName);
       if (!propertyType.isFunctionType() || forcePropDeclaration) {
         UnionType unionType = propertyType.toMaybeUnionType();
