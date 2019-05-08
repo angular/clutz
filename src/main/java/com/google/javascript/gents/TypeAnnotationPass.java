@@ -259,6 +259,7 @@ public final class TypeAnnotationPass implements CompilerPass {
       if (parameterType == null) {
         return false;
       }
+      TypeDeclarationNode parameterTypeNode = convertTypeNodeAST(parameterType.getRoot());
       // Parameter is declared using verbose @param syntax before the function definition.
       Node attachTypeExpr = node;
       // Modify the primary AST to represent a function parameter as a
@@ -272,10 +273,14 @@ public final class TypeAnnotationPass implements CompilerPass {
         attachTypeExpr = IR.name(node.getString());
         if (!node.getParent().isDefaultValue()) {
           attachTypeExpr.putBooleanProp(Node.OPT_ES6_TYPED, true);
+        } else if (node.getParent().getChildAtIndex(1).isName()
+            && node.getParent().getChildAtIndex(1).getString().equals("undefined")) {
+          // if default value is "undefined" add undefined to the type
+          parameterTypeNode = flatUnionType(ImmutableList.of(parameterTypeNode, undefinedType()));
         }
         nodeComments.replaceWithComment(node, attachTypeExpr);
       }
-      setTypeExpression(attachTypeExpr, parameterType, false);
+      setTypeExpression(attachTypeExpr, parameterTypeNode);
       return true;
     }
   }
@@ -328,8 +333,13 @@ public final class TypeAnnotationPass implements CompilerPass {
   /** Sets the annotated type expression corresponding to Node {@code n}. */
   private void setTypeExpression(Node n, @Nullable JSTypeExpression type, boolean isReturnType) {
     TypeDeclarationNode node = convert(type, isReturnType);
-    if (node != null) {
-      n.setDeclaredTypeExpression(node);
+    setTypeExpression(n, node);
+  }
+
+  /** Sets the annotated type expression corresponding to Node {@code n}. */
+  private void setTypeExpression(Node n, @Nullable TypeDeclarationNode type) {
+    if (type != null) {
+      n.setDeclaredTypeExpression(type);
       compiler.reportChangeToEnclosingScope(n);
     }
   }

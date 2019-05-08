@@ -15,6 +15,14 @@ function twoParams(b, s) {}
 /** @param {!Array<?>=} list */
 function withDefaultValue(list = []) {}
 
+/**
+ * @param {boolean=} a
+ */
+function undefinedDefault(a = undefined) {}
+
+/** @param {!Array<?>=} list */
+function undefinedDefaultArray(list = undefined) {}
+
 // Function returns
 /**
  * @return {*}
