@@ -20,6 +20,9 @@ function withDefaultValue(list = []) {}
  */
 function undefinedDefault(a = undefined) {}
 
+/** @param {!Array<?>=} list */
+function undefinedDefaultArray(list = undefined) {}
+
 // Function returns
 /**
  * @return {*}

@@ -9,6 +9,8 @@ function withDefaultValue(list: any[] = []) {}
 
 function undefinedDefault(a: boolean|undefined = undefined) {}
 
+function undefinedDefaultArray(list: any[]|undefined = undefined) {}
+
 // Function returns
 let anyReturn = function(): any {
   return 'hello';

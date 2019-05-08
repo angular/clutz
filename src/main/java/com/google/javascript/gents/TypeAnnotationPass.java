@@ -333,10 +333,7 @@ public final class TypeAnnotationPass implements CompilerPass {
   /** Sets the annotated type expression corresponding to Node {@code n}. */
   private void setTypeExpression(Node n, @Nullable JSTypeExpression type, boolean isReturnType) {
     TypeDeclarationNode node = convert(type, isReturnType);
-    if (node != null) {
-      n.setDeclaredTypeExpression(node);
-      compiler.reportChangeToEnclosingScope(n);
-    }
+    setTypeExpression(n, node);
   }
 
   /** Sets the annotated type expression corresponding to Node {@code n}. */
