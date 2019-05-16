@@ -3,6 +3,7 @@ package com.google.javascript.gents;
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.JSError;
@@ -10,10 +11,7 @@ import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.Node;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import javax.annotation.Nullable;
 
 /**
@@ -132,8 +130,13 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
           String maybeExportString = maybeExportNode.getQualifiedName();
           if (maybeExportString != null
               && (maybeExportString.equals("exports")
-                  || maybeExportString.equals(module.namespaceInJS))) {
-            module.hasDefaultExport = true;
+                  || module.jsNamespaces.contains(maybeExportString))) {
+            if (module.isGoogModule) {
+              module.namespaceHasDefaultExport.put(
+                  Iterables.getOnlyElement(module.jsNamespaces), true);
+            } else {
+              module.namespaceHasDefaultExport.put(maybeExportString, true);
+            }
           }
         }
         module.maybeAddExport(maybeExportNode);
@@ -155,7 +158,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
       return;
     }
     FileModule module = new FileModule(file, true);
-    module.namespaceInJS = namespace;
+    module.jsNamespaces.add(namespace);
     module.registerNamespaceToGlobalScope(namespace);
   }
 
@@ -174,8 +177,8 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
       module = fileToModule.get(file);
     } else {
       module = new FileModule(file, false);
-      module.namespaceInJS = namespace;
     }
+    module.jsNamespaces.add(namespace);
     module.registerNamespaceToGlobalScope(namespace);
   }
 
@@ -192,9 +195,9 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     private boolean hasImports = false;
 
     /** namespace of the module in the original closure javascript. */
-    private String namespaceInJS = "";
-    /** true if the module's clutz generated .d.ts will have a default export. */
-    boolean hasDefaultExport = false;
+    private Set<String> jsNamespaces = new HashSet<>();
+    /** true if the namespace's clutz generated .d.ts will have a default export. */
+    Map<String, Boolean> namespaceHasDefaultExport = new HashMap<>();
 
     /**
      * Map from each provided namespace to all exported subproperties. Note that only namespaces
