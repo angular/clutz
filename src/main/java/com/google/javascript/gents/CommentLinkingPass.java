@@ -307,31 +307,7 @@ public final class CommentLinkingPass implements CompilerPass {
         if (parent.isCall()) {
           // We're inside a function call, we have to be careful about which node to attach to, since comments
           // can go before or after an argument.
-          if (n.getNext() == null) {
-            // the last argument in the call, attach the comment here
-            linkCommentBufferToNode(n);
-          } else {
-            int endOfComment = getCurrentComment().location.end.column;
-            int startOfNextNode = n.getNext().getCharno();
-            if (endOfComment < startOfNextNode) {
-              // the comment is between this node and the next node, so check which side of the comment the comma
-              // separating the arguments is on to decide which argument to attach it to.
-              String lineContents =
-                  compiler
-                      .getInput(new InputId(n.getSourceFileName()))
-                      .getSourceFile()
-                      .getLine(line);
-              String interval = lineContents.substring(endOfComment, startOfNextNode);
-              if (interval.contains(",")) {
-                linkCommentBufferToNode(n);
-              } else {
-                linkCommentBufferToNode(n.getNext());
-              }
-            } else {
-              // comment is after this node, keep traversing the node graph
-              return true;
-            }
-          }
+          if (linkFunctionArgs(n, line)) return true;
         } else if (getCurrentComment().location.end.column < n.getCharno()) {
           // comment is before this node, so attach it
           linkCommentBufferToNode(n);
@@ -350,6 +326,32 @@ public final class CommentLinkingPass implements CompilerPass {
         addNextCommentToBuffer();
       }
       return true;
+    }
+
+    private boolean linkFunctionArgs(Node n, int line) {
+      if (n.getNext() == null) {
+        // the last argument in the call, attach the comment here
+        linkCommentBufferToNode(n);
+      } else {
+        int endOfComment = getCurrentComment().location.end.column;
+        int startOfNextNode = n.getNext().getCharno();
+        if (endOfComment < startOfNextNode) {
+          // the comment is between this node and the next node, so check which side of the comment the comma
+          // separating the arguments is on to decide which argument to attach it to.
+          String lineContents =
+              compiler.getInput(new InputId(n.getSourceFileName())).getSourceFile().getLine(line);
+          String interval = lineContents.substring(endOfComment, startOfNextNode);
+          if (interval.contains(",")) {
+            linkCommentBufferToNode(n);
+          } else {
+            linkCommentBufferToNode(n.getNext());
+          }
+        } else {
+          // comment is after this node, keep traversing the node graph
+          return true;
+        }
+      }
+      return false;
     }
 
     @Override
