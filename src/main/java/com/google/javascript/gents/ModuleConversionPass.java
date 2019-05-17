@@ -580,7 +580,8 @@ public final class ModuleConversionPass implements CompilerPass {
         nodeToImport.addChildToBack(Node.newString(Token.STRING_KEY, localName));
       }
       // For non destructuring imports, it is safe to assume there's only one localName
-    } else if (moduleImport.module.hasDefaultExport) {
+    } else if (moduleImport.module.namespaceHasDefaultExport.getOrDefault(
+        moduleImport.requiredNamespace, false)) {
       // If it has a default export then use `import foo from 'goog:bar';`
       nodeToImport = Node.newString(Token.NAME, moduleImport.localNames.get(0));
     } else {
