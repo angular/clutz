@@ -196,7 +196,10 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
 
     /** namespace of the module in the original closure javascript. */
     private Set<String> jsNamespaces = new HashSet<>();
-    /** true if the goog.provide namespace/goog.module module's clutz generated .d.ts will have a default export. */
+    /**
+     * true if the goog.provide namespace/goog.module module's clutz generated .d.ts will have a
+     * default export.
+     */
     Map<String, Boolean> namespaceHasDefaultExport = new HashMap<>();
 
     /**
