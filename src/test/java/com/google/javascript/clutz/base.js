@@ -36,10 +36,58 @@ goog.require = function(name) {};
 goog.inherits = function(childCtor, parentCtor) {};
 
 /**
- * @param {?} val Variable to test.
- * @return {boolean} Whether variable is defined.
+ * @param {?} val
+ * @return {boolean}
+ */
+goog.isArray = function(val) {};
+
+/**
+ * @param {?} val
+ * @return {boolean}
+ */
+goog.isBoolean = function(val) {};
+
+/**
+ * @param {?} val
+ * @return {boolean}
  */
 goog.isDef = function(val) {};
+
+/**
+ * @param {?} val
+ * @return {boolean}
+ */
+goog.isDefAndNotNull = function(val) {};
+
+/**
+ * @param {?} val
+ * @return {boolean}
+ */
+goog.isFunction = function(val) {};
+
+/**
+ * @param {?} val
+ * @return {boolean}
+ */
+goog.isNull = function(val) {};
+
+/**
+ * @param {?} val
+ * @return {boolean}
+ */
+goog.isNumber = function(val) {};
+
+/**
+ * @param {?} val
+ * @return {boolean}
+ */
+goog.isObject = function(val) {};
+
+/**
+ * @param {?} val
+ * @return {boolean}
+ */
+goog.isString = function(val) {};
 
 goog.provide('goog.Uri');
 /** @constructor */

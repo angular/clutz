@@ -2950,6 +2950,47 @@ class DeclarationGenerator {
           && type.toMaybeTemplatizedType().getReferenceName().equals(typeName);
     }
 
+    private boolean handleSpecialTypeAssertionFunctions(String propName) {
+      if (!isGoogNamespace) return false;
+      if (propName.equals("isArray")) {
+        emit("(val : any ) : val is any[] ");
+        return true;
+      }
+      if (propName.equals("isBoolean")) {
+        emit("(val : any ) : val is boolean ");
+        return true;
+      }
+      if (propName.equals("isDef")) {
+        emit("<T> (val : T ) : val is Exclude<T, undefined> ");
+        return true;
+      }
+      if (propName.equals("isDefAndNotNull")) {
+        emit("<T> (val : T ) : val is NonNullable<T> ");
+        return true;
+      }
+      if (propName.equals("isFunction")) {
+        emit("(val : any ) : val is Function ");
+        return true;
+      }
+      if (propName.equals("isNull")) {
+        emit("(val : any ) : val is null ");
+        return true;
+      }
+      if (propName.equals("isNumber")) {
+        emit("(val : any ) : val is number ");
+        return true;
+      }
+      if (propName.equals("isObject")) {
+        emit("(val : any ) : val is Object ");
+        return true;
+      }
+      if (propName.equals("isString")) {
+        emit("(val : any ) : val is string ");
+        return true;
+      }
+      return false;
+    }
+
     /**
      * Closure has an experimental feature - Type Transformation Expression (TTE) - used to type
      * functions like Promise.then and Promise.all. The feature is rarely used and impossible to
@@ -3384,7 +3425,8 @@ class DeclarationGenerator {
     private void visitFunctionExpression(String propName, FunctionType ftype) {
       emit("function");
       emit(propName);
-      visitFunctionDeclaration(ftype, Collections.<String>emptyList());
+      if (!handleSpecialTypeAssertionFunctions(propName))
+        visitFunctionDeclaration(ftype, Collections.<String>emptyList());
       emit(";");
       emitBreak();
     }
