@@ -241,12 +241,9 @@ public final class ModuleConversionPass implements CompilerPass {
     public void visit(NodeTraversal t, Node n, Node parent) {
       if (NodeUtil.isNameDeclaration(n)) {
         Node node = n.getFirstFirstChild();
-        if (node == null) {
-          return;
-        }
 
         // var x = goog.require(...);
-        if (node.isCall() && node.getFirstChild().matchesQualifiedName("goog.require")) {
+        if (isARequireLikeCall(node)) {
           Node callNode = node;
           String requiredNamespace = callNode.getLastChild().getString();
           String localName = n.getFirstChild().getQualifiedName();
@@ -259,9 +256,7 @@ public final class ModuleConversionPass implements CompilerPass {
         }
 
         // var {foo, bar} = goog.require(...);
-        if (node.isObjectPattern()
-            && node.getNext().getFirstChild() != null
-            && node.getNext().getFirstChild().matchesQualifiedName("goog.require")) {
+        if (isADestructuringRequireCall(node)) {
           Node importedNode = node.getFirstChild();
           // For multiple destructuring imports, there are multiple full local names.
           // This does not support renaming imports of the sort
@@ -282,10 +277,7 @@ public final class ModuleConversionPass implements CompilerPass {
       } else if (n.isExprResult()) {
         // goog.require(...);
         Node callNode = n.getFirstChild();
-        if (callNode == null || !callNode.isCall()) {
-          return;
-        }
-        if (callNode.getFirstChild().matchesQualifiedName("goog.require")) {
+        if (isARequireLikeCall(callNode)) {
           String requiredNamespace = callNode.getLastChild().getString();
           // For goog.require(...) imports, the full local name is just the required namespace/module.
           // We use the suffix from the namespace as the local name, i.e. for
@@ -299,6 +291,21 @@ public final class ModuleConversionPass implements CompilerPass {
           return;
         }
       }
+    }
+
+    private boolean isADestructuringRequireCall(Node node) {
+      return node != null
+          && node.isObjectPattern()
+          && node.getNext().getFirstChild() != null
+          && isARequireLikeCall(node.getNext());
+    }
+
+    private boolean isARequireLikeCall(Node node) {
+      return node != null
+          && node.isCall()
+          && (node.getFirstChild().matchesQualifiedName("goog.require")
+              || node.getFirstChild().matchesQualifiedName("goog.requireType")
+              || node.getFirstChild().matchesQualifiedName("goog.forwardDeclare"));
     }
   }
 

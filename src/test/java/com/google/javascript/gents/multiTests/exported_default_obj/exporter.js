@@ -2,4 +2,9 @@ goog.module('default_obj.exporter');
 
 class C {}
 
-exports = {C};
+/**
+ * @interface
+ */
+class I {}
+
+exports = {C, I};
