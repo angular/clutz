@@ -5,6 +5,9 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz.module$exports$foo$C {
+  /**
+   * Test
+   */
   enum Enum {
     A = '' ,
   }
