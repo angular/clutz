@@ -1,3 +1,7 @@
+declare namespace ಠ_ಠ.clutz {
+  interface Transferable {
+  }
+}
 declare namespace ಠ_ಠ.clutz.u2f {
   /**
    * An error object for responses
@@ -32,8 +36,124 @@ declare namespace ಠ_ಠ.clutz.u2f {
   function sign (appId : string , challenge : string , registeredKeys : ಠ_ಠ.clutz.u2f.RegisteredKey [] , callback : (a : ಠ_ಠ.clutz.u2f.Error | ಠ_ಠ.clutz.u2f.SignResponse ) => any , opt_timeoutSeconds ? : number ) : any ;
 }
 declare namespace ಠ_ಠ.clutz {
+  abstract class BaseRenderingContext2D implements CanvasDrawingStyles , CanvasPathMethods {
+    private noStructuralTyping_BaseRenderingContext2D : any;
+    arc (x : number , y : number , radius : number , startAngle : number , endAngle : number , opt_anticlockwise ? : boolean ) : void ;
+    arcTo (x1 : number , y1 : number , x2 : number , y2 : number , radius : number ) : void ;
+    beginPath ( ) : void ;
+    bezierCurveTo (cp1x : number , cp1y : number , cp2x : number , cp2y : number , x : number , y : number ) : void ;
+    canvas : HTMLCanvasElement | OffscreenCanvas ;
+    clearRect (x : number , y : number , w : number , h : number ) : void ;
+    clip (optFillRuleOrPath ? : Path2D | null | string , optFillRule ? : string ) : void ;
+    closePath ( ) : void ;
+    createImageData (sw : number , sh : number ) : ImageData ;
+    createLinearGradient (x0 : number , y0 : number , x1 : number , y1 : number ) : CanvasGradient ;
+    createPattern (image : HTMLImageElement | null | HTMLVideoElement | HTMLCanvasElement | ImageBitmap | OffscreenCanvas , repetition : string ) : CanvasPattern | null ;
+    createRadialGradient (x0 : number , y0 : number , r0 : number , x1 : number , y1 : number , r1 : number ) : CanvasGradient ;
+    drawFocusIfNeeded (element : GlobalElement | null ) : void ;
+    drawImage (image : HTMLImageElement | null | HTMLVideoElement | HTMLCanvasElement | ImageBitmap | OffscreenCanvas , dx : number , dy : number , opt_dw ? : number , opt_dh ? : number , opt_sx ? : number , opt_sy ? : number , opt_sw ? : number , opt_sh ? : number ) : void ;
+    ellipse (x : number , y : number , radiusX : number , radiusY : number , rotation : number , startAngle : number , endAngle : number , opt_anticlockwise ? : boolean ) : void ;
+    fill (optFillRuleOrPath ? : Path2D | null | string , optFillRule ? : string ) : void ;
+    fillColor : string ;
+    fillRect (x : number , y : number , w : number , h : number ) : void ;
+    fillStyle : string | CanvasGradient | CanvasPattern ;
+    fillText (text : string , x : number , y : number , opt_maxWidth ? : number ) : void ;
+    font : string ;
+    getImageData (sx : number , sy : number , sw : number , sh : number ) : ImageData ;
+    getLineDash ( ) : number [] ;
+    globalAlpha : number ;
+    globalCompositeOperation : string ;
+    imageSmoothingEnabled : boolean ;
+    isPointInPath (x : number , y : number , opt_fillRule ? : string ) : boolean ;
+    isPointInStroke (x : number , y : number ) : boolean ;
+    lineCap : string ;
+    lineDashOffset : number ;
+    lineJoin : string ;
+    lineTo (x : number , y : number ) : void ;
+    lineWidth : number ;
+    measureText (text : string ) : TextMetrics ;
+    miterLimit : number ;
+    moveTo (x : number , y : number ) : void ;
+    putImageData (imagedata : ImageData | null , dx : number , dy : number , opt_dirtyX ? : number , opt_dirtyY ? : number , opt_dirtyWidth ? : number , opt_dirtyHeight ? : number ) : void ;
+    quadraticCurveTo (cpx : number , cpy : number , x : number , y : number ) : void ;
+    rect (x : number , y : number , w : number , h : number ) : void ;
+    restore ( ) : void ;
+    rotate (angle : number ) : void ;
+    save ( ) : void ;
+    scale (x : number , y : number ) : void ;
+    /**
+     * Note: WebKit only
+     */
+    setFillColor (opt_a ? : number | string , opt_b ? : number , opt_c ? : number , opt_d ? : number , opt_e ? : number ) : void ;
+    setLineDash (segments : number [] | null ) : void ;
+    /**
+     * Note: WebKit only
+     */
+    setStrokeColor (opt_a ? : number | string , opt_b ? : number , opt_c ? : number , opt_d ? : number , opt_e ? : number ) : void ;
+    setTransform (m11 : number , m12 : number , m21 : number , m22 : number , dx : number , dy : number ) : void ;
+    shadowBlur : number ;
+    shadowColor : string ;
+    shadowOffsetX : number ;
+    shadowOffsetY : number ;
+    stroke (optStroke ? : Path2D | null ) : void ;
+    strokeColor : string ;
+    strokeRect (x : number , y : number , w : number , h : number ) : void ;
+    strokeStyle : string | CanvasGradient | CanvasPattern ;
+    strokeText (text : string , x : number , y : number , opt_maxWidth ? : number ) : void ;
+    textAlign : string ;
+    textBaseline : string ;
+    transform (m11 : number , m12 : number , m21 : number , m22 : number , dx : number , dy : number ) : void ;
+    translate (x : number , y : number ) : void ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface CanvasDrawingStyles {
+    font : string ;
+    getLineDash ( ) : number [] ;
+    lineCap : string ;
+    lineJoin : string ;
+    lineWidth : number ;
+    miterLimit : number ;
+    setLineDash (segments : number [] | null ) : void ;
+    textAlign : string ;
+    textBaseline : string ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface CanvasPathMethods {
+    arc (x : number , y : number , radius : number , startAngle : number , endAngle : number , opt_anticlockwise ? : boolean ) : void ;
+    arcTo (x1 : number , y1 : number , x2 : number , y2 : number , radius : number ) : void ;
+    bezierCurveTo (cp1x : number , cp1y : number , cp2x : number , cp2y : number , x : number , y : number ) : void ;
+    closePath ( ) : void ;
+    lineTo (x : number , y : number ) : void ;
+    moveTo (x : number , y : number ) : void ;
+    quadraticCurveTo (cpx : number , cpy : number , x : number , y : number ) : void ;
+    rect (x : number , y : number , w : number , h : number ) : void ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   interface NavigatorStorage {
     storage : StorageManager ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class OffscreenCanvas implements GlobalEventTarget , Transferable {
+    private noStructuralTyping_OffscreenCanvas : any;
+    constructor (width : number , height : number ) ;
+    addEventListener (type : string , listener : EventListener | null | ( (a : GlobalEvent ) => any ) , opt_options ? : boolean | AddEventListenerOptions ) : void ;
+    convertToBlob (opt_options ? : { quality ? : number , type ? : string } ) : Promise < Blob > ;
+    dispatchEvent (evt : GlobalEvent ) : boolean ;
+    getContext (contextId : string , opt_options ? : GlobalObject ) : GlobalObject ;
+    height : number ;
+    removeEventListener (type : string , listener : EventListener | null | ( (a : GlobalEvent ) => any ) , opt_options ? : boolean | EventListenerOptions ) : void ;
+    transferToImageBitmap ( ) : ImageBitmap ;
+    width : number ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class OffscreenCanvasRenderingContext2D extends BaseRenderingContext2D {
+    private noStructuralTyping_OffscreenCanvasRenderingContext2D : any;
+    canvas : OffscreenCanvas ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
@@ -355,6 +475,11 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  interface ReadableStreamIteratorOptions {
+    preventCancel ? : boolean ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
   interface ReadableStreamSource {
     autoAllocateChunkSize ? : number ;
     cancel ? : (a : any ) => Promise < any > | undefined ;
@@ -388,7 +513,7 @@ declare namespace ಠ_ಠ.clutz {
 declare namespace ಠ_ಠ.clutz {
   class WritableStream {
     private noStructuralTyping_WritableStream : any;
-    constructor (opt_underlyingSink ? : WritableStreamSink , opt_queuingStrategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark : number , size ? : (a : any ) => number } ) ;
+    constructor (opt_underlyingSink ? : WritableStreamSink , opt_queuingStrategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark ? : number , size ? : (a : any ) => number } ) ;
     abort (reason : any ) : Promise < undefined > ;
     getWriter ( ) : WritableStreamDefaultWriter ;
     locked : boolean ;
@@ -480,5 +605,125 @@ declare namespace ಠ_ಠ.clutz {
      * The streams to add to the tranceiver's sender.
      */
     streams ? : MediaStream [] | null ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class Animation implements GlobalEventTarget {
+    private noStructuralTyping_Animation : any;
+    constructor (effect ? : AnimationEffectReadOnly | null , timeline ? : AnimationTimeline | null ) ;
+    addEventListener (type : string , listener : EventListener | null | ( (a : GlobalEvent ) => any ) , options ? : boolean | AddEventListenerOptions ) : void ;
+    cancel ( ) : void ;
+    currentTime : number ;
+    dispatchEvent (evt : GlobalEvent ) : boolean ;
+    effect : AnimationEffectReadOnly | null ;
+    finish ( ) : void ;
+    finished : Promise < undefined > ;
+    id : string ;
+    oncancel : ( (a : GlobalEvent ) => any ) | null ;
+    onfinish : ( (a : GlobalEvent ) => any ) | null ;
+    pause ( ) : void ;
+    play ( ) : void ;
+    playState : string ;
+    playbackRate : number ;
+    ready : Promise < undefined > ;
+    removeEventListener (type : string , listener : EventListener | null | ( (a : GlobalEvent ) => any ) , options ? : boolean | EventListenerOptions ) : void ;
+    reverse ( ) : void ;
+    startTime : number ;
+    timeline : AnimationTimeline ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface AnimationEffectReadOnly {
+    getComputedTiming ( ) : ComputedTimingProperties ;
+    timing : AnimationEffectTiming ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface AnimationEffectTiming extends AnimationEffectTimingReadOnly {
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface AnimationEffectTimingProperties {
+    delay ? : number ;
+    direction ? : string ;
+    duration ? : number | string ;
+    easing ? : string ;
+    endDelay ? : number ;
+    fill ? : string ;
+    iterationStart ? : number ;
+    iterations ? : number ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface AnimationEffectTimingReadOnly {
+    delay : number ;
+    direction : string ;
+    duration : number | string ;
+    easing : string ;
+    endDelay : number ;
+    fill : string ;
+    iterationStart : number ;
+    iterations : number ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface AnimationTimeline {
+    currentTime : number | null ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface ComputedTimingProperties extends AnimationEffectTimingProperties {
+    activeDuration : number ;
+    currentIteration : number | null ;
+    endTime : number ;
+    localTime : number | null ;
+    progress : number | null ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class DocumentTimeline implements AnimationTimeline {
+    private noStructuralTyping_DocumentTimeline : any;
+    currentTime : number | null ;
+    getAnimations ( ) : Animation [] ;
+    play (effect : AnimationEffectReadOnly ) : Animation ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class GroupEffect implements AnimationEffectReadOnly {
+    private noStructuralTyping_GroupEffect : any;
+    constructor (children : AnimationEffectReadOnly [] , timing ? : AnimationEffectTimingProperties | null ) ;
+    children : AnimationEffectReadOnly [] ;
+    getComputedTiming ( ) : ComputedTimingProperties ;
+    timing : AnimationEffectTiming ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface KeyframeAnimationOptions extends AnimationEffectTimingProperties {
+    id ? : string ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class KeyframeEffect extends KeyframeEffectReadOnly {
+    private noStructuralTyping_KeyframeEffect : any;
+    constructor (target : GlobalElement | null , frames : { [ key: string ]: any } [] | { [ key: string ]: any [] } , options ? : number | AnimationEffectTimingProperties | null ) ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class KeyframeEffectReadOnly implements AnimationEffectReadOnly {
+    private noStructuralTyping_KeyframeEffectReadOnly : any;
+    constructor (target : GlobalElement | null , frames : { [ key: string ]: any } [] | { [ key: string ]: any [] } , options ? : number | AnimationEffectTimingProperties | null ) ;
+    getComputedTiming ( ) : ComputedTimingProperties ;
+    onsample ? : ( (a : number , b : KeyframeEffect , c : Animation ) => any ) | null ;
+    target : GlobalElement | null ;
+    timing : AnimationEffectTiming ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  class SequenceEffect implements AnimationEffectReadOnly {
+    private noStructuralTyping_SequenceEffect : any;
+    constructor (children : AnimationEffectReadOnly [] , timing ? : AnimationEffectTimingProperties | null ) ;
+    children : AnimationEffectReadOnly [] ;
+    getComputedTiming ( ) : ComputedTimingProperties ;
+    timing : AnimationEffectTiming ;
   }
 }
