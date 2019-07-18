@@ -93,9 +93,13 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
         String localVariableName = getExportsAssignmentPropRootName(statement);
         String localPropName = getExportsAssignmentPropName(statement);
         String exportName = getNamedExportName(statement);
+        String localNamespaceName =
+            localVariableToImportedSymbolNameMap.containsKey(localVariableName)
+                ? localVariableToImportedSymbolNameMap.get(localVariableName)
+                : localVariableName;
         aliasMap.put(
             buildNamedExportSymbolName(localModuleId, exportName),
-            localVariableToImportedSymbolNameMap.get(localVariableName) + "." + localPropName);
+            localNamespaceName + "." + localPropName);
       }
     }
 
