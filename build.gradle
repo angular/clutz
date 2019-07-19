@@ -82,7 +82,7 @@ dependencies {
   errorproneJavac('com.google.errorprone:javac:9+181-r4173-1')
 
   testCompile 'junit:junit:4.11'
-  testCompile 'com.google.truth:truth:0.40'
+  testCompile 'com.google.truth:truth:1.0'
 }
 
 tasks.withType(Test) {
