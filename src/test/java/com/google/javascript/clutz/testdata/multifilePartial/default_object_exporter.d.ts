@@ -1,7 +1,6 @@
 // Generated from src/test/java/com/google/javascript/clutz/testdata/multifilePartial/default_object_exporter.js
 declare namespace ಠ_ಠ.clutz.module$exports$default$object$exporter {
-  type BaseClass = ಠ_ಠ.clutz.module$contents$default$object$exporter_BaseClass ;
-  let BaseClass : typeof ಠ_ಠ.clutz.module$contents$default$object$exporter_BaseClass ;
+  export import BaseClass = ಠ_ಠ.clutz.module$contents$default$object$exporter_BaseClass ;
 }
 declare module 'goog:default.object.exporter' {
   import exporter = ಠ_ಠ.clutz.module$exports$default$object$exporter;

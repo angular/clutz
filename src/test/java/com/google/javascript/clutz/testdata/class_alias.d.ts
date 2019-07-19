@@ -1,7 +1,6 @@
 // Generated from src/test/java/com/google/javascript/clutz/testdata/class_alias.js
 declare namespace ಠ_ಠ.clutz.alias {
-  type A = ಠ_ಠ.clutz.original.A ;
-  let A : typeof ಠ_ಠ.clutz.original.A ;
+  export import A = ಠ_ಠ.clutz.original.A ;
 }
 declare module 'goog:alias.A' {
   import A = ಠ_ಠ.clutz.alias.A;

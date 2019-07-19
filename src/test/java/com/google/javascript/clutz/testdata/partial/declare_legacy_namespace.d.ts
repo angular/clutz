@@ -1,7 +1,6 @@
 // Generated from src/test/java/com/google/javascript/clutz/testdata/partial/declare_legacy_namespace.js
 declare namespace ಠ_ಠ.clutz.declare.legacy {
-  type namespace = ಠ_ಠ.clutz.module$contents$declare$legacy$namespace_Class ;
-  let namespace : typeof ಠ_ಠ.clutz.module$contents$declare$legacy$namespace_Class ;
+  export import namespace = ಠ_ಠ.clutz.module$contents$declare$legacy$namespace_Class ;
 }
 declare module 'goog:declare.legacy.namespace' {
   import namespace = ಠ_ಠ.clutz.declare.legacy.namespace;
@@ -14,6 +13,5 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  type module$exports$declare$legacy$namespace = ಠ_ಠ.clutz.module$contents$declare$legacy$namespace_Class ;
-  let module$exports$declare$legacy$namespace : typeof ಠ_ಠ.clutz.module$contents$declare$legacy$namespace_Class ;
+  export import module$exports$declare$legacy$namespace = ಠ_ಠ.clutz.module$contents$declare$legacy$namespace_Class ;
 }
