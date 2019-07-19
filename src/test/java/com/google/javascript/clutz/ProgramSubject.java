@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 /** A subject that supports assertions on {@link DeclarationGenerator}'s results. */
-class ProgramSubject extends Subject<ProgramSubject, ProgramSubject.Program> {
+class ProgramSubject extends Subject {
 
   /**
    * A global root for all file access for testing in clutz. Intentionally left empty here, so that
