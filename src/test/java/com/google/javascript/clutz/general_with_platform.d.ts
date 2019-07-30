@@ -698,7 +698,7 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
-  interface KeyframeAnimationOptions extends AnimationEffectTimingProperties {
+  interface KeyframeAnimationOptions extends KeyframeEffectOptions {
     id ? : string ;
   }
 }
@@ -706,6 +706,18 @@ declare namespace ಠ_ಠ.clutz {
   class KeyframeEffect extends KeyframeEffectReadOnly {
     private noStructuralTyping_KeyframeEffect : any;
     constructor (target : GlobalElement | null , frames : { [ key: string ]: any } [] | { [ key: string ]: any [] } , options ? : number | AnimationEffectTimingProperties | null ) ;
+  }
+}
+declare namespace ಠ_ಠ.clutz {
+  interface KeyframeEffectOptions extends AnimationEffectTimingProperties {
+    /**
+     * Possible values: 'replace', 'add', 'accumulate'
+     */
+    composite ? : string ;
+    /**
+     * Possible values: 'replace', 'accumulate'
+     */
+    iterationComposite ? : string ;
   }
 }
 declare namespace ಠ_ಠ.clutz {
