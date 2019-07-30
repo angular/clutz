@@ -1916,7 +1916,7 @@ class DeclarationGenerator {
           elementStream.collect(Collectors.toMap(Node::getString, Node::getFirstChild));
 
       JSType primitiveType = type.getEnumeratedTypeOfEnumObject();
-      if (maybeStringOrNumericEnum(primitiveType, unqualifiedName, objectOfAllMembers, elements)) {
+      if (maybeStringOrNumericEnum(type, unqualifiedName, objectOfAllMembers, elements)) {
         return;
       }
 
@@ -1979,10 +1979,12 @@ class DeclarationGenerator {
      * whether it successfully emitted the enum.
      */
     private boolean maybeStringOrNumericEnum(
-        JSType primitiveType,
+        EnumType enumType,
         String unqualifiedName,
         Node objectOfAllMembers,
         Map<String, Node> elements) {
+
+      JSType primitiveType = enumType.getEnumeratedTypeOfEnumObject();
       if (!primitiveType.equals(numberType) && !primitiveType.equals(stringType)) {
         return false;
       }
@@ -2002,6 +2004,7 @@ class DeclarationGenerator {
         }
       }
 
+      maybeEmitJsDoc(enumType.getJSDocInfo(), /* ignoreParams= */ true);
       emit("enum");
       emit(unqualifiedName);
       emit("{");
