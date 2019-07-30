@@ -264,8 +264,8 @@ public final class TypeAnnotationPass implements CompilerPass {
       Node attachTypeExpr = node;
       // Modify the primary AST to represent a function parameter as a
       // REST node, if the type indicates it is a rest parameter.
-      if (parameterType.getRoot().getToken() == Token.ELLIPSIS) {
-        attachTypeExpr = IR.rest(IR.name(node.getString()));
+      if (parameterType.getRoot().getToken() == Token.ITER_REST) {
+        attachTypeExpr = IR.iterRest(IR.name(node.getString()));
         nodeComments.replaceWithComment(node, attachTypeExpr);
       }
       // Modify the AST to represent an optional parameter
@@ -479,7 +479,7 @@ public final class TypeAnnotationPass implements CompilerPass {
             int paramIdx = 1;
             for (Node param : child2.children()) {
               String paramName = "p" + paramIdx++;
-              if (param.getToken() == Token.ELLIPSIS) {
+              if (param.getToken() == Token.ITER_REST) {
                 if (param.getFirstChild() != null) {
                   restType = convertTypeNodeAST(param);
                 }
@@ -505,7 +505,7 @@ public final class TypeAnnotationPass implements CompilerPass {
         }
         return functionType(returnType, requiredParams, optionalParams, restName, restType);
         // Variable function parameters are encoded as an array.
-      case ELLIPSIS:
+      case ITER_REST:
         Node arrType = convertTypeNodeAST(n.getFirstChild());
         if (arrType == null) {
           arrType = anyType();
