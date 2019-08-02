@@ -95,26 +95,27 @@ public class DeclarationGeneratorTests {
 
   static String getExternFileNameOrNull(String testFileName) {
     String possibleFileName = testFileName.replace(".js", ".externs.js");
-    Path externFile = getPackagePath().resolve(possibleFileName);
+    Path externFile = getTestDataFolderPath().resolve(possibleFileName);
     return externFile.toFile().exists() ? externFile.toString() : null;
   }
 
   public static List<File> getTestInputFiles(FilenameFilter filter) {
-    File[] testFiles = getPackagePath().toFile().listFiles(filter);
+    File[] testFiles = getTestDataFolderPath().toFile().listFiles(filter);
     // Partial files live in 'partial' dir and run implicitly with the --partialInput option on.
-    File[] testPartialFiles = getPackagePath().resolve("partial").toFile().listFiles(filter);
+    File[] testPartialFiles = getTestDataFolderPath().resolve("partial").toFile().listFiles(filter);
     // Test files that live in the 'multifilePartial' dir, and run with the --partialInput option
     // The resulting .d.ts files are checked with a DeclarationSyntaxTest, and they're also
     // compiled in a single run in MultiFileTest
     File[] testMultifilePartialFiles =
-        getPackagePath().resolve("multifilePartial").toFile().listFiles(filter);
+        getTestDataFolderPath().resolve("multifilePartial").toFile().listFiles(filter);
     // Test files that live in the 'testPartialCrossModuleTypeImportsFiles' dir, and run with the
     // --partialInput and --googProvides options.  The resulting .d.ts files are checked with a
     // DeclarationSyntaxTest, and they're also compiled in a single run in MultiFileTest
     File[] testPartialCrossModuleTypeImportsFiles =
-        getPackagePath().resolve("partialCrossModuleTypeImports").toFile().listFiles(filter);
+        getTestDataFolderPath().resolve("partialCrossModuleTypeImports").toFile().listFiles(filter);
     // Output base files live in the 'outputBase' dir and impilicitly have base.js in their roots
-    File[] testOutputBaseFiles = getPackagePath().resolve("outputBase").toFile().listFiles(filter);
+    File[] testOutputBaseFiles =
+        getTestDataFolderPath().resolve("outputBase").toFile().listFiles(filter);
     List<File> filesList = Lists.newArrayList(testFiles);
     filesList.addAll(Arrays.asList(testPartialFiles));
     filesList.addAll(Arrays.asList(testMultifilePartialFiles));
@@ -137,25 +138,25 @@ public class DeclarationGeneratorTests {
   }
 
   public static List<File> getTestInputFilesNoPartial(FilenameFilter filter) {
-    File[] testFiles = getPackagePath().toFile().listFiles(filter);
+    File[] testFiles = getTestDataFolderPath().toFile().listFiles(filter);
     return Arrays.asList(testFiles);
   }
 
   static Path getTestInputFile(String fileName) {
-    return getPackagePath().resolve(fileName);
+    return getTestDataFolderPath().resolve(fileName);
   }
 
-  private static Path getPackagePath() {
+  private static Path getTestDataFolderPath() {
     Path root = FileSystems.getDefault().getPath(ProgramSubject.SOURCE_ROOT);
     Path testDir = root.resolve("src").resolve("test").resolve("java");
     String packageName = DeclarationGeneratorTests.class.getPackage().getName();
-    return testDir.resolve(packageName.replace('.', File.separatorChar));
+    return testDir.resolve(packageName.replace('.', File.separatorChar)).resolve("testdata");
   }
 
   static String getTestFileText(final File input) throws IOException {
     String text = Files.asCharSource(input, Charsets.UTF_8).read();
     if (input.getName().endsWith("_with_platform.d.ts")) {
-      File platformGolden = getPackagePath().resolve("general_with_platform.d.ts").toFile();
+      File platformGolden = getTestDataFolderPath().resolve("general_with_platform.d.ts").toFile();
       String platformGoldenText = Files.asCharSource(platformGolden, Charsets.UTF_8).read();
       if (text.contains(PLATFORM_MARKER)) {
         text = text.replace(PLATFORM_MARKER, platformGoldenText);
