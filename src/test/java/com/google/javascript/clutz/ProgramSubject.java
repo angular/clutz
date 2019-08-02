@@ -45,7 +45,8 @@ class ProgramSubject extends Subject {
    * always pass the real closure's base.js.
    */
   private static final SourceFile CLUTZ_GOOG_BASE_TOTAL =
-      SourceFile.fromFile(resource("src/test/java/com/google/javascript/clutz/base.js"), UTF_8);
+      SourceFile.fromFile(
+          resource("src/test/java/com/google/javascript/clutz/testdata/base.js"), UTF_8);
 
   /**
    * A even more stripped down version of Closure's base.js for incremental Clutz tests. In
