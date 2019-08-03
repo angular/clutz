@@ -10,12 +10,12 @@ import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public class DepgraphTest {
-  static final Path DEPGRAPH_PATH = DeclarationGeneratorTests.getTestInputFile("closure.depgraph");
+  static final Path DEPGRAPH_PATH = DeclarationGeneratorTest.getTestInputFile("closure.depgraph");
 
   static Depgraph parseFile(String filename) {
     return Depgraph.parseFrom(
         Collections.singletonList(
-            DeclarationGeneratorTests.getTestInputFile(filename).toFile().toString()));
+            DeclarationGeneratorTest.getTestInputFile(filename).toFile().toString()));
   }
 
   @Test

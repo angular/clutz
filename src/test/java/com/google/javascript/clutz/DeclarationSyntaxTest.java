@@ -1,7 +1,7 @@
 package com.google.javascript.clutz;
 
-import static com.google.javascript.clutz.DeclarationGeneratorTests.JS_NO_EXTERNS;
-import static com.google.javascript.clutz.DeclarationGeneratorTests.TS_SOURCES;
+import static com.google.javascript.clutz.DeclarationGeneratorTest.JS_NO_EXTERNS;
+import static com.google.javascript.clutz.DeclarationGeneratorTest.TS_SOURCES;
 import static org.junit.Assert.fail;
 
 import com.google.common.base.Charsets;
@@ -53,27 +53,27 @@ public class DeclarationSyntaxTest {
 
   @Test
   public void testDeclarationSyntax() throws Exception {
-    List<File> inputs = DeclarationGeneratorTests.getTestInputFilesNoPartial(JS_NO_EXTERNS);
+    List<File> inputs = DeclarationGeneratorTest.getTestInputFilesNoPartial(JS_NO_EXTERNS);
     doTestDeclarationSyntax(inputs);
   }
 
   @Test
   public void testMultiFilePartialDeclarationSyntax() throws Exception {
-    List<File> inputs = DeclarationGeneratorTests.getTestInputFiles(JS_MULTIFILE_PARTIAL);
+    List<File> inputs = DeclarationGeneratorTest.getTestInputFiles(JS_MULTIFILE_PARTIAL);
     doTestDeclarationSyntax(inputs);
   }
 
   @Test
   public void testPartialCrossModuleTypeImportsDeclarationSyntax() throws Exception {
     List<File> inputs =
-        DeclarationGeneratorTests.getTestInputFiles(JS_PARTIAL_CROSS_MODULE_TYPE_IMPORTS);
+        DeclarationGeneratorTest.getTestInputFiles(JS_PARTIAL_CROSS_MODULE_TYPE_IMPORTS);
     doTestDeclarationSyntax(inputs);
   }
 
   @Test
   public void testAliasedInterfaceDeclarationSyntax() throws Exception {
     List<File> inputs =
-        DeclarationGeneratorTests.getTestInputFiles(
+        DeclarationGeneratorTest.getTestInputFiles(
             (File dir, String name) ->
                 TS_SOURCES.accept(dir, name) && dir.getName().equals("aliasedInterface"));
     List<String> tsPaths = new ArrayList<>();
@@ -94,7 +94,7 @@ public class DeclarationSyntaxTest {
     // across test cases.
     List<String> goldenFilePaths = new ArrayList<>();
     for (File input : inputs) {
-      goldenFilePaths.add(DeclarationGeneratorTests.getGoldenFile(input, ".d.ts").getPath());
+      goldenFilePaths.add(DeclarationGeneratorTest.getGoldenFile(input, ".d.ts").getPath());
     }
 
     List<String> tscCommand = Lists.newArrayList(TSC.toString());
@@ -111,7 +111,7 @@ public class DeclarationSyntaxTest {
   }
 
   private void doTestDeclarationUsage(FilenameFilter filenameFilter) throws Exception {
-    List<File> inputs = DeclarationGeneratorTests.getTestInputFilesNoPartial(filenameFilter);
+    List<File> inputs = DeclarationGeneratorTest.getTestInputFilesNoPartial(filenameFilter);
     final List<String> tscCommand = Lists.newArrayList(TSC.toString(), "-m", "commonjs");
     tscCommand.addAll(TSC_FLAGS);
 
