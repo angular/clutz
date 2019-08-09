@@ -608,6 +608,9 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz {
+  let TrustedTypePolicyOptions : PrivateType;
+}
+declare namespace ಠ_ಠ.clutz {
   class Animation implements GlobalEventTarget {
     private noStructuralTyping_Animation : any;
     constructor (effect ? : AnimationEffectReadOnly | null , timeline ? : AnimationTimeline | null ) ;
