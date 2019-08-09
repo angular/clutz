@@ -16,7 +16,7 @@ public class OptionsTest {
   @Test
   public void testFullUsage() throws Exception {
     final String TEST_EXTERNS_MAP =
-        TypeScriptGeneratorTests.getTestDirPath("test_externs_map.json").toString();
+        TypeScriptGeneratorTest.getTestDirPath("test_externs_map.json").toString();
 
     Options opts =
         new Options(

@@ -1,7 +1,7 @@
 package com.google.javascript.gents;
 
-import static com.google.javascript.clutz.DeclarationGeneratorTests.D_TS;
-import static com.google.javascript.clutz.DeclarationGeneratorTests.TS_SOURCES;
+import static com.google.javascript.clutz.DeclarationGeneratorTest.D_TS;
+import static com.google.javascript.clutz.DeclarationGeneratorTest.TS_SOURCES;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -49,10 +49,10 @@ public class GeneratedSyntaxTest {
   @Test
   public void testGenerated() throws Exception {
     List<File> tsInputs =
-        TypeScriptGeneratorTests.getTestInputFiles(
-            COMPILABLE_TS_SOURCES, TypeScriptGeneratorTests.singleTestPath);
+        TypeScriptGeneratorTest.getTestInputFiles(
+            COMPILABLE_TS_SOURCES, TypeScriptGeneratorTest.singleTestPath);
     List<File> dtsInputs =
-        TypeScriptGeneratorTests.getTestInputFiles(D_TS, TypeScriptGeneratorTests.singleTestPath);
+        TypeScriptGeneratorTest.getTestInputFiles(D_TS, TypeScriptGeneratorTest.singleTestPath);
     List<String> tscCommand = null;
 
     for (File tsInput : tsInputs) {

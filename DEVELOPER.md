@@ -30,12 +30,23 @@ $ ./gradlew test
 
 Pass the environment variable `UPDATE_GOLDENS=y` to update the golden files.
 
+Project contains couple hundreds testcases, usually there is a separate testcase
+per .js/.ts input file. In order to run specific test use gradle filter option:
+
+```shell
+$ ./gradlew test --test "*aliased_enums*"
+```
+
 ### Running tests from an IDE
 
 The `gradle` configuration makes sure that tests use the locally installed
 `clang-format` by setting the system property `gents.clangFormat`, see
 `build.gradle`. Make sure to configure your IDE's test runner to pass the same
 property for reproducible results.
+
+To run single testcase of parameterized tests first run all tests from IDE and 
+then IDE allows to rerun specific testcase by clicking on its passed/failed 
+name. At least IntelliJ Idea supports it.
 
 ## Java Formatting
 

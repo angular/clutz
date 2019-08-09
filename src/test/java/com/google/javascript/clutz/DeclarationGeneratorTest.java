@@ -16,16 +16,13 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
-import org.junit.runner.Describable;
-import org.junit.runner.Description;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
-@RunWith(AllTests.class)
-public class DeclarationGeneratorTests {
+@RunWith(Parameterized.class)
+public class DeclarationGeneratorTest {
   /** Comments in .d.ts and .js golden files starting with '//!!' are stripped. */
   public static final Pattern GOLDEN_FILE_COMMENTS_REGEXP = Pattern.compile("(?m)^\\s*//!!.*\\n");
 
@@ -51,37 +48,35 @@ public class DeclarationGeneratorTests {
 
   public static final String PLATFORM_MARKER = "/** Insert general_with_platform.d.ts here */\n";
 
-  public static TestSuite suite() {
-    TestSuite suite = new TestSuite(DeclarationGeneratorTests.class.getName());
+  @Parameters(name = "{index}: {0}")
+  public static Iterable<File> testCases() {
+    return getTestInputFiles(JS_NO_EXTERNS_OR_ZIP);
+  }
 
-    List<File> testFiles = getTestInputFiles(JS_NO_EXTERNS_OR_ZIP);
-    for (final File input : testFiles) {
-      File golden = getGoldenFile(input, ".d.ts");
-      ProgramSubject subject = assertThatProgram(input);
-      if (input.getName().contains("_with_platform")) {
-        subject.withPlatform = true;
-      }
-      if (input.getName().contains("_output_base")) {
-        subject.emitBase = true;
-      }
-      if (Arrays.asList("partial", "multifilePartial", "partialCrossModuleTypeImports")
-          .contains(input.getParentFile().getName())) {
-        subject.partialInput = true;
-        subject.debug = false;
-      }
-      if (input.getParentFile().getName().equals("partialCrossModuleTypeImports")) {
-        subject.depgraph = "partialCrossModuleTypeImports/cross_module_type.depgraph";
-      }
-      // using async/await causes warnings inside closure's standard library, so ignore them for our
-      // tests
-      if (input.getName().contains("async")) {
-        subject.debug = false;
-      }
-
-      subject.extraExternFile = getExternFileNameOrNull(input.getName());
-      suite.addTest(new DeclarationTest(input.getName(), golden, subject));
+  private static ProgramSubject createProgramSubject(File input) {
+    ProgramSubject subject = assertThatProgram(input);
+    if (input.getName().contains("_with_platform")) {
+      subject.withPlatform = true;
     }
-    return suite;
+    if (input.getName().contains("_output_base")) {
+      subject.emitBase = true;
+    }
+    if (Arrays.asList("partial", "multifilePartial", "partialCrossModuleTypeImports")
+        .contains(input.getParentFile().getName())) {
+      subject.partialInput = true;
+      subject.debug = false;
+    }
+    if (input.getParentFile().getName().equals("partialCrossModuleTypeImports")) {
+      subject.depgraph = "partialCrossModuleTypeImports/cross_module_type.depgraph";
+    }
+    // using async/await causes warnings inside closure's standard library, so ignore them for our
+    // tests
+    if (input.getName().contains("async")) {
+      subject.debug = false;
+    }
+
+    subject.extraExternFile = getExternFileNameOrNull(input.getName());
+    return subject;
   }
 
   public static File getGoldenFile(final File input, String ext) {
@@ -149,7 +144,7 @@ public class DeclarationGeneratorTests {
   private static Path getTestDataFolderPath() {
     Path root = FileSystems.getDefault().getPath(ProgramSubject.SOURCE_ROOT);
     Path testDir = root.resolve("src").resolve("test").resolve("java");
-    String packageName = DeclarationGeneratorTests.class.getPackage().getName();
+    String packageName = DeclarationGeneratorTest.class.getPackage().getName();
     return testDir.resolve(packageName.replace('.', File.separatorChar)).resolve("testdata");
   }
 
@@ -167,42 +162,15 @@ public class DeclarationGeneratorTests {
     return text;
   }
 
-  private static final class DeclarationTest implements Test, Describable {
-    private final String testName;
-    private final ProgramSubject subject;
-    private final File golden;
+  private final File input;
 
-    private DeclarationTest(String testName, File golden, ProgramSubject subject) {
-      this.testName = testName;
-      this.golden = golden;
-      this.subject = subject;
-    }
+  public DeclarationGeneratorTest(File input) {
+    this.input = input;
+  }
 
-    @Override
-    public void run(TestResult result) {
-      result.startTest(this);
-      try {
-        subject.generatesDeclarations(golden);
-      } catch (Throwable t) {
-        result.addError(this, t);
-      } finally {
-        result.endTest(this);
-      }
-    }
-
-    @Override
-    public int countTestCases() {
-      return 1;
-    }
-
-    @Override
-    public String toString() {
-      return testName;
-    }
-
-    @Override
-    public Description getDescription() {
-      return Description.createTestDescription(DeclarationGeneratorTests.class, testName);
-    }
+  @Test
+  public void runTest() throws Exception {
+    File golden = getGoldenFile(input, ".d.ts");
+    createProgramSubject(input).generatesDeclarations(golden);
   }
 }

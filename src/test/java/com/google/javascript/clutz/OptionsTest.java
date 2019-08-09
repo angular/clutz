@@ -169,7 +169,7 @@ public class OptionsTest {
             new String[] {
               "foo.js",
               "--googProvides",
-              DeclarationGeneratorTests.getTestInputFile("test_goog_provides").toFile().toString()
+              DeclarationGeneratorTest.getTestInputFile("test_goog_provides").toFile().toString()
             });
     assertThat(opts.knownGoogProvides).containsExactly("foo.bar", "baz.quux");
   }

@@ -17,7 +17,7 @@ import org.junit.runners.JUnit4;
 public class ClosureEnvTest {
 
   private final Path inputFile =
-      DeclarationGeneratorTests.getTestInputFile("env" + File.separatorChar + "browser.js");
+      DeclarationGeneratorTest.getTestInputFile("env" + File.separatorChar + "browser.js");
   private PrintStream defaultOut;
 
   @Before
