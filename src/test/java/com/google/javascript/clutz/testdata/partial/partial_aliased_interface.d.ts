@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/partial_aliased_interface.js
 declare namespace ಠ_ಠ.clutz {
   namespace module$exports$partial$aliased_interface {
     function staticMethod ( ) : string ;

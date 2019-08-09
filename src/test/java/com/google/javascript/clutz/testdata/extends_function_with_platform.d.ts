@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/extends_function_with_platform.js
 declare namespace ಠ_ಠ.clutz.foo {
   class A extends Function {
     private noStructuralTyping_foo_A : any;

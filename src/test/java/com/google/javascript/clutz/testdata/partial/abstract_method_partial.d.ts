@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/abstract_method_partial.js
 declare namespace ಠ_ಠ.clutz {
   class module$exports$abst$method {
     private noStructuralTyping_module$exports$abst$method : any;

@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/base.js
 declare namespace goog {
   /**
    * A debug loader is responsible for downloading and executing javascript
@@ -27,6 +28,7 @@ declare namespace goog {
    */
   global : any ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/base.js
 declare namespace ಠ_ಠ.clutz.goog {
   class Uri {
     private noStructuralTyping_goog_Uri : any;
@@ -36,6 +38,7 @@ declare module 'goog:goog.Uri' {
   import Uri = ಠ_ಠ.clutz.goog.Uri;
   export default Uri;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/outputBase/function_alias_output_base.js
 declare namespace ಠ_ಠ.clutz.partial {
   type FunctionAlias = Function ;
 }

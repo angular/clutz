@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/ctor_func.js
 declare namespace ಠ_ಠ.clutz.ctor_func {
   class Ctor < T > {
     private noStructuralTyping_ctor_func_Ctor : any;

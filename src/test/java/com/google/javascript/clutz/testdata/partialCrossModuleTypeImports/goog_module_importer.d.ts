@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/goog_module_importer.js
 declare namespace ಠ_ಠ.clutz.module$exports$goog$module$importer {
   class ClassExtendingLegacyBaseClass extends ಠ_ಠ.clutz.module$exports$goog$legacy$namespace$exporter.LegacyBaseClass {
     private noStructuralTyping_module$exports$goog$module$importer_ClassExtendingLegacyBaseClass : any;

@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/nullable.js
 declare namespace ಠ_ಠ.clutz.nullable {
   let w : boolean | null ;
   /**

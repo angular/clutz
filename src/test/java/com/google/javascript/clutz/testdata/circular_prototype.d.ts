@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/circular_prototype.js
 declare namespace ಠ_ಠ.clutz.module$exports$circular$obj {
   let deepObj : { a : number , child : { //!! Unsupported circular reference for prop name: cycle
   } , z : number } ;

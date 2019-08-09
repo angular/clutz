@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/undefined_provide.js
 declare namespace ಠ_ಠ.clutz.undefined.nested {
   let provide : { } ;
 }
@@ -5,6 +6,7 @@ declare module 'goog:undefined.nested.provide' {
   import provide = ಠ_ಠ.clutz.undefined.nested.provide;
   export default provide;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/undefined_provide.js
 declare namespace ಠ_ಠ.clutz {
   let undefined_provide : { } ;
 }

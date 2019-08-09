@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/skipEmitWithTypedefs/uses_type.js
 declare namespace ಠ_ಠ.clutz.module$exports$skip_with_typedefs$uses_type {
   function parseIntAlias (parseInt : (a : string ) => number ) : number ;
 }

@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/forward_declare.js
 declare namespace ಠ_ಠ.clutz.forward {
   class A {
     private noStructuralTyping_forward_A : any;

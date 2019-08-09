@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/multifilePartial/default_base_exporter.js
 declare namespace ಠ_ಠ.clutz {
   class module$exports$default$base$exporter {
     private noStructuralTyping_module$exports$default$base$exporter : any;

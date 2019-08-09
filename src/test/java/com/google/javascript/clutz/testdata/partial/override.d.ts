@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/override.js
 declare namespace ಠ_ಠ.clutz.module$exports$override {
   class ExtendsBase extends module$contents$override_Base {
     private noStructuralTyping_module$exports$override_ExtendsBase : any;
@@ -39,6 +40,7 @@ declare module 'goog:override' {
   import override = ಠ_ಠ.clutz.module$exports$override;
   export = override;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/override.js
 declare namespace ಠ_ಠ.clutz {
   class module$contents$override_Base {
     private noStructuralTyping_module$contents$override_Base : any;

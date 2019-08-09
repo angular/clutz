@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/goog_module_legacy_named.js
 declare namespace ಠ_ಠ.clutz.module.legacy.named {
   function f (a : number ) : void ;
 }

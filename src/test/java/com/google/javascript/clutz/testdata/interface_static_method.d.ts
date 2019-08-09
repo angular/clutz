@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/interface_static_method.js
 declare namespace ಠ_ಠ.clutz.module$exports$interface_static_method {
   namespace ClassIf {
     function staticMethod ( ) : any ;

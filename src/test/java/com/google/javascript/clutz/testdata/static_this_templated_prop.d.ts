@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/static_this_templated_prop.js
 declare namespace ಠ_ಠ.clutz.static_this_templated_prop {
   /**
    * Some container to hold the static property.

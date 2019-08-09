@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/enum_with_method.js
 declare namespace ಠ_ಠ.clutz.enums {
   enum EnumWithInlineMethod {
     A ,
@@ -9,6 +10,7 @@ declare module 'goog:enums.EnumWithInlineMethod' {
   import EnumWithInlineMethod = ಠ_ಠ.clutz.enums.EnumWithInlineMethod;
   export default EnumWithInlineMethod;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/enum_with_method.js
 declare namespace ಠ_ಠ.clutz.enums {
   enum EnumWithMethod {
     APPLE = 1.0 ,

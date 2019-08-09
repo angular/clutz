@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/tte_promise.js
 declare namespace ಠ_ಠ.clutz.angular.$q {
   class Promise < T > {
     private noStructuralTyping_angular_$q_Promise : any;
@@ -12,12 +13,14 @@ declare module 'goog:angular.$q.Promise' {
   import Promise = ಠ_ಠ.clutz.angular.$q.Promise;
   export default Promise;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/tte_promise.js
 declare namespace ಠ_ಠ.clutz.angular.$q {
   class PromiseService < T > {
     private noStructuralTyping_angular_$q_PromiseService : any;
     all(promises : ಠ_ಠ.clutz.angular.$q.PromiseService.Promise < any > [] ) : ಠ_ಠ.clutz.angular.$q.PromiseService.Promise < any [] > ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/tte_promise.js
 declare namespace ಠ_ಠ.clutz.angular.$q.PromiseService {
   interface Promise < T > {
   }

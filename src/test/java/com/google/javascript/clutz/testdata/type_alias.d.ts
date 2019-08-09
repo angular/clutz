@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/type_alias.js
 declare namespace ಠ_ಠ.clutz.typedefs {
   class Aclass {
     private noStructuralTyping_typedefs_Aclass : any;

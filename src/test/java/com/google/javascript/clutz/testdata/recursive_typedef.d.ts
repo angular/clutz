@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/recursive_typedef.js
 declare namespace ಠ_ಠ.clutz.rec {
   class Aclass {
     private noStructuralTyping_rec_Aclass : any;
@@ -8,6 +9,7 @@ declare module 'goog:rec.Aclass' {
   import Aclass = ಠ_ಠ.clutz.rec.Aclass;
   export default Aclass;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/recursive_typedef.js
 declare namespace ಠ_ಠ.clutz.rec.ns {
   type Arr = ಠ_ಠ.clutz.rec.ns.El [] ;
   type El = { arr : ಠ_ಠ.clutz.rec.ns.Arr } ;

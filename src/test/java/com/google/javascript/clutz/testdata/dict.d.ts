@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/dict.js
 declare namespace ಠ_ಠ.clutz.dict {
   class ClassWithDottedProperties {
     private noStructuralTyping_dict_ClassWithDottedProperties : any;

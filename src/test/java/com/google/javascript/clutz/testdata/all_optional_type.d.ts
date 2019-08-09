@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/all_optional_type.js
 declare namespace ಠ_ಠ.clutz.module$exports$collapsed$union {
   function fn (arg : { opt_some ? : string } | Function | null ) : void ;
   //!! TODO(rado): It would be better if {other: string} was not omitted.

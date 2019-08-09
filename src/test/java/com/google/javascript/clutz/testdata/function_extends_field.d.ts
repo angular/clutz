@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/function_extends_field.js
 declare namespace ಠ_ಠ.clutz.fn.field {
   class A {
     private noStructuralTyping_fn_field_A : any;

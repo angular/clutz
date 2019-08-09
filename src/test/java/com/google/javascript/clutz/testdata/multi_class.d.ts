@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/multi_class.js
 declare namespace ಠ_ಠ.clutz.multi_class {
   class A {
     private noStructuralTyping_multi_class_A : any;

@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/class_extends_array.js
 declare namespace ಠ_ಠ.clutz.extend.array {
   class C extends Array< any > {
     private noStructuralTyping_extend_array_C : any;

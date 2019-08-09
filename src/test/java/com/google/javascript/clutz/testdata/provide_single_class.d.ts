@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/provide_single_class.js
 declare namespace ಠ_ಠ.clutz.foo.bar {
   class Baz {
     private noStructuralTyping_foo_bar_Baz : any;
@@ -9,6 +10,7 @@ declare namespace ಠ_ಠ.clutz.foo.bar {
     static staticMethod (a : string ) : number ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/provide_single_class.js
 declare namespace ಠ_ಠ.clutz.foo.bar.Baz {
   class NestedClass {
     private noStructuralTyping_foo_bar_Baz_NestedClass : any;

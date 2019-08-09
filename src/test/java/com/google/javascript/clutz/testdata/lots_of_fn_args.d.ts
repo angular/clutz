@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/lots_of_fn_args.js
 declare namespace ಠ_ಠ.clutz.ns.lots.of.args {
   class C {
     private noStructuralTyping_ns_lots_of_args_C : any;

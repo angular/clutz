@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/multifilePartial/named_base_exporter.js
 declare namespace ಠ_ಠ.clutz.module$exports$named$base$exporter {
   class MissingDestructuredRequire {
     private noStructuralTyping_module$exports$named$base$exporter_MissingDestructuredRequire : any;

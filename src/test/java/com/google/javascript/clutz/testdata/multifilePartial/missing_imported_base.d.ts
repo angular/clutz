@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/multifilePartial/missing_imported_base.js
 declare namespace ಠ_ಠ.clutz.module$exports$missing$imported$base {
   class ClassExtendingDefaultObjectExporterBaseClass extends ಠ_ಠ.clutz.module$exports$default$object$exporter.BaseClass {
     private noStructuralTyping_module$exports$missing$imported$base_ClassExtendingDefaultObjectExporterBaseClass : any;
