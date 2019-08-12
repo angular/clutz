@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/base.js
 declare namespace goog {
   /**
    * A debug loader is responsible for downloading and executing javascript
@@ -27,6 +28,7 @@ declare namespace goog {
    */
   global : any ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/base.js
 declare namespace ಠ_ಠ.clutz.goog {
   class Uri {
     private noStructuralTyping_goog_Uri : any;

@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/this_type_param.js
 declare namespace ಠ_ಠ.clutz.nsThis {
   class C {
     private noStructuralTyping_nsThis_C : any;
@@ -11,6 +12,7 @@ declare module 'goog:nsThis.C' {
   import C = ಠ_ಠ.clutz.nsThis.C;
   export default C;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/this_type_param.js
 declare namespace ಠ_ಠ.clutz.nsThis {
   class D extends ಠ_ಠ.clutz.nsThis.C {
     private noStructuralTyping_nsThis_D : any;

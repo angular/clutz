@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/methods_generics.js
 declare namespace ಠ_ಠ.clutz.method_generics {
   class Foo < T > {
     private noStructuralTyping_method_generics_Foo : any;

@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/inherit_visibility.js
 declare namespace ಠ_ಠ.clutz.module$exports$inherit_visibility {
   class Child extends ಠ_ಠ.clutz.module$exports$inherit_visibility.Parent {
     private noStructuralTyping_module$exports$inherit_visibility_Child : any;

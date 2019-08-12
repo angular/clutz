@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/goog_module_class.js
 declare namespace ಠ_ಠ.clutz {
   class module$exports$module$Foo {
     private noStructuralTyping_module$exports$module$Foo : any;

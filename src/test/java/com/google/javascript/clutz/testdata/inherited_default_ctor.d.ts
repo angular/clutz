@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/inherited_default_ctor.js
 declare namespace ಠ_ಠ.clutz.def.ctor {
   class A {
     private noStructuralTyping_def_ctor_A : any;

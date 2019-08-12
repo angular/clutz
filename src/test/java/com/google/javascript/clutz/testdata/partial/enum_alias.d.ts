@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/enum_alias.js
 declare namespace ಠ_ಠ.clutz {
   //!! Closure will begin emitting this soon:
   //!! enum module$exports$enum_alias { }

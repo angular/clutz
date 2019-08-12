@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.js
 declare namespace ಠ_ಠ.clutz.typesWithExterns {
   class Error extends GlobalError {
     private noStructuralTyping_typesWithExterns_Error : any;
@@ -21,6 +22,7 @@ declare module 'goog:typesWithExterns' {
   import typesWithExterns = ಠ_ಠ.clutz.typesWithExterns;
   export = typesWithExterns;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.js
 declare namespace ಠ_ಠ.clutz.typesWithExterns {
   class A {
     private noStructuralTyping_typesWithExterns_A : any;
@@ -33,6 +35,7 @@ declare module 'goog:typesWithExterns.A' {
   export default A;
 }
 /* skipped emitting type alias typesWithExterns.ArrayLike to avoid collision with existing one in lib.d.ts. */
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.js
 declare namespace ಠ_ಠ.clutz.typesWithExterns {
   class B extends ಠ_ಠ.clutz.typesWithExterns.A {
     private noStructuralTyping_typesWithExterns_B : any;
@@ -43,6 +46,7 @@ declare module 'goog:typesWithExterns.B' {
   import B = ಠ_ಠ.clutz.typesWithExterns.B;
   export default B;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.js
 declare namespace ಠ_ಠ.clutz.typesWithExterns {
   class C extends ಠ_ಠ.clutz.typesWithExterns.A {
     private noStructuralTyping_typesWithExterns_C : any;
@@ -54,22 +58,27 @@ declare module 'goog:typesWithExterns.C' {
   export default C;
 }
 /** Insert general_with_platform.d.ts here */
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.externs.js
 declare namespace ಠ_ಠ.clutz {
   function functionNamespace (descriptor : { is : string } ) : any ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.externs.js
 declare namespace ಠ_ಠ.clutz.functionNamespace {
   function dom (nodeOrEvent : Node | null | GlobalEvent ) : functionNamespaceHelperClass ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.externs.js
 declare namespace ಠ_ಠ.clutz.functionNamespace {
   class privateClass {
     private noStructuralTyping_functionNamespace_privateClass : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.externs.js
 declare namespace ಠ_ಠ.clutz {
   class functionNamespaceHelperClass {
     private noStructuralTyping_functionNamespaceHelperClass : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.externs.js
 declare namespace ಠ_ಠ.clutz.namespace {
   class Foo {
     private noStructuralTyping_namespace_Foo : any;
@@ -79,9 +88,11 @@ declare namespace ಠ_ಠ.clutz.namespace {
     static staticMethod ( ) : string ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.externs.js
 declare namespace ಠ_ಠ.clutz.namespace {
   type atypedef = (a : string , b ? : ಠ_ಠ.clutz.namespace.atypedef.Options ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.externs.js
 declare namespace ಠ_ಠ.clutz.namespace.atypedef {
   class Cache < T > {
     private noStructuralTyping_namespace_atypedef_Cache : any;
@@ -93,15 +104,19 @@ declare namespace ಠ_ಠ.clutz.namespace.atypedef {
     removeAll ( ) : any ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.externs.js
 declare namespace ಠ_ಠ.clutz.namespace.atypedef.Cache {
   type Info = { id : string , options : ಠ_ಠ.clutz.namespace.atypedef.Options , size : number } ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.externs.js
 declare namespace ಠ_ಠ.clutz.namespace.atypedef {
   type Options = { capacity ? : number } ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.externs.js
 declare namespace ಠ_ಠ.clutz.namespace.atypedef {
   type get = (a : string ) => ಠ_ಠ.clutz.namespace.atypedef.Cache < any > | null ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.externs.js
 declare namespace ಠ_ಠ.clutz.namespace {
   function bootstrap (arg1 : GlobalElement | null | HTMLDocument , opt_arg2 ? : ( string | Function | null ) [] | null ) : any ;
 }

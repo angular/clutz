@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/static_provided.js
 declare namespace ಠ_ಠ.clutz.a.b {
   class StaticHolder {
     private noStructuralTyping_a_b_StaticHolder : any;
@@ -7,6 +8,7 @@ declare module 'goog:a.b.StaticHolder' {
   import StaticHolder = ಠ_ಠ.clutz.a.b.StaticHolder;
   export default StaticHolder;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/static_provided.js
 declare namespace ಠ_ಠ.clutz.a.b.StaticHolder {
   enum AnEnum {
     X = 0.0 ,
@@ -17,6 +19,7 @@ declare module 'goog:a.b.StaticHolder.AnEnum' {
   import AnEnum = ಠ_ಠ.clutz.a.b.StaticHolder.AnEnum;
   export default AnEnum;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/static_provided.js
 declare namespace ಠ_ಠ.clutz.a.b.StaticHolder {
   function aFunction ( ) : boolean ;
 }

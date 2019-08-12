@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/missing_direct_ref_base.js
 declare namespace ಠ_ಠ.clutz.module$exports$missing$extend {
   class ClassExtendingMissing extends ಠ_ಠ.clutz.direct.ref.A {
     private noStructuralTyping_module$exports$missing$extend_ClassExtendingMissing : any;

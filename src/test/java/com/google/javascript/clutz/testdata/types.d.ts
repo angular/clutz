@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types.js
 declare namespace ಠ_ಠ.clutz.types {
   let a : number ;
   let b : boolean ;

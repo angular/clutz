@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/goog_promise_with_platform.js
 declare namespace ಠ_ಠ.clutz.goog {
   class Promise < TYPE , RESOLVER_CONTEXT > implements ಠ_ಠ.clutz.goog.Thenable < TYPE > {
     private noStructuralTyping_goog_Promise : any;
@@ -12,6 +13,7 @@ declare module 'goog:goog.Promise' {
   import Promise = ಠ_ಠ.clutz.goog.Promise;
   export default Promise;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/goog_promise_with_platform.js
 declare namespace ಠ_ಠ.clutz.goog {
   namespace Thenable {
     let IMPLEMENTED_BY_PROP : string ;

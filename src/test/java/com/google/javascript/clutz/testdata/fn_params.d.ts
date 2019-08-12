@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/fn_params.js
 declare namespace ಠ_ಠ.clutz.fn_params {
   function declaredWithType ( ...a : any [] ) : any ;
   function optional (x : string , opt_y ? : number ) : number ;

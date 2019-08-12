@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/undefined_type.js
 declare namespace ಠ_ಠ.clutz.undefinedns {
   class C {
     private noStructuralTyping_undefinedns_C : any;

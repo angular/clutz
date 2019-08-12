@@ -38,6 +38,7 @@ import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.JSTypeExpression;
 import com.google.javascript.rhino.Node;
+import com.google.javascript.rhino.StaticSourceFile;
 import com.google.javascript.rhino.jstype.EnumElementType;
 import com.google.javascript.rhino.jstype.EnumType;
 import com.google.javascript.rhino.jstype.FunctionType;
@@ -479,10 +480,6 @@ class DeclarationGenerator {
       String originalPath = compilerInput.getSourceFile().getOriginalPath();
       if (depgraph.isRoot(originalPath)) {
         provides.addAll(filteredProvides);
-        emitComment(
-            String.format(
-                "Processing provides %s from input %s",
-                compilerInput.getProvides(), compilerInput.getSourceFile().getOriginalPath()));
       }
     }
 
@@ -534,7 +531,7 @@ class DeclarationGenerator {
         // corresponding type from the type registry.
         JSType moduleType = compiler.getTypeRegistry().getGlobalType(rewritenProvide);
         if (moduleType != null) {
-          declareTypedefNamespace(symbol.getName(), moduleType, provides);
+          declareTypedefNamespace(symbol, moduleType, provides);
           declareModule(provide, /* isDefault */ true, rewritenProvide);
         } else {
           emitComment("Skipping symbol " + symbol.getName() + " due to missing type information.");
@@ -595,10 +592,11 @@ class DeclarationGenerator {
    * <p>Note that this only handles default exports of typedefs. Typedefs as properties on an
    * already exported object (like class) are handled separately.
    */
-  private void declareTypedefNamespace(
-      String typedefName, JSType typedefType, Set<String> provides) {
+  private void declareTypedefNamespace(TypedVar typedef, JSType typedefType, Set<String> provides) {
+    String typedefName = typedef.getName();
     String namespace = getNamespace(typedefName);
 
+    emitGeneratedFromFileComment(typedef.getSourceFile());
     // Ideally we should be using declareNamespace here, but it cannot handle gluing the TypedVar
     // symbol with the additional JSType typedefType.
     emitNamespaceBegin(namespace);
@@ -751,7 +749,7 @@ class DeclarationGenerator {
         if (symbol.getType() == null) {
           JSType typedef = compiler.getTypeRegistry().getGlobalType(name);
           if (typedef != null) {
-            declareTypedefNamespace(symbol.getName(), typedef, Collections.emptySet());
+            declareTypedefNamespace(symbol, typedef, Collections.emptySet());
             typesEmitted.add(name);
           }
           continue;
@@ -1032,6 +1030,7 @@ class DeclarationGenerator {
       emitBreak();
       return;
     }
+    emitGeneratedFromFileComment(symbol.getSourceFile());
     boolean isGoogNamespace =
         GOOG_BASE_NAMESPACE.equals(namespace) && GOOG_BASE_NAMESPACE.equals(symbol.getName());
     if (isGoogNamespace) {
@@ -1458,6 +1457,21 @@ class DeclarationGenerator {
   private void emitBreak() {
     out.write("\n");
     startOfLine = true;
+  }
+
+  /**
+   * This function should called before every top-level `declare module` or `declare namespace`
+   * call. It is used by developers to better understand where symbols are coming from and also by
+   * tools (e.g. http://kythe.io for JS <=> TS integration).
+   *
+   * @param file Original .js file that contained JS symbol for which module/namespace is being
+   *     generated.
+   */
+  private void emitGeneratedFromFileComment(StaticSourceFile file) {
+    emit("// Generated from");
+    String fileName = file == null ? "unknown file" : file.getName();
+    emit(stripLineTerminators(fileName));
+    emitBreak();
   }
 
   private void emitComment(String s) {
@@ -3335,20 +3349,24 @@ class DeclarationGenerator {
         JSType pType = namedType.type;
         String qualifiedName = innerNamespace + '.' + propName;
         if (provides.contains(qualifiedName)) continue;
+        Node node = innerProps.get(namedType);
         if (pType.isEnumType()) {
           if (!foundNamespaceMembers) {
+            emitGeneratedFromFileComment(node.getStaticSourceFile());
             emitNamespaceBegin(innerNamespace);
             foundNamespaceMembers = true;
           }
-          visitEnumType(propName, qualifiedName, (EnumType) pType, innerProps.get(namedType));
+          visitEnumType(propName, qualifiedName, (EnumType) pType, node);
         } else if (isClassLike(pType)) {
           if (!foundNamespaceMembers) {
+            emitGeneratedFromFileComment(node.getStaticSourceFile());
             emitNamespaceBegin(innerNamespace);
             foundNamespaceMembers = true;
           }
           visitClassOrInterface(propName, (FunctionType) pType);
         } else if (isTypedef(pType)) {
           if (!foundNamespaceMembers) {
+            emitGeneratedFromFileComment(node.getStaticSourceFile());
             emitNamespaceBegin(innerNamespace);
             foundNamespaceMembers = true;
           }

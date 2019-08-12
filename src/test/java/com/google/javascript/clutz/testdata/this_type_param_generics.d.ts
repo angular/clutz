@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/this_type_param_generics.js
 declare namespace ಠ_ಠ.clutz.nsThisGenerics {
   class A {
     private noStructuralTyping_nsThisGenerics_A : any;

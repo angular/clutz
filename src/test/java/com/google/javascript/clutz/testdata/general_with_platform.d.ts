@@ -1,40 +1,49 @@
+// Generated from externs.zip//es6.js
 declare namespace ಠ_ಠ.clutz {
   interface Transferable {
   }
 }
+// Generated from externs.zip//fido.js
 declare namespace ಠ_ಠ.clutz.u2f {
   /**
    * An error object for responses
    */
   type Error = { errorCode : number , errorMessage : string | null } ;
 }
+// Generated from externs.zip//fido.js
 declare namespace ಠ_ಠ.clutz.u2f {
   type RegisterRequest = { challenge : string , version : string } ;
 }
+// Generated from externs.zip//fido.js
 declare namespace ಠ_ಠ.clutz.u2f {
   /**
    * Data object for a registered key.
    */
   type RegisteredKey = { appId : string | null , keyHandle : string , transports ? : string [] , version : string } ;
 }
+// Generated from externs.zip//fido.js
 declare namespace ಠ_ಠ.clutz.u2f {
   /**
    * Data object for a sign response.
    */
   type SignResponse = { clientData : string , keyHandle : string , signatureData : string } ;
 }
+// Generated from externs.zip//fido.js
 declare namespace ಠ_ಠ.clutz.u2f {
   /**
    * Data object for a single sign request.
    */
   type Transport = string ;
 }
+// Generated from externs.zip//fido.js
 declare namespace ಠ_ಠ.clutz.u2f {
   function register (appId : string , registerRequests : ಠ_ಠ.clutz.u2f.RegisterRequest [] , registeredKeys : ಠ_ಠ.clutz.u2f.RegisteredKey [] , callback : (a : ಠ_ಠ.clutz.u2f.Error | ಠ_ಠ.clutz.u2f.SignResponse ) => any , opt_timeoutSeconds ? : number ) : any ;
 }
+// Generated from externs.zip//fido.js
 declare namespace ಠ_ಠ.clutz.u2f {
   function sign (appId : string , challenge : string , registeredKeys : ಠ_ಠ.clutz.u2f.RegisteredKey [] , callback : (a : ಠ_ಠ.clutz.u2f.Error | ಠ_ಠ.clutz.u2f.SignResponse ) => any , opt_timeoutSeconds ? : number ) : any ;
 }
+// Generated from externs.zip//html5.js
 declare namespace ಠ_ಠ.clutz {
   abstract class BaseRenderingContext2D implements CanvasDrawingStyles , CanvasPathMethods {
     private noStructuralTyping_BaseRenderingContext2D : any;
@@ -106,6 +115,7 @@ declare namespace ಠ_ಠ.clutz {
     translate (x : number , y : number ) : void ;
   }
 }
+// Generated from externs.zip//html5.js
 declare namespace ಠ_ಠ.clutz {
   interface CanvasDrawingStyles {
     font : string ;
@@ -119,6 +129,7 @@ declare namespace ಠ_ಠ.clutz {
     textBaseline : string ;
   }
 }
+// Generated from externs.zip//html5.js
 declare namespace ಠ_ಠ.clutz {
   interface CanvasPathMethods {
     arc (x : number , y : number , radius : number , startAngle : number , endAngle : number , opt_anticlockwise ? : boolean ) : void ;
@@ -131,11 +142,13 @@ declare namespace ಠ_ಠ.clutz {
     rect (x : number , y : number , w : number , h : number ) : void ;
   }
 }
+// Generated from externs.zip//html5.js
 declare namespace ಠ_ಠ.clutz {
   interface NavigatorStorage {
     storage : StorageManager ;
   }
 }
+// Generated from externs.zip//html5.js
 declare namespace ಠ_ಠ.clutz {
   class OffscreenCanvas implements GlobalEventTarget , Transferable {
     private noStructuralTyping_OffscreenCanvas : any;
@@ -150,12 +163,14 @@ declare namespace ಠ_ಠ.clutz {
     width : number ;
   }
 }
+// Generated from externs.zip//html5.js
 declare namespace ಠ_ಠ.clutz {
   class OffscreenCanvasRenderingContext2D extends BaseRenderingContext2D {
     private noStructuralTyping_OffscreenCanvasRenderingContext2D : any;
     canvas : OffscreenCanvas ;
   }
 }
+// Generated from externs.zip//html5.js
 declare namespace ಠ_ಠ.clutz {
   interface ShareData {
     text ? : string ;
@@ -163,9 +178,11 @@ declare namespace ಠ_ಠ.clutz {
     url ? : string ;
   }
 }
+// Generated from externs.zip//html5.js
 declare namespace ಠ_ಠ.clutz {
   type StorageEstimate = { quota : number , usage : number } ;
 }
+// Generated from externs.zip//html5.js
 declare namespace ಠ_ಠ.clutz {
   class StorageManager {
     private noStructuralTyping_StorageManager : any;
@@ -174,6 +191,7 @@ declare namespace ಠ_ಠ.clutz {
     persisted ( ) : Promise < boolean > ;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class DirectoryEntry extends Entry {
     private noStructuralTyping_DirectoryEntry : any;
@@ -183,6 +201,7 @@ declare namespace ಠ_ಠ.clutz {
     removeRecursively (successCallback : ( ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class DirectoryEntrySync extends EntrySync {
     private noStructuralTyping_DirectoryEntrySync : any;
@@ -192,18 +211,21 @@ declare namespace ಠ_ಠ.clutz {
     removeRecursively ( ) : void ;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class DirectoryReader {
     private noStructuralTyping_DirectoryReader : any;
     readEntries (successCallback : (a : Entry [] ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class DirectoryReaderSync {
     private noStructuralTyping_DirectoryReaderSync : any;
     readEntries ( ) : EntrySync [] ;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class Entry {
     private noStructuralTyping_Entry : any;
@@ -220,6 +242,7 @@ declare namespace ಠ_ಠ.clutz {
     toURL (mimeType ? : string ) : string ;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class EntrySync {
     private noStructuralTyping_EntrySync : any;
@@ -236,6 +259,7 @@ declare namespace ಠ_ಠ.clutz {
     toURL (mimeType ? : string ) : string ;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class FileEntry extends Entry {
     private noStructuralTyping_FileEntry : any;
@@ -243,6 +267,7 @@ declare namespace ಠ_ಠ.clutz {
     file (successCallback : (a : File ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class FileEntrySync extends EntrySync {
     private noStructuralTyping_FileEntrySync : any;
@@ -250,6 +275,7 @@ declare namespace ಠ_ಠ.clutz {
     file ( ) : File ;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class FileError extends DOMError {
     private noStructuralTyping_FileError : any;
@@ -280,6 +306,7 @@ declare namespace ಠ_ಠ.clutz {
     static TYPE_MISMATCH_ERR : number ;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class FileException {
     private noStructuralTyping_FileException : any;
@@ -310,6 +337,7 @@ declare namespace ಠ_ಠ.clutz {
     static TYPE_MISMATCH_ERR : number ;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class FileSaver {
     private noStructuralTyping_FileSaver : any;
@@ -327,6 +355,7 @@ declare namespace ಠ_ಠ.clutz {
     readyState : number ;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class FileSystem {
     private noStructuralTyping_FileSystem : any;
@@ -334,12 +363,14 @@ declare namespace ಠ_ಠ.clutz {
     root : DirectoryEntry ;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   interface FileSystemFlags {
     create ? : boolean ;
     exclusive ? : boolean ;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class FileSystemSync {
     private noStructuralTyping_FileSystemSync : any;
@@ -347,6 +378,7 @@ declare namespace ಠ_ಠ.clutz {
     root : DirectoryEntrySync ;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class FileWriter extends FileSaver {
     private noStructuralTyping_FileWriter : any;
@@ -357,6 +389,7 @@ declare namespace ಠ_ಠ.clutz {
     write (blob : Blob ) : void ;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class FileWriterSync {
     private noStructuralTyping_FileWriterSync : any;
@@ -367,6 +400,7 @@ declare namespace ಠ_ಠ.clutz {
     write (blob : Blob ) : void ;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   /**
    * LocalFileSystemSync interface, implemented by WorkerGlobalScope.
@@ -375,6 +409,7 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_LocalFileSystemSync : any;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   /**
    * Metadata interface.
@@ -385,12 +420,15 @@ declare namespace ಠ_ಠ.clutz {
     size : number ;
   }
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   function requestFileSystemSync (type : number , size : number ) : FileSystemSync ;
 }
+// Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   function webkitRequestFileSystemSync (type : number , size : number ) : FileSystemSync ;
 }
+// Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   class ByteLengthQueuingStrategy {
     private noStructuralTyping_ByteLengthQueuingStrategy : any;
@@ -402,6 +440,7 @@ declare namespace ಠ_ಠ.clutz {
     size (chunk : { byteLength : number } ) : number ;
   }
 }
+// Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   class CountQueuingStrategy {
     private noStructuralTyping_CountQueuingStrategy : any;
@@ -409,6 +448,7 @@ declare namespace ಠ_ಠ.clutz {
     size (chunk : any ) : number ;
   }
 }
+// Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   /**
    * A transform stream (https://streams.spec.whatwg.org/#transform-stream).
@@ -418,6 +458,7 @@ declare namespace ಠ_ಠ.clutz {
     writable : WritableStream ;
   }
 }
+// Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   /**
    * The ReadableByteStreamController constructor cannot be used directly;
@@ -431,6 +472,7 @@ declare namespace ಠ_ಠ.clutz {
     error (err : any ) : void ;
   }
 }
+// Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   /**
    * The ReadableStreamBYOBReader constructor is generally not meant to be used
@@ -443,6 +485,7 @@ declare namespace ಠ_ಠ.clutz {
     releaseLock ( ) : void ;
   }
 }
+// Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   interface ReadableStreamBYOBRequest {
     respond (bytesWritten : number ) : void ;
@@ -450,6 +493,7 @@ declare namespace ಠ_ಠ.clutz {
     view : ArrayBufferView ;
   }
 }
+// Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   /**
    * The ReadableStreamDefaultController constructor cannot be used directly;
@@ -462,6 +506,7 @@ declare namespace ಠ_ಠ.clutz {
     error (err : any ) : void ;
   }
 }
+// Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   /**
    * The ReadableStreamDefaultReader constructor is generally not meant to be used directly;
@@ -474,11 +519,13 @@ declare namespace ಠ_ಠ.clutz {
     releaseLock ( ) : void ;
   }
 }
+// Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   interface ReadableStreamIteratorOptions {
     preventCancel ? : boolean ;
   }
 }
+// Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   interface ReadableStreamSource {
     autoAllocateChunkSize ? : number ;
@@ -488,6 +535,7 @@ declare namespace ಠ_ಠ.clutz {
     type ? : string ;
   }
 }
+// Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   /**
    * The TransformStreamDefaultController class has methods that allow
@@ -503,6 +551,7 @@ declare namespace ಠ_ಠ.clutz {
     terminate ( ) : void ;
   }
 }
+// Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   interface TransformStreamTransformer {
     flush ? : (a : TransformStreamDefaultController ) => PromiseLike < any > | undefined ;
@@ -510,6 +559,7 @@ declare namespace ಠ_ಠ.clutz {
     transform ? : (a : any , b : TransformStreamDefaultController ) => PromiseLike < any > | undefined ;
   }
 }
+// Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   class WritableStream {
     private noStructuralTyping_WritableStream : any;
@@ -519,6 +569,7 @@ declare namespace ಠ_ಠ.clutz {
     locked : boolean ;
   }
 }
+// Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   /**
    * The WritableStreamDefaultController constructor cannot be used directly;
@@ -528,6 +579,7 @@ declare namespace ಠ_ಠ.clutz {
     error (err : any ) : Promise < undefined > ;
   }
 }
+// Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   interface WritableStreamDefaultWriter {
     abort (reason : any ) : Promise < undefined > ;
@@ -539,6 +591,7 @@ declare namespace ಠ_ಠ.clutz {
     write (chunk : any ) : Promise < undefined > ;
   }
 }
+// Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   interface WritableStreamSink {
     abort ? : (a : any ) => PromiseLike < any > | undefined ;
@@ -547,9 +600,11 @@ declare namespace ಠ_ಠ.clutz {
     write ? : (a : any , b : WritableStreamDefaultController ) => PromiseLike < any > | undefined ;
   }
 }
+// Generated from externs.zip//url.js
 declare namespace ಠ_ಠ.clutz {
   type URLSearchParamsTupleType = string [] | null ;
 }
+// Generated from externs.zip//w3c_abort.js
 declare namespace ಠ_ಠ.clutz {
   class AbortController {
     private noStructuralTyping_AbortController : any;
@@ -557,18 +612,21 @@ declare namespace ಠ_ಠ.clutz {
     signal : AbortSignal ;
   }
 }
+// Generated from externs.zip//w3c_abort.js
 declare namespace ಠ_ಠ.clutz {
   interface AbortSignal extends GlobalEventTarget {
     aborted : boolean ;
     onabort : ( (a : GlobalEvent ) => any ) | null ;
   }
 }
+// Generated from externs.zip//w3c_clipboard.js
 declare namespace ಠ_ಠ.clutz {
   interface Clipboard {
     readText ( ) : Promise < string > ;
     writeText (text : string ) : Promise < undefined > ;
   }
 }
+// Generated from externs.zip//w3c_rtc.js
 declare namespace ಠ_ಠ.clutz {
   class BlobEvent extends GlobalEvent {
     private noStructuralTyping_BlobEvent : any;
@@ -577,6 +635,7 @@ declare namespace ಠ_ಠ.clutz {
     timecode : number ;
   }
 }
+// Generated from externs.zip//w3c_rtc.js
 declare namespace ಠ_ಠ.clutz {
   interface RTCRtpSendParameters {
     /**
@@ -588,12 +647,14 @@ declare namespace ಠ_ಠ.clutz {
     transactionId ? : string ;
   }
 }
+// Generated from externs.zip//w3c_rtc.js
 declare namespace ಠ_ಠ.clutz {
   /**
    * Possible values are "sendrecv", "sendonly", "recvonly", and "inactive".
    */
   type RTCRtpTransceiverDirection = string ;
 }
+// Generated from externs.zip//w3c_rtc.js
 declare namespace ಠ_ಠ.clutz {
   interface RTCRtpTransceiverInit {
     /**
@@ -607,6 +668,7 @@ declare namespace ಠ_ಠ.clutz {
     streams ? : MediaStream [] | null ;
   }
 }
+// Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   class Animation implements GlobalEventTarget {
     private noStructuralTyping_Animation : any;
@@ -632,16 +694,19 @@ declare namespace ಠ_ಠ.clutz {
     timeline : AnimationTimeline ;
   }
 }
+// Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   interface AnimationEffectReadOnly {
     getComputedTiming ( ) : ComputedTimingProperties ;
     timing : AnimationEffectTiming ;
   }
 }
+// Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   interface AnimationEffectTiming extends AnimationEffectTimingReadOnly {
   }
 }
+// Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   interface AnimationEffectTimingProperties {
     delay ? : number ;
@@ -654,6 +719,7 @@ declare namespace ಠ_ಠ.clutz {
     iterations ? : number ;
   }
 }
+// Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   interface AnimationEffectTimingReadOnly {
     delay : number ;
@@ -666,11 +732,13 @@ declare namespace ಠ_ಠ.clutz {
     iterations : number ;
   }
 }
+// Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   interface AnimationTimeline {
     currentTime : number | null ;
   }
 }
+// Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   interface ComputedTimingProperties extends AnimationEffectTimingProperties {
     activeDuration : number ;
@@ -680,6 +748,7 @@ declare namespace ಠ_ಠ.clutz {
     progress : number | null ;
   }
 }
+// Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   class DocumentTimeline implements AnimationTimeline {
     private noStructuralTyping_DocumentTimeline : any;
@@ -688,6 +757,7 @@ declare namespace ಠ_ಠ.clutz {
     play (effect : AnimationEffectReadOnly ) : Animation ;
   }
 }
+// Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   class GroupEffect implements AnimationEffectReadOnly {
     private noStructuralTyping_GroupEffect : any;
@@ -697,17 +767,20 @@ declare namespace ಠ_ಠ.clutz {
     timing : AnimationEffectTiming ;
   }
 }
+// Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   interface KeyframeAnimationOptions extends KeyframeEffectOptions {
     id ? : string ;
   }
 }
+// Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   class KeyframeEffect extends KeyframeEffectReadOnly {
     private noStructuralTyping_KeyframeEffect : any;
     constructor (target : GlobalElement | null , frames : { [ key: string ]: any } [] | { [ key: string ]: any [] } , options ? : number | AnimationEffectTimingProperties | null ) ;
   }
 }
+// Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   interface KeyframeEffectOptions extends AnimationEffectTimingProperties {
     /**
@@ -720,6 +793,7 @@ declare namespace ಠ_ಠ.clutz {
     iterationComposite ? : string ;
   }
 }
+// Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   class KeyframeEffectReadOnly implements AnimationEffectReadOnly {
     private noStructuralTyping_KeyframeEffectReadOnly : any;
@@ -730,6 +804,7 @@ declare namespace ಠ_ಠ.clutz {
     timing : AnimationEffectTiming ;
   }
 }
+// Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   class SequenceEffect implements AnimationEffectReadOnly {
     private noStructuralTyping_SequenceEffect : any;

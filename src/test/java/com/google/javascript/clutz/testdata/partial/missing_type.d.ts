@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/missing_type.js
 declare namespace ಠ_ಠ.clutz.module$exports$missing$type {
   let x : ಠ_ಠ.clutz.Missing ;
   let xWithGenerics : ಠ_ಠ.clutz.goog.missing.map < string , number > ;

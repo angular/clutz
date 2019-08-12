@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/index_signature_with_platform.js
 declare namespace ಠ_ಠ.clutz.index_signature {
   class ImplementsIArrayLike implements ArrayLike < string > {
     private noStructuralTyping_index_signature_ImplementsIArrayLike : any;

@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/separated_destructure.js
 declare namespace ಠ_ಠ.clutz.module$exports$separated$destructure {
   class ClassExtendingMissingDestructuredRequire extends ಠ_ಠ.clutz.module$exports$named$base$exporter.MissingDestructuredRequire {
     private noStructuralTyping_module$exports$separated$destructure_ClassExtendingMissingDestructuredRequire : any;

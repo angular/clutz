@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/jsdoc.js
 declare namespace ಠ_ಠ.clutz.x {
   /**
    * Docs on a ctor.

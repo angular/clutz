@@ -1,6 +1,8 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/fn_inner_enum.js
 declare namespace ಠ_ಠ.clutz.ns {
   function foo ( ) : boolean ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/fn_inner_enum.js
 declare namespace ಠ_ಠ.clutz.ns.foo {
   enum Enum {
   }
