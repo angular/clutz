@@ -668,6 +668,10 @@ declare namespace ಠ_ಠ.clutz {
     streams ? : MediaStream [] | null ;
   }
 }
+// Generated from externs.zip//w3c_trusted_types.js
+declare namespace ಠ_ಠ.clutz {
+  let TrustedTypePolicyOptions : PrivateType;
+}
 // Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   class Animation implements GlobalEventTarget {
