@@ -13,6 +13,9 @@ plugins {
 
   // enforces java style
   id 'net.ltgt.errorprone' version '0.6'
+
+  // improve the test output
+  id "com.adarshr.test-logger" version "1.7.0"
 }
 
 eclipse {
@@ -98,4 +101,9 @@ test {
 
 googleJavaFormat {
   toolVersion '1.3'
+}
+
+// configure the test output
+testlogger {
+  theme 'mocha'
 }
