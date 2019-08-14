@@ -1472,6 +1472,7 @@ public class PlatformSymbols {
           "TrustedTypePolicyFactory",
           "TrustedTypes",
           "TrustedURL",
+          "trustedTypes",
           // End of trusted types.
           "TypeError",
           "TypeErrorConstructor",
