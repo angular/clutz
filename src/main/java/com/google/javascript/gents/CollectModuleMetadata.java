@@ -11,7 +11,12 @@ import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.Node;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 
 /**
@@ -314,13 +319,12 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
 
     private void maybeAddGoogExport(Node exportsName) {
       String fullname = providesObjectChildren.keySet().iterator().next();
-      if (exportsName.matchesQualifiedName("exports")) {
+      if (exportsName.matchesName("exports")) {
         String identifier =
             firstNonNull(
                 exportsName.getNext().getQualifiedName(), nameUtil.lastStepOfName(fullname));
         addExport(exportsName.getQualifiedName(), fullname, identifier);
-      } else if (exportsName.isGetProp()
-          && exportsName.getFirstChild().matchesQualifiedName("exports")) {
+      } else if (exportsName.isGetProp() && exportsName.getFirstChild().matchesName("exports")) {
         String identifier = exportsName.getLastChild().getString();
         String importName = fullname + "." + identifier;
         addExport(exportsName.getQualifiedName(), importName, identifier);
