@@ -22,10 +22,10 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz.module$exports$goog$legacy$namespace$exporter {
-  type OriginalName = ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_OriginalName ;
-  let OriginalName : typeof ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_OriginalName ;
-}
-declare namespace ಠ_ಠ.clutz.module$exports$goog$legacy$namespace$exporter {
   type LegacyBaseClass = ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_LegacyBaseClass ;
   let LegacyBaseClass : typeof ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_LegacyBaseClass ;
+}
+declare namespace ಠ_ಠ.clutz.module$exports$goog$legacy$namespace$exporter {
+  type OriginalName = ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_OriginalName ;
+  let OriginalName : typeof ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_OriginalName ;
 }

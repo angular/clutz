@@ -1,7 +1,7 @@
 package com.google.javascript.clutz;
 
 import com.google.javascript.rhino.Node;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -19,7 +19,7 @@ public class LegacyNamespaceReexportMapBuilder extends ImportBasedMapBuilder {
   @Override
   protected Map<String, String> build(
       String localModuleId, Node moduleBody, Set<String> googProvides) {
-    Map<String, String> reexportMap = new HashMap<>();
+    Map<String, String> reexportMap = new LinkedHashMap<>();
     if (localModuleId == null) {
       return reexportMap;
     }

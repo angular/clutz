@@ -24,7 +24,6 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.google.common.collect.Streams;
 import com.google.common.io.Files;
 import com.google.javascript.jscomp.AbstractCommandLineRunner;
 import com.google.javascript.jscomp.CompilerInput;
@@ -64,8 +63,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +74,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 import javax.annotation.Nullable;
 import org.kohsuke.args4j.CmdLineException;
@@ -242,20 +240,20 @@ class DeclarationGenerator {
    * In partial mode, closure doesn't know the correct name of imported symbols, and importRenameMap
    * is used to store the mappings from the closure supplied names to the correct names.
    */
-  private Map<String, String> importRenameMap = Collections.emptyMap();
+  private Map<String, String> importRenameMap = new LinkedHashMap<>();
 
   /**
    * In partial mode, closure doesn't give proper types for reexported symbols. This map contains
    * potential aliases for reexported types. See AliasMapBuilder for details.
    */
-  private Map<String, String> aliasMap = Collections.emptyMap();
+  private Map<String, String> aliasMap = new LinkedHashMap<>();
 
   /**
    * declareLegacyNamespace modules declare goog.provides symbols, but depgraph analysis shows them
    * as goog.modules. This map contains aliases for the symbols in goog.module style, so they can be
    * imported from other goog.modules. See LegacyNamespaceReexportMapBuilder for more details.
    */
-  private Map<String, String> legacyNamespaceReexportMap = Collections.emptyMap();
+  private Map<String, String> legacyNamespaceReexportMap = new LinkedHashMap<>();
 
   /** If true, add all the import rename map entries to the output as comments in the .d.ts. */
   private final boolean PRINT_IMPORT_RENAME_MAP = false;
@@ -803,7 +801,7 @@ class DeclarationGenerator {
           googModuleStyleName = e.getKey();
         }
         TreeWalker treeWalker =
-            new TreeWalker(compiler.getTypeRegistry(), new HashSet<>(), false, false);
+            new TreeWalker(compiler.getTypeRegistry(), new LinkedHashSet<>(), false, false);
         TypedVar symbol = compiler.getTopScope().getOwnSlot(e.getValue());
         if (symbol != null) {
           JSType type = symbol.getType();
@@ -1925,9 +1923,11 @@ class DeclarationGenerator {
       // 2) The STRINGLIT node for a goog.module style export - exports = { MyEnum: {...}, ...}
       // For case 1) we need to get the next node, while for 2) we need to get the first child.
       Node objectOfAllMembers = node.getParent().isAssign() ? node.getNext() : node.getFirstChild();
-      Stream<Node> elementStream = Streams.stream(objectOfAllMembers.children());
-      Map<String, Node> elements =
-          elementStream.collect(Collectors.toMap(Node::getString, Node::getFirstChild));
+
+      Map<String, Node> elements = new LinkedHashMap<>();
+      for (Node element : objectOfAllMembers.children()) {
+        elements.put(element.getString(), element.getFirstChild());
+      }
 
       JSType primitiveType = type.getEnumeratedTypeOfEnumObject();
       if (maybeStringOrNumericEnum(type, unqualifiedName, objectOfAllMembers, elements)) {
@@ -1979,7 +1979,7 @@ class DeclarationGenerator {
      * literal initializers to complete the type alias.
      */
     private Set<String> collectAllLiterals(Map<String, Node> elements) {
-      Set<String> literalInitializers = new HashSet<>();
+      Set<String> literalInitializers = new TreeSet<>();
       for (Node n : elements.values()) {
         if (n.isString()) {
           literalInitializers.add(escapeEcmaScript(n.getString()));
@@ -2419,7 +2419,7 @@ class DeclarationGenerator {
      * inline, we cannot express that without introducing aliases. To avoid infinite recursion, we
      * store the types that we see during the traversal in this object.
      */
-    Set<JSType> visitedRecordTypes = new HashSet<>();
+    Set<JSType> visitedRecordTypes = new LinkedHashSet<>();
 
     private void visitRecordType(ObjectType type) {
       visitedRecordTypes.add(type);
@@ -2667,7 +2667,7 @@ class DeclarationGenerator {
      * interfaces.
      */
     public Set<ObjectType> getAllDirectlyImplementedInterfaces(FunctionType type) {
-      Set<ObjectType> interfaces = new HashSet<>();
+      Set<ObjectType> interfaces = new LinkedHashSet<>();
 
       for (ObjectType implementedInterface : type.getOwnImplementedInterfaces()) {
         addRelatedInterfaces(implementedInterface, interfaces);
@@ -3330,12 +3330,11 @@ class DeclarationGenerator {
           }
         }
       } else {
-        Map<String, Node> nodes =
-            childListMap
-                .get(innerNamespace)
-                .stream()
-                .filter(symbol -> symbol.getName() != null && symbol.getNode() != null)
-                .collect(Collectors.toMap(TypedVar::getName, TypedVar::getNode));
+        Map<String, Node> nodes = new LinkedHashMap<>();
+        for (TypedVar symbol : childListMap.get(innerNamespace)) {
+          if (symbol.getName() != null && symbol.getNode() != null)
+            nodes.put(symbol.getName(), symbol.getNode());
+        }
         for (String propName : getEmittablePropertyNames(type)) {
           innerProps.put(
               new NamedTypePair(type.getPropertyType(propName), propName),
