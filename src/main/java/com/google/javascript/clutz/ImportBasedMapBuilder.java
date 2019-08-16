@@ -16,7 +16,7 @@ public abstract class ImportBasedMapBuilder {
    * variables to build a map based on the concrete class's implementation of build.
    */
   public Map<String, String> build(Collection<Node> parsedInputs, Set<String> googProvides) {
-    Map<String, String> importRenameMap = new HashMap<>();
+    Map<String, String> importRenameMap = new LinkedHashMap<>();
     for (Node ast : parsedInputs) {
       // Symbols can be imported into a variable in a goog.module() file, so look for imports in the
       // body of the goog module.
@@ -255,7 +255,7 @@ public abstract class ImportBasedMapBuilder {
   }
 
   protected Map<String, String> objectLiteralASTToStringMap(Node objectLiteral) {
-    Map<String, String> stringMap = new HashMap<>();
+    Map<String, String> stringMap = new LinkedHashMap<>();
     for (Node objectMember : objectLiteral.children()) {
       String originalName = objectMember.getString();
       // Object literals can use the original name `{A}` or rename it `{RenameA: A}`.
