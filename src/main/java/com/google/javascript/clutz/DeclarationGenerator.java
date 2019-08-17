@@ -3349,23 +3349,26 @@ class DeclarationGenerator {
         String qualifiedName = innerNamespace + '.' + propName;
         if (provides.contains(qualifiedName)) continue;
         Node node = innerProps.get(namedType);
+        // Node might be null in some edge cases. For example when "type not found in Closure
+        // type registry" comment emmited below.
+        StaticSourceFile sourceFile = node == null ? null : node.getStaticSourceFile();
         if (pType.isEnumType()) {
           if (!foundNamespaceMembers) {
-            emitGeneratedFromFileComment(node.getStaticSourceFile());
+            emitGeneratedFromFileComment(sourceFile);
             emitNamespaceBegin(innerNamespace);
             foundNamespaceMembers = true;
           }
           visitEnumType(propName, qualifiedName, (EnumType) pType, node);
         } else if (isClassLike(pType)) {
           if (!foundNamespaceMembers) {
-            emitGeneratedFromFileComment(node.getStaticSourceFile());
+            emitGeneratedFromFileComment(sourceFile);
             emitNamespaceBegin(innerNamespace);
             foundNamespaceMembers = true;
           }
           visitClassOrInterface(propName, (FunctionType) pType);
         } else if (isTypedef(pType)) {
           if (!foundNamespaceMembers) {
-            emitGeneratedFromFileComment(node.getStaticSourceFile());
+            emitGeneratedFromFileComment(sourceFile);
             emitNamespaceBegin(innerNamespace);
             foundNamespaceMembers = true;
           }
@@ -3380,9 +3383,9 @@ class DeclarationGenerator {
                     + propName
                     + " but type not found in Closure type registry.");
           }
-          // Non-type defining static properties are handled for provided and unprovided
-          // interfaces in visitClassOrInterface.
         }
+        // Non-type defining static properties are handled for provided and unprovided
+        // interfaces in visitClassOrInterface.
       }
       if (foundNamespaceMembers) emitNamespaceEnd();
 
