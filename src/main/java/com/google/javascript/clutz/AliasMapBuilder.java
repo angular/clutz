@@ -91,6 +91,12 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
       } else if (isNamedExportPropAssignment(statement)) {
         // `exports.foo = foo.bar;`
         String localVariableName = getExportsAssignmentPropRootName(statement);
+        if (localVariableName.equals("exports")) {
+          // This is a "local" alias between two exports from the same module.
+          // There is no need to for clutz to special handle this, as the JS
+          // Compiler will resolve this properly.
+          continue;
+        }
         String localPropName = getExportsAssignmentPropName(statement);
         String exportName = getNamedExportName(statement);
         String localNamespaceName =
