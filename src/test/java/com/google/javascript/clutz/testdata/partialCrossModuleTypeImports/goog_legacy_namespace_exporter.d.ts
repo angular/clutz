@@ -1,9 +1,7 @@
 // Generated from src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/goog_legacy_namespace_exporter.js
 declare namespace ಠ_ಠ.clutz.goog.legacy.namespace.exporter {
-  type LegacyBaseClass = ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_LegacyBaseClass ;
-  let LegacyBaseClass : typeof ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_LegacyBaseClass ;
-  type OriginalName = ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_OriginalName ;
-  let OriginalName : typeof ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_OriginalName ;
+  export import LegacyBaseClass = ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_LegacyBaseClass ;
+  export import OriginalName = ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_OriginalName ;
 }
 declare module 'goog:goog.legacy.namespace.exporter' {
   import exporter = ಠ_ಠ.clutz.goog.legacy.namespace.exporter;
@@ -22,10 +20,8 @@ declare namespace ಠ_ಠ.clutz {
   }
 }
 declare namespace ಠ_ಠ.clutz.module$exports$goog$legacy$namespace$exporter {
-  type LegacyBaseClass = ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_LegacyBaseClass ;
-  let LegacyBaseClass : typeof ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_LegacyBaseClass ;
+  export import LegacyBaseClass = ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_LegacyBaseClass ;
 }
 declare namespace ಠ_ಠ.clutz.module$exports$goog$legacy$namespace$exporter {
-  type OriginalName = ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_OriginalName ;
-  let OriginalName : typeof ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_OriginalName ;
+  export import OriginalName = ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_OriginalName ;
 }

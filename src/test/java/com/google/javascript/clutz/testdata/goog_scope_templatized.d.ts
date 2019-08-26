@@ -1,6 +1,6 @@
 // Generated from src/test/java/com/google/javascript/clutz/testdata/goog_scope_templatized.js
 declare namespace ಠ_ಠ.clutz.aliasT {
-  type I < T > = ಠ_ಠ.clutz.$jscomp.scope.I < T > ;
+  export import I = ಠ_ಠ.clutz.$jscomp.scope.I ;
 }
 declare module 'goog:aliasT.I' {
   import I = ಠ_ಠ.clutz.aliasT.I;
@@ -8,7 +8,7 @@ declare module 'goog:aliasT.I' {
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/goog_scope_templatized.js
 declare namespace ಠ_ಠ.clutz.aliasT {
-  type I2 < T > = ಠ_ಠ.clutz.$jscomp.scope.I < T > ;
+  export import I2 = ಠ_ಠ.clutz.$jscomp.scope.I ;
 }
 declare module 'goog:aliasT.I2' {
   import I2 = ಠ_ಠ.clutz.aliasT.I2;

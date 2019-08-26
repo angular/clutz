@@ -11,8 +11,7 @@ declare module 'goog:enum_from_enum.Bar.bar.GoodEnum' {
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/enum_from_enum.js
 declare namespace ಠ_ಠ.clutz.enum_from_enum.Foo.foo {
-  type DeprecatedEnum = enum_from_enum.Bar.bar.GoodEnum ;
-  let DeprecatedEnum : typeof enum_from_enum.Bar.bar.GoodEnum ;
+  export import DeprecatedEnum = enum_from_enum.Bar.bar.GoodEnum ;
 }
 declare module 'goog:enum_from_enum.Foo.foo.DeprecatedEnum' {
   import DeprecatedEnum = ಠ_ಠ.clutz.enum_from_enum.Foo.foo.DeprecatedEnum;

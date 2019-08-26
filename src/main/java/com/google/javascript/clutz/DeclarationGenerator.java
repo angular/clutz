@@ -1195,15 +1195,9 @@ class DeclarationGenerator {
    */
   private void visitKnownTypeValueAlias(String unqualifiedName, String alternativeAliasName) {
     String emitName = Constants.INTERNAL_NAMESPACE + "." + alternativeAliasName;
-    emit("type");
+    emit("export import");
     emit(unqualifiedName);
     emit("=");
-    emit(emitName);
-    emit(";");
-    emitBreak();
-    emit("let " + unqualifiedName);
-    emit(":");
-    emit("typeof");
     emit(emitName);
     emit(";");
     emitBreak();
@@ -1654,26 +1648,12 @@ class DeclarationGenerator {
      */
     private void visitTypeValueAlias(String unqualifiedName, ObjectType otype) {
       String emitName = Constants.INTERNAL_NAMESPACE + "." + otype.getDisplayName();
-      emit("type");
+      emit("export import");
       emit(unqualifiedName);
-      visitTemplateTypes(otype);
       emit("=");
       emit(emitName);
-      visitTemplateTypes(otype, Collections.emptyList(), false);
       emit(";");
       emitBreak();
-      if (!otype.isInterface() || !getTypePropertyNamesToEmit(otype, true).isEmpty()) {
-        // TS type aliases are only useful in type positions.
-        // To emulate closure alias semantics, introduce also an aliased constructor if there is a
-        // value associated with the type (i.e. non-interfaces or interfaces that also have static
-        // properties emitted on them).
-        emit("let " + unqualifiedName);
-        emit(":");
-        emit("typeof");
-        emit(emitName);
-        emit(";");
-        emitBreak();
-      }
       typesUsed.add(otype.getDisplayName());
     }
 
@@ -1903,15 +1883,9 @@ class DeclarationGenerator {
 
       if (!qualifiedName.equals(elementsTypeName)) {
         emitComment(symbolName + " aliases enum " + elementsTypeName);
-        emit("type");
+        emit("export import");
         emit(unqualifiedName);
         emit("=");
-        emit(elementsTypeName);
-        emit(";");
-        emitBreak();
-        emit("let");
-        emit(unqualifiedName);
-        emit(": typeof");
         emit(elementsTypeName);
         emit(";");
         emitBreak();

@@ -1,7 +1,6 @@
 // Generated from src/test/java/com/google/javascript/clutz/testdata/goog_scope.js
 declare namespace ಠ_ಠ.clutz.foo {
-  type Bar = ಠ_ಠ.clutz.$jscomp.scope.Bar ;
-  let Bar : typeof ಠ_ಠ.clutz.$jscomp.scope.Bar ;
+  export import Bar = ಠ_ಠ.clutz.$jscomp.scope.Bar ;
 }
 declare module 'goog:foo.Bar' {
   import Bar = ಠ_ಠ.clutz.foo.Bar;
@@ -9,7 +8,7 @@ declare module 'goog:foo.Bar' {
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/goog_scope.js
 declare namespace ಠ_ಠ.clutz.foo {
-  type IBar = ಠ_ಠ.clutz.$jscomp.scope.IBar ;
+  export import IBar = ಠ_ಠ.clutz.$jscomp.scope.IBar ;
 }
 declare module 'goog:foo.IBar' {
   import IBar = ಠ_ಠ.clutz.foo.IBar;
