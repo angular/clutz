@@ -142,13 +142,6 @@ public class Options {
   String skipEmitRegExp = null;
 
   @Option(
-    name = "--googProvides",
-    usage =
-        "file containing a list of namespaces names that we know come from goog.provides (not goog.modules)"
-  )
-  String googProvidesFile = null;
-
-  @Option(
     name = "--collidingProvides",
     usage = "file containing a list of names that we know conflict with namespaces"
   )
@@ -180,7 +173,6 @@ public class Options {
   // TODO(martinprobst): Remove when internal Google is upgraded to a more recent args4j
   // library that supports Pattern arguments.
   Pattern skipEmitPattern;
-  Set<String> knownGoogProvides = new HashSet<>();
   Set<String> collidingProvides = new HashSet<>();
 
   public CompilerOptions getCompilerOptions() {
@@ -282,13 +274,6 @@ public class Options {
       throw new CmdLineException(parser, "No files or externs were given");
     }
 
-    if (googProvidesFile != null) {
-      try {
-        knownGoogProvides.addAll(Files.readLines(new File(googProvidesFile), UTF_8));
-      } catch (IOException e) {
-        throw new RuntimeException("Error reading goog provides file " + googProvidesFile, e);
-      }
-    }
     if (collidingProvidesFile != null) {
       try {
         collidingProvides.addAll(Files.readLines(new File(collidingProvidesFile), UTF_8));
