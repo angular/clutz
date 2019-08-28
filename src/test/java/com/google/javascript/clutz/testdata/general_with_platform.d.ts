@@ -626,6 +626,18 @@ declare namespace ಠ_ಠ.clutz {
     writeText (text : string ) : Promise < undefined > ;
   }
 }
+// Generated from externs.zip//w3c_navigation_timing.js
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * https://wicg.github.io/layout-instability/#sec-layout-shift
+   */
+  class LayoutShift extends PerformanceEntry {
+    private noStructuralTyping_LayoutShift : any;
+    hadRecentInput : boolean ;
+    lastInputTime : number ;
+    value : number ;
+  }
+}
 // Generated from externs.zip//w3c_rtc.js
 declare namespace ಠ_ಠ.clutz {
   class BlobEvent extends GlobalEvent {
