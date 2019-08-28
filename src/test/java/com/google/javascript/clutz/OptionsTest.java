@@ -163,18 +163,6 @@ public class OptionsTest {
   }
 
   @Test
-  public void testGoogProvides() throws Exception {
-    Options opts =
-        new Options(
-            new String[] {
-              "foo.js",
-              "--googProvides",
-              DeclarationGeneratorTest.getTestInputFile("test_goog_provides").toFile().toString()
-            });
-    assertThat(opts.knownGoogProvides).containsExactly("foo.bar", "baz.quux");
-  }
-
-  @Test
   public void testPartialInputIgnoresDepgraphRootExternsIfNotPassedToExterns() throws Exception {
     // Due to "exported" libraries, what the depgraph considers "root" can be incorrect for the
     // purposes of incremental clutz. Arguments and Externs lists should only be filtered down
