@@ -79,7 +79,7 @@ import javax.annotation.Nullable;
 import org.kohsuke.args4j.CmdLineException;
 
 /** A tool that generates {@code .d.ts} declarations from a Google Closure JavaScript program. */
-class DeclarationGenerator {
+public class DeclarationGenerator {
 
   /**
    * Words for which we cannot generate 'namespace foo.Word {}'; Instead clutz tries to roll them up

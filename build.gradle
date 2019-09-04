@@ -107,3 +107,14 @@ googleJavaFormat {
 testlogger {
   theme 'mocha'
 }
+
+jar {
+  manifest {
+    attributes 'Main-Class': 'com.google.javascript.Main'
+  }
+  from {
+    configurations.compile.collect {
+      it.isDirectory() ? it : zipTree(it)
+    }
+  }
+}
