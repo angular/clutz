@@ -57,8 +57,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     return out;
   }
 
-  CollectModuleMetadata(
-      AbstractCompiler compiler, NameUtil nameUtil, Set<String> filesToConvert) {
+  CollectModuleMetadata(AbstractCompiler compiler, NameUtil nameUtil, Set<String> filesToConvert) {
     this.compiler = compiler;
     this.nameUtil = nameUtil;
     this.filesToConvert = filesToConvert;
