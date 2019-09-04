@@ -51,6 +51,15 @@ jobs:
       - run: ./gradlew assemble || true
       - run: ./gradlew check || true
 
+  test_format:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: *cache_key
+      - run: ./gradlew verifyGoogleJavaFormat
+      - *save_cache
+
 workflows:
   version: 2
   default_workflow:
