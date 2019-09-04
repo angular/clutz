@@ -28,9 +28,9 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
   private final AbstractCompiler compiler;
   private final NameUtil nameUtil;
 
-  final Set<String> filesToConvert;
-  final Map<String, FileModule> fileToModule = new LinkedHashMap<>();
-  final Map<String, FileModule> namespaceToModule = new LinkedHashMap<>();
+  private final Set<String> filesToConvert;
+  private final Map<String, FileModule> fileToModule = new LinkedHashMap<>();
+  private final Map<String, FileModule> namespaceToModule = new LinkedHashMap<>();
 
   Map<String, FileModule> getFileMap() {
     return fileToModule;
@@ -57,7 +57,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     return out;
   }
 
-  public CollectModuleMetadata(
+  CollectModuleMetadata(
       AbstractCompiler compiler, NameUtil nameUtil, Set<String> filesToConvert) {
     this.compiler = compiler;
     this.nameUtil = nameUtil;
@@ -152,7 +152,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
   }
 
   /** Registers a goog.module namespace for future lookup. */
-  void registerGoogModule(Node n, String file, String namespace) {
+  private void registerGoogModule(Node n, String file, String namespace) {
     if (fileToModule.containsKey(file)) {
       compiler.report(
           JSError.make(

@@ -18,7 +18,7 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
   private final AbstractCompiler compiler;
   private final NodeComments nodeComments;
 
-  public StyleFixPass(AbstractCompiler compiler, NodeComments nodeComments) {
+  StyleFixPass(AbstractCompiler compiler, NodeComments nodeComments) {
     this.compiler = compiler;
     this.nodeComments = nodeComments;
   }
@@ -128,7 +128,7 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
    * Attempts to lift class or functions declarations of the form 'var/let/const x = class/function
    * {...}' into 'class/function x {...}'
    */
-  void liftClassOrFunctionDefinition(Node n) {
+  private void liftClassOrFunctionDefinition(Node n) {
     Node rhs = n.getFirstFirstChild();
     Node oldName = rhs.getFirstChild();
     Node newName = n.getFirstChild();

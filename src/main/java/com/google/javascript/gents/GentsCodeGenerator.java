@@ -16,7 +16,7 @@ public class GentsCodeGenerator extends CodeGenerator {
   private final NodeComments nodeComments;
   private final Map<String, String> externsMap;
 
-  protected GentsCodeGenerator(
+  GentsCodeGenerator(
       CodeConsumer consumer,
       CompilerOptions options,
       NodeComments nodeComments,
@@ -108,7 +108,7 @@ public class GentsCodeGenerator extends CodeGenerator {
    *
    * @return true if no further code generation on this node is needed.
    */
-  boolean maybeOverrideCodeGen(Node n) {
+  private boolean maybeOverrideCodeGen(Node n) {
     @Nullable Node parent = n.getParent();
     switch (n.getToken()) {
       case INDEX_SIGNATURE:

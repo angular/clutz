@@ -9,7 +9,7 @@ public class PathUtil {
   private final String rootpath;
   private final String absolutePrefix;
 
-  public PathUtil(String root, String absolutePrefix) {
+  PathUtil(String root, String absolutePrefix) {
     this.rootpath = root;
     this.absolutePrefix = absolutePrefix;
   }

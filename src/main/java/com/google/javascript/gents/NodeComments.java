@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /** Represents the mapping from an AST Node to its corresponding comment. */
-public class NodeComments {
-  final Map<Node, String> nodeToComment = new HashMap<>();
+class NodeComments {
+  private final Map<Node, String> nodeToComment = new HashMap<>();
 
   void addComment(Node n, String comment) {
     if (hasComment(n)) {

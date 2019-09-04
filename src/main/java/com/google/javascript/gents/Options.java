@@ -58,7 +58,7 @@ public class Options {
             + "Passing dependency files is disallowed when \"--dependenciesManifest\" option is used",
     metaVar = "DEPENDENCIES_MANIFEST"
   )
-  String dependenciesManifest = null;
+  private String dependenciesManifest = null;
 
   @Option(
     name = "--sourcesManifest",
@@ -67,7 +67,7 @@ public class Options {
             + "\"--convert\" option is disallowed when \"--sourcesManifest\" option is used",
     metaVar = "SOURCES_MANIFEST"
   )
-  String sourcesManifest = null;
+  private String sourcesManifest = null;
 
   @Option(
     name = "--convert",
@@ -115,7 +115,7 @@ public class Options {
   Set<String> srcFiles = new LinkedHashSet<>();
   Map<String, String> externsMap = null;
 
-  public CompilerOptions getCompilerOptions() {
+  CompilerOptions getCompilerOptions() {
     final CompilerOptions options = new CompilerOptions();
     options.setClosurePass(true);
 
