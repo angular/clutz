@@ -9,10 +9,10 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 /** Utility methods for variable naming. */
-public class NameUtil {
+class NameUtil {
   private AbstractCompiler compiler;
 
-  public NameUtil(AbstractCompiler compiler) {
+  NameUtil(AbstractCompiler compiler) {
     this.compiler = compiler;
   }
 

@@ -41,7 +41,7 @@ public final class TypeConversionPass implements CompilerPass {
 
   private Map<String, String> typesToFilename;
 
-  public TypeConversionPass(
+  TypeConversionPass(
       AbstractCompiler compiler, CollectModuleMetadata modulePrepass, NodeComments nodeComments) {
     this.compiler = compiler;
     this.modulePrepass = modulePrepass;
@@ -514,7 +514,7 @@ public final class TypeConversionPass implements CompilerPass {
   }
 
   /** Converts @constructor annotated functions into class definitions. */
-  void convertConstructorToClass(Node n, JSDocInfo jsDoc) {
+  private void convertConstructorToClass(Node n, JSDocInfo jsDoc) {
     Preconditions.checkState(n.isFunction());
     Preconditions.checkState(n.getFirstChild().isName());
     Preconditions.checkState(n.getSecondChild().isParamList());
@@ -580,7 +580,7 @@ public final class TypeConversionPass implements CompilerPass {
   }
 
   /** Converts goog.defineClass calls into class definitions. */
-  void convertDefineClassToClass(Node n) {
+  private void convertDefineClassToClass(Node n) {
     Preconditions.checkState(n.isCall());
     Node superClass = n.getSecondChild();
     if (superClass.isNull()) {
@@ -614,7 +614,7 @@ public final class TypeConversionPass implements CompilerPass {
   }
 
   /** return if node n is a @constructor annotated function inside goog.defineClass */
-  boolean isConstructorInGoogDefineClass(Node n) {
+  private boolean isConstructorInGoogDefineClass(Node n) {
     // CALL
     //     GETPROP
     //         NAME goog
@@ -650,7 +650,7 @@ public final class TypeConversionPass implements CompilerPass {
    * Converts functions and variables declared in object literals into member method and field
    * definitions
    */
-  void convertObjectLiteral(Node classMembers, Node objectLiteralMember, boolean isStatic) {
+  private void convertObjectLiteral(Node classMembers, Node objectLiteralMember, boolean isStatic) {
     Preconditions.checkState(
         objectLiteralMember.isStringKey() || objectLiteralMember.isMemberFunctionDef());
 
@@ -679,7 +679,7 @@ public final class TypeConversionPass implements CompilerPass {
    * Attempts to move a method declaration into a class definition. This generates a new
    * MEMBER_FUNCTION_DEF Node while removing the old function node from the AST.
    */
-  void moveMethodsIntoClasses(ClassMemberDeclaration declaration) {
+  private void moveMethodsIntoClasses(ClassMemberDeclaration declaration) {
     Node classMembers = declaration.classNode.getLastChild();
     String fieldName = declaration.memberName;
 
@@ -709,7 +709,7 @@ public final class TypeConversionPass implements CompilerPass {
     compiler.reportChangeToEnclosingScope(memberFunc);
   }
 
-  Node createMemberVariableDef(ClassMemberDeclaration declaration) {
+  private Node createMemberVariableDef(ClassMemberDeclaration declaration) {
     Node fieldNode = Node.newString(Token.MEMBER_VARIABLE_DEF, declaration.memberName);
     fieldNode.setJSDocInfo(declaration.jsDoc);
     fieldNode.setStaticMember(declaration.isStatic);
@@ -721,7 +721,7 @@ public final class TypeConversionPass implements CompilerPass {
    * Attempts to move a field declaration into a class definition. This generates a new
    * MEMBER_VARIABLE_DEF Node while persisting the old node in the AST.
    */
-  void moveFieldsIntoClasses(ClassMemberDeclaration declaration) {
+  private void moveFieldsIntoClasses(ClassMemberDeclaration declaration) {
     Node classMembers = declaration.classNode.getLastChild();
 
     Node fieldNode = createMemberVariableDef(declaration);
@@ -766,7 +766,7 @@ public final class TypeConversionPass implements CompilerPass {
    * <p>This returns without any modification if the node is not an inheritance statement. This
    * fails by reporting an error when the node is an invalid inheritance statement.
    */
-  void maybeRemoveInherits(Node exprNode) {
+  private void maybeRemoveInherits(Node exprNode) {
     Preconditions.checkState(exprNode.isExprResult());
     if (exprNode.getFirstChild().isCall()) {
       Node callNode = exprNode.getFirstChild();
@@ -831,7 +831,7 @@ public final class TypeConversionPass implements CompilerPass {
    *
    * <p>This returns without any modification if the node is not an superclass call statement.
    */
-  void maybeReplaceSuperCall(Node callNode) {
+  private void maybeReplaceSuperCall(Node callNode) {
     Preconditions.checkState(callNode.isCall());
     String callName = callNode.getFirstChild().getQualifiedName();
 
@@ -903,7 +903,7 @@ public final class TypeConversionPass implements CompilerPass {
   }
 
   /** Adds a field node before the first method node in classMembers */
-  void addFieldToClassMembers(Node classMembers, Node field) {
+  private void addFieldToClassMembers(Node classMembers, Node field) {
     for (Node n : classMembers.children()) {
       if (n.isMemberFunctionDef()) {
         classMembers.addChildBefore(field, n);
@@ -918,7 +918,7 @@ public final class TypeConversionPass implements CompilerPass {
    *
    * <p>This determines the classname using the nearest available name node.
    */
-  void addClassToScope(Node n) {
+  private void addClassToScope(Node n) {
     Preconditions.checkState(n.isClass());
     String className = NodeUtil.getName(n);
     if (className == null) {

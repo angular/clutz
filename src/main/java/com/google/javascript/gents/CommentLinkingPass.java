@@ -77,7 +77,7 @@ public final class CommentLinkingPass implements CompilerPass {
   private final Compiler compiler;
   private final NodeComments nodeComments;
 
-  public CommentLinkingPass(Compiler compiler) {
+  CommentLinkingPass(Compiler compiler) {
     this.compiler = compiler;
     this.nodeComments = new NodeComments();
   }

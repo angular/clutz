@@ -65,11 +65,11 @@ public final class ModuleConversionPass implements CompilerPass {
   // full module imports.
   private final Table<String, String, Node> destructuringAssignments = HashBasedTable.create();
 
-  public Table<String, String, String> getTypeRewrite() {
+  Table<String, String, String> getTypeRewrite() {
     return typeRewrite;
   }
 
-  public ModuleConversionPass(
+  ModuleConversionPass(
       AbstractCompiler compiler,
       PathUtil pathUtil,
       NameUtil nameUtil,
@@ -331,7 +331,7 @@ public final class ModuleConversionPass implements CompilerPass {
   }
 
   /** A single statement containing {@code goog.require(...)}. */
-  class ModuleImport {
+  private class ModuleImport {
     /** require statement Node. */
     private Node originalImportNode;
 
@@ -451,7 +451,7 @@ public final class ModuleConversionPass implements CompilerPass {
    *   import "./sideEffectsOnly"
    * </pre>
    */
-  void convertNonDestructuringRequireToImportStatements(Node n, ModuleImport moduleImport) {
+  private void convertNonDestructuringRequireToImportStatements(Node n, ModuleImport moduleImport) {
     // The imported file is already in TS
     if (moduleImport.isAlreadyConverted()) {
       convertRequireForAlreadyConverted(moduleImport);
@@ -538,7 +538,7 @@ public final class ModuleConversionPass implements CompilerPass {
    *   import {A as localName, B} from "./valueExports";
    * </pre>
    */
-  void convertDestructuringRequireToImportStatements(Node n, ModuleImport moduleImport) {
+  private void convertDestructuringRequireToImportStatements(Node n, ModuleImport moduleImport) {
     // The imported file is already in TS
     if (moduleImport.isAlreadyConverted()) {
       convertRequireForAlreadyConverted(moduleImport);
@@ -673,7 +673,7 @@ public final class ModuleConversionPass implements CompilerPass {
    *     convertExportAssignment(pre.fix = ..., "pre.fix", "name") <-> export const name = ...
    *     convertExportAssignment(pre.fix.foo = ..., "pre.fix", "name") <-> name.foo = ...
    */
-  void convertExportAssignment(
+  private void convertExportAssignment(
       Node assign, String exportedNamespace, String exportedSymbol, String fileName) {
     checkState(assign.isAssign());
     checkState(assign.getParent().isExprResult());

@@ -66,7 +66,7 @@ public final class TypeAnnotationPass implements CompilerPass {
   /** extern -> typing map for when extern and TS typing names differ */
   private final Map<String, String> externsMap;
 
-  public TypeAnnotationPass(
+  TypeAnnotationPass(
       AbstractCompiler compiler,
       PathUtil pathUtil,
       NameUtil nameUtil,
@@ -345,7 +345,7 @@ public final class TypeAnnotationPass implements CompilerPass {
   }
 
   @Nullable
-  public TypeDeclarationNode convert(@Nullable JSTypeExpression typeExpr, boolean isReturnType) {
+  private TypeDeclarationNode convert(@Nullable JSTypeExpression typeExpr, boolean isReturnType) {
     if (typeExpr == null) {
       return null;
     }
@@ -360,12 +360,12 @@ public final class TypeAnnotationPass implements CompilerPass {
    * @return the root node of a TypeDeclaration AST, or null if no type is available for the node.
    */
   @Nullable
-  public TypeDeclarationNode convertTypeNodeAST(Node n) {
+  private TypeDeclarationNode convertTypeNodeAST(Node n) {
     return convertTypeNodeAST(n, false);
   }
 
   @Nullable
-  public TypeDeclarationNode convertTypeNodeAST(Node n, boolean isReturnType) {
+  private TypeDeclarationNode convertTypeNodeAST(Node n, boolean isReturnType) {
     switch (n.getToken()) {
         // for function types that don't declare a return type
         // ex. /** @return */ var f = function() {};
@@ -523,7 +523,7 @@ public final class TypeAnnotationPass implements CompilerPass {
   }
 
   /** Returns a new node representing an index signature type. */
-  TypeDeclarationNode indexSignatureType(
+  private TypeDeclarationNode indexSignatureType(
       TypeDeclarationNode keyType, TypeDeclarationNode valueType) {
     TypeDeclarationNode node = new TypeDeclarationNode(Token.INDEX_SIGNATURE);
     TypeDeclarationNode first = null;
@@ -535,7 +535,7 @@ public final class TypeAnnotationPass implements CompilerPass {
   }
 
   /** Converts the global type name to the local type name. */
-  String convertTypeName(String sourceFile, String typeName) {
+  private String convertTypeName(String sourceFile, String typeName) {
     Map<String, String> rewriteMap =
         typeRewrite.containsRow(sourceFile)
             ? typeRewrite.rowMap().get(sourceFile)
@@ -591,7 +591,7 @@ public final class TypeAnnotationPass implements CompilerPass {
    * If an extern-to-typing map is provided, try to look up the extern type name and replace it with
    * the TypeScript version.
    */
-  String convertExternNameToTypingName(String externTypeName) {
+  private String convertExternNameToTypingName(String externTypeName) {
     String typingName = this.externsMap.get(externTypeName);
     if (typingName != null) {
       return typingName;
@@ -601,7 +601,7 @@ public final class TypeAnnotationPass implements CompilerPass {
   }
 
   /** Helper function to recursively flatten union types. */
-  void flatten(
+  private void flatten(
       Iterable<TypeDeclarationNode> types, List<TypeDeclarationNode> result, boolean hasNull) {
     for (TypeDeclarationNode t : types) {
       switch (t.getToken()) {
@@ -632,7 +632,7 @@ public final class TypeAnnotationPass implements CompilerPass {
    *
    * @return A flattened union type with at most 1 null.
    */
-  TypeDeclarationNode flatUnionType(Iterable<TypeDeclarationNode> types) {
+  private TypeDeclarationNode flatUnionType(Iterable<TypeDeclarationNode> types) {
     List<TypeDeclarationNode> flatTypes = new ArrayList<>();
     flatten(types, flatTypes, false);
     return unionType(flatTypes);

@@ -90,7 +90,7 @@ public class TypeScriptGenerator {
   private final Compiler compiler;
 
   final PathUtil pathUtil;
-  final NameUtil nameUtil;
+  private final NameUtil nameUtil;
   private GentsErrorManager errorManager;
 
   TypeScriptGenerator(Options opts) {
