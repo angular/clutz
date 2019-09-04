@@ -26,7 +26,7 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
   private final Set<String> providedNamespaces = new HashSet<>();
   private final Map<String, String> aliasToProvidedNamespace = new HashMap<>();
 
-  public RemoveGoogScopePass(AbstractCompiler compiler) {
+  RemoveGoogScopePass(AbstractCompiler compiler) {
     this.compiler = compiler;
   }
 
