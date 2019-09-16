@@ -638,6 +638,15 @@ declare namespace ಠ_ಠ.clutz {
     value : number ;
   }
 }
+// Generated from externs.zip//w3c_navigation_timing.js
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * https://w3c.github.io/paint-timing/#sec-PerformancePaintTiming
+   */
+  class PerformancePaintTiming extends PerformanceEntry {
+    private noStructuralTyping_PerformancePaintTiming : any;
+  }
+}
 // Generated from externs.zip//w3c_rtc.js
 declare namespace ಠ_ಠ.clutz {
   class BlobEvent extends GlobalEvent {
