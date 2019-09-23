@@ -629,6 +629,21 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//w3c_navigation_timing.js
 declare namespace ಠ_ಠ.clutz {
   /**
+   * https://wicg.github.io/largest-contentful-paint/#largestcontentfulpaint
+   */
+  class LargestContentfulPaint extends PerformanceEntry {
+    private noStructuralTyping_LargestContentfulPaint : any;
+    element : GlobalElement | null ;
+    id : string ;
+    loadTime : number ;
+    renderTime : number ;
+    size : number ;
+    url : string ;
+  }
+}
+// Generated from externs.zip//w3c_navigation_timing.js
+declare namespace ಠ_ಠ.clutz {
+  /**
    * https://wicg.github.io/layout-instability/#sec-layout-shift
    */
   class LayoutShift extends PerformanceEntry {
@@ -636,6 +651,27 @@ declare namespace ಠ_ಠ.clutz {
     hadRecentInput : boolean ;
     lastInputTime : number ;
     value : number ;
+  }
+}
+// Generated from externs.zip//w3c_navigation_timing.js
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * https://wicg.github.io/event-timing/#sec-performance-event-timing
+   */
+  class PerformanceEventTiming extends PerformanceEntry {
+    private noStructuralTyping_PerformanceEventTiming : any;
+    cancelable : boolean ;
+    processingEnd : number ;
+    processingStart : number ;
+  }
+}
+// Generated from externs.zip//w3c_navigation_timing.js
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * https://w3c.github.io/paint-timing/#sec-PerformancePaintTiming
+   */
+  class PerformancePaintTiming extends PerformanceEntry {
+    private noStructuralTyping_PerformancePaintTiming : any;
   }
 }
 // Generated from externs.zip//w3c_rtc.js
