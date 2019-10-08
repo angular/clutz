@@ -67,13 +67,10 @@ dependencies {
     // Forced, as Closure Compiler depends on the wrong version.
     force = true
   }
-  // clutz runs against closure head inside google, so default to that, but also test against
-  // the latest release for external users
-  if (System.getenv().get('CI_MODE') == 'Released') {
-    compile 'com.google.javascript:closure-compiler:v20181008'
-  } else {
-    compile 'com.google.javascript:closure-compiler:1.0-SNAPSHOT'
-  }
+  // In the past we tested against nightly closure releases at  'com.google.javascript:closure-compiler:1.0-SNAPSHOT',
+  // but sonatype started 404-ing CircleCI. Now, we test against the latest released Closure version on Circle, and
+  // internally test against Closure head.
+  compile 'com.google.javascript:closure-compiler:v20190929'
 
   compile 'com.google.code.gson:gson:2.7'
   compile 'com.google.code.findbugs:jsr305:3.0.1'
