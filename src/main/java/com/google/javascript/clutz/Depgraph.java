@@ -112,9 +112,7 @@ class Depgraph {
         throw new RuntimeException("malformed depgraph: " + depgraphName, e);
       }
     }
-    if (result.roots.isEmpty() && result.rootExterns.isEmpty()) {
-      throw new IllegalStateException("No roots were found in the provided depgraphs files");
-    }
+
     return result;
   }
 
