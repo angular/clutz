@@ -31,3 +31,11 @@ declare module 'goog:goog.scope.ClassExtendingRenamedDestructuredRequire' {
   import ClassExtendingRenamedDestructuredRequire = ಠ_ಠ.clutz.goog.scope.ClassExtendingRenamedDestructuredRequire;
   export default ClassExtendingRenamedDestructuredRequire;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/goog_module_get.js
+declare namespace ಠ_ಠ.clutz.goog.scope {
+  let NameAssignedToMissingGoogModuleGet : number ;
+}
+declare module 'goog:goog.scope.NameAssignedToMissingGoogModuleGet' {
+  import NameAssignedToMissingGoogModuleGet = ಠ_ಠ.clutz.goog.scope.NameAssignedToMissingGoogModuleGet;
+  export default NameAssignedToMissingGoogModuleGet;
+}
