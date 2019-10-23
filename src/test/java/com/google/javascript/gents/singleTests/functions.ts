@@ -48,3 +48,14 @@ const arrowNoJsDoc = (a) => {
   return a;
 };
 const implicitReturnArrow = (a) => a;
+
+// Argument descructuring
+// TODO(b/142972217): Add more tests, e.g. with default parameters
+// TODO(b/142972217): Fix, this should output
+// `function namedParams({a}: {a: number}) {}`
+/**
+ * @param {{
+ *   a: number,
+ * }} params
+ */
+function namedParams({a}) {}

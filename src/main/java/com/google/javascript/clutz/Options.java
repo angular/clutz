@@ -211,7 +211,7 @@ public class Options {
     options.setLanguageOut(LanguageMode.ECMASCRIPT5);
 
     options.setModuleResolutionMode(ModuleLoader.ResolutionMode.BROWSER_WITH_TRANSFORMED_PREFIXES);
-    ImmutableMap.Builder builder = ImmutableMap.builder();
+    ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
     for (String str : browserResolverStrippedPrefixes) {
       builder.put(str, "/");
     }
