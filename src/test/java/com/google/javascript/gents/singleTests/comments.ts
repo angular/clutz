@@ -39,8 +39,9 @@ class X extends A {}
 class B {
   twoLines: {param1: string|undefined} = {param1: 'param1'};
   multipleLines: {param2: string|undefined} = {param2: 'param2'};
-  twoParams: {param3: string|undefined,
-              param4: string|undefined} = {param3: 'param3', param4: 'param4'};
+  twoParams:
+      {param3: string|undefined,
+       param4: string|undefined} = {param3: 'param3', param4: 'param4'};
 
   /**
    * My special number.
