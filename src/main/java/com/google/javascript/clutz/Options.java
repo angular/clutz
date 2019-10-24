@@ -179,6 +179,8 @@ public class Options {
     final CompilerOptions options = new CompilerOptions();
     options.setClosurePass(true);
     options.setTracerMode(this.tracerMode);
+    // TODO(b/142973207): Set this to false after clutz supports native module checking
+    options.setBadRewriteModulesBeforeTypecheckingThatWeWantToGetRidOf(true);
 
     if (this.entryPoints.isEmpty()) {
       options.setDependencyOptions(DependencyOptions.sortOnly());
