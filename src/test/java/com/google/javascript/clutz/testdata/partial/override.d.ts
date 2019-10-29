@@ -1,15 +1,17 @@
 // Generated from src/test/java/com/google/javascript/clutz/testdata/partial/override.js
 declare namespace ಠ_ಠ.clutz.module$exports$override {
-  class ExtendsBase extends module$contents$override_Base {
-    private noStructuralTyping_module$exports$override_ExtendsBase : any;
-    /**
-     * This function has no type information, but its base class is visible, so it should inherit
-     * the types from the base.
-     */
-    method (x : number ) : void ;
-  }
-  class ExtendsInvisible extends ಠ_ಠ.clutz.module$exports$override.Invisible {
-    private noStructuralTyping_module$exports$override_ExtendsInvisible : any;
+  export import ExtendsBase = ಠ_ಠ.clutz.module$contents$override_ExtendsBase ;
+  export import ExtendsInvisible = ಠ_ಠ.clutz.module$contents$override_ExtendsInvisible ;
+  export import Template = ಠ_ಠ.clutz.module$contents$override_Template ;
+}
+declare module 'goog:override' {
+  import override = ಠ_ಠ.clutz.module$exports$override;
+  export = override;
+}
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/override.js
+declare namespace ಠ_ಠ.clutz {
+  class module$contents$override_ExtendsInvisible extends ಠ_ಠ.clutz.module$exports$override.Invisible {
+    private noStructuralTyping_module$contents$override_ExtendsInvisible : any;
     constructor ( ) ;
     /**
      * This function has no known type, so its parameter should be optional.
@@ -24,7 +26,21 @@ declare namespace ಠ_ಠ.clutz.module$exports$override {
      */
     overrideWithType (x : number ) : number ;
   }
-  interface Template < T = any > {
+}
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/override.js
+declare namespace ಠ_ಠ.clutz {
+  class module$contents$override_ExtendsBase extends module$contents$override_Base {
+    private noStructuralTyping_module$contents$override_ExtendsBase : any;
+    /**
+     * This function has no type information, but its base class is visible, so it should inherit
+     * the types from the base.
+     */
+    method (x : number ) : void ;
+  }
+}
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/override.js
+declare namespace ಠ_ಠ.clutz {
+  interface module$contents$override_Template < T = any > {
     /**
      * The type of T in the callback should not be marked optional.
      */
@@ -35,10 +51,6 @@ declare namespace ಠ_ಠ.clutz.module$exports$override {
      */
     callbackWithUnknownArg < R = any > (f : (a ? : any ) => R ) : void ;
   }
-}
-declare module 'goog:override' {
-  import override = ಠ_ಠ.clutz.module$exports$override;
-  export = override;
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/partial/override.js
 declare namespace ಠ_ಠ.clutz {
