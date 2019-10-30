@@ -1,4 +1,4 @@
-goog.module('optional.export.object.property');
+goog.module('optional.exporting.object.property');
 goog.module.declareLegacyNamespace();
 
 //!! Need to use a function to initialize optional to get around closure's

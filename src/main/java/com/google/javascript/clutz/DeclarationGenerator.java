@@ -1282,11 +1282,41 @@ class DeclarationGenerator {
   }
 
   private void emitTopLevelNamespaceBegin(String namespace) {
+    List<String> prefix = new ArrayList<>();
+    // Closure Compiler accepts namespaces containing keywords, e.g. foo.delete.bar.
+    // TypeScript rejects "namespace foo.delete.bar".
+    // To fix, we emit "foo.delete_.bar", and then re-export the keywords:
+    //     namespace foo { export { delete_ as delete }; }
+    // Order does not matter, so emitting the re-export before the declaration is fine.
+    for (String token : DOT_SPLITTER.split(namespace)) {
+      if (RESERVED_JS_WORDS.contains(token)) {
+        emitNoSpace("declare namespace ");
+        emitNoSpace(Joiner.on(".").join(prefix));
+        emitNoSpace(" {");
+        indent();
+        emitBreak();
+        emit("export {" + token + "_ as " + token + "};");
+        emitBreak();
+        unindent();
+        emitNoSpace("}");
+        emitBreak();
+      }
+      prefix.add(token);
+    }
+    String fixed = escapeKeywordsInNamespace(namespace);
     emitNoSpace("declare namespace ");
-    emitNoSpace(namespace);
+    emitNoSpace(fixed);
     emitNoSpace(" {");
     indent();
     emitBreak();
+  }
+
+  /** Escapes reserved words in a namespace by appending underscores. */
+  String escapeKeywordsInNamespace(String namespace) {
+    return DOT_SPLITTER
+        .splitToStream(namespace)
+        .map(t -> RESERVED_JS_WORDS.contains(t) ? t + "_" : t)
+        .collect(Collectors.joining("."));
   }
 
   private void emitNamespaceEnd() {
@@ -1389,7 +1419,8 @@ class DeclarationGenerator {
     emit("import " + alias + " = ");
     emitNoSpace(Constants.INTERNAL_NAMESPACE);
     emitNoSpace(".");
-    emitNoSpace(inParentNamespace ? getNamespace(emitName) : emitName);
+    String emitNamespace = inParentNamespace ? getNamespace(emitName) : emitName;
+    emitNoSpace(escapeKeywordsInNamespace(emitNamespace));
     emitNoSpace(";");
     emitBreak();
     if (isDefault) {
