@@ -1,6 +1,7 @@
 package com.google.javascript.clutz;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Iterables.transform;
 import static com.google.javascript.rhino.jstype.JSTypeNative.ALL_TYPE;
@@ -13,7 +14,6 @@ import static org.apache.commons.text.StringEscapeUtils.escapeEcmaScript;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Collections2;
@@ -1463,7 +1463,7 @@ class DeclarationGenerator {
   }
 
   private void emit(String str) {
-    Preconditions.checkNotNull(str);
+    checkNotNull(str);
     if (!maybeEmitIndent()) {
       out.write(" ");
     }
@@ -2110,7 +2110,7 @@ class DeclarationGenerator {
       emit(displayName);
       List<JSType> templateTypes = type.getTemplateTypes();
       if (templateTypes != null && templateTypes.size() > 0) {
-        emitGenericTypeArguments(type.getTemplateTypes().iterator());
+        emitGenericTypeArguments(type.getTemplateTypes());
       }
     }
 
@@ -2350,14 +2350,15 @@ class DeclarationGenerator {
     private Void emitTemplatizedType(TemplatizedType type, boolean inImplementsExtendsPosition) {
       ObjectType referencedType = type.getReferencedType();
       String templateTypeName = getAbsoluteName(type);
+      final ImmutableList<JSType> templateTypes = type.getTemplateTypes();
       if (typeRegistry.getNativeType(ARRAY_TYPE).equals(referencedType)
-          && type.getTemplateTypes().size() == 1) {
+          && templateTypes.size() == 1) {
         // As per TS type grammar, array types require primary types.
         // https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#a-grammar
         if (inImplementsExtendsPosition) {
           emit("Array<");
         }
-        visitTypeAsPrimary(type.getTemplateTypes().get(0));
+        visitTypeAsPrimary(templateTypes.get(0));
         emit(inImplementsExtendsPosition ? ">" : "[]");
         return null;
       }
@@ -2371,27 +2372,32 @@ class DeclarationGenerator {
       String maybeGlobalName = maybeRenameGlobalType(displayName);
       templateTypeName = maybeGlobalName == null ? templateTypeName : maybeGlobalName;
 
-      if (type.getTemplateTypes().isEmpty()) {
+      if (templateTypes.isEmpty()) {
         // In Closure, subtypes of `TemplatizedType`s that do not take type arguments are still
         // represented by templatized types.
         emit(templateTypeName);
         typesUsed.add(displayName);
         return null;
       }
-      Iterator<JSType> it = type.getTemplateTypes().iterator();
       if (typeRegistry.getNativeType(OBJECT_TYPE).equals(referencedType)) {
+        checkState(templateTypes.size() == 2, templateTypes);
         emit("{");
-        emitIndexSignature(it.next(), it.next(), false);
+        emitIndexSignature(templateTypes.get(0), templateTypes.get(1), false);
         emit("}");
         return null;
       }
       emit(templateTypeName);
       typesUsed.add(displayName);
-      emitGenericTypeArguments(it);
+      // TODO(b/140560697): Remove this restriction when TS 3.6 support is complete.
+      boolean onlyEmitOneTemplateParameter =
+          PlatformSymbols.ONLY_1_TEMPLATE_PARAM_FOR_TS_35.contains(templateTypeName);
+      emitGenericTypeArguments(
+          onlyEmitOneTemplateParameter ? ImmutableList.of(templateTypes.get(0)) : templateTypes);
       return null;
     }
 
-    private void emitGenericTypeArguments(Iterator<JSType> it) {
+    private void emitGenericTypeArguments(Iterable<JSType> iterable) {
+      Iterator<JSType> it = iterable.iterator();
       emit("<");
       while (it.hasNext()) {
         visitType(it.next());
@@ -2940,27 +2946,39 @@ class DeclarationGenerator {
         return false;
       }
 
-      ImmutableList<JSType> ttypes = null;
+      // we have entries(): returnType
       JSType returnType = propertyType.getReturnType();
-
-      // In incremental mode this type is noResolvedType, while in total mode it is TemplatizedType
-      // They both have getTemplateTypes, but neither extends the other in the class heirarchy.
-      if (returnType.isTemplatizedType()) {
-        ttypes = ((TemplatizedType) returnType).getTemplateTypes();
-      } else if (returnType.isNoResolvedType()) {
-        ttypes = ((NoResolvedType) returnType).getTemplateTypes();
-      }
-      if (ttypes == null
-          || !returnType.getDisplayName().equals("IteratorIterable")
-          || ttypes.size() != 1
-          || !isTemplateOf(ttypes.get(0), "Array")) {
+      if (!returnType.getDisplayName().equals("IteratorIterable")) {
         return false;
       }
-      JSType arrayMembers = ttypes.get(0).toMaybeTemplatizedType().getTemplateTypes().get(0);
+
+      // we have entries(): IteratorIterable<valueType, iteratorReturnType, nextParamType>
+      // TODO(b/140560697): Stop ignoring return and param types when upgrade to TS 3.6 is complete.
+      //
+      // In incremental mode IteratorIterable is noResolvedType, while in total mode it is
+      // TemplatizedType.
+      // They both have getTemplateTypes, but neither extends the other in the class hierarchy.
+      final JSType valueType;
+      if (returnType.isTemplatizedType()) {
+        valueType = returnType.toMaybeTemplatizedType().getTemplateTypes().get(0);
+      } else {
+        // IteratorIterable must always have template types, even if they're unknown
+        checkState(returnType.isNoResolvedType(), returnType);
+        valueType = ((NoResolvedType) returnType).getTemplateTypes().get(0);
+      }
+
+      if (!isTemplateOf(valueType, "Array")) {
+        return false;
+      }
+
+      // we have entries() : IteratorIterable<Array<arrayMembers>>
+      JSType arrayMembers = valueType.toMaybeTemplatizedType().getTemplateTypes().get(0);
       if (!arrayMembers.isUnionType()
           || arrayMembers.toMaybeUnionType().getAlternates().size() != 2) {
         return false;
       }
+
+      // we have entries() : IteratorIterable<Array<KEY|VALUE>
       emit("(): IterableIterator<[");
       Iterator<JSType> it = arrayMembers.toMaybeUnionType().getAlternates().iterator();
       visitType(it.next());
