@@ -70,11 +70,11 @@ dependencies {
   // In the past we tested against nightly closure releases at  'com.google.javascript:closure-compiler:1.0-SNAPSHOT',
   // but sonatype started 404-ing CircleCI. Now, we test against the latest released Closure version on Circle, and
   // internally test against Closure head.
-  compile 'com.google.javascript:closure-compiler:v20190929'
+  compile 'com.google.javascript:closure-compiler:v20191027'
 
   compile 'com.google.code.gson:gson:2.7'
   compile 'com.google.code.findbugs:jsr305:3.0.1'
-  compile 'com.google.guava:guava:28.0-jre'
+  compile 'com.google.guava:guava:28.1-jre'
   compile 'org.apache.commons:commons-text:1.4'
 
   // ErrorProne itself, plus its javac integration.
