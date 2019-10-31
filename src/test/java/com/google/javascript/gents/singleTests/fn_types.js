@@ -7,7 +7,9 @@ var nop = function() {};
 /**
  * @type {Function}
  */
-var foo = function(a, b, c) { return a + b + c; };
+var foo = function(a, b, c) {
+  return a + b + c;
+};
 
 // Infers return type as 'any' by default
 /**
@@ -24,7 +26,9 @@ var typedRetVoid = function() {};
 /**
  * @type {function(number, string) : number}
  */
-var basicParams = function(n, s) { return n; };
+var basicParams = function(n, s) {
+  return n;
+};
 
 // Optional Parameters
 /**
@@ -46,7 +50,9 @@ var restParamsTyped = function(n, br) {};
 /**
  * @type {function(number, boolean=, ...): number}
  */
-const complex = function(n, o, r) { return n; };
+const complex = function(n, o, r) {
+  return n;
+};
 
 /** @type {?function():string} */
 let f1 = null;

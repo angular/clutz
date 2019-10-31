@@ -1,15 +1,14 @@
-goog.module("A.B.Klass");
+goog.module('A.B.Klass');
 
 /** Possibly outdated information about Klass. */
 class Klass {
-
-  /** 
+  /**
    * @param {number} n
    * @param {Array<?>=} list
    */
   constructor(n, list = []) {
     this.n = n;
-    
+
     /** @const {Array<?>} */
     this.list = list;
     this.x = 4;
@@ -23,7 +22,7 @@ class Klass {
 
 /** @return {string} */
 Klass.myStaticFunction = function() {
-  return ""
-}
+  return ''
+};
 
 exports = Klass;

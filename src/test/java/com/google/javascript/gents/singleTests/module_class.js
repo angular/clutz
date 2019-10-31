@@ -1,4 +1,4 @@
-goog.module("A.B.Klass");
+goog.module('A.B.Klass');
 
 /**
  * @constructor

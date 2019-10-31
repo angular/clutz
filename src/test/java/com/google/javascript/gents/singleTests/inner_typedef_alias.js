@@ -1,10 +1,8 @@
 goog.module('inner.class');
 
-class Inner {
-}
+class Inner {}
 
-class Outer {
-}
+class Outer {}
 
 /** @typedef {!Inner} */
 Outer.RenameInner = Inner;

@@ -26,4 +26,6 @@ var restParamsTyped = function(n, br) {};
  * @param {...} r
  * @returns {number}
  */
-var complex = function(n, o, r) { return n; };
+var complex = function(n, o, r) {
+  return n;
+};

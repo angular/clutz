@@ -7,7 +7,9 @@ var n = 5;
  * @param {!string} s
  * @returns {!boolean}
  */
-var foo = function(s) { return true; };
+var foo = function(s) {
+  return true;
+};
 
 // Nullable types
 /** @type {?number} */
@@ -17,7 +19,9 @@ var niln = null;
  * @param {?string} s
  * @returns {?boolean}
  */
-var bar = function(s) { return null; };
+var bar = function(s) {
+  return null;
+};
 
 // Union types
 /** @type {string | number} */
@@ -33,4 +37,6 @@ var manyNulls = null;
  * @param {number | ?string} s
  * @return {null | boolean}
  */
-var baz = function(s) { return null; };
+var baz = function(s) {
+  return null;
+};

@@ -1,4 +1,4 @@
-goog.provide("A.B");
+goog.provide('A.B');
 
 A.B = function() {};
 

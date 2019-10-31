@@ -27,12 +27,16 @@ function undefinedDefaultArray(list = undefined) {}
 /**
  * @return {*}
  */
-var anyReturn = function() { return "hello"; };
+var anyReturn = function() {
+  return 'hello';
+};
 
 /**
  * @return {number}
  */
-function typedReturn() { return 4; }
+function typedReturn() {
+  return 4;
+}
 
 /**
  * @param {number} n
@@ -47,7 +51,12 @@ var partiallyTyped = function(n, u1, b, u2) {};
  * @param {?} x
  * @return {?string}
  */
-var complex = function(b, s, x) { if (b) { return s; } return null;};
+var complex = function(b, s, x) {
+  if (b) {
+    return s;
+  }
+  return null;
+};
 
 // Undefined params
 
@@ -73,22 +82,30 @@ var retUndef = function() {};
  * @param {number} a
  * @return {number}
  */
-const arrowWithJsDoc = a => { return a; };
+const arrowWithJsDoc = a => {
+  return a;
+};
 
 /**
  * @param {number} a
  * @return {number}
  */
-const arrowWithJsDocAndParens = (a) => { return a; };
+const arrowWithJsDocAndParens = (a) => {
+  return a;
+};
 
 /**
  * @param {number} a
  * @param {number} b
  * @return {number}
  */
-const arrowWithJsDocMultiArg = (a, b) => { return a; };
+const arrowWithJsDocMultiArg = (a, b) => {
+  return a;
+};
 
-const arrowNoJsDoc = a => { return a; };
+const arrowNoJsDoc = a => {
+  return a;
+};
 
 const implicitReturnArrow = a => a;
 

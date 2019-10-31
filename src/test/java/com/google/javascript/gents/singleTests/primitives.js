@@ -20,7 +20,7 @@ var n = 4;
 var b = true;
 
 /** @type {string} */
-var s = "hello";
+var s = 'hello';
 
 /** @type {number} */
 let l = 6;
@@ -32,5 +32,4 @@ const c = 8;
  * Escape characters
  * @type {string}
  */
-var escaped = "'\"=&<>";
-  
+var escaped = '\'"=&<>';

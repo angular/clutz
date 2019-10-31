@@ -15,4 +15,6 @@ var foo = function() {};
  * @return {number}
  * @const
  */
-let bar = function(n) { return n; };
+let bar = function(n) {
+  return n;
+};

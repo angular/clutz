@@ -31,21 +31,27 @@ goog.inherits(B, goog.A);
 /**
  * Untyped method
  */
-goog.A.prototype.foo = function(n) { return n; };
+goog.A.prototype.foo = function(n) {
+  return n;
+};
 
 /**
  * Typed method
  * @param {number} n
  * @return {boolean}
  */
-B.prototype.bar = function(n) { return goog.A.prototype.foo.call(this, n) > 0; };
+B.prototype.bar = function(n) {
+  return goog.A.prototype.foo.call(this, n) > 0;
+};
 
 /**
  * Another typed method
  * @param {number} n
  * @return {boolean}
  */
-B.prototype.baz = function(n) { return B.base(this, 'foo', n) > 0; }
+B.prototype.baz = function(n) {
+  return B.base(this, 'foo', n) > 0;
+};
 
 /**
  * Unconverted method
@@ -64,5 +70,7 @@ goog.B = goog.defineClass(goog.A, {
   /**
    * @returns {number}
    */
-  foo: function() { return 0; }
+  foo: function() {
+    return 0;
+  }
 });

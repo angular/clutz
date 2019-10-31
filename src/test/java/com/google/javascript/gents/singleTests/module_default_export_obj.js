@@ -8,5 +8,7 @@ function f() {}
 const a = 0;
 
 exports = {
-  C, f, a
+  C,
+  f,
+  a
 };

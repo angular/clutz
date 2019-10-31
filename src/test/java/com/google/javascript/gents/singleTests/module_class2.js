@@ -1,7 +1,7 @@
 /**
  * @fileoverview Rivoting description of the file.
  */
-goog.module("A.B.Klass");
+goog.module('A.B.Klass');
 
 
 /** Possibly outdated information about Klass. */
@@ -22,7 +22,7 @@ const Klass = goog.defineClass(null, {
 
 /** @return {string} */
 Klass.myStaticFunction = function() {
-  return ""
-}
+  return ''
+};
 
 exports = Klass;

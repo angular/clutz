@@ -11,7 +11,7 @@ function Interface() {}
 Interface.prototype.bar = function(a) {};
 
 /** @interface */
-ns.Interface2 = function() {}
+ns.Interface2 = function() {};
 /**
  * @param {string} a
  * @return {number}
@@ -19,7 +19,7 @@ ns.Interface2 = function() {}
 ns.Interface2.prototype.bar = function(a) {};
 
 /** @interface @extends {ns.Interface2} */
-ns.Interface3 = function() {}
+ns.Interface3 = function() {};
 /**
  * @param {string} a
  * @return {number}
@@ -32,7 +32,9 @@ class X {
    * @param {string} a
    * @return {number}
    */
-  bar(a) {return 1;}
+  bar(a) {
+    return 1;
+  }
 }
 
 /**
@@ -45,26 +47,32 @@ function Y() {}
  * @param {string} a
  * @return {number}
  */
-Y.prototype.bar = function(a) {return 1;}
+Y.prototype.bar = function(a) {
+  return 1;
+};
 /**
  * @param {string} a
  * @return {number}
  */
-Y.prototype.baz = function(a) {return 1;}
+Y.prototype.baz = function(a) {
+  return 1;
+};
 
 /** @record */
 ns.StructuralInterface = function() {}
 
-/**
- * @param {string} a
- * @return {number}
- */
-ns.StructuralInterface.prototype.bar = function(a) {};
+                         /**
+                          * @param {string} a
+                          * @return {number}
+                          */
+                         ns.StructuralInterface.prototype.bar = function(a) {};
 
 const /** !ns.StructuralInterface */ structInterfaceImpl = {
   /**
    * @param {string} a
    * @return {number}
    */
-  bar: function(a) { return 1;}
-} 
+  bar: function(a) {
+    return 1;
+  }
+};

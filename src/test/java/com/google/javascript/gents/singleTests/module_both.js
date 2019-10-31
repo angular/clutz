@@ -1,4 +1,4 @@
-goog.module("both.A.B");
+goog.module('both.A.B');
 
 /**
  * Note: As written in .js if num is reassigned by a consumer of the goog.module
@@ -13,25 +13,31 @@ var num = 4;
 /**
  * @return {number}
  */
-var B = function() { return num; };
+var B = function() {
+  return num;
+};
 
 exports = B;
 
 /** @return {number} */
-const C = function() { return num; };
+const C = function() {
+  return num;
+};
 
 exports.C = C;
 
 /**
  * @return {number}
  */
-var L = function() { return num; };
+var L = function() {
+  return num;
+};
 
 exports.L = L;
 
 exports.num = num;
 /** @constructor */
-exports.foo = function() { };
+exports.foo = function() {};
 /** @type {number} */
 exports.foo.z = num * 2;
 

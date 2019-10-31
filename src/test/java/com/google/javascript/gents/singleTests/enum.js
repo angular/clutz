@@ -38,8 +38,8 @@ const RepeatedNumEnum = {
 
 /** @enum {number} */
 const EnumWithArithmetics = {
-    A: 10 * 10 + 2,
-    B: 2
+  A: 10 * 10 + 2,
+  B: 2
 };
 
 /** @enum {string} My useful comment */

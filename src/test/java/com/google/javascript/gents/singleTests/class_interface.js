@@ -14,20 +14,18 @@ goog.module('klass.interface');
  * @interface
  */
 class IBase {
-    constructor() {
-        /** @const {number} */
-        this.a;
-    }
-    /** @return {boolean} */
-    method1() {}
+  constructor() {
+    /** @const {number} */
+    this.a;
+  }
+  /** @return {boolean} */
+  method1() {}
 }
 
 /**
  * @interface
  */
-class IExtendsUsingEs6 extends IBase {
-
-}
+class IExtendsUsingEs6 extends IBase {}
 
 
 /** @const {number} */
@@ -39,27 +37,25 @@ IExtendsUsingEs6.prototype.method2 = function() {};
 /**
  * @record
  */
-class RExtendsUsingEs6 extends IBase {
-
-}
+class RExtendsUsingEs6 extends IBase {}
 
 /**
  * @record
  */
 class RecordClass {
-    constructor() {
-        /** @type {number} The number of attempts before giving up. */
-        this.attempts;
-        /** @type {boolean} */
-        this.foo;
-    }
+  constructor() {
+    /** @type {number} The number of attempts before giving up. */
+    this.attempts;
+    /** @type {boolean} */
+    this.foo;
+  }
 
-    /**
-     * Performs the frobnication according to the given strategy.
-     * @param {!string} strategy
-     * @return {boolean}
-     */
-    frobnicate(strategy) {}
+  /**
+   * Performs the frobnication according to the given strategy.
+   * @param {!string} strategy
+   * @return {boolean}
+   */
+  frobnicate(strategy) {}
 }
 
 /** @const {number} */
@@ -71,8 +67,8 @@ RExtendsUsingEs6.prototype.c;
  * @extends {IBase}
  */
 class IExtendsUsingClosure {
-    /** @return {boolean} */
-    method3() {}
+  /** @return {boolean} */
+  method3() {}
 }
 
 exports.IBase = IBase;

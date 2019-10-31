@@ -52,9 +52,8 @@ class B {
 /** @export */
 let m: number = 4;
 
-// comment at the bottom of if block
-
 // head comment
+// comment at the bottom of if block
 if (m) {
 } else {
 }

@@ -5,6 +5,4 @@ goog.module('typedef.exported.obj');
  */
 let ATypeDef;
 
-exports = {
-  ATypeDef
-};
+exports = {ATypeDef};

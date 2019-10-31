@@ -14,14 +14,18 @@ goog.A = function(a) {
 /**
  * Untyped method
  */
-goog.A.foo = function(n) { return n; };
+goog.A.foo = function(n) {
+  return n;
+};
 
 /**
  * Typed method
  * @param {number} n
  * @return {boolean}
  */
-goog.A.bar = function(n) { return n > 0; };
+goog.A.bar = function(n) {
+  return n > 0;
+};
 
 goog.A.B = {};
 
@@ -43,11 +47,15 @@ goog.B = goog.defineClass(goog.A, {
     /**
      * @returns {boolean}
      */
-    foo: function() { return false; },
+    foo: function() {
+      return false;
+    },
     /**
      * @returns {boolean}
      */
-    bar: function() { return true; },
+    bar: function() {
+      return true;
+    },
     /**
      * @type {number}
      */

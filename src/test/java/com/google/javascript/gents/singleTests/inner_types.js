@@ -1,4 +1,4 @@
-goog.module("foo.MyClass");
+goog.module('foo.MyClass');
 
 class MyClass {
   /**

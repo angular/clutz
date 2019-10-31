@@ -26,7 +26,9 @@ A.prototype.foo = function() {};
  * @return {number} this also has a description
  */
 // This is just some extra stuff
-var foo = function(deleted, notdeleted) { return deleted + notdeleted; };
+var foo = function(deleted, notdeleted) {
+  return deleted + notdeleted;
+};
 
 // The following comments should be mostly deleted
 /**
@@ -52,19 +54,18 @@ var X = function() {}
 
 class B {
   constructor() {
-
     /**
      * @type {{param1: (string|undefined)
      * }}
      */
-    this.twoLines = {param1: "param1"};
+    this.twoLines = {param1: 'param1'};
 
     /**
      * @type {{
      *   param2: (string|undefined)
      * }}
      */
-    this.multipleLines = {param2: "param2"};
+    this.multipleLines = {param2: 'param2'};
 
     /**
      * @type {{
@@ -72,7 +73,7 @@ class B {
      *   param4: (string|undefined),
      * }}
      */
-    this.twoParams = {param3: "param3", param4: "param4"};
+    this.twoParams = {param3: 'param3', param4: 'param4'};
 
     /**
      * @private @const {number} My special number.
@@ -87,8 +88,7 @@ let m = 4;
 // head comment
 if (m) {
   // comment at the bottom of if block
-}
-else {
+} else {
   // comment at the bottom of else block
 }
 
@@ -101,9 +101,9 @@ var c = function() {};
 
 // comment before GETPROP
 a(
-// comment in GETPROP
-).
-b();
+    // comment in GETPROP
+    )
+    .b();
 
 // comment after GETPROP
 c();
