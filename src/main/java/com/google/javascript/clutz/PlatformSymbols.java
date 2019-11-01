@@ -39,6 +39,7 @@ public class PlatformSymbols {
           .add("Arguments")
           .add("NodeList")
           .add("MessageEvent")
+          .add("ProgressEvent")
           .add("NamedNodeMap")
           .build();
 

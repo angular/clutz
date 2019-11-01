@@ -346,12 +346,12 @@ declare namespace ಠ_ಠ.clutz {
     WRITING : number ;
     abort ( ) : void ;
     error : FileError | null ;
-    onabort : ( (a : ProgressEvent < FileSaver > ) => any ) | null ;
-    onerror : ( (a : ProgressEvent < FileSaver > ) => any ) | null ;
-    onprogress : ( (a : ProgressEvent < FileSaver > ) => any ) | null ;
-    onwrite : ( (a : ProgressEvent < FileSaver > ) => any ) | null ;
-    onwriteend : ( (a : ProgressEvent < FileSaver > ) => any ) | null ;
-    onwritestart : ( (a : ProgressEvent < FileSaver > ) => any ) | null ;
+    onabort : ( (a : ProgressEvent ) => any ) | null ;
+    onerror : ( (a : ProgressEvent ) => any ) | null ;
+    onprogress : ( (a : ProgressEvent ) => any ) | null ;
+    onwrite : ( (a : ProgressEvent ) => any ) | null ;
+    onwriteend : ( (a : ProgressEvent ) => any ) | null ;
+    onwritestart : ( (a : ProgressEvent ) => any ) | null ;
     readyState : number ;
   }
 }
