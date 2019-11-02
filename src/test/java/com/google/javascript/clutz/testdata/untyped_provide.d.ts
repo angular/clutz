@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/untyped_provide.js
 declare namespace ಠ_ಠ.clutz.untyped {
   let Provide : any;
 }

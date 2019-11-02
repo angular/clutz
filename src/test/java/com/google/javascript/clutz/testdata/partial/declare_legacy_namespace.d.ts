@@ -12,6 +12,7 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_module$contents$declare$legacy$namespace_Class : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/declare_legacy_namespace.js
 declare namespace ಠ_ಠ.clutz {
   export import module$exports$declare$legacy$namespace = ಠ_ಠ.clutz.module$contents$declare$legacy$namespace_Class ;
 }

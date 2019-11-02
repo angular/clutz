@@ -459,6 +459,7 @@ class DeclarationGenerator {
     TreeSet<String> provides = new TreeSet<>();
     Set<String> rewrittenProvides = new TreeSet<>();
     Set<String> transitiveProvides = new TreeSet<>();
+    Map<String, SourceFile> provideToFile = new HashMap<>();
 
     for (CompilerInput compilerInput : compiler.getInputsById().values()) {
       if (shouldSkipSourceFile(compilerInput.getSourceFile())) {
@@ -481,6 +482,9 @@ class DeclarationGenerator {
       transitiveProvides.addAll(filteredProvides);
       String originalPath = compilerInput.getSourceFile().getOriginalPath();
       if (depgraph.isRoot(originalPath)) {
+        for (String provide : filteredProvides) {
+          provideToFile.put(provide, compilerInput.getSourceFile());
+        }
         provides.addAll(filteredProvides);
       }
     }
@@ -519,6 +523,7 @@ class DeclarationGenerator {
       if (symbol == null) {
         // Sometimes goog.provide statements are used as pure markers for dependency management, or
         // the defined provides do not get a symbol because they don't have a proper type.
+        emitGeneratedFromFileComment(provideToFile.get(provide));
         emitNamespaceBegin(getNamespace(emitName));
         emit("let");
         emit(getUnqualifiedName(emitName));
@@ -642,10 +647,14 @@ class DeclarationGenerator {
     Set<String> collapsedNamespaces = new TreeSet<>();
     for (String reservedProvide : provides) {
       if (RESERVED_JS_WORDS.contains(getUnqualifiedName(reservedProvide))) {
+        TypedVar var = topScope.getOwnSlot(reservedProvide);
         String namespace = getNamespace(reservedProvide);
         if (collapsedNamespaces.contains(namespace)) continue;
         collapsedNamespaces.add(namespace);
         Set<String> properties = getSubNamespace(provides, namespace);
+        if (var != null) {
+          emitGeneratedFromFileComment(var.getSourceFile());
+        }
         emitNamespaceBegin(getNamespace(namespace));
         emit("let");
         emit(getUnqualifiedName(namespace));
@@ -654,7 +663,6 @@ class DeclarationGenerator {
         while (bundledIt.hasNext()) {
           emit(getUnqualifiedName(bundledIt.next()));
           emit(":");
-          TypedVar var = topScope.getOwnSlot(reservedProvide);
           if (var != null) {
             TreeWalker walker = new TreeWalker(compiler.getTypeRegistry(), provides, false, false);
             walker.visitType(var.getType());
@@ -810,6 +818,7 @@ class DeclarationGenerator {
         if (symbol != null) {
           JSType type = symbol.getType();
           if (type != null && isDefiningType(type)) {
+            emitGeneratedFromFileComment(symbol.getSourceFile());
             emitNamespaceBegin(namespace);
             treeWalker.visitTypeValueAlias(googModuleStyleName, type.toMaybeObjectType());
             emitNamespaceEnd();

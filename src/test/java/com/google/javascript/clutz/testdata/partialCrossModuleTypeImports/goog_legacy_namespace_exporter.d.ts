@@ -19,9 +19,11 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_module$contents$goog$legacy$namespace$exporter_OriginalName : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/goog_legacy_namespace_exporter.js
 declare namespace ಠ_ಠ.clutz.module$exports$goog$legacy$namespace$exporter {
   export import LegacyBaseClass = ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_LegacyBaseClass ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/goog_legacy_namespace_exporter.js
 declare namespace ಠ_ಠ.clutz.module$exports$goog$legacy$namespace$exporter {
   export import OriginalName = ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_OriginalName ;
 }

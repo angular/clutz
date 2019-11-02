@@ -21,9 +21,11 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_module$contents$object$literal$exports_Class2 : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/declare_legacy_namespace_object_literal_export.js
 declare namespace ಠ_ಠ.clutz.module$exports$object$literal$exports {
   export import Class1 = ಠ_ಠ.clutz.module$contents$object$literal$exports_Class1 ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/declare_legacy_namespace_object_literal_export.js
 declare namespace ಠ_ಠ.clutz.module$exports$object$literal$exports {
   export import RenamedClass2 = ಠ_ಠ.clutz.module$contents$object$literal$exports_Class2 ;
 }

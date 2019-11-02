@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/is_def_and_not_null.js
 declare namespace ಠ_ಠ.clutz.is.def.and {
   let not : { null : (c : ಠ_ಠ.clutz.some.C | null ) => any };
 }
