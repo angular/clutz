@@ -2,6 +2,7 @@
 declare namespace ಠ_ಠ.clutz.ns {
   function provide ( ) : void ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/inner_provide_with_inner_symbol.js
 declare module 'goog:ns.provide' {
   import provide = ಠ_ಠ.clutz.ns.provide;
   export default provide;
@@ -18,6 +19,7 @@ declare namespace ಠ_ಠ.clutz.ns.provide.C {
     private noStructuralTyping_ns_provide_C_Inner : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/inner_provide_with_inner_symbol.js
 declare module 'goog:ns.provide.C' {
   import C = ಠ_ಠ.clutz.ns.provide.C;
   export default C;

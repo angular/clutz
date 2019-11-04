@@ -19,6 +19,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$missing$imported$base {
   let DeclarationOfMissingRequire : ಠ_ಠ.clutz.module$exports$default$base$exporter | null ;
   function FuncWithMissingRequireParam (c : ಠ_ಠ.clutz.module$exports$default$base$exporter | null ) : void ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/es6_missing_imported_base.js
 declare module 'goog:missing.imported.base' {
   import base = ಠ_ಠ.clutz.module$exports$missing$imported$base;
   export = base;

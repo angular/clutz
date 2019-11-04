@@ -5,6 +5,7 @@ declare namespace ಠ_ಠ.clutz.object.literal.exports {
   let aConstant : number ;
   function aFunction ( ) : void ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/declare_legacy_namespace_object_literal_export.js
 declare module 'goog:object.literal.exports' {
   import exports = ಠ_ಠ.clutz.object.literal.exports;
   export = exports;

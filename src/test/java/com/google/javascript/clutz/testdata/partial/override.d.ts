@@ -4,6 +4,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$override {
   export import ExtendsInvisible = ಠ_ಠ.clutz.module$contents$override_ExtendsInvisible ;
   export import Template = ಠ_ಠ.clutz.module$contents$override_Template ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/override.js
 declare module 'goog:override' {
   import override = ಠ_ಠ.clutz.module$exports$override;
   export = override;

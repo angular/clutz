@@ -8,6 +8,7 @@ declare namespace ಠ_ಠ.clutz.static_this_templated_prop {
     static nestedClass < SCOPE > (this : SCOPE ) : void ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/static_this_templated_prop.js
 declare module 'goog:static_this_templated_prop' {
   import static_this_templated_prop = ಠ_ಠ.clutz.static_this_templated_prop;
   export = static_this_templated_prop;

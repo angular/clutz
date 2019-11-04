@@ -2,6 +2,7 @@
 declare namespace ಠ_ಠ.clutz.a {
   function messesWithB (b : ಠ_ಠ.clutz.ns.B ) : void ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/extending_function_field.js
 declare module 'goog:a.messesWithB' {
   import messesWithB = ಠ_ಠ.clutz.a.messesWithB;
   export default messesWithB;
@@ -13,6 +14,7 @@ declare namespace ಠ_ಠ.clutz.ns {
     fn ( ) : void ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/extending_function_field.js
 declare module 'goog:ns.A' {
   import A = ಠ_ಠ.clutz.ns.A;
   export default A;
@@ -24,6 +26,7 @@ declare namespace ಠ_ಠ.clutz.ns {
     fn ( ) : void ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/extending_function_field.js
 declare module 'goog:ns.B' {
   import B = ಠ_ಠ.clutz.ns.B;
   export default B;

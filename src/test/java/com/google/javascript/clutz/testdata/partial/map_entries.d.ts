@@ -8,6 +8,7 @@ declare namespace ಠ_ಠ.clutz {
     entries (): IterableIterator<[ K , V ]>;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/map_entries.js
 declare module 'goog:map_entries.Map' {
   import Map = ಠ_ಠ.clutz.module$exports$map_entries$Map;
   export default Map;

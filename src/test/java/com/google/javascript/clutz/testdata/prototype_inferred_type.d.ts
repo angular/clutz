@@ -5,6 +5,7 @@ declare namespace ಠ_ಠ.clutz.foo {
     static foo : any ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/prototype_inferred_type.js
 declare module 'goog:foo.Klass' {
   import Klass = ಠ_ಠ.clutz.foo.Klass;
   export default Klass;

@@ -9,6 +9,7 @@ declare namespace ಠ_ಠ.clutz.def.ctor {
     constructor ( ) ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/inherited_default_ctor.js
 declare module 'goog:def.ctor' {
   import ctor = ಠ_ಠ.clutz.def.ctor;
   export = ctor;

@@ -31,6 +31,7 @@ declare namespace ಠ_ಠ.clutz.goog {
     private noStructuralTyping_goog_Uri : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/base.js
 declare module 'goog:goog.Uri' {
   import Uri = ಠ_ಠ.clutz.goog.Uri;
   export default Uri;

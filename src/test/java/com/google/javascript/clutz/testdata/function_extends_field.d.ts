@@ -22,6 +22,7 @@ declare namespace ಠ_ಠ.clutz.fn.field {
     pg : ( ) => number ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/function_extends_field.js
 declare module 'goog:fn.field' {
   import field = ಠ_ಠ.clutz.fn.field;
   export = field;

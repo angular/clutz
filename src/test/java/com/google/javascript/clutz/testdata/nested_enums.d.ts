@@ -27,6 +27,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$iterated$nestedenums.B {
     SECOND = 'second' ,
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/nested_enums.js
 declare module 'goog:iterated.nestedenums' {
   import nestedenums = ಠ_ಠ.clutz.module$exports$iterated$nestedenums;
   export default nestedenums;

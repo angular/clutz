@@ -9,6 +9,7 @@ declare namespace ಠ_ಠ.clutz.namespace.I {
     foo : boolean ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/record.js
 declare module 'goog:namespace.I' {
   import I = ಠ_ಠ.clutz.namespace.I;
   export default I;
@@ -20,6 +21,7 @@ declare namespace ಠ_ಠ.clutz.namespace {
     optionalFoo ? : boolean ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/record.js
 declare module 'goog:namespace.R' {
   import R = ಠ_ಠ.clutz.namespace.R;
   export default R;

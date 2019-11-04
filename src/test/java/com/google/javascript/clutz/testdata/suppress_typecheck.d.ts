@@ -8,6 +8,7 @@ declare namespace ಠ_ಠ.clutz.suppress {
     private noStructuralTyping_suppress_B : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/suppress_typecheck.js
 declare module 'goog:suppress' {
   import suppress = ಠ_ಠ.clutz.suppress;
   export = suppress;

@@ -24,6 +24,7 @@ declare namespace ಠ_ಠ.clutz.method_generics {
     static staticBar < T , R > (bar : R ) : T ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/methods_generics.js
 declare module 'goog:method_generics' {
   import method_generics = ಠ_ಠ.clutz.method_generics;
   export = method_generics;

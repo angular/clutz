@@ -5,6 +5,7 @@ declare namespace ಠ_ಠ.clutz.implements_iterable {
     [Symbol.iterator]():  Iterator < string > ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/implements_iterable_with_platform.js
 declare module 'goog:implements_iterable.ImplIterable' {
   import ImplIterable = ಠ_ಠ.clutz.implements_iterable.ImplIterable;
   export default ImplIterable;
@@ -16,6 +17,7 @@ declare namespace ಠ_ಠ.clutz.implements_iterable {
     [Symbol.iterator]():  Iterator < any > ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/implements_iterable_with_platform.js
 declare module 'goog:implements_iterable.ImplIterableGeneric' {
   import ImplIterableGeneric = ಠ_ಠ.clutz.implements_iterable.ImplIterableGeneric;
   export default ImplIterableGeneric;
@@ -28,6 +30,7 @@ declare namespace ಠ_ಠ.clutz.implements_iterable {
     next (a ? : any ) : IteratorResult < string > ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/implements_iterable_with_platform.js
 declare module 'goog:implements_iterable.ImplIterableIterator' {
   import ImplIterableIterator = ಠ_ಠ.clutz.implements_iterable.ImplIterableIterator;
   export default ImplIterableIterator;

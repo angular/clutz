@@ -16,6 +16,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$innerclass$namedexport.A.B {
     private noStructuralTyping_module$exports$innerclass$namedexport_A_B_C : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/inner_class_named_export.js
 declare module 'goog:innerclass.namedexport' {
   import namedexport = ಠ_ಠ.clutz.module$exports$innerclass$namedexport;
   export = namedexport;

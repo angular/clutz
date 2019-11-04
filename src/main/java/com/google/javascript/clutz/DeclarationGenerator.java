@@ -523,14 +523,15 @@ class DeclarationGenerator {
       if (symbol == null) {
         // Sometimes goog.provide statements are used as pure markers for dependency management, or
         // the defined provides do not get a symbol because they don't have a proper type.
-        emitGeneratedFromFileComment(provideToFile.get(provide));
+        SourceFile file = provideToFile.get(provide);
+        emitGeneratedFromFileComment(file);
         emitNamespaceBegin(getNamespace(emitName));
         emit("let");
         emit(getUnqualifiedName(emitName));
         emit(": any;");
         emitBreak();
         emitNamespaceEnd();
-        declareModule(provide, true, emitName);
+        declareModule(provide, true, emitName, file);
         continue;
       }
       if (symbol.getType() == null) {
@@ -539,7 +540,7 @@ class DeclarationGenerator {
         JSType moduleType = compiler.getTypeRegistry().getGlobalType(rewritenProvide);
         if (moduleType != null) {
           declareTypedefNamespace(symbol, moduleType, provides);
-          declareModule(provide, /* isDefault */ true, rewritenProvide);
+          declareModule(provide, /* isDefault */ true, rewritenProvide, symbol.getSourceFile());
         } else {
           emitComment("Skipping symbol " + symbol.getName() + " due to missing type information.");
         }
@@ -562,7 +563,7 @@ class DeclarationGenerator {
         namespace = getNamespace(symbol.getName());
       }
       declareNamespace(namespace, symbol, emitName, isDefault, transitiveProvides, false);
-      declareModule(provide, isDefault, emitName);
+      declareModule(provide, isDefault, emitName, symbol.getSourceFile());
     }
     // In order to typecheck in the presence of third-party externs, emit all extern symbols.
     processExternSymbols();
@@ -676,7 +677,7 @@ class DeclarationGenerator {
         emitNamespaceEnd();
         for (String property : properties) {
           // Assume that all symbols that are siblings of the reserved word are default exports.
-          declareModule(property, true, property, true);
+          declareModule(property, true, property, true, var != null ? var.getSourceFile() : null);
         }
       }
     }
@@ -1401,16 +1402,22 @@ class DeclarationGenerator {
     return docInfo != null && docInfo.isConstructor();
   }
 
-  private void declareModule(String name, boolean isDefault, String emitName) {
-    declareModule(name, isDefault, emitName, false);
+  private void declareModule(
+      String name, boolean isDefault, String emitName, StaticSourceFile sourceFile) {
+    declareModule(name, isDefault, emitName, /* inParentNamespace= */ false, sourceFile);
   }
 
   private void declareModule(
-      String name, boolean isDefault, String emitName, boolean inParentNamespace) {
+      String name,
+      boolean isDefault,
+      String emitName,
+      boolean inParentNamespace,
+      StaticSourceFile sourceFile) {
     if (GOOG_BASE_NAMESPACE.equals(name)) {
       // goog:goog cannot be imported.
       return;
     }
+    emitGeneratedFromFileComment(sourceFile);
     emitNoSpace("declare module '");
     emitNoSpace("goog:" + name);
     emitNoSpace("' {");

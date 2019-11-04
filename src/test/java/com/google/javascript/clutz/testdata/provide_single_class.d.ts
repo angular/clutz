@@ -20,6 +20,7 @@ declare namespace ಠ_ಠ.clutz.foo.bar.Baz {
     XD = 2.0 ,
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/provide_single_class.js
 declare module 'goog:foo.bar.Baz' {
   import Baz = ಠ_ಠ.clutz.foo.bar.Baz;
   export default Baz;

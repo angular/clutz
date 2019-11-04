@@ -8,6 +8,7 @@ declare namespace ಠ_ಠ.clutz {
 declare namespace ಠ_ಠ.clutz.module$exports$nested$typedef$mod {
   type T = { a : string } ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/nested_typedef_module.js
 declare module 'goog:nested.typedef.mod' {
   import mod = ಠ_ಠ.clutz.module$exports$nested$typedef$mod;
   export default mod;

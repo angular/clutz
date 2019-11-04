@@ -3,6 +3,7 @@ declare namespace ಠ_ಠ.clutz.empty_type_args {
   interface ITemplated < T > {
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/empty_type_args.js
 declare module 'goog:empty_type_args.ITemplated' {
   import ITemplated = ಠ_ಠ.clutz.empty_type_args.ITemplated;
   export default ITemplated;
@@ -13,6 +14,7 @@ declare namespace ಠ_ಠ.clutz.empty_type_args {
     private noStructuralTyping_empty_type_args_NoMoreTemplateArgs : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/empty_type_args.js
 declare module 'goog:empty_type_args.NoMoreTemplateArgs' {
   import NoMoreTemplateArgs = ಠ_ಠ.clutz.empty_type_args.NoMoreTemplateArgs;
   export default NoMoreTemplateArgs;
@@ -24,6 +26,7 @@ declare namespace ಠ_ಠ.clutz.empty_type_args {
     constructor (a : ಠ_ಠ.clutz.empty_type_args.NoMoreTemplateArgs ) ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/empty_type_args.js
 declare module 'goog:empty_type_args.X' {
   import X = ಠ_ಠ.clutz.empty_type_args.X;
   export default X;

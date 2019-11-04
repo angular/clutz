@@ -4,6 +4,7 @@ declare namespace ಠ_ಠ.clutz.some {
     A = '\\' ,
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/enum.js
 declare module 'goog:some.EscapedEnum' {
   import EscapedEnum = ಠ_ಠ.clutz.some.EscapedEnum;
   export default EscapedEnum;
@@ -17,6 +18,7 @@ declare namespace ಠ_ಠ.clutz.some {
     C : MixedEnum ,
   };
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/enum.js
 declare module 'goog:some.MixedEnum' {
   import MixedEnum = ಠ_ಠ.clutz.some.MixedEnum;
   export default MixedEnum;
@@ -29,6 +31,7 @@ declare namespace ಠ_ಠ.clutz.some {
     2 : 'b' ,
   };
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/enum.js
 declare module 'goog:some.NumberAsKey' {
   import NumberAsKey = ಠ_ಠ.clutz.some.NumberAsKey;
   export default NumberAsKey;
@@ -41,6 +44,7 @@ declare namespace ಠ_ಠ.clutz.some {
     B : ObjectValuedEnum ,
   };
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/enum.js
 declare module 'goog:some.ObjectValuedEnum' {
   import ObjectValuedEnum = ಠ_ಠ.clutz.some.ObjectValuedEnum;
   export default ObjectValuedEnum;
@@ -55,6 +59,7 @@ declare namespace ಠ_ಠ.clutz.some {
     D : PartialLiteralStringEnum ,
   };
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/enum.js
 declare module 'goog:some.PartialLiteralStringEnum' {
   import PartialLiteralStringEnum = ಠ_ಠ.clutz.some.PartialLiteralStringEnum;
   export default PartialLiteralStringEnum;
@@ -66,6 +71,7 @@ declare namespace ಠ_ಠ.clutz.some {
     B = 2.0 ,
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/enum.js
 declare module 'goog:some.SomeEnum' {
   import SomeEnum = ಠ_ಠ.clutz.some.SomeEnum;
   export default SomeEnum;
@@ -77,6 +83,7 @@ declare namespace ಠ_ಠ.clutz.some {
     B = '2' ,
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/enum.js
 declare module 'goog:some.StringEnum' {
   import StringEnum = ಠ_ಠ.clutz.some.StringEnum;
   export default StringEnum;
@@ -89,6 +96,7 @@ declare namespace ಠ_ಠ.clutz.some {
     B : StringVariableEnum ,
   };
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/enum.js
 declare module 'goog:some.StringVariableEnum' {
   import StringVariableEnum = ಠ_ಠ.clutz.some.StringVariableEnum;
   export default StringVariableEnum;
@@ -97,6 +105,7 @@ declare module 'goog:some.StringVariableEnum' {
 declare namespace ಠ_ಠ.clutz.some {
   function setEnvironment (a : Environment ) : any ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/enum.js
 declare module 'goog:some.setEnvironment' {
   import setEnvironment = ಠ_ಠ.clutz.some.setEnvironment;
   export default setEnvironment;

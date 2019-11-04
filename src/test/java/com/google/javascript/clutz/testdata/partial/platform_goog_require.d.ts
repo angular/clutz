@@ -5,6 +5,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$platform$goog$require {
     constructor ( ...a : any [] ) ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/platform_goog_require.js
 declare module 'goog:platform.goog.require' {
   import require = ಠ_ಠ.clutz.module$exports$platform$goog$require;
   export = require;

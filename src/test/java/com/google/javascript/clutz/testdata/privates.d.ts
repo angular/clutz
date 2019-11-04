@@ -8,6 +8,7 @@ declare namespace ಠ_ಠ.clutz.priv {
     publicField : number ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/privates.js
 declare module 'goog:priv' {
   import priv = ಠ_ಠ.clutz.priv;
   export = priv;
@@ -24,6 +25,7 @@ declare namespace ಠ_ಠ.clutz.priv2.PublicClass {
     private noStructuralTyping_priv2_PublicClass_PrivateNestedClass_ : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/privates.js
 declare module 'goog:priv2.PublicClass' {
   import PublicClass = ಠ_ಠ.clutz.priv2.PublicClass;
   export default PublicClass;

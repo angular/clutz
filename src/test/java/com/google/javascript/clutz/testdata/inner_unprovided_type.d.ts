@@ -10,6 +10,7 @@ declare namespace ಠ_ಠ.clutz.ns {
 declare namespace ಠ_ಠ.clutz.ns.f {
   type Inner = { a : number } ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/inner_unprovided_type.js
 declare module 'goog:ns' {
   import ns = ಠ_ಠ.clutz.ns;
   export = ns;

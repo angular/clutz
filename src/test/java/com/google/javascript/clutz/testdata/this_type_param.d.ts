@@ -8,6 +8,7 @@ declare namespace ಠ_ಠ.clutz.nsThis {
     foo3 < THIS > (this : THIS , arr : THIS [] ) : this ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/this_type_param.js
 declare module 'goog:nsThis.C' {
   import C = ಠ_ಠ.clutz.nsThis.C;
   export default C;
@@ -18,6 +19,7 @@ declare namespace ಠ_ಠ.clutz.nsThis {
     private noStructuralTyping_nsThis_D : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/this_type_param.js
 declare module 'goog:nsThis.D' {
   import D = ಠ_ಠ.clutz.nsThis.D;
   export default D;

@@ -5,6 +5,7 @@ declare namespace ಠ_ಠ.clutz.abstract_method {
     bar (a : number ) : string ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/abstract_method.js
 declare module 'goog:abstract_method.Child' {
   import Child = ಠ_ಠ.clutz.abstract_method.Child;
   export default Child;
@@ -17,6 +18,7 @@ declare namespace ಠ_ಠ.clutz.abstract_method {
     foo ( ) : string ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/abstract_method.js
 declare module 'goog:abstract_method.Clazz' {
   import Clazz = ಠ_ಠ.clutz.abstract_method.Clazz;
   export default Clazz;
@@ -28,6 +30,7 @@ declare namespace ಠ_ಠ.clutz.abstract_method {
     foo ( ) : string ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/abstract_method.js
 declare module 'goog:abstract_method.Interface' {
   import Interface = ಠ_ಠ.clutz.abstract_method.Interface;
   export default Interface;

@@ -14,6 +14,7 @@ declare namespace ಠ_ಠ.clutz.dict {
   let typed : { a : Function | null } ;
   let untyped : {[key: string]: any} ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/dict.js
 declare module 'goog:dict' {
   import dict = ಠ_ಠ.clutz.dict;
   export = dict;

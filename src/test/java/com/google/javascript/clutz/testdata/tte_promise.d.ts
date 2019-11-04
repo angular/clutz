@@ -9,6 +9,7 @@ declare namespace ಠ_ಠ.clutz.angular.$q {
     static resolve < T >(value: PromiseLike < T > | T): ಠ_ಠ.clutz.angular.$q.Promise < T >;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/tte_promise.js
 declare module 'goog:angular.$q.Promise' {
   import Promise = ಠ_ಠ.clutz.angular.$q.Promise;
   export default Promise;
@@ -25,6 +26,7 @@ declare namespace ಠ_ಠ.clutz.angular.$q.PromiseService {
   interface Promise < T > {
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/tte_promise.js
 declare module 'goog:angular.$q.PromiseService' {
   import PromiseService = ಠ_ಠ.clutz.angular.$q.PromiseService;
   export default PromiseService;

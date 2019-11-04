@@ -13,6 +13,7 @@ declare namespace ಠ_ಠ.clutz.nsThisGenerics {
     constructor (t : TYPE ) ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/this_type_param_generics.js
 declare module 'goog:nsThisGenerics' {
   import nsThisGenerics = ಠ_ಠ.clutz.nsThisGenerics;
   export = nsThisGenerics;

@@ -13,6 +13,7 @@ declare namespace ಠ_ಠ.clutz.undefinedns {
   function h ( ) : void ;
   function i ( ) : undefined | string ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/undefined_type.js
 declare module 'goog:undefinedns' {
   import undefinedns = ಠ_ಠ.clutz.undefinedns;
   export = undefinedns;

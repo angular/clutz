@@ -6,6 +6,7 @@ declare namespace ಠ_ಠ.clutz.extend.arraylike {
     length : number ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/extends_arraylike_with_platform.js
 declare module 'goog:extend.arraylike.A' {
   import A = ಠ_ಠ.clutz.extend.arraylike.A;
   export default A;
@@ -18,6 +19,7 @@ declare namespace ಠ_ಠ.clutz.extend.arraylike {
     length : number ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/extends_arraylike_with_platform.js
 declare module 'goog:extend.arraylike.B' {
   import B = ಠ_ಠ.clutz.extend.arraylike.B;
   export default B;
@@ -27,6 +29,7 @@ declare namespace ಠ_ಠ.clutz.extend.arraylike {
   interface I extends ArrayLike < any > {
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/extends_arraylike_with_platform.js
 declare module 'goog:extend.arraylike.I' {
   import I = ಠ_ಠ.clutz.extend.arraylike.I;
   export default I;

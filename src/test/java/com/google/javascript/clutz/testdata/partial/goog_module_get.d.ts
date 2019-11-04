@@ -5,6 +5,7 @@ declare namespace ಠ_ಠ.clutz.goog.scope {
     constructor ( ) ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/goog_module_get.js
 declare module 'goog:goog.scope.ClassExtendingMissingDestructuredRequire' {
   import ClassExtendingMissingDestructuredRequire = ಠ_ಠ.clutz.goog.scope.ClassExtendingMissingDestructuredRequire;
   export default ClassExtendingMissingDestructuredRequire;
@@ -16,6 +17,7 @@ declare namespace ಠ_ಠ.clutz.goog.scope {
     constructor ( ) ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/goog_module_get.js
 declare module 'goog:goog.scope.ClassExtendingMissingGoogModuleGet' {
   import ClassExtendingMissingGoogModuleGet = ಠ_ಠ.clutz.goog.scope.ClassExtendingMissingGoogModuleGet;
   export default ClassExtendingMissingGoogModuleGet;
@@ -27,6 +29,7 @@ declare namespace ಠ_ಠ.clutz.goog.scope {
     constructor ( ) ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/goog_module_get.js
 declare module 'goog:goog.scope.ClassExtendingRenamedDestructuredRequire' {
   import ClassExtendingRenamedDestructuredRequire = ಠ_ಠ.clutz.goog.scope.ClassExtendingRenamedDestructuredRequire;
   export default ClassExtendingRenamedDestructuredRequire;
@@ -35,6 +38,7 @@ declare module 'goog:goog.scope.ClassExtendingRenamedDestructuredRequire' {
 declare namespace ಠ_ಠ.clutz.goog.scope {
   let NameAssignedToMissingGoogModuleGet : number ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/goog_module_get.js
 declare module 'goog:goog.scope.NameAssignedToMissingGoogModuleGet' {
   import NameAssignedToMissingGoogModuleGet = ಠ_ಠ.clutz.goog.scope.NameAssignedToMissingGoogModuleGet;
   export default NameAssignedToMissingGoogModuleGet;

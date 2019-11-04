@@ -14,6 +14,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$interface_static_method {
     method ( ) : string ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/interface_static_method.js
 declare module 'goog:interface_static_method' {
   import interface_static_method = ಠ_ಠ.clutz.module$exports$interface_static_method;
   export = interface_static_method;

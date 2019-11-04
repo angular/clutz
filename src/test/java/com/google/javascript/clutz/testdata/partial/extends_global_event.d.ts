@@ -5,6 +5,7 @@ declare namespace ಠ_ಠ.clutz.foo.bar {
     constructor ( ) ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/extends_global_event.js
 declare module 'goog:foo.bar.Baz' {
   import Baz = ಠ_ಠ.clutz.foo.bar.Baz;
   export default Baz;

@@ -14,6 +14,7 @@ declare namespace ಠ_ಠ.clutz.typedef {
 declare namespace ಠ_ಠ.clutz.typedef.C {
   type T = (a : any ) => any ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/typealias_wrong_jsdoc.js
 declare module 'goog:typedef.C' {
   import C = ಠ_ಠ.clutz.typedef.C;
   export default C;

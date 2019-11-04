@@ -2,6 +2,7 @@
 declare namespace ಠ_ಠ.clutz.nswindow {
   let c : ಠ_ಠ.clutz.window.C ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/window_ext.js
 declare module 'goog:nswindow.c' {
   import c = ಠ_ಠ.clutz.nswindow.c;
   export default c;

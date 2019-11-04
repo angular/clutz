@@ -25,6 +25,7 @@ declare namespace ಠ_ಠ.clutz.x {
     method (foo : string ) : void ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/jsdoc.js
 declare module 'goog:x.Y' {
   import Y = ಠ_ಠ.clutz.x.Y;
   export default Y;

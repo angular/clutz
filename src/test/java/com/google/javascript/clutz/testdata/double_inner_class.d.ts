@@ -22,6 +22,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$iterated$innerclass.B.C {
     private noStructuralTyping_module$exports$iterated$innerclass_B_C_D : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/double_inner_class.js
 declare module 'goog:iterated.innerclass' {
   import innerclass = ಠ_ಠ.clutz.module$exports$iterated$innerclass;
   export default innerclass;

@@ -14,6 +14,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$foo$C {
     A = '' ,
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/static_enum.js
 declare module 'goog:foo.C' {
   import C = ಠ_ಠ.clutz.module$exports$foo$C;
   export default C;

@@ -16,6 +16,7 @@ declare namespace ಠ_ಠ.clutz.typedefs {
   type strOrFunc = string | ( ( ) => string ) ;
   type strToStr = (a : string ) => string ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/type_alias.js
 declare module 'goog:typedefs' {
   import typedefs = ಠ_ಠ.clutz.typedefs;
   export = typedefs;

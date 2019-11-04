@@ -9,6 +9,7 @@ declare namespace ಠ_ಠ.clutz.keyword.delete_.namespace {
   }
   let someConstant : ಠ_ಠ.clutz.keyword.delete.namespace.SomeClass ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/keyword_namespace.js
 declare module 'goog:keyword.delete.namespace' {
   import namespace = ಠ_ಠ.clutz.keyword.delete_.namespace;
   export = namespace;

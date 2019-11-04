@@ -5,6 +5,7 @@ declare namespace ಠ_ಠ.clutz.somenamespace {
     bar : ಠ_ಠ.clutz.somenamespace.MyEnum ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/enum_unprovided.js
 declare module 'goog:somenamespace.Foo' {
   import Foo = ಠ_ಠ.clutz.somenamespace.Foo;
   export default Foo;

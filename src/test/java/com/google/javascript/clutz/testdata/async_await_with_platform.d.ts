@@ -6,6 +6,7 @@ declare namespace ಠ_ಠ.clutz {
     foo ( ) : Promise < undefined > ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/async_await_with_platform.js
 declare module 'goog:asyncawait' {
   import asyncawait = ಠ_ಠ.clutz.module$exports$asyncawait;
   export default asyncawait;

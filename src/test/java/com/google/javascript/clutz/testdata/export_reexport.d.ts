@@ -6,6 +6,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$exports$reexport {
   let UntypedExportLocal : string ;
   let UntypedReexport : string ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/export_reexport.js
 declare module 'goog:exports.reexport' {
   import reexport = ಠ_ಠ.clutz.module$exports$exports$reexport;
   export = reexport;

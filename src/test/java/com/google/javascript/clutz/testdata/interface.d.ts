@@ -10,6 +10,7 @@ declare namespace ಠ_ಠ.clutz.interface_exp {
     private noStructuralTyping_interface_exp_SomeClazz : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/interface.js
 declare module 'goog:interface_exp' {
   import interface_exp = ಠ_ಠ.clutz.interface_exp;
   export default interface_exp;
@@ -21,6 +22,7 @@ declare namespace ಠ_ಠ.clutz.interface_exp {
     B = 2.0 ,
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/interface.js
 declare module 'goog:interface_exp.SomeEnum' {
   import SomeEnum = ಠ_ಠ.clutz.interface_exp.SomeEnum;
   export default SomeEnum;

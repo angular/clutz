@@ -6,6 +6,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$protected {
     protected static staticProtected : number ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/protected.js
 declare module 'goog:protected' {
   import protected = ಠ_ಠ.clutz.module$exports$protected;
   export = protected;

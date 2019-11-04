@@ -3,6 +3,7 @@ declare namespace ಠ_ಠ.clutz.goog.legacy.namespace.exporter {
   export import LegacyBaseClass = ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_LegacyBaseClass ;
   export import OriginalName = ಠ_ಠ.clutz.module$contents$goog$legacy$namespace$exporter_OriginalName ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/goog_legacy_namespace_exporter.js
 declare module 'goog:goog.legacy.namespace.exporter' {
   import exporter = ಠ_ಠ.clutz.goog.legacy.namespace.exporter;
   export = exporter;

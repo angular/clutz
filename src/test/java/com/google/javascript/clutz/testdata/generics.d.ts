@@ -25,6 +25,7 @@ declare namespace ಠ_ಠ.clutz.generics {
   function identity < T > (a : T ) : T ;
   function objectWithGenericKeyType < K , V > (obj : { [ /* warning: coerced from K */ key: string ]: V } ) : void ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/generics.js
 declare module 'goog:generics' {
   import generics = ಠ_ಠ.clutz.generics;
   export = generics;

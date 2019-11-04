@@ -6,6 +6,7 @@ declare namespace ಠ_ಠ.clutz.enums {
     C = 42.0 ,
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/enum_with_method.js
 declare module 'goog:enums.EnumWithInlineMethod' {
   import EnumWithInlineMethod = ಠ_ಠ.clutz.enums.EnumWithInlineMethod;
   export default EnumWithInlineMethod;
@@ -17,6 +18,7 @@ declare namespace ಠ_ಠ.clutz.enums {
     BANANA = 2.0 ,
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/enum_with_method.js
 declare module 'goog:enums.EnumWithMethod' {
   import EnumWithMethod = ಠ_ಠ.clutz.enums.EnumWithMethod;
   export default EnumWithMethod;

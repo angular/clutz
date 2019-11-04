@@ -7,6 +7,7 @@ declare namespace ಠ_ಠ.clutz.extend.array {
     //!! be just picked up from the Array base.
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/class_extends_array.js
 declare module 'goog:extend.array.C' {
   import C = ಠ_ಠ.clutz.extend.array.C;
   export default C;

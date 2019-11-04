@@ -2,6 +2,7 @@
 declare namespace ಠ_ಠ.clutz.module$exports$tte$Promise$Partial {
   export import PartialDeferred = ಠ_ಠ.clutz.module$contents$tte$Promise$Partial_PartialDeferred ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/tte_promise_partial.js
 declare module 'goog:tte.Promise.Partial' {
   import Partial = ಠ_ಠ.clutz.module$exports$tte$Promise$Partial;
   export = Partial;

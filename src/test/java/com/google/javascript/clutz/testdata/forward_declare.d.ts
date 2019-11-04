@@ -8,6 +8,7 @@ declare namespace ಠ_ಠ.clutz.forward {
     fn (a : any ) : any ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/forward_declare.js
 declare module 'goog:forward.A' {
   import A = ಠ_ಠ.clutz.forward.A;
   export default A;

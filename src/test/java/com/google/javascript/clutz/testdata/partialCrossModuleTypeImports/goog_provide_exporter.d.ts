@@ -4,6 +4,7 @@ declare namespace ಠ_ಠ.clutz.googprovide {
     private noStructuralTyping_googprovide_exporter : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/goog_provide_exporter.js
 declare module 'goog:googprovide.exporter' {
   import exporter = ಠ_ಠ.clutz.googprovide.exporter;
   export default exporter;

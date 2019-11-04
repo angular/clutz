@@ -4,6 +4,7 @@ declare namespace ಠ_ಠ.clutz.googmodule {
     private noStructuralTyping_googmodule_Required : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/googModule/required.js
 declare module 'goog:googmodule.Required' {
   import Required = ಠ_ಠ.clutz.googmodule.Required;
   export default Required;
@@ -15,6 +16,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$googmodule$TheModule {
   let required : ಠ_ಠ.clutz.googmodule.Required ;
   let requiredDefault : module$exports$googmodule$requiredModuleDefault ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/googModule/goog_module.js
 declare module 'goog:googmodule.TheModule' {
   import TheModule = ಠ_ಠ.clutz.module$exports$googmodule$TheModule;
   export = TheModule;
@@ -23,6 +25,7 @@ declare module 'goog:googmodule.TheModule' {
 declare namespace ಠ_ಠ.clutz.module$exports$googmodule$requiredModule {
   let rm : number ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/googModule/required_module.js
 declare module 'goog:googmodule.requiredModule' {
   import requiredModule = ಠ_ಠ.clutz.module$exports$googmodule$requiredModule;
   export = requiredModule;
@@ -33,6 +36,7 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_module$exports$googmodule$requiredModuleDefault : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/googModule/required_module_default.js
 declare module 'goog:googmodule.requiredModuleDefault' {
   import requiredModuleDefault = ಠ_ಠ.clutz.module$exports$googmodule$requiredModuleDefault;
   export default requiredModuleDefault;

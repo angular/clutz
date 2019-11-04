@@ -9,6 +9,7 @@ declare namespace ಠ_ಠ.clutz {
     methodWithoutTypes ( ...a : any [] ) : any ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/abstract_method_partial.js
 declare module 'goog:abst.method' {
   import method = ಠ_ಠ.clutz.module$exports$abst$method;
   export default method;

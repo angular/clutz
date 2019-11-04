@@ -6,6 +6,7 @@ declare namespace ಠ_ಠ.clutz {
     abstract myStaticAbstractMethod ( ) : string ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/abstract_class.js
 declare module 'goog:foo.AbstractClass' {
   import AbstractClass = ಠ_ಠ.clutz.module$exports$foo$AbstractClass;
   export default AbstractClass;

@@ -18,6 +18,7 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
   let myScope : ಠ_ಠ.clutz.namespace.Foo ;
   function topLevelFunction ( ...a : any [] ) : any ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.js
 declare module 'goog:typesWithExterns' {
   import typesWithExterns = ಠ_ಠ.clutz.typesWithExterns;
   export = typesWithExterns;
@@ -30,6 +31,7 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
     apply : number ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.js
 declare module 'goog:typesWithExterns.A' {
   import A = ಠ_ಠ.clutz.typesWithExterns.A;
   export default A;
@@ -42,6 +44,7 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
     constructor ( ) ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.js
 declare module 'goog:typesWithExterns.B' {
   import B = ಠ_ಠ.clutz.typesWithExterns.B;
   export default B;
@@ -53,6 +56,7 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
     constructor ( ) ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.js
 declare module 'goog:typesWithExterns.C' {
   import C = ಠ_ಠ.clutz.typesWithExterns.C;
   export default C;

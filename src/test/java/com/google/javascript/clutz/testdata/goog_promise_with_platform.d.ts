@@ -9,6 +9,7 @@ declare namespace ಠ_ಠ.clutz.goog {
     static resolve < T >(value: PromiseLike < T > | T): any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/goog_promise_with_platform.js
 declare module 'goog:goog.Promise' {
   import Promise = ಠ_ಠ.clutz.goog.Promise;
   export default Promise;
@@ -24,6 +25,7 @@ declare namespace ಠ_ಠ.clutz.goog {
     then < RESULT > (opt_onFulfilled ? : ( (a : TYPE ) => PromiseLike < RESULT > | RESULT ) | null , opt_onRejected ? : ( (a : any ) => any ) | null) : ಠ_ಠ.clutz.goog.Thenable < RESULT > ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/goog_promise_with_platform.js
 declare module 'goog:goog.Thenable' {
   import Thenable = ಠ_ಠ.clutz.goog.Thenable;
   export default Thenable;

@@ -9,6 +9,7 @@ declare namespace ಠ_ಠ.clutz.fn_params {
   function varargs (x : string ,  ...y : number [] ) : void ;
   function varargs_fns ( ...var_args : ( Function | null ) [] ) : void ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/fn_params.js
 declare module 'goog:fn_params' {
   import fn_params = ಠ_ಠ.clutz.fn_params;
   export = fn_params;

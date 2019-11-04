@@ -6,6 +6,7 @@ declare namespace ಠ_ಠ.clutz.root {
     useTransitiveNamespaced ( ) : ಠ_ಠ.clutz.transitive.ns.Z | null ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/depgraph/root.js
 declare module 'goog:root.Z' {
   import Z = ಠ_ಠ.clutz.root.Z;
   export default Z;

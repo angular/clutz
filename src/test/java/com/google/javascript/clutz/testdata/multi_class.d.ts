@@ -23,6 +23,7 @@ declare namespace ಠ_ಠ.clutz.multi_class {
   interface I2 extends ಠ_ಠ.clutz.multi_class.I {
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/multi_class.js
 declare module 'goog:multi_class' {
   import multi_class = ಠ_ಠ.clutz.multi_class;
   export = multi_class;

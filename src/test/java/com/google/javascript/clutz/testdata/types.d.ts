@@ -20,6 +20,7 @@ declare namespace ಠ_ಠ.clutz.types {
   let recordType : { a : string , b : any } ;
   let recordTypeOptional : { a : string , optional ? : string } ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/types.js
 declare module 'goog:types' {
   import types = ಠ_ಠ.clutz.types;
   export = types;

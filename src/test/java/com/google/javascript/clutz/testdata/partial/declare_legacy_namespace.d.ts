@@ -2,6 +2,7 @@
 declare namespace ಠ_ಠ.clutz.declare.legacy {
   export import namespace = ಠ_ಠ.clutz.module$contents$declare$legacy$namespace_Class ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/declare_legacy_namespace.js
 declare module 'goog:declare.legacy.namespace' {
   import namespace = ಠ_ಠ.clutz.declare.legacy.namespace;
   export default namespace;

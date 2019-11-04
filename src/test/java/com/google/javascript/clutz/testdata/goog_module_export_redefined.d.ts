@@ -3,6 +3,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$module$tsickle$like {
   export import A = ಠ_ಠ.clutz.module$contents$module$tsickle$like_A ;
   let moduleId : string ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/goog_module_export_redefined.js
 declare module 'goog:module.tsickle.like' {
   import like = ಠ_ಠ.clutz.module$exports$module$tsickle$like;
   export = like;

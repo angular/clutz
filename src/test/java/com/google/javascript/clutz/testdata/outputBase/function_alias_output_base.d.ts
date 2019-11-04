@@ -31,6 +31,7 @@ declare namespace ಠ_ಠ.clutz.goog {
     private noStructuralTyping_goog_Uri : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/base.js
 declare module 'goog:goog.Uri' {
   import Uri = ಠ_ಠ.clutz.goog.Uri;
   export default Uri;
@@ -39,6 +40,7 @@ declare module 'goog:goog.Uri' {
 declare namespace ಠ_ಠ.clutz.partial {
   type FunctionAlias = Function ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/outputBase/function_alias_output_base.js
 declare module 'goog:partial.FunctionAlias' {
   import FunctionAlias = ಠ_ಠ.clutz.partial.FunctionAlias;
   export default FunctionAlias;

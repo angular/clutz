@@ -41,6 +41,7 @@ declare namespace ಠ_ಠ.clutz.index_signature {
     private noStructuralTyping_index_signature_SomeType : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/index_signature_with_platform.js
 declare module 'goog:index_signature' {
   import index_signature = ಠ_ಠ.clutz.index_signature;
   export = index_signature;

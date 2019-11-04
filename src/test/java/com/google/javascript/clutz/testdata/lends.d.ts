@@ -1,6 +1,7 @@
 // Generated from src/test/java/com/google/javascript/clutz/testdata/lends.js
 declare namespace ಠ_ಠ.clutz.lends {
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/lends.js
 declare module 'goog:lends' {
   import lends = ಠ_ಠ.clutz.lends;
   export = lends;
@@ -14,6 +15,7 @@ declare namespace ಠ_ಠ.clutz.lends {
     static b : number ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/lends.js
 declare module 'goog:lends.A' {
   import A = ಠ_ಠ.clutz.lends.A;
   export default A;
