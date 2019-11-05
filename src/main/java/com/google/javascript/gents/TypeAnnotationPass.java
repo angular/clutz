@@ -144,6 +144,7 @@ public final class TypeAnnotationPass implements CompilerPass {
           // Names and properties are annotated with their types
         case NAME:
         case GETPROP:
+        case OBJECT_PATTERN:
           if (parent == null) {
             break;
           }
@@ -162,7 +163,7 @@ public final class TypeAnnotationPass implements CompilerPass {
             maybeSetInlineTypeExpression(parent, n, bestJSDocInfo, true);
           }
           break;
-          // If a DEVAULE_VALUE is in a PARAM_LIST we type annotate its first child which is the
+          // If a DEFAULT_VALUE is in a PARAM_LIST we type annotate its first child which is the
           // actual parameter.
         case DEFAULT_VALUE:
           Node paramNode = n.getFirstChild();
@@ -255,7 +256,11 @@ public final class TypeAnnotationPass implements CompilerPass {
       if (parentDocInfo == null) {
         return false;
       }
-      JSTypeExpression parameterType = parentDocInfo.getParameterType(node.getString());
+      String parameterName =
+          node.isObjectPattern()
+              ? parentDocInfo.getParameterNameAt(parent.getIndexOfChild(node))
+              : node.getString();
+      JSTypeExpression parameterType = parentDocInfo.getParameterType(parameterName);
       if (parameterType == null) {
         return false;
       }
@@ -376,9 +381,6 @@ public final class TypeAnnotationPass implements CompilerPass {
         return anyType();
       case VOID:
         return isReturnType ? voidType() : undefinedType();
-        // TypeScript types are non-nullable by default with --strictNullChecks
-      case BANG:
-        return convertTypeNodeAST(n.getFirstChild());
       case QMARK:
         Node child = n.getFirstChild();
         if (child == null) {
@@ -403,7 +405,8 @@ public final class TypeAnnotationPass implements CompilerPass {
             // Both undefined and void are converted to undefined for all non-return types.
             // In closure, "void" and "undefined" are type aliases and thus, equivalent types.
             // However, in TS, it is more ideomatic to emit "void" for return types.
-            // Additionally, there is semantic difference to note: TS "undefined" return types require
+            // Additionally, there is semantic difference to note: TS "undefined" return types
+            // require
             // a return statement, while "void" does not.
           case "undefined":
           case "void":
@@ -514,6 +517,7 @@ public final class TypeAnnotationPass implements CompilerPass {
         // Optional parameters are entirely encoded within the parameter name while the type
         // remains the same.
       case EQUALS:
+      case BANG: // TypeScript types are non-nullable by default with --strictNullChecks
         return convertTypeNodeAST(n.getFirstChild());
       case NAME:
         return namedType(n.getString());
@@ -526,8 +530,7 @@ public final class TypeAnnotationPass implements CompilerPass {
   private TypeDeclarationNode indexSignatureType(
       TypeDeclarationNode keyType, TypeDeclarationNode valueType) {
     TypeDeclarationNode node = new TypeDeclarationNode(Token.INDEX_SIGNATURE);
-    TypeDeclarationNode first = null;
-    first = new TypeDeclarationNode(Token.STRING_KEY, "key");
+    TypeDeclarationNode first = new TypeDeclarationNode(Token.STRING_KEY, "key");
     first.setDeclaredTypeExpression(keyType);
     node.addChildToBack(first);
     node.setDeclaredTypeExpression(valueType);
