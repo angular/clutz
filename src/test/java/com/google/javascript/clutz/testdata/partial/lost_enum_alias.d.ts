@@ -1,3 +1,4 @@
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/lost_enum_alias.js
 declare namespace ಠ_ಠ.clutz.module$exports$lost$enum$alias {
   class C {
     private noStructuralTyping_module$exports$lost$enum$alias_C : any;
@@ -13,6 +14,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$lost$enum$alias {
   //!! This is wrong, it should contain a mention to EAlias.
   type TypeDef = { e : undefined } ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/partial/lost_enum_alias.js
 declare module 'goog:lost.enum.alias' {
   import alias = ಠ_ಠ.clutz.module$exports$lost$enum$alias;
   export = alias;
