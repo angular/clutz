@@ -35,7 +35,7 @@ public final class CommentLinkingPass implements CompilerPass {
   private static final Pattern[] JSDOC_REPLACEMENTS_WITH_KEEP = {
     // Removes @param and @return if there is no description
     Pattern.compile(
-        BEGIN_JSDOC_LINE + "@param[ \t]*(\\{.*\\})[ \t]*[\\w\\$]+[ \t]*(?<keep>\\*\\/|\n)"),
+        BEGIN_JSDOC_LINE + "@param[ \t]*(\\{[^@]*\\})[ \t]*[\\w\\$]+[ \t]*(?<keep>\\*\\/|\n)"),
     Pattern.compile(BEGIN_JSDOC_LINE + "@returns?[ \t]*(\\{.*\\})[ \t]*(?<keep>\\*\\/|\n)"),
     Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@(param|returns?))[ \t]*(\\{.*\\})"),
     // Remove type annotation from @export
@@ -305,7 +305,8 @@ public final class CommentLinkingPass implements CompilerPass {
         // Comment on same line as code -- we have to make sure this is the node we should attach
         // it to.
         if (parent.isCall()) {
-          // We're inside a function call, we have to be careful about which node to attach to, since comments
+          // We're inside a function call, we have to be careful about which node to attach to,
+          // since comments
           // can go before or after an argument.
           if (linkFunctionArgs(n, line)) return true;
         } else if (getCurrentComment().location.end.column < n.getCharno()) {
@@ -336,7 +337,8 @@ public final class CommentLinkingPass implements CompilerPass {
         int endOfComment = getCurrentComment().location.end.column;
         int startOfNextNode = n.getNext().getCharno();
         if (endOfComment < startOfNextNode) {
-          // the comment is between this node and the next node, so check which side of the comment the comma
+          // the comment is between this node and the next node, so check which side of the comment
+          // the comma
           // separating the arguments is on to decide which argument to attach it to.
           String lineContents =
               compiler.getInput(new InputId(n.getSourceFileName())).getSourceFile().getLine(line);

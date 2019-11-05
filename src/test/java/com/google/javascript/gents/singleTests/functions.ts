@@ -52,12 +52,6 @@ const implicitReturnArrow = (a) => a;
 // Argument descructuring
 function namedParams({a}: {a: number}) {}
 
-// TODO(b/142972217): The multiline annotation should be removed in TS.
-/**
- * @param {{
- *   a: number,
- * }} params
- */
 function namedParamsMultiLine({a}: {a: number}) {}
 
 function namedParamsWithDefaultValues({a = 1} = {}) {}

@@ -113,7 +113,6 @@ const implicitReturnArrow = a => a;
 /** @param {{a: number}} params */
 function namedParams({a}) {}
 
-// TODO(b/142972217): The multiline annotation should be removed in TS.
 /**
  * @param {{
  *   a: number,
