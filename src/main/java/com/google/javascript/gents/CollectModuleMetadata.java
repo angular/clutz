@@ -129,20 +129,40 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
         if (module == null) {
           break;
         }
+
         Node maybeExportNode = child.getFirstChild();
-        if (maybeExportNode != null) {
-          String maybeExportString = maybeExportNode.getQualifiedName();
-          if (maybeExportString != null
-              && (maybeExportString.equals("exports")
-                  || module.jsNamespaces.contains(maybeExportString))) {
-            if (module.isGoogModule) {
-              module.namespaceHasDefaultExport.put(
-                  Iterables.getOnlyElement(module.jsNamespaces), true);
-            } else {
-              module.namespaceHasDefaultExport.put(maybeExportString, true);
+        if (maybeExportNode == null) {
+          break;
+        }
+        String maybeExportString = maybeExportNode.getQualifiedName();
+        if (maybeExportString != null
+            && (maybeExportString.equals("exports")
+                || module.jsNamespaces.contains(maybeExportString))) {
+
+          if (module.isGoogModule) {
+            // This is the exports = {A, B, C} pattern, despite it looking like
+            // a default export, we want to treat it like the equivalent
+            // exports.A = A; exports.B = B; exports.C = C;
+            // pattern.
+            if (GentsNodeUtil.isObjLitWithSimpleRefs(child.getSecondChild())) {
+              String fullname = module.providesObjectChildren.keySet().iterator().next();
+
+              Node obj = child.getSecondChild();
+              for (Node symbol : obj.children()) {
+                String identifier = symbol.getString();
+                module.addExport(
+                    maybeExportString + '.' + identifier, fullname + '.' + identifier, identifier);
+              }
+              break;
             }
+            module.namespaceHasDefaultExport.put(
+                Iterables.getOnlyElement(module.jsNamespaces), true);
+
+          } else {
+            module.namespaceHasDefaultExport.put(maybeExportString, true);
           }
         }
+
         module.maybeAddExport(maybeExportNode);
         break;
       default:

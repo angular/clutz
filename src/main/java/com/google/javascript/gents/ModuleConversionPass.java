@@ -181,17 +181,24 @@ public final class ModuleConversionPass implements CompilerPass {
           Node lhs = child.getFirstChild();
           Map<String, String> symbols = module.exportedNamespacesToSymbols;
 
-          // We export the longest valid prefix
           String exportedNamespace = nameUtil.findLongestNamePrefix(lhs, symbols.keySet());
+          String exportedSymbol = null;
+
           if (exportedNamespace != null) {
-            convertExportAssignment(
-                child, exportedNamespace, symbols.get(exportedNamespace), fileName);
+            exportedSymbol = symbols.get(exportedNamespace);
+          } else if (GentsNodeUtil.isObjLitWithSimpleRefs(child.getSecondChild())) {
+            // Special case the exports = {A, B, C} pattern. The rewritter code
+            // already handles this pattern, but we need to pick a non-null symbol to
+            // proceed.
+            // TODO(radokirov): refactor this to not care about exportedSymbol when
+            // export pattern is detected.
+            exportedNamespace = exportedSymbol = "exports";
+          }
+          if (exportedNamespace != null) {
+            convertExportAssignment(child, exportedNamespace, exportedSymbol, fileName);
             // Registers symbol for rewriting local uses
             registerLocalSymbol(
-                child.getSourceFileName(),
-                exportedNamespace,
-                exportedNamespace,
-                symbols.get(exportedNamespace));
+                child.getSourceFileName(), exportedNamespace, exportedNamespace, exportedSymbol);
           }
           break;
         default:
@@ -689,7 +696,7 @@ public final class ModuleConversionPass implements CompilerPass {
 
     if (lhs.matchesQualifiedName(exportedNamespace)) {
       rhs.detach();
-      if (isObjLitWithSimpleRefs(rhs)) {
+      if (GentsNodeUtil.isObjLitWithSimpleRefs(rhs)) {
         for (Node child : rhs.children()) {
           ExportedSymbol symbolToExport =
               ExportedSymbol.fromExportAssignment(
@@ -729,27 +736,6 @@ public final class ModuleConversionPass implements CompilerPass {
       // Assume prefix has already been exported and just trim the prefix
       nameUtil.replacePrefixInName(lhs, exportedNamespace, exportedSymbol);
     }
-  }
-
-  /**
-   * Returns true is the object is an object literal where all values are symbols that match the
-   * name:
-   *
-   * <p>Ex: {A, B: B} -> true {A: C} -> false {A: A + 1} -> false
-   *
-   * <p>TODO(rado): see if we can also support simple renaming objects like {NewName: OldName}.
-   */
-  private boolean isObjLitWithSimpleRefs(Node node) {
-    if (!node.isObjectLit()) return false;
-    for (Node child : node.children()) {
-      if (!child.isStringKey() || !child.getFirstChild().isName()) {
-        return false;
-      }
-      if (!child.getString().equals(child.getFirstChild().getString())) {
-        return false;
-      }
-    }
-    return true;
   }
 
   /**

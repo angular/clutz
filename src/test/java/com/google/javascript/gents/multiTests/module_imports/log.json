@@ -76,5 +76,10 @@
     "originalName": "import.binding.barrel",
     "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/import_binding.js",
     "defaultRename": ""
+  },
+  {
+    "originalName": "exports.default.obj",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_default_obj.js",
+    "defaultRename": ""
   }
 ]
