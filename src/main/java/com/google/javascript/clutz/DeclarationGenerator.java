@@ -1940,6 +1940,7 @@ class DeclarationGenerator {
         emit(elementsTypeName);
         emit(";");
         emitBreak();
+        typesUsed.add(elementsTypeName);
         return;
       }
 
