@@ -9,7 +9,7 @@ import static com.google.javascript.rhino.jstype.JSTypeNative.ARRAY_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.STRING_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.stream.Collectors.toCollection;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static org.apache.commons.text.StringEscapeUtils.escapeEcmaScript;
 
 import com.google.common.base.CharMatcher;
@@ -3160,7 +3160,7 @@ class DeclarationGenerator {
           .getTemplateKeys()
           .stream()
           .map(jsType -> jsType != null ? jsType.getDisplayName() : "")
-          .collect(toCollection(ArrayList::new));
+          .collect(toImmutableList());
     }
 
     private void visitFunctionDeclaration(FunctionType ftype, List<String> skipTemplateParams) {
