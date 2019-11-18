@@ -1,5 +1,6 @@
 goog.provide('nested.baz.Enum');
 goog.provide('nested.bar.HahaEnum');
+goog.provide('nested.bar.ConstAliasEnum');
 
 /** @enum */
 nested.baz.Enum = {
@@ -8,3 +9,7 @@ nested.baz.Enum = {
 
 /** @enum */
 nested.bar.HahaEnum = nested.baz.Enum;
+
+
+/** @const */
+nested.bar.ConstAliasEnum = nested.baz.Enum;

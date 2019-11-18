@@ -1,5 +1,14 @@
 // Generated from src/test/java/com/google/javascript/clutz/testdata/aliased_enums.js
 declare namespace ಠ_ಠ.clutz.nested.bar {
+  export import ConstAliasEnum = nested.baz.Enum ;
+}
+// Generated from src/test/java/com/google/javascript/clutz/testdata/aliased_enums.js
+declare module 'goog:nested.bar.ConstAliasEnum' {
+  import ConstAliasEnum = ಠ_ಠ.clutz.nested.bar.ConstAliasEnum;
+  export default ConstAliasEnum;
+}
+// Generated from src/test/java/com/google/javascript/clutz/testdata/aliased_enums.js
+declare namespace ಠ_ಠ.clutz.nested.bar {
   export import HahaEnum = nested.baz.Enum ;
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/aliased_enums.js
