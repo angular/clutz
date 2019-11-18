@@ -1940,25 +1940,18 @@ class DeclarationGenerator {
         emit(elementsTypeName);
         emit(";");
         emitBreak();
-        typesUsed.add(elementsTypeName);
         return;
       }
 
-      Map<String, Node> elements = new LinkedHashMap<>();
-      Node objectOfAllMembers = null;
       // The current node points to either:
       // 1) The GETPROP node for a goog.provide style export - a.b.MyEnum = {...};
       // 2) The STRINGLIT node for a goog.module style export - exports = { MyEnum: {...}, ...}
-      // 3) The NAME node for 'const Foo = someModule.Foo' reexport.
-      // Case 3) is not supported at the moment https://github.com/angular/clutz/issues/862
-      // so as a workaround just output empty enum by keeping elements map empty.
-      boolean isReexport = node.isName() && node.getFirstChild().isGetProp();
-      if (!isReexport) {
-        // For case 1) we need to get the next node, while for 2) we need to get the first child.
-        objectOfAllMembers = node.getParent().isAssign() ? node.getNext() : node.getFirstChild();
-        for (Node element : objectOfAllMembers.children()) {
-          elements.put(element.getString(), element.getFirstChild());
-        }
+      // For case 1) we need to get the next node, while for 2) we need to get the first child.
+      Node objectOfAllMembers = node.getParent().isAssign() ? node.getNext() : node.getFirstChild();
+
+      Map<String, Node> elements = new LinkedHashMap<>();
+      for (Node element : objectOfAllMembers.children()) {
+        elements.put(element.getString(), element.getFirstChild());
       }
 
       JSType primitiveType = type.getEnumeratedTypeOfEnumObject();
@@ -2039,7 +2032,7 @@ class DeclarationGenerator {
       // emit anything and fall back to the safe conversion. Also, if any of the Closure string
       // enum's keys starts with a digit it's invalid in TS. Quoted digits are considered numeric as
       // well so they cannot be used as enum keys either.
-      if (primitiveType.equals(stringType) && objectOfAllMembers != null) {
+      if (primitiveType.equals(stringType)) {
         for (Node c : objectOfAllMembers.children()) {
           if (Character.isDigit(c.getString().charAt(0))) {
             return false;
