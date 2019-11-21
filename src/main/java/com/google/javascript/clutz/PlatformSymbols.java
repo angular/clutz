@@ -1627,6 +1627,7 @@ public class PlatformSymbols {
           "getComputedStyle",
           "getMatchedCSSRules",
           "getSelection",
+          "globalThis",
           "history",
           "importScripts",
           "indexedDB",
