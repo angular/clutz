@@ -5,7 +5,6 @@ import static com.google.common.truth.Truth.assert_;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -18,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -108,7 +108,7 @@ class ProgramSubject extends Subject {
       if (System.getenv("UPDATE_GOLDENS") != null
           && !golden.getName().endsWith("_with_platform.d.ts")
           && expected.equals(expectedClean)) {
-        Files.asCharSink(golden, Charsets.UTF_8).write(stripped);
+        Files.asCharSink(golden, StandardCharsets.UTF_8).write(stripped);
       } else {
         check("generatedDeclarations()")
             .withMessage("Verifying %s", golden.getName())

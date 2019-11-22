@@ -1,7 +1,5 @@
 package com.google.javascript.gents;
 
-import static com.google.common.base.Charsets.UTF_8;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -13,6 +11,7 @@ import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.parsing.Config;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -158,7 +157,8 @@ public class Options {
             /* empty */
           }.getType();
       try (JsonReader reader =
-          new JsonReader(Files.newBufferedReader(Paths.get(externsMapFile), UTF_8))) {
+          new JsonReader(
+              Files.newBufferedReader(Paths.get(externsMapFile), StandardCharsets.UTF_8))) {
         return new Gson().fromJson(reader, mapType);
       }
     } else {
@@ -183,7 +183,7 @@ public class Options {
 
     if (sourcesManifest != null) {
       try {
-        filesToConvert = Files.readAllLines(Paths.get(sourcesManifest), UTF_8);
+        filesToConvert = Files.readAllLines(Paths.get(sourcesManifest), StandardCharsets.UTF_8);
       } catch (IOException e) {
         throw new CmdLineException(
             parser, "sources manifest file " + sourcesManifest + " not found.", e);
@@ -194,7 +194,8 @@ public class Options {
       srcFiles.addAll(arguments);
     } else {
       try {
-        srcFiles.addAll(Files.readAllLines(Paths.get(dependenciesManifest), UTF_8));
+        srcFiles.addAll(
+            Files.readAllLines(Paths.get(dependenciesManifest), StandardCharsets.UTF_8));
       } catch (IOException e) {
         throw new CmdLineException(
             parser, "dependencies manifest file " + dependenciesManifest + " not found.", e);

@@ -2,12 +2,12 @@ package com.google.javascript.clutz;
 
 import static com.google.javascript.clutz.ProgramSubject.assertThatProgram;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -149,10 +149,10 @@ public class DeclarationGeneratorTest {
   }
 
   static String getTestFileText(final File input) throws IOException {
-    String text = Files.asCharSource(input, Charsets.UTF_8).read();
+    String text = Files.asCharSource(input, StandardCharsets.UTF_8).read();
     if (input.getName().endsWith("_with_platform.d.ts")) {
       File platformGolden = getTestDataFolderPath().resolve("general_with_platform.d.ts").toFile();
-      String platformGoldenText = Files.asCharSource(platformGolden, Charsets.UTF_8).read();
+      String platformGoldenText = Files.asCharSource(platformGolden, StandardCharsets.UTF_8).read();
       if (text.contains(PLATFORM_MARKER)) {
         text = text.replace(PLATFORM_MARKER, platformGoldenText);
       } else {
