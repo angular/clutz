@@ -3,13 +3,13 @@ package com.google.javascript.clutz;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Iterables.transform;
 import static com.google.javascript.rhino.jstype.JSTypeNative.ALL_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.ARRAY_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.STRING_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static org.apache.commons.text.StringEscapeUtils.escapeEcmaScript;
 
 import com.google.common.base.CharMatcher;
@@ -358,8 +358,7 @@ class DeclarationGenerator {
         continue;
       }
 
-      getJsEntryPathsFromZip(source)
-          .stream()
+      getJsEntryPathsFromZip(source).stream()
           .map(p -> SourceFile.fromPath(p, UTF_8))
           .forEach(sourceFiles::add);
     }
@@ -392,8 +391,7 @@ class DeclarationGenerator {
    */
   static List<Path> getJsEntryPathsFromZip(String source) {
     try (ZipFile zipFile = new ZipFile(source)) {
-      return zipFile
-          .stream()
+      return zipFile.stream()
           .filter(e -> !e.isDirectory())
           .filter(e -> e.getName().endsWith(".js"))
           .map(e -> source + "!/" + e.getName())
@@ -1020,13 +1018,6 @@ class DeclarationGenerator {
    */
   private String normalizeWindowGlobals(String name) {
     return name.replaceAll("^(window|this)\\.", "");
-  }
-
-  /** See the comment above on shouldAvoidGeneratingExterns. */
-  private boolean shouldAvoidGeneratingExterns(ObjectType type) {
-    if (type.getConstructor() == null || type.getConstructor().getSource() == null) return false;
-    return shouldAvoidGeneratingExterns(
-        type.getConstructor().getSource().getSourceFileName(), type.getDisplayName());
   }
 
   private void declareNamespace(
@@ -1776,8 +1767,7 @@ class DeclarationGenerator {
       ObjectType superType = getSuperType(ftype);
       if (superType != null) {
         emit("extends");
-        boolean emitInstanceForObject = !shouldAvoidGeneratingExterns(superType);
-        Visitor<Void> visitor = new ExtendsImplementsTypeVisitor(emitInstanceForObject);
+        Visitor<Void> visitor = new ExtendsImplementsTypeVisitor();
         superType.visit(visitor);
       }
 
@@ -1797,7 +1787,7 @@ class DeclarationGenerator {
           // TypeScript does not allow public APIs that expose non-exported/private types.
           emit(getGlobalSymbolNamespacePrefix() + "PrivateInterface");
         } else {
-          ExtendsImplementsTypeVisitor visitor = new ExtendsImplementsTypeVisitor(false);
+          ExtendsImplementsTypeVisitor visitor = new ExtendsImplementsTypeVisitor();
           type.visit(visitor);
         }
         if (it.hasNext()) {
@@ -2225,7 +2215,7 @@ class DeclarationGenerator {
 
             @Override
             public Void caseObjectType(ObjectType type) {
-              return emitObjectType(type, false, false);
+              return emitObjectType(type, false);
             }
 
             @Override
@@ -2775,7 +2765,8 @@ class DeclarationGenerator {
       // Unfortunately, this method of detecting whether a class implements Iterator, is error-prone
       // in cases where the extension goes through another extends clause. Consider, C extends D,
       // and D implements Iterable.
-      // In such cases C doesn't need to emit anything new, because D's emit would have handled that.
+      // In such cases C doesn't need to emit anything new, because D's emit would have handled
+      // that.
       // Here we detect one such case - D being the always-present Array type and skip unnecessary
       // custom emit.
       if (instanceType.isSubtype(arrayType)) {
@@ -3155,10 +3146,7 @@ class DeclarationGenerator {
       if (objType.getTemplateTypeMap() == null) {
         return Collections.emptyList();
       }
-      return objType
-          .getTemplateTypeMap()
-          .getTemplateKeys()
-          .stream()
+      return objType.getTemplateTypeMap().getTemplateKeys().stream()
           .map(jsType -> jsType != null ? jsType.getDisplayName() : "")
           .collect(toImmutableList());
     }
@@ -3463,8 +3451,7 @@ class DeclarationGenerator {
       emitBreak();
     }
 
-    public Void emitObjectType(
-        ObjectType type, boolean extendingInstanceClass, boolean inExtendsImplementsPosition) {
+    public Void emitObjectType(ObjectType type, boolean inExtendsImplementsPosition) {
       // Closure doesn't require that all the type params be declared, but TS does
       if (!type.getTemplateTypeMap().isEmpty()
           && !typeRegistry.getNativeType(OBJECT_TYPE).equals(type)) {
@@ -3526,15 +3513,9 @@ class DeclarationGenerator {
      * any' is invalid, even though () => any is a valid type.
      */
     class ExtendsImplementsTypeVisitor implements Visitor<Void> {
-      final boolean emitInstanceForObject;
-
-      ExtendsImplementsTypeVisitor(boolean emitInstanceForObject) {
-        this.emitInstanceForObject = emitInstanceForObject;
-      }
-
       @Override
       public Void caseObjectType(ObjectType type) {
-        emitObjectType(type, emitInstanceForObject, true);
+        emitObjectType(type, true);
         return null;
       }
 

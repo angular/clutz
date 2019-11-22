@@ -4,7 +4,6 @@ import static com.google.javascript.clutz.DeclarationGeneratorTest.JS_NO_EXTERNS
 import static com.google.javascript.clutz.DeclarationGeneratorTest.TS_SOURCES;
 import static org.junit.Assert.fail;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -12,6 +11,7 @@ import com.google.common.io.CharStreams;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -33,10 +33,6 @@ public class DeclarationSyntaxTest {
   private static final FilenameFilter JS_PARTIAL_CROSS_MODULE_TYPE_IMPORTS =
       (File dir, String name) ->
           JS_NO_EXTERNS.accept(dir, name) && dir.getName().equals("partialCrossModuleTypeImports");
-
-  private static final FilenameFilter JS_ALIASED_INTERFACE =
-      (File dir, String name) ->
-          JS_NO_EXTERNS.accept(dir, name) && dir.getName().equals("aliasedInterface");
 
   public static final Path TSC =
       FileSystems.getDefault().getPath("node_modules", "typescript", "bin", "tsc");
@@ -130,7 +126,7 @@ public class DeclarationSyntaxTest {
       tsc.destroyForcibly();
     }
     if (tsc.exitValue() != 0) {
-      InputStreamReader isr = new InputStreamReader(tsc.getInputStream(), Charsets.UTF_8);
+      InputStreamReader isr = new InputStreamReader(tsc.getInputStream(), StandardCharsets.UTF_8);
       String consoleOut = CharStreams.toString(isr);
       fail("tsc exited abnormally with code " + tsc.exitValue() + "\n" + consoleOut);
     }

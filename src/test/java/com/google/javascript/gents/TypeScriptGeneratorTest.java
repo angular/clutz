@@ -2,7 +2,6 @@ package com.google.javascript.gents;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.javascript.clutz.DeclarationGeneratorTest;
 import com.google.javascript.gents.TypeScriptGenerator.GentsResult;
@@ -60,7 +59,7 @@ public class TypeScriptGeneratorTest {
   }
 
   static String getFileText(final File input) throws IOException {
-    String text = Files.asCharSource(input, Charsets.UTF_8).read();
+    String text = Files.asCharSource(input, StandardCharsets.UTF_8).read();
     String cleanText =
         DeclarationGeneratorTest.GOLDEN_FILE_COMMENTS_REGEXP.matcher(text).replaceAll("");
     return cleanText;

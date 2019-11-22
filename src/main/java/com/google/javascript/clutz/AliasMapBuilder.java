@@ -24,7 +24,7 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
       String localModuleId, Node moduleBody, Set<String> googProvides) {
     Map<String, String> aliasMap = new HashMap<>();
     if (localModuleId == null) {
-      //TODO(lucassloan): handle goog.module.get()
+      // TODO(lucassloan): handle goog.module.get()
       return aliasMap;
     }
 
@@ -36,7 +36,7 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
       if (isImportAssignment(statement)) {
         // `const C = goog.require()` or
         // `const C = goog.module.get()`
-        String importedModuleId = statement.getFirstFirstChild().getChildAtIndex(1).getString();
+        String importedModuleId = statement.getFirstFirstChild().getSecondChild().getString();
         String localVariableName = statement.getFirstChild().getString();
 
         String importedSymbolName = buildWholeModuleExportSymbolName(importedModuleId);
@@ -45,14 +45,14 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
         // `const {C, Clazz: RenamedClazz} = goog.require()` or
         // `const {C, Clazz: RenamedClazz} = goog.module.get()`
         String importedModuleId =
-            statement.getFirstChild().getChildAtIndex(1).getChildAtIndex(1).getString();
+            statement.getFirstChild().getChildAtIndex(1).getSecondChild().getString();
         for (Node destructured : statement.getFirstFirstChild().children()) {
           String originalName = destructured.getString();
           // Destructuring can use the original name `const {A} = goog.require("foo.a")` or rename
           // it `const {A: RenamedA} = ...`, and closure uses whichever in the symbol name it
           // generates, so we have to extract it.
           String localVariableName;
-          if (destructured.getFirstChild() != null) {
+          if (destructured.hasChildren()) {
             // Renaming
             localVariableName = destructured.getFirstChild().getString();
           } else {
@@ -100,9 +100,7 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
         String localPropName = getExportsAssignmentPropName(statement);
         String exportName = getNamedExportName(statement);
         String localNamespaceName =
-            localVariableToImportedSymbolNameMap.containsKey(localVariableName)
-                ? localVariableToImportedSymbolNameMap.get(localVariableName)
-                : localVariableName;
+            localVariableToImportedSymbolNameMap.getOrDefault(localVariableName, localVariableName);
         aliasMap.put(
             buildNamedExportSymbolName(localModuleId, exportName),
             localNamespaceName + "." + localPropName);
