@@ -9,11 +9,11 @@ goog.module('both.A.B');
  * This is an intentional semantic mismatch, because most of the time the
  * bindings are immutable and 'export let L' is syntactically preferable.
  */
-var num = 4;
+const num = 4;
 /**
  * @return {number}
  */
-var B = function() {
+const B = function() {
   return num;
 };
 
@@ -29,7 +29,7 @@ exports.C = C;
 /**
  * @return {number}
  */
-var L = function() {
+const L = function() {
   return num;
 };
 
