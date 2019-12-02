@@ -1645,7 +1645,7 @@ class DeclarationGenerator {
         // listed as unknown type instead of enum type.
         JSType registryType = typeRegistry.getGlobalType(symbol.getName());
         if (type.isUnknownType() && registryType != null && registryType.isEnumElementType()) {
-          visitTypeValueAlias(symbol.getName(), (EnumElementType) registryType);
+          visitTypeValueAlias(getUnqualifiedName(symbol), (EnumElementType) registryType);
           return;
         }
         // Clutz doesn't have good type info - check if the symbol is a reexport by checking
@@ -1689,7 +1689,7 @@ class DeclarationGenerator {
      * needs to pass 'null' and an explicit non-null alternativeAliasName will be used.
      */
     private void visitTypeValueAlias(String unqualifiedName, ObjectType otype) {
-      String emitName = Constants.INTERNAL_NAMESPACE + "." + otype.getDisplayName();
+      String emitName =  otype.getDisplayName() == null ? "any" : Constants.INTERNAL_NAMESPACE + "." + otype.getDisplayName();
       emit("export import");
       emit(unqualifiedName);
       emit("=");
