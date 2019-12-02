@@ -1652,7 +1652,7 @@ class DeclarationGenerator {
         // aliasMap
         // otherwise assume it's a var declaration
         if (aliasMap.containsKey(emitName)) {
-          visitKnownTypeValueAlias(symbol.getName(), aliasMap.get(emitName));
+          visitKnownTypeValueAlias(getUnqualifiedName(symbol), aliasMap.get(emitName));
         } else {
           visitVarDeclaration(getUnqualifiedName(emitName), type);
         }
