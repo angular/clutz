@@ -45,6 +45,10 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
             liftClassOrFunctionDefinition(n);
           }
         }
+        // Mutable exports are forbidden in both JS and TS, so change them all to CONST
+        if (parent.isExport()) {
+          n.setToken(Token.CONST);
+        }
         break;
       case CONST:
         if (hasGrandchildren(n)) {

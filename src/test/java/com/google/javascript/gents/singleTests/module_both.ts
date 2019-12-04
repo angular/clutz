@@ -7,9 +7,9 @@
  * This is an intentional semantic mismatch, because most of the time the
  * bindings are immutable and 'export let L' is syntactically preferable.
  */
-export let num = 4;
+export const num = 4;
 
-export let B = function(): number {
+export const B = function(): number {
   return num;
 };
 
@@ -17,7 +17,7 @@ export function C(): number {
   return num;
 }
 
-export let L = function(): number {
+export const L = function(): number {
   return num;
 };
 
