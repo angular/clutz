@@ -57,9 +57,10 @@ export interface InnerTypedefWithAssignment {
   key: number;
   value: string;
 }
-type PrivateTypedef_ = {
-  myFunction: (p1: any) => PrivateTypedef_
-};
+
+interface PrivateTypedef_ {
+  myFunction: (p1: any) => PrivateTypedef_;
+}
 Foo.FruitType = {
   UNKNOWN: 0,
   APPLE: 1,

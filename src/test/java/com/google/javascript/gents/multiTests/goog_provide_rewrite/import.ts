@@ -9,6 +9,7 @@ Foo.func = function(arg: InnerTypedef): InnerTypedefWithAssignment {
   return {key: 3, value: 'bar3'};
 };
 const b = Foo.func(a);
-type PrivateTypedef_ = {
-  t: InnerTypedefWithAssignment
-};
+
+interface PrivateTypedef_ {
+  t: InnerTypedefWithAssignment;
+}

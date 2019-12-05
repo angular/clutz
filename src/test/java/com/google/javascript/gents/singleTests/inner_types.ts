@@ -50,9 +50,10 @@ type InnerMyAny1 = any;
 type InnerMyAny2 = any;
 type InnerUnionType = boolean|number|string;
 type InnerNumberArrayType = number[];
-type Typedef = {
-  a: {b: {c: number}}
-};
+
+interface Typedef {
+  a: {b: {c: number}};
+}
 type MyStringType = string;
 type MyStringTypeNonNullable = string;
 type MyStringTypeNullable = string|null;

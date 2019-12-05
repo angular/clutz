@@ -69,7 +69,7 @@ public final class TypeConversionPass implements CompilerPass {
     convertTypeAlias();
   }
 
-  /** Converts @constructor annotated functions into classes. */
+  /** Converts @constructor annotated functions into classes and all @typedefs. */
   private class TypeConverter extends AbstractPostOrderCallback {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
@@ -104,7 +104,7 @@ public final class TypeConversionPass implements CompilerPass {
           if (containsObject(typedefNode)) {
             // Interface
             String interfaceName = n.getSecondChild().getString();
-            Node interfaceMember = Node.newString(Token.INTERFACE_MEMBERS, interfaceName);
+            Node interfaceMember = new Node(Token.INTERFACE_MEMBERS);
             typesToRename.put(n.getQualifiedName(), interfaceName);
             typesToFilename.put(n.getQualifiedName(), n.getSourceFileName());
             types.put(interfaceName, interfaceMember);
@@ -123,7 +123,25 @@ public final class TypeConversionPass implements CompilerPass {
         case VAR:
         case LET:
         case CONST:
-          createTypeAlias(n, parent);
+          bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
+          if (bestJSDocInfo == null || !bestJSDocInfo.hasTypedefType()) break;
+          // Similar to GETPROP logic @typedefs of a simple object type {a: ..., b: ...} should
+          // get translated to TS interfaces. See comment above for more reasoning.
+          if (containsObject(bestJSDocInfo.getTypedefType().getRoot())) {
+            String name = n.getFirstChild().getString();
+            Node interfaceMember = new Node(Token.INTERFACE_MEMBERS);
+            interfaceMember.setJSDocInfo(bestJSDocInfo);
+            Node interfaceNode = new Node(Token.INTERFACE, IR.empty(), IR.empty(), interfaceMember);
+            Node nameNode = Node.newString(Token.NAME, name);
+            nameNode.addChildToBack(interfaceNode);
+            Node constNode = new Node(Token.CONST, nameNode);
+            // At this point the AST is the non-syntactically correct `const Foo = interface {}`,
+            // and a later pass will fill in the members and change to proper interface Foo.
+            // TODO(radokirov): Figure out if we can just generate interface Foo {}.
+            replaceExpressionOrAssignment(n, parent, constNode);
+          } else {
+            createTypeAlias(n, parent);
+          }
           break;
         case NAME:
           // NAME token can occur in many locations. Only create an alias for ones that are direct

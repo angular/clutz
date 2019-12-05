@@ -2,8 +2,13 @@
  * Comment
  */
 type MyString = string;
-type MyInterface = {
-  x: string,
-  y: number
-};
-let x: MyString = 'x';
+
+interface MyInterface {
+  x: string;
+  y: number;
+}
+export interface MyExportedInterface {
+  x: string;
+  y: number;
+}
+const x: MyString = 'x';

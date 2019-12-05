@@ -1,8 +1,10 @@
+goog.module('typedefs.test');
+
 /**
  * Comment
  * @typedef {string}
  */
-var MyString;
+let MyString;
 
 /**
  * @typedef {{
@@ -10,7 +12,18 @@ var MyString;
  *   y: number
  * }}
  */
-var MyInterface;
+let MyInterface;
+
+/**
+ * @typedef {{
+ *   x: string,
+ *   y: number
+ * }}
+ */
+let MyExportedInterface;
+
 
 /** @type {MyString} */
-var x = 'x';
+const x = 'x';
+
+exports = {MyExportedInterface};
