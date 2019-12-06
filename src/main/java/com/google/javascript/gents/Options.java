@@ -1,6 +1,8 @@
 package com.google.javascript.gents;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
@@ -15,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -51,12 +54,12 @@ public class Options {
   String moduleRewriteLog = null;
 
   @Option(
-    name = "--dependenciesManifest",
-    usage =
-        "the path to a manifest file containing all dependencies\n"
-            + "Passing dependency files is disallowed when \"--dependenciesManifest\" option is used",
-    metaVar = "DEPENDENCIES_MANIFEST"
-  )
+      name = "--dependenciesManifest",
+      usage =
+          "the path to a manifest file containing all dependencies\n"
+              + "Passing dependency files is disallowed when \"--dependenciesManifest\" option is"
+              + " used",
+      metaVar = "DEPENDENCIES_MANIFEST")
   private String dependenciesManifest = null;
 
   @Option(
@@ -92,6 +95,12 @@ public class Options {
     metaVar = "EXTERNSMAP"
   )
   String externsMapFile = null;
+
+  @Option(
+      name = "--externsOverride",
+      usage = "list of externs to override in the form <oldType>:<newType> (as separate args)",
+      metaVar = "EXTERNSOVERRIDE...")
+  List<String> externsOverride = new ArrayList<>();
 
   @Option(
     name = "--alreadyConvertedPrefix",
@@ -151,6 +160,27 @@ public class Options {
   }
 
   private Map<String, String> getExternsMap() throws IOException {
+    Map<String, String> externsMap = getFileExternsMap();
+    if (this.externsOverride != null) {
+      Splitter splitter = Splitter.on(':').trimResults().omitEmptyStrings();
+      for (String mapping : this.externsOverride) {
+        List<String> parts = Lists.newArrayList(splitter.split(mapping));
+        if (parts.size() != 2) {
+          throw new IllegalArgumentException(
+              "Expected an externsOverride to be of the "
+                  + "form <oldType>:<newType> but found '"
+                  + mapping
+                  + "'");
+        }
+        String oldType = parts.get(0);
+        String newType = parts.get(1);
+        externsMap.put(oldType, newType);
+      }
+    }
+    return ImmutableMap.copyOf(externsMap);
+  }
+
+  private Map<String, String> getFileExternsMap() throws IOException {
     if (this.externsMapFile != null) {
       Type mapType =
           new TypeToken<Map<String, String>>() {
@@ -162,7 +192,7 @@ public class Options {
         return new Gson().fromJson(reader, mapType);
       }
     } else {
-      return ImmutableMap.of();
+      return new HashMap<>();
     }
   }
 
@@ -170,15 +200,17 @@ public class Options {
     CmdLineParser parser = new CmdLineParser(this);
     parser.parseArgument(args);
 
-    if (filesToConvert.size() != 0 && sourcesManifest != null) {
+    if (!filesToConvert.isEmpty() && sourcesManifest != null) {
       throw new CmdLineException(
           parser,
-          "Don't specify a sources manifest file and source files (\"--convert\") at the same time.");
+          "Don't specify a sources manifest file and source files (\"--convert\") at the same"
+              + " time.");
     }
-    if (arguments.size() != 0 && dependenciesManifest != null) {
+    if (!arguments.isEmpty() && dependenciesManifest != null) {
       throw new CmdLineException(
           parser,
-          "Don't specify a dependencies manifest file and dependency files as arguments at the same time.");
+          "Don't specify a dependencies manifest file and dependency files as arguments at the"
+              + " same time.");
     }
 
     if (sourcesManifest != null) {
