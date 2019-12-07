@@ -29,11 +29,16 @@ public class OptionsTest {
               "output",
               "--externsMap",
               TEST_EXTERNS_MAP,
+              "--externsOverride",
+              "any:CustomAny",
+              "--externsOverride",
+              "a:b"
             });
     assertThat(opts.arguments).containsExactly("foo.js");
     assertThat(opts.externs).containsExactly("extern1.js", "extern2.js").inOrder();
     assertThat(opts.output).isEqualTo("output");
     assertThat(opts.externsMapFile).isEqualTo(TEST_EXTERNS_MAP);
+    assertThat(opts.externsOverride).containsExactly("any:CustomAny", "a:b").inOrder();
   }
 
   @Test

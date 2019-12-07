@@ -2,6 +2,7 @@ package com.google.javascript.gents;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.google.javascript.clutz.DeclarationGeneratorTest;
 import com.google.javascript.gents.TypeScriptGenerator.GentsResult;
@@ -73,10 +74,16 @@ public class TypeScriptGeneratorTest {
 
   @Test
   public void runTest() throws Exception {
-    Options options =
-        input.getName().equals("externs_map.js")
-            ? new Options(TypeScriptGeneratorTest.TEST_EXTERNS_MAP)
-            : new Options();
+    Options options;
+    if (input.getName().equals("externs_map.js")) {
+      options = new Options(TypeScriptGeneratorTest.TEST_EXTERNS_MAP);
+    } else if (input.getName().equals("externs_override.js")) {
+      options =
+          new Options(
+              TypeScriptGeneratorTest.TEST_EXTERNS_MAP, Lists.newArrayList("any:AnyDuringTs37Migration"));
+    } else {
+      options = new Options();
+    }
 
     TypeScriptGenerator gents = new TypeScriptGenerator(options);
 
