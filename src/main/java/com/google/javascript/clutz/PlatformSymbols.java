@@ -26,7 +26,6 @@ public class PlatformSymbols {
           .put("CSSProperties", "CSSStyleDeclaration")
           .put("IteratorIterable", "IterableIterator")
           .put("AsyncIteratorIterable", "AsyncIterableIterator")
-          .put("Generator", "IterableIterator")
           .put("IArrayLike", "ArrayLike")
           .put("Arguments", "IArguments")
           .put("IThenable", "PromiseLike")
@@ -42,20 +41,6 @@ public class PlatformSymbols {
           .add("ProgressEvent")
           .add("NamedNodeMap")
           .build();
-
-  /**
-   * These types will have 3 template parameters as of TS 3.6, but in TS 3.5 only have 1.
-   *
-   * <p>Closure compiler has started recording 3 template parameters for these types in order to be
-   * consistent with TS 3.6, but we need to ignore the last 2 template parameters when generating
-   * .d.ts output to be used with TS 3.5 .d.ts files.
-   *
-   * <p>Note that unlike NOT_TEMPLATIZE_IN_TYPESCRIPT these are the TS type names rather than the
-   * Closure type names, because the check for how many parameters to emit comes after the name has
-   * been converted already.
-   */
-  public static final ImmutableSet<String> ONLY_1_TEMPLATE_PARAM_FOR_TS_35 =
-      ImmutableSet.of("Iterator", "IterableIterator", "AsyncIterableIterator");
 
   /**
    * List of global platform symbols that are redirected through an alias in closure.lib.d.ts. This

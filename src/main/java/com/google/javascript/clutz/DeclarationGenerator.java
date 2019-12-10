@@ -2394,11 +2394,7 @@ class DeclarationGenerator {
       }
       emit(templateTypeName);
       typesUsed.add(displayName);
-      // TODO(b/140560697): Remove this restriction when TS 3.6 support is complete.
-      boolean onlyEmitOneTemplateParameter =
-          PlatformSymbols.ONLY_1_TEMPLATE_PARAM_FOR_TS_35.contains(templateTypeName);
-      emitGenericTypeArguments(
-          onlyEmitOneTemplateParameter ? ImmutableList.of(templateTypes.get(0)) : templateTypes);
+      emitGenericTypeArguments(templateTypes);
       return null;
     }
 
