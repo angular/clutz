@@ -1689,7 +1689,10 @@ class DeclarationGenerator {
      * needs to pass 'null' and an explicit non-null alternativeAliasName will be used.
      */
     private void visitTypeValueAlias(String unqualifiedName, ObjectType otype) {
-      String emitName =  otype.getDisplayName() == null ? "any" : Constants.INTERNAL_NAMESPACE + "." + otype.getDisplayName();
+      String emitName =
+          otype.getDisplayName() == null
+              ? "any"
+              : Constants.INTERNAL_NAMESPACE + "." + otype.getDisplayName();
       emit("export import");
       emit(unqualifiedName);
       emit("=");
@@ -1930,12 +1933,23 @@ class DeclarationGenerator {
         emit(elementsTypeName);
         emit(";");
         emitBreak();
+        typesUsed.add(elementsTypeName);
         return;
       }
 
       // The current node points to either:
       // 1) The GETPROP node for a goog.provide style export - a.b.MyEnum = {...};
       // 2) The STRINGLIT node for a goog.module style export - exports = { MyEnum: {...}, ...}
+      // 3) The NAME node for 'const Foo = someModule.Foo' reexport.
+      // 4) The NAME node for 'const Foo = Bar;' Currently this case produces empty enum (enum with
+      // no values). See partial/enum_alias.js.
+
+      if (node.isName() && node.getFirstChild().isGetProp()) {
+        // Case 3: reexport. Quit without outputting anything and let it be unknown type
+        // See hanging enum_alias2_Enum in enum_alias_declare_legacy_namespace.d.ts test.
+        // It might be fixed with b/144351396.
+        return;
+      }
       // For case 1) we need to get the next node, while for 2) we need to get the first child.
       Node objectOfAllMembers = node.getParent().isAssign() ? node.getNext() : node.getFirstChild();
 
