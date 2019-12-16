@@ -55,7 +55,9 @@ public final class CommentLinkingPass implements CompilerPass {
             + EOL),
     Pattern.compile(BEGIN_JSDOC_LINE + "@suppress[ \t]*\\{extraRequire\\}[ \t]*" + EOL),
     // Remove @typedef if there is no description.
-    Pattern.compile(BEGIN_JSDOC_LINE + "@typedef[ \t]*(\\{.*\\})" + EOL, Pattern.DOTALL)
+    Pattern.compile(BEGIN_JSDOC_LINE + "@typedef[ \t]*(\\{.*\\})" + EOL, Pattern.DOTALL),
+    // Remove @abstract.
+    Pattern.compile(BEGIN_JSDOC_LINE + "@abstract" + EOL, Pattern.DOTALL)
   };
 
   private static final Pattern[] COMMENT_REPLACEMENTS = {Pattern.compile("//\\s*goog.scope\\s*")};

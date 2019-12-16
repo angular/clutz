@@ -111,3 +111,17 @@ class ClassWithNoConstructorJsDocAndProperties {
     this.foo = foo;
   }
 }
+
+class AbstractClass {
+  method() {}
+}
+
+/**
+ * My abstract class.
+ */
+class AnotherAbstractClass {
+  /**
+   * My abstract method.
+   */
+  anotherMethod() {}
+}
