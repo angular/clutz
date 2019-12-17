@@ -3076,16 +3076,46 @@ class DeclarationGenerator {
       // the same runtime.
       if (propName.equals("then")) {
         if (className.equals("ಠ_ಠ.clutz.angular.$q.Promise")) {
-          return "then < RESULT > (opt_onFulfilled ? : ( (a : "
+          return "// matching ng.IPromise in angular.d.ts.\n"
+              + "    then<TResult1 = "
               + templateVarName
-              + " ) => "
-              + classTemplatizedType
-              + " | RESULT | "
+              + ", TResult2 = never>(\n"
+              + "        successCallback?:\n"
+              + "        | ((value: "
+              + templateVarName
+              + ") => PromiseLike<never> | PromiseLike<TResult1> | TResult1)\n"
+              + "        | null,\n"
+              + "            errorCallback?:\n"
+              + "        | ((reason: any) => PromiseLike<never> | PromiseLike<TResult2> |"
+              + " TResult2)\n"
+              + "        | null,\n"
+              + "            notifyCallback?: (state: any) => any\n"
+              + "        ): "
               + className
-              + "<never>) | null , "
-              + "opt_onRejected ? : ( (a : any ) => any ) | null) : "
-              + classTemplatizedType
-              + " ;";
+              + "<TResult1 | TResult2>;\n"
+              + "    then<TResult1 = "
+              + templateVarName
+              + ", TResult2 = never>(\n"
+              + "        successCallback?:\n"
+              + "        | ((value: "
+              + templateVarName
+              + ") => "
+              + className
+              + "<never> | "
+              + className
+              + "<TResult1> | TResult1)\n"
+              + "        | null,\n"
+              + "            errorCallback?:\n"
+              + "        | ((reason: any) => "
+              + className
+              + "<never> | "
+              + className
+              + "<TResult2> | TResult2)\n"
+              + "        | null,\n"
+              + "            notifyCallback?: (state: any) => any\n"
+              + "        ): "
+              + className
+              + "<TResult1 | TResult2>;\n";
         } else {
           return "then < RESULT > (opt_onFulfilled ? : ( (a : "
               + templateVarName
