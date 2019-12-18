@@ -3245,8 +3245,8 @@ class DeclarationGenerator {
 
     private void visitFunctionParameters(
         FunctionType ftype, boolean emitTemplatizedTypes, List<String> alreadyEmittedTemplateType) {
-      final boolean shouldSkipEmittingThis = shouldSkipEmittingThisTemplateAndParam(ftype);
-      if (shouldSkipEmittingThis) {
+      final boolean shouldEmitThis = shouldEmitThisParam(ftype);
+      if (!shouldEmitThis) {
         // alreadyEmittedTemplateType might be an immutable list.
         alreadyEmittedTemplateType = new ArrayList<>(alreadyEmittedTemplateType);
         alreadyEmittedTemplateType.add(ftype.getTypeOfThis().getDisplayName());
@@ -3262,7 +3262,7 @@ class DeclarationGenerator {
       boolean makeAllParametersOptional = opts.partialInput && allParametersUnknown(ftype);
       emit("(");
       Iterator<Node> parameters = ftype.getParameters().iterator();
-      if (!shouldSkipEmittingThis) {
+      if (shouldEmitThis) {
         emitThisParameter(ftype, parameters);
       }
       Iterator<String> names = null;
@@ -3324,27 +3324,30 @@ class DeclarationGenerator {
      * Special handling for simple typing returning polymorphic this type in TypeScript. Prefer
      * `func(): this` instead of `func&lt;T&gt;(this: T): T` when any params are not templatized.
      */
-    private boolean shouldSkipEmittingThisTemplateAndParam(FunctionType ftype) {
+    private boolean shouldEmitThisParam(FunctionType ftype) {
       final JSType typeOfThis = ftype.getTypeOfThis();
       if (typeOfThis == null
           || !typeOfThis.isTemplateType()
           || !typeOfThis.equals(ftype.getReturnType())) {
-        return false;
+        return true;
       }
+
       Iterator<Node> parameters = ftype.getParameters().iterator();
       while (parameters.hasNext()) {
         final JSType paramType = parameters.next().getJSType();
         if (!paramType.isTemplatizedType()) {
           continue;
         }
+
         final TemplateTypeMap templateTypeMap = paramType.getTemplateTypeMap();
         for (TemplateType key : templateTypeMap.getTemplateKeys()) {
           if (templateTypeMap.getResolvedTemplateType(key).equals(typeOfThis)) {
-            return false;
+            return true;
           }
         }
       }
-      return true;
+
+      return false;
     }
 
     /**

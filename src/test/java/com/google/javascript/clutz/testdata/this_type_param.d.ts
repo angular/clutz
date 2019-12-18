@@ -24,3 +24,12 @@ declare module 'goog:nsThis.D' {
   import D = ಠ_ಠ.clutz.nsThis.D;
   export default D;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/this_type_param.js
+declare namespace ಠ_ಠ.clutz.nsThis {
+  function arrayMap < THIS , VALUE > (callback : ( (this : THIS , a : VALUE , b : number ) => any ) | null , reciever ? : THIS ) : void ;
+}
+// Generated from src/test/java/com/google/javascript/clutz/testdata/this_type_param.js
+declare module 'goog:nsThis.arrayMap' {
+  import arrayMap = ಠ_ಠ.clutz.nsThis.arrayMap;
+  export default arrayMap;
+}

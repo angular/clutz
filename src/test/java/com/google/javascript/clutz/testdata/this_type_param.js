@@ -1,5 +1,6 @@
 goog.provide('nsThis.C');
 goog.provide('nsThis.D');
+goog.provide('nsThis.arrayMap');
 
 /**
  * @constructor
@@ -48,3 +49,10 @@ nsThis.C.prototype.bar = function() {
  * @extends {nsThis.C}
  */
 nsThis.D = function() {};
+
+/**
+ * @param {?function(this: THIS, VALUE, number)} callback
+ * @param {THIS=} reciever
+ * @template THIS, VALUE
+ */
+nsThis.arrayMap = function(callback, reciever) {};
