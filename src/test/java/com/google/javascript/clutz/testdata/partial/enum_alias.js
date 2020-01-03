@@ -3,6 +3,9 @@ goog.module('enum_alias');
 const OtherEnum = goog.require('not_visible');
 
 /** @enum {string} */
-const Enum = OtherEnum;
+const EnumAlias = OtherEnum;
 
-exports = Enum;
+const ConstAlias = OtherEnum;
+
+exports.EnumAlias = EnumAlias;
+exports.ConstAlias = ConstAlias;

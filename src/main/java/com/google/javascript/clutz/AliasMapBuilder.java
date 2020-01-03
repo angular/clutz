@@ -63,6 +63,19 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
           String importedSymbolName = buildNamedExportSymbolName(importedModuleId, originalName);
           localVariableToImportedSymbolNameMap.put(localVariableName, importedSymbolName);
         }
+      } else if (statement.isConst() && statement.getFirstChild().isName()) {
+        // Look for `const x = someImport;`, where someImport is a local from one of the above.
+        // This is to handle the case like:
+        //   const a = goog.require(...);  // handled above
+        //   const b = a;  // handled here
+        String localVariableName = statement.getFirstChild().getString();
+        Node target = statement.getFirstFirstChild();
+        if (target.isName()) {
+          String imported = localVariableToImportedSymbolNameMap.get(target.getQualifiedName());
+          if (imported != null) {
+            localVariableToImportedSymbolNameMap.put(localVariableName, imported);
+          }
+        }
       }
     }
 
