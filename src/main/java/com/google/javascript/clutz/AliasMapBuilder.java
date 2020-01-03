@@ -64,16 +64,29 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
           localVariableToImportedSymbolNameMap.put(localVariableName, importedSymbolName);
         }
       } else if (statement.isConst() && statement.getFirstChild().isName()) {
-        // Look for `const x = someImport;`, where someImport is a local from one of the above.
+        // Look for `const x = someExpression;`, where someExpression involves a local from one of
+        // the above.
         // This is to handle the case like:
         //   const a = goog.require(...);  // handled above
         //   const b = a;  // handled here
         String localVariableName = statement.getFirstChild().getString();
         Node target = statement.getFirstFirstChild();
+        // target refers to the right side of the equals.
         if (target.isName()) {
           String imported = localVariableToImportedSymbolNameMap.get(target.getQualifiedName());
           if (imported != null) {
             localVariableToImportedSymbolNameMap.put(localVariableName, imported);
+          }
+        } else if (target.isGetProp()) {
+          // An expression like "someImport.someAttribute".
+          // We only handle one level of GETPROP here.  This code feels dangerously close to
+          // becoming a not-well-thought-through expression evaluator and we should probably
+          // revisit the approach if we need to extend it much more.
+          if (target.getFirstChild().isName()) {
+            String imported = localVariableToImportedSymbolNameMap.get(target.getFirstChild().getQualifiedName());
+            if (imported != null) {
+              localVariableToImportedSymbolNameMap.put(localVariableName, imported + "." + target.getSecondChild().getString());
+            }
           }
         }
       }

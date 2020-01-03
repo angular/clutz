@@ -4,6 +4,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$enum_alias {
   enum EnumAlias {
   }
   export import ConstAlias = ಠ_ಠ.clutz.module$exports$not_visible ;
+  export import ConstModAlias = ಠ_ಠ.clutz.module$exports$not_visible_mod.ModEnum ;
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/partial/enum_alias.js
 declare module 'goog:enum_alias' {
