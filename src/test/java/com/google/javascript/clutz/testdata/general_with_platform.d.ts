@@ -626,6 +626,90 @@ declare namespace ಠ_ಠ.clutz {
     writeText (text : string ) : Promise < undefined > ;
   }
 }
+// Generated from externs.zip//w3c_mediacapabilities.js
+declare namespace ಠ_ಠ.clutz {
+  type AudioConfiguration = { bitrate ? : number , channels ? : any , contentType : string , samplerate ? : number , spatialRendering ? : boolean } ;
+}
+// Generated from externs.zip//w3c_mediacapabilities.js
+declare namespace ಠ_ಠ.clutz {
+  type ColorGamut = string ;
+}
+// Generated from externs.zip//w3c_mediacapabilities.js
+declare namespace ಠ_ಠ.clutz {
+  type HdrMetadataType = string ;
+}
+// Generated from externs.zip//w3c_mediacapabilities.js
+declare namespace ಠ_ಠ.clutz {
+  type KeySystemTrackConfiguration = { encryptionScheme ? : string , robustness ? : string } ;
+}
+// Generated from externs.zip//w3c_mediacapabilities.js
+declare namespace ಠ_ಠ.clutz {
+  interface MediaCapabilities {
+    decodingInfo (configuration : MediaDecodingConfiguration ) : Promise < MediaCapabilitiesDecodingInfo > ;
+    encodingInfo (configuration : MediaEncodingConfiguration ) : Promise < MediaCapabilitiesEncodingInfo > ;
+  }
+}
+// Generated from externs.zip//w3c_mediacapabilities.js
+declare namespace ಠ_ಠ.clutz {
+  interface MediaCapabilitiesDecodingInfo extends MediaCapabilitiesInfo {
+    configuration : MediaDecodingConfiguration ;
+    keySystemAccess : MediaKeySystemAccess | null ;
+  }
+}
+// Generated from externs.zip//w3c_mediacapabilities.js
+declare namespace ಠ_ಠ.clutz {
+  interface MediaCapabilitiesEncodingInfo extends MediaCapabilitiesInfo {
+    configuration : MediaEncodingConfiguration ;
+  }
+}
+// Generated from externs.zip//w3c_mediacapabilities.js
+declare namespace ಠ_ಠ.clutz {
+  interface MediaCapabilitiesInfo {
+    powerEfficient : boolean ;
+    smooth : boolean ;
+    supported : boolean ;
+  }
+}
+// Generated from externs.zip//w3c_mediacapabilities.js
+declare namespace ಠ_ಠ.clutz {
+  type MediaCapabilitiesKeySystemConfiguration = { audio ? : ಠ_ಠ.clutz.KeySystemTrackConfiguration , distinctiveIdentifier ? : string , initDataType ? : string , keySystem : string , persistentState ? : string , sessionTypes ? : string [] , video ? : ಠ_ಠ.clutz.KeySystemTrackConfiguration } ;
+}
+// Generated from externs.zip//w3c_mediacapabilities.js
+declare namespace ಠ_ಠ.clutz {
+  interface MediaConfiguration {
+    audio ? : ಠ_ಠ.clutz.AudioConfiguration ;
+    video ? : ಠ_ಠ.clutz.VideoConfiguration ;
+  }
+}
+// Generated from externs.zip//w3c_mediacapabilities.js
+declare namespace ಠ_ಠ.clutz {
+  interface MediaDecodingConfiguration extends MediaConfiguration {
+    keySystemConfiguration ? : ಠ_ಠ.clutz.MediaCapabilitiesKeySystemConfiguration ;
+    type : string ;
+  }
+}
+// Generated from externs.zip//w3c_mediacapabilities.js
+declare namespace ಠ_ಠ.clutz {
+  type MediaDecodingType = string ;
+}
+// Generated from externs.zip//w3c_mediacapabilities.js
+declare namespace ಠ_ಠ.clutz {
+  interface MediaEncodingConfiguration extends MediaConfiguration {
+    type : string ;
+  }
+}
+// Generated from externs.zip//w3c_mediacapabilities.js
+declare namespace ಠ_ಠ.clutz {
+  type MediaEncodingType = string ;
+}
+// Generated from externs.zip//w3c_mediacapabilities.js
+declare namespace ಠ_ಠ.clutz {
+  type TransferFunction = string ;
+}
+// Generated from externs.zip//w3c_mediacapabilities.js
+declare namespace ಠ_ಠ.clutz {
+  type VideoConfiguration = { bitrate : number , colorGamut ? : string , contentType : string , framerate : number , hasAlphaChannel ? : boolean , hdrMetadataType ? : string , height : number , transferFunction ? : string , width : number } ;
+}
 // Generated from externs.zip//w3c_navigation_timing.js
 declare namespace ಠ_ಠ.clutz {
   /**
