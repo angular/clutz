@@ -970,6 +970,25 @@ public final class TypeConversionPass implements CompilerPass {
       return NodeUtil.getName(fnNode);
     }
 
+    /*
+     * For the specific case below, when fnNode is the anonymous function then fnParent
+     * is an ASSIGN node and getString() is an invalid operation on an ASSIGN node.
+     *
+     * Thus, in this case, there isn't an enclosing function name and so null should be
+     * returned.
+     *
+     * class A {
+     *   constructor() {
+     *     this.x = function() {
+     *       this.y;
+     *     }
+     *   }
+     * }
+     */
+    if (fnParent.isAssign()) {
+      return null;
+    }
+
     return fnParent.getString();
   }
 

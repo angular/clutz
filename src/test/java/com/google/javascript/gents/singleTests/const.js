@@ -10,6 +10,17 @@ let c = 3;
 /** @const */
 var foo = function() {};
 
+class A {
+  constructor() {
+    this.x = function() {
+      console.log('before');
+      /** @type {!Object} */
+      this.y;
+      console.log('after');
+    }
+  }
+}
+
 /**
  * @param {number} n
  * @return {number}
