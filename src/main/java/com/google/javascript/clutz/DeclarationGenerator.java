@@ -2353,7 +2353,7 @@ class DeclarationGenerator {
 
     /** Whether the type was written as the literal 'Function' type */
     private boolean isLiteralFunction(JSType type) {
-      return type.equals(typeRegistry.getNativeType(JSTypeNative.U2U_CONSTRUCTOR_TYPE));
+      return type.equals(typeRegistry.getNativeType(JSTypeNative.FUNCTION_TYPE));
     }
 
     private Void emitTemplatizedType(TemplatizedType type, boolean inImplementsExtendsPosition) {
