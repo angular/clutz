@@ -2606,7 +2606,7 @@ class DeclarationGenerator {
           Collections.<String>emptyList());
 
       // Bracket-style property access for dictionnary...
-      if (type.isDict()) {
+      if (instanceType.isDict()) {
         emitIndexSignature(
             compiler.getTypeRegistry().getNativeType(STRING_TYPE),
             compiler.getTypeRegistry().getNativeType(ALL_TYPE),
