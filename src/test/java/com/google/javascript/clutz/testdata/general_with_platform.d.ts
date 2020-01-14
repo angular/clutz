@@ -758,6 +758,111 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_PerformancePaintTiming : any;
   }
 }
+// Generated from externs.zip//w3c_payment_request.js
+declare namespace ಠ_ಠ.clutz {
+  interface AddressErrors {
+    addressLine ? : string ;
+    city ? : string ;
+    country ? : string ;
+    dependentLocality ? : string ;
+    organization ? : string ;
+    phone ? : string ;
+    postalCode ? : string ;
+    recipient ? : string ;
+    region ? : string ;
+    sortingCode ? : string ;
+  }
+}
+// Generated from externs.zip//w3c_payment_request.js
+declare namespace ಠ_ಠ.clutz {
+  interface AddressInit {
+    addressLine ? : string [] ;
+    city ? : string ;
+    country ? : string ;
+    dependentLocality ? : string ;
+    organization ? : string ;
+    phone ? : string ;
+    postalCode ? : string ;
+    recipient ? : string ;
+    region ? : string ;
+    sortingCode ? : string ;
+  }
+}
+// Generated from externs.zip//w3c_payment_request.js
+declare namespace ಠ_ಠ.clutz {
+  class MerchantValidationEvent extends GlobalEvent {
+    private noStructuralTyping_MerchantValidationEvent : any;
+    constructor (type : string , eventInitDict ? : MerchantValidationEventInit ) ;
+    complete (merchantSessionPromise : Promise < undefined > ) : void ;
+    methodName : string ;
+    validationURL : string ;
+  }
+}
+// Generated from externs.zip//w3c_payment_request.js
+declare namespace ಠ_ಠ.clutz {
+  interface MerchantValidationEventInit extends EventInit {
+    methodName ? : string ;
+    validationURL ? : string ;
+  }
+}
+// Generated from externs.zip//w3c_payment_request.js
+declare namespace ಠ_ಠ.clutz {
+  interface PayerErrors {
+    email ? : string ;
+    name ? : string ;
+    phone ? : string ;
+  }
+}
+// Generated from externs.zip//w3c_payment_request.js
+declare namespace ಠ_ಠ.clutz {
+  interface PaymentDetailsBase {
+    displayItems ? : PaymentItem [] ;
+    modifiers ? : PaymentDetailsModifier [] ;
+    shippingOptions ? : PaymentShippingOption [] ;
+  }
+}
+// Generated from externs.zip//w3c_payment_request.js
+declare namespace ಠ_ಠ.clutz {
+  interface PaymentDetailsInit extends PaymentDetailsBase {
+    id ? : string ;
+    total : PaymentItem ;
+  }
+}
+// Generated from externs.zip//w3c_payment_request.js
+declare namespace ಠ_ಠ.clutz {
+  interface PaymentDetailsUpdate extends PaymentDetailsBase {
+    error ? : string ;
+    payerErrors ? : PayerErrors ;
+    paymentMethodErrors ? : GlobalObject ;
+    shippingAddressErrors ? : AddressErrors ;
+    total ? : PaymentItem ;
+  }
+}
+// Generated from externs.zip//w3c_payment_request.js
+declare namespace ಠ_ಠ.clutz {
+  class PaymentMethodChangeEvent extends PaymentRequestUpdateEvent {
+    private noStructuralTyping_PaymentMethodChangeEvent : any;
+    constructor (type : string , eventInitDict ? : PaymentMethodChangeEventInit ) ;
+    methodDetails : GlobalObject | null ;
+    methodName : string ;
+  }
+}
+// Generated from externs.zip//w3c_payment_request.js
+declare namespace ಠ_ಠ.clutz {
+  interface PaymentMethodChangeEventInit extends PaymentRequestUpdateEventInit {
+    methodDetails ? : GlobalObject | null ;
+    methodName ? : string ;
+  }
+}
+// Generated from externs.zip//w3c_payment_request.js
+declare namespace ಠ_ಠ.clutz {
+  interface PaymentValidationErrors {
+    error ? : string ;
+    payer ? : PayerErrors ;
+    paymentMethod ? : GlobalObject ;
+    shippingAddress ? : AddressErrors ;
+  }
+}
 // Generated from externs.zip//w3c_rtc.js
 declare namespace ಠ_ಠ.clutz {
   class BlobEvent extends GlobalEvent {
