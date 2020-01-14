@@ -3,7 +3,7 @@ goog.module.declareLegacyNamespace();
 
 const notVisible = goog.require('not_visible');
 
-/** @enum {string} */
+/** @const */
 const Enum = notVisible.OtherEnum;
 
 exports = {Enum};

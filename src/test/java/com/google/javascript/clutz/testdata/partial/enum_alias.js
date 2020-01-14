@@ -3,7 +3,7 @@ goog.module('enum_alias');
 const OtherEnum = goog.require('not_visible');
 const mod = goog.require('not_visible_mod');
 
-/** @enum {string} */
+/** @const */
 const EnumAlias = OtherEnum;
 
 const ConstAlias = OtherEnum;
