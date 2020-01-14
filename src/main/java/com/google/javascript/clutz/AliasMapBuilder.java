@@ -130,6 +130,19 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
         aliasMap.put(
             buildNamedExportSymbolName(localModuleId, exportName),
             localNamespaceName + "." + localPropName);
+      } else if (isObjectLiteralExport(statement)) {
+        // `exports = {foo, bar}`
+        for (Map.Entry<String, String> e :
+            objectLiteralASTToStringMap(statement.getFirstChild().getSecondChild()).entrySet()) {
+          String localVariableName = e.getValue();
+          String exportName = e.getKey();
+
+          if (localVariableToImportedSymbolNameMap.containsKey(localVariableName)) {
+            aliasMap.put(
+                buildNamedExportSymbolName(localModuleId, exportName),
+                localVariableToImportedSymbolNameMap.get(localVariableName));
+          }
+        }
       }
     }
 
