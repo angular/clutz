@@ -20,7 +20,7 @@ declare namespace goog {
    * @param symbol Object the name should point to.
    */
   function exportProperty (object : ಠ_ಠ.clutz.GlobalObject | null , publicName : string , symbol : any ) : void ;
-  function inherits (childCtor : ಠ_ಠ.clutz.partial.FunctionAlias , parentCtor : ಠ_ಠ.clutz.partial.FunctionAlias ) : void ;
+  function inherits (childCtor : Function , parentCtor : Function ) : void ;
   function isDef (val : any ) : boolean ;
   function require (name : string ) : ಠ_ಠ.clutz.ClosureSymbolNotGoogProvided;
   let global : any ;
