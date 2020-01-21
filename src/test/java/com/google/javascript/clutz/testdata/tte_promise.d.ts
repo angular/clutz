@@ -2,7 +2,26 @@
 declare namespace ಠ_ಠ.clutz.angular.$q {
   class Promise < T > {
     private noStructuralTyping_angular_$q_Promise : any;
-    then < RESULT > (opt_onFulfilled ? : ( (a : T ) => ಠ_ಠ.clutz.angular.$q.Promise < RESULT > | RESULT | ಠ_ಠ.clutz.angular.$q.Promise<never>) | null , opt_onRejected ? : ( (a : any ) => any ) | null) : ಠ_ಠ.clutz.angular.$q.Promise < RESULT > ;
+    // matching ng.IPromise in angular.d.ts.
+    then<TResult1 = T, TResult2 = never>(
+        successCallback?:
+        | ((value: T) => PromiseLike<never> | PromiseLike<TResult1> | TResult1)
+        | null,
+            errorCallback?:
+        | ((reason: any) => PromiseLike<never> | PromiseLike<TResult2> | TResult2)
+        | null,
+            notifyCallback?: (state: any) => any
+        ): ಠ_ಠ.clutz.angular.$q.Promise<TResult1 | TResult2>;
+    then<TResult1 = T, TResult2 = never>(
+        successCallback?:
+        | ((value: T) => ಠ_ಠ.clutz.angular.$q.Promise<never> | ಠ_ಠ.clutz.angular.$q.Promise<TResult1> | TResult1)
+        | null,
+            errorCallback?:
+        | ((reason: any) => ಠ_ಠ.clutz.angular.$q.Promise<never> | ಠ_ಠ.clutz.angular.$q.Promise<TResult2> | TResult2)
+        | null,
+            notifyCallback?: (state: any) => any
+        ): ಠ_ಠ.clutz.angular.$q.Promise<TResult1 | TResult2>;
+
     when < RESULT, T > (value: T, successCallback: (promiseValue: T) => ಠ_ಠ.clutz.angular.$q.Promise < RESULT >|RESULT, errorCallback: null | undefined |  ((reason: any) => any), notifyCallback?: (state: any) => any): ಠ_ಠ.clutz.angular.$q.Promise < RESULT >;
     static all(promises : ಠ_ಠ.clutz.angular.$q.Promise < any > [] ) : ಠ_ಠ.clutz.angular.$q.Promise < any [] > ;
     static race < T > (values : T [] ) : ಠ_ಠ.clutz.angular.$q.Promise < T > ;
