@@ -45,7 +45,7 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
         // `const {C, Clazz: RenamedClazz} = goog.require()` or
         // `const {C, Clazz: RenamedClazz} = goog.module.get()`
         String importedModuleId =
-            statement.getFirstChild().getChildAtIndex(1).getSecondChild().getString();
+            statement.getFirstChild().getSecondChild().getSecondChild().getString();
         for (Node destructured : statement.getFirstFirstChild().children()) {
           String originalName = destructured.getString();
           // Destructuring can use the original name `const {A} = goog.require("foo.a")` or rename
@@ -85,7 +85,8 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
           if (target.getFirstChild().isName()) {
             String imported = localVariableToImportedSymbolNameMap.get(target.getFirstChild().getQualifiedName());
             if (imported != null) {
-              localVariableToImportedSymbolNameMap.put(localVariableName, imported + "." + target.getSecondChild().getString());
+              localVariableToImportedSymbolNameMap.put(
+                  localVariableName, imported + "." + target.getSecondChild().getString());
             }
           }
         }

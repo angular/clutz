@@ -70,7 +70,7 @@ class NameUtil {
       Node newName = NodeUtil.newQName(compiler, newPrefix);
       JSDocInfo jsdoc = NodeUtil.getBestJSDocInfo(name);
       newName.setJSDocInfo(jsdoc);
-      name.getParent().replaceChild(name, newName);
+      name.replaceWith(newName);
     } else {
       if (name.isGetProp()) {
         replacePrefixInName(name.getFirstChild(), prefix, newPrefix);

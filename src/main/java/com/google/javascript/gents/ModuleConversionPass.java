@@ -273,7 +273,7 @@ public final class ModuleConversionPass implements CompilerPass {
     private boolean isADestructuringRequireCall(Node node) {
       return node != null
           && node.isObjectPattern()
-          && node.getNext().getFirstChild() != null
+          && node.getNext().hasChildren()
           && isARequireLikeCall(node.getNext());
     }
 

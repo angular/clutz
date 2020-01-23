@@ -150,7 +150,7 @@ public final class TypeConversionPass implements CompilerPass {
           // /** @typedef {...} */
           // Foo.Bar = Buz;
           // Because of the NAME tokens - Bar and Buz.
-          if (parent.isExprResult() && parent.getChildCount() == 1) {
+          if (parent.isExprResult() && parent.hasOneChild()) {
             createTypeAlias(n, parent);
           }
           break;
@@ -281,7 +281,7 @@ public final class TypeConversionPass implements CompilerPass {
         //     GETPROP
         //         NAME MyClass
         //         STRING Type
-        parent.getParent().replaceChild(parent, newNode);
+        parent.replaceWith(newNode);
       } else if (parent.isAssign()) {
         // Handles case: Myclass.Type = {};
         // AST:
@@ -438,8 +438,8 @@ public final class TypeConversionPass implements CompilerPass {
           String enumTypeStr = enumExp.getRoot().getString();
           if (!enumTypeStr.equals("number") && !enumTypeStr.equals("string")) return;
 
-          Node name = n.getFirstChild().detach();
-          Node members = name.getFirstChild().detach();
+          Node name = n.removeFirstChild();
+          Node members = name.removeFirstChild();
 
           Node enumMembers = transformMembers(members, enumTypeStr.equals("number"));
           Node enumNode = new Node(Token.ENUM, name, enumMembers);
@@ -457,7 +457,7 @@ public final class TypeConversionPass implements CompilerPass {
       Node enumMembers = new Node(Token.ENUM_MEMBERS);
       for (Node child : members.children()) {
         Node name = Node.newString(Token.NAME, child.getString());
-        Node value = child.getFirstChild().detach();
+        Node value = child.removeFirstChild();
         Node newMember;
         // Check whether we can emit simply the name, and rely on the automatic numeric assignment
         // in TypeScript. For example, enum E { A, B } is equivalent to enum E { A = 0, B = 1 }.

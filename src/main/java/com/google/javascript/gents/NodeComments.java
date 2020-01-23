@@ -40,7 +40,7 @@ class NodeComments {
 
   void replaceWithComment(Node oldNode, Node newNode) {
     newNode.useSourceInfoFrom(newNode);
-    oldNode.getParent().replaceChild(oldNode, newNode);
+    oldNode.replaceWith(newNode);
     moveComment(oldNode, newNode);
   }
 }

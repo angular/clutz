@@ -41,7 +41,7 @@ public abstract class ImportBasedMapBuilder {
     List<Node> googScopes = new ArrayList<>();
     for (Node statement : astRoot.children()) {
       if (isGoogScopeCall(statement)) {
-        googScopes.add(statement.getFirstChild().getChildAtIndex(1).getChildAtIndex(2));
+        googScopes.add(statement.getFirstChild().getSecondChild().getChildAtIndex(2));
       }
     }
     return googScopes;
@@ -97,7 +97,7 @@ public abstract class ImportBasedMapBuilder {
 
     Node destructuringAssignment = statement.getFirstChild();
 
-    Node rightHandSide = destructuringAssignment.getChildAtIndex(1);
+    Node rightHandSide = destructuringAssignment.getSecondChild();
 
     return rightHandSide.isName();
   }
@@ -117,7 +117,7 @@ public abstract class ImportBasedMapBuilder {
 
     Node destructuringAssignment = statement.getFirstChild();
 
-    Node rightHandSide = destructuringAssignment.getChildAtIndex(1);
+    Node rightHandSide = destructuringAssignment.getSecondChild();
 
     return rightHandSide.isCall()
         && (rightHandSide.getFirstChild().matchesQualifiedName("goog.require")
@@ -125,14 +125,14 @@ public abstract class ImportBasedMapBuilder {
   }
 
   protected static String getGoogModuleId(Node astRoot) {
-    if (astRoot.getFirstChild() == null || !astRoot.getFirstChild().isModuleBody()) {
+    if (!astRoot.hasChildren() || !astRoot.getFirstChild().isModuleBody()) {
       return null;
     }
 
     Node moduleBody = astRoot.getFirstChild();
     for (Node statement : moduleBody.children()) {
       if (isGoogModuleCall(statement)) {
-        return statement.getFirstChild().getChildAtIndex(1).getString();
+        return statement.getFirstChild().getSecondChild().getString();
       }
     }
     return null;
@@ -148,15 +148,15 @@ public abstract class ImportBasedMapBuilder {
       return false;
     }
 
-    if (!statement.getFirstChild().getFirstChild().isName()) {
+    if (!statement.getFirstFirstChild().isName()) {
       return false;
     }
 
-    if (!statement.getFirstChild().getChildAtIndex(1).isName()) {
+    if (!statement.getFirstChild().getSecondChild().isName()) {
       return false;
     }
 
-    return statement.getFirstChild().getFirstChild().getString().equals("exports");
+    return statement.getFirstFirstChild().getString().equals("exports");
   }
 
   /** Matches `exports = {foo, bar};` */
@@ -169,15 +169,15 @@ public abstract class ImportBasedMapBuilder {
       return false;
     }
 
-    if (!statement.getFirstChild().getFirstChild().isName()) {
+    if (!statement.getFirstFirstChild().isName()) {
       return false;
     }
 
-    if (!statement.getFirstChild().getChildAtIndex(1).isObjectLit()) {
+    if (!statement.getFirstChild().getSecondChild().isObjectLit()) {
       return false;
     }
 
-    return statement.getFirstChild().getFirstChild().getString().equals("exports");
+    return statement.getFirstFirstChild().getString().equals("exports");
   }
 
   /** Matches `exports.foo = foo;` */
@@ -190,19 +190,19 @@ public abstract class ImportBasedMapBuilder {
       return false;
     }
 
-    if (!statement.getFirstChild().getFirstChild().isGetProp()) {
+    if (!statement.getFirstFirstChild().isGetProp()) {
       return false;
     }
 
-    if (!statement.getFirstChild().getFirstChild().getFirstChild().isName()) {
+    if (!statement.getFirstFirstChild().getFirstChild().isName()) {
       return false;
     }
 
-    if (!statement.getFirstChild().getChildAtIndex(1).isName()) {
+    if (!statement.getFirstChild().getSecondChild().isName()) {
       return false;
     }
 
-    return statement.getFirstChild().getFirstChild().getFirstChild().getString().equals("exports");
+    return statement.getFirstFirstChild().getFirstChild().getString().equals("exports");
   }
 
   /** Matches `exports.foo = foo.bar;` */
@@ -215,11 +215,11 @@ public abstract class ImportBasedMapBuilder {
       return false;
     }
 
-    if (!statement.getFirstChild().getFirstChild().isGetProp()) {
+    if (!statement.getFirstFirstChild().isGetProp()) {
       return false;
     }
 
-    if (!statement.getFirstChild().getFirstChild().getFirstChild().isName()) {
+    if (!statement.getFirstFirstChild().getFirstChild().isName()) {
       return false;
     }
 
@@ -231,12 +231,12 @@ public abstract class ImportBasedMapBuilder {
       return false;
     }
 
-    return statement.getFirstChild().getFirstChild().getFirstChild().getString().equals("exports");
+    return statement.getFirstFirstChild().getFirstChild().getString().equals("exports");
   }
 
   /** Returns `foo` from 'exports.foo = bar` */
   protected String getNamedExportName(Node statement) {
-    return statement.getFirstChild().getFirstChild().getChildAtIndex(1).getString();
+    return statement.getFirstFirstChild().getSecondChild().getString();
   }
 
   /** Returns `foo` from `exports = foo` or `exports.foo = foo` */
@@ -260,7 +260,7 @@ public abstract class ImportBasedMapBuilder {
       String originalName = objectMember.getString();
       // Object literals can use the original name `{A}` or rename it `{RenameA: A}`.
       String variableName;
-      if (objectMember.getFirstChild() != null) {
+      if (objectMember.hasChildren()) {
         // RHS is an expression, not a name
         if (!objectMember.getFirstChild().isName()) {
           continue;

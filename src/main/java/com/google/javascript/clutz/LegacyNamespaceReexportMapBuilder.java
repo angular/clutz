@@ -47,7 +47,7 @@ public class LegacyNamespaceReexportMapBuilder extends ImportBasedMapBuilder {
       } else if (isObjectLiteralExport(statement)) {
         // `exports = {foo, bar}`
         for (Entry<String, String> e :
-            objectLiteralASTToStringMap(statement.getFirstChild().getChildAtIndex(1)).entrySet()) {
+            objectLiteralASTToStringMap(statement.getFirstChild().getSecondChild()).entrySet()) {
           String localVariableName = e.getValue();
           String exportName = e.getKey();
 

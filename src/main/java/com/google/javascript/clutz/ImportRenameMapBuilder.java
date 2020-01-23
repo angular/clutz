@@ -31,7 +31,7 @@ public class ImportRenameMapBuilder extends ImportBasedMapBuilder {
       if (isImportAssignment(statement)) {
         // `const C = goog.require()` or
         // `const C = goog.module.get()`
-        String importedModuleId = statement.getFirstFirstChild().getChildAtIndex(1).getString();
+        String importedModuleId = statement.getFirstFirstChild().getSecondChild().getString();
         String variableName = statement.getFirstChild().getString();
 
         String exportedSymbolName;
@@ -50,7 +50,7 @@ public class ImportRenameMapBuilder extends ImportBasedMapBuilder {
         // `const {C, Clazz: RenamedClazz} = goog.require()` or
         // `const {C, Clazz: RenamedClazz} = goog.module.get()`
         String importedModuleId =
-            statement.getFirstChild().getChildAtIndex(1).getChildAtIndex(1).getString();
+            statement.getFirstChild().getSecondChild().getSecondChild().getString();
         for (Entry<String, String> e :
             objectLiteralASTToStringMap(statement.getFirstFirstChild()).entrySet()) {
           String originalName = e.getKey();
@@ -77,7 +77,7 @@ public class ImportRenameMapBuilder extends ImportBasedMapBuilder {
         // `const B = goog.require()`
         // `const {C, Clazz: RenamedClazz} = B`
         // On separate lines
-        String destructuredVariable = statement.getFirstChild().getChildAtIndex(1).getString();
+        String destructuredVariable = statement.getFirstChild().getSecondChild().getString();
 
         for (Entry<String, String> e :
             objectLiteralASTToStringMap(statement.getFirstFirstChild()).entrySet()) {

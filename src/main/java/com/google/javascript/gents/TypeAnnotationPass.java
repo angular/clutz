@@ -278,8 +278,8 @@ public final class TypeAnnotationPass implements CompilerPass {
         attachTypeExpr = IR.name(node.getString());
         if (!node.getParent().isDefaultValue()) {
           attachTypeExpr.putBooleanProp(Node.OPT_ES6_TYPED, true);
-        } else if (node.getParent().getChildAtIndex(1).isName()
-            && node.getParent().getChildAtIndex(1).getString().equals("undefined")) {
+        } else if (node.getParent().getSecondChild().isName()
+            && node.getParent().getSecondChild().getString().equals("undefined")) {
           // if default value is "undefined" add undefined to the type
           parameterTypeNode = flatUnionType(ImmutableList.of(parameterTypeNode, undefinedType()));
         }
@@ -483,7 +483,7 @@ public final class TypeAnnotationPass implements CompilerPass {
             for (Node param : child2.children()) {
               String paramName = "p" + paramIdx++;
               if (param.getToken() == Token.ITER_REST) {
-                if (param.getFirstChild() != null) {
+                if (param.hasChildren()) {
                   restType = convertTypeNodeAST(param);
                 }
                 restName = paramName;
