@@ -1,3 +1,5 @@
+goog.module('gents.const');
+
 /** @const */
 var a = 1;
 
@@ -29,3 +31,5 @@ class A {
 let bar = function(n) {
   return n;
 };
+
+exports = {a, b, c, foo, bar};

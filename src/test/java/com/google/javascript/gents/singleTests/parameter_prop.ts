@@ -1,6 +1,6 @@
 type Foo = string;
 
-class A {
+export class A {
   b: any;
   c: number;
 
@@ -12,12 +12,12 @@ class A {
   }
 }
 
-class B {
+export class B {
   constructor(
       public a: number, public b: number, protected c: number,
       private d: number, public readonly e: number) {}
 }
 
-class C {
+export class C {
   constructor(public readonly a: string = 'default value') {}
 }

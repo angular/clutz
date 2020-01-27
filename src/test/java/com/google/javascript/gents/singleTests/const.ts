@@ -1,8 +1,10 @@
-const a = 1;
-const b: number = 2;
-const c = 3;
+export const a = 1;
 
-function foo() {}
+export const b: number = 2;
+
+export const c = 3;
+
+export function foo() {}
 
 class A {
   y: Object;
@@ -16,6 +18,6 @@ class A {
   }
 }
 
-function bar(n: number): number {
+export function bar(n: number): number {
   return n;
 }

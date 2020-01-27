@@ -1,3 +1,5 @@
+goog.module('gents.fn_params');
+
 // Optional Parameters
 /**
  * @param {number} n
@@ -29,3 +31,5 @@ var restParamsTyped = function(n, br) {};
 var complex = function(n, o, r) {
   return n;
 };
+
+exports = {optParams, restParams, restParamsTyped, complex};

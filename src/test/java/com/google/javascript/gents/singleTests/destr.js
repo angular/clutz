@@ -1,3 +1,5 @@
+goog.module('gents.destr');
+
 class C {
   /**
    * @param {{a: number}} destrParam
@@ -21,3 +23,5 @@ class C {
 }
 
 let {x = 0} = {};
+
+exports = {C};

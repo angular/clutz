@@ -1,4 +1,8 @@
+goog.module('gents.casts');
+
 let x;
-let foo;
+function foo() { return 0; };
 let n = /** @type {string?|undefined} */ (x);
 let m = /** @type {number} */ (foo());
+
+exports = {m, n};

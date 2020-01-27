@@ -1,3 +1,5 @@
+goog.module('gents.proto_methods');
+
 /**
  * @type {*}
  */
@@ -74,3 +76,5 @@ goog.B = goog.defineClass(goog.A, {
     return 0;
   }
 });
+
+exports = {B};

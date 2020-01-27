@@ -24,12 +24,15 @@ let restParamsTyped: (p1: number, ...p2: boolean[]) => any = function(n, br) {};
 function complex(n: number, o?: boolean, ...r: any[]): number {
   return n;
 }
-let f1: (() => string)|null = null;
-const f2: (() => any)|string = 'string';
-const f3: (() => string)|(() => string) = function() {
+
+export const f1: (() => string)|null = null;
+
+export const f2: (() => any)|string = 'string';
+
+export const f3: (() => string)|(() => string) = function() {
   return 'string';
 };
 
-function f4(): string|(() => string) {
+export function f4(): string|(() => string) {
   return 'string';
 }

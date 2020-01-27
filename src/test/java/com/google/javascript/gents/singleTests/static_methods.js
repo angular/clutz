@@ -1,3 +1,5 @@
+goog.module('goog.statics_methods');
+
 /**
  * @type {*}
  */
@@ -74,3 +76,5 @@ A.anon = function() {
   // Anonymous function call
   (function() {})();
 }
+
+exports = {A};

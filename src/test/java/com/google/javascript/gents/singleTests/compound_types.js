@@ -1,3 +1,5 @@
+goog.module('gents.compound_types');
+
 // Non-nullable types
 // We ignore the non-nullability as we transpile to TS with --strictNullChecks
 /** @type {!number} */
@@ -40,3 +42,5 @@ var manyNulls = null;
 var baz = function(s) {
   return null;
 };
+
+exports = {bar, foo, baz};

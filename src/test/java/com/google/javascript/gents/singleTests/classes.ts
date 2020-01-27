@@ -1,7 +1,7 @@
 /**
  * Anonymous class
  */
-class A {
+export class A {
   a: any;
 
   constructor(a: number) {
@@ -12,7 +12,7 @@ class A {
 /**
  * Named class
  */
-class B {
+export class B {
   a: any;
   b: any;
 
@@ -25,7 +25,7 @@ class B {
 /**
  * Named class extension
  */
-class C extends A {
+export class C extends A {
   b: any;
 
   constructor(a, b) {
@@ -37,7 +37,7 @@ class C extends A {
 /**
  * Anonymous class extension
  */
-class D extends B {
+export class D extends B {
   c: any;
 
   constructor(a, b, c) {
@@ -49,7 +49,7 @@ class D extends B {
 /**
  * goog.defineClass based classes
  */
-class E extends C {
+export class E extends C {
   constructor(a, b) {
     super(a, b);
   }
@@ -57,7 +57,7 @@ class E extends C {
 let nested = {};
 nested.klass = class {};
 
-class F {
+export class F {
   // inline comment
   /**
    * block comment
@@ -78,12 +78,12 @@ class F {
 /**
  * goog.defineClass with annotation
  */
-class GoogDefinedClassWithConstructorAnnotation {}
+export class GoogDefinedClassWithConstructorAnnotation {}
 
 /**
  * goog.defineClass with deeply nested annotation
  */
-class GoogDefinedClassWithDeeplyNestedConstructorAnnotation {
+export class GoogDefinedClassWithDeeplyNestedConstructorAnnotation {
   foo() {
     return new class Klass {}
     ();
@@ -93,18 +93,18 @@ class GoogDefinedClassWithDeeplyNestedConstructorAnnotation {
 /**
  * goog.defineClass with annotation and parameters
  */
-class GoogDefinedClassWithConstructorAnnotationAndParameters {
+export class GoogDefinedClassWithConstructorAnnotationAndParameters {
   constructor(a: number) {}
 }
 
-class G {
+export class G {
   /**
    * ES6 method short hand.
    */
   method() {}
 }
 
-class ClassWithNoConstructorJsDocAndProperties {
+export class ClassWithNoConstructorJsDocAndProperties {
   private foo: string;
 
   constructor(foo) {

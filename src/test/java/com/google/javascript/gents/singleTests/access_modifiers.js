@@ -1,18 +1,20 @@
+goog.module('goog.access_modifiers');
+
 /**
  * @constructor
  */
 function A() {
   // Field access
   /** @type {number} */
-  this.a;
+  this.a = 0;
   /** @public {number} */
-  this.b;
+  this.b = 0;
   /** @package {number} */
-  this.c;
+  this.c = 0;
   /** @protected {number} */
-  this.d;
+  this.d = 0;
   /** @private {number} */
-  this.e;
+  this.e = 0;
 }
 
 // Static field access
@@ -36,3 +38,5 @@ A.fizzbuzz = function() {};
 A.fizz = function() {};
 /** @private */
 A.buzz = function() {};
+
+exports = {A};

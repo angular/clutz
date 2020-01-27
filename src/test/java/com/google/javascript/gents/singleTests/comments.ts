@@ -1,7 +1,7 @@
 /**
  * This comment describes a class
  */
-class A {
+export class A {
   // This comment is moved with the method
   /* This one too (same comment block) */
   foo() {}
@@ -34,9 +34,9 @@ let foo = function(deleted: number, notdeleted: number): number {
 let x: number;
 const xConst: number = 1;
 
-class X extends A {}
+export class X extends A {}
 
-class B {
+export class B {
   twoLines: {param1: string|undefined} = {param1: 'param1'};
   multipleLines: {param2: string|undefined} = {param2: 'param2'};
   twoParams:

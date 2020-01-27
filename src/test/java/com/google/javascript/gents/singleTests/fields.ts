@@ -1,4 +1,4 @@
-class A {
+export class A {
   e: number = 8;
   f: any;
   static g: boolean = true;

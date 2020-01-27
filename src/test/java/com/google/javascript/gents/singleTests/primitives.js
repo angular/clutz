@@ -1,3 +1,5 @@
+goog.module('gents.primitives');
+
 /** @type {*} */
 var x;
 
@@ -33,3 +35,5 @@ const c = 8;
  * @type {string}
  */
 var escaped = '\'"=&<>';
+
+exports = {c};

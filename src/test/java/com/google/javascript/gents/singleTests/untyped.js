@@ -1,3 +1,5 @@
+goog.module('gents.untyped');
+
 var x;
 var n = 4;
 var b = true;
@@ -9,3 +11,5 @@ var foo = function(v) {
 function bar(b) {
   return !b;
 }
+
+exports = {foo, bar};

@@ -1,3 +1,5 @@
+goog.module('gents.classes');
+
 /**
  * Anonymous class
  * @param {number} a
@@ -138,3 +140,5 @@ class AnotherAbstractClass {
    */
   anotherMethod() {}
 }
+
+exports = {G, ClassWithNoConstructorJsDocAndProperties, GoogDefinedClassWithConstructorAnnotation, GoogDefinedClassWithConstructorAnnotationAndParameters, GoogDefinedClassWithDeeplyNestedConstructorAnnotation, A, B, C, D, E, F};

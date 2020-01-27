@@ -1,3 +1,5 @@
-let d: ng.IDirective = function() {};
-let j: JQuery = $('#foo');
-let o: OldNoType = Object();
+export const d: ng.IDirective = function() {};
+
+export const j: JQuery = $('#foo');
+
+export const o: OldNoType = Object();

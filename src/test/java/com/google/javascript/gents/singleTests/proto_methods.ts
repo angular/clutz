@@ -21,7 +21,7 @@ goog.A = class {
 /**
  * Named class extension
  */
-class B extends goog.A {
+export class B extends goog.A {
   b: any;
 
   constructor(a: number, b: boolean) {

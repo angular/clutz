@@ -1,3 +1,5 @@
+goog.module('gents.parameter_prop');
+
 /** @typedef {string} */
 var Foo;
 
@@ -46,3 +48,5 @@ class C {
     this.a = a;
   }
 }
+
+exports = {A, B, C};

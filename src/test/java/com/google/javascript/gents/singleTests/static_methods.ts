@@ -46,7 +46,7 @@ goog.B = class extends goog.A {
   }
 };
 
-class A {
+export class A {
   constructor() {
     goog.A.foo(4);
   }

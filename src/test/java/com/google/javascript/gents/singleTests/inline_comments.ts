@@ -1,4 +1,4 @@
-function foo(...varargs: number[]) {}
+export function foo(...varargs: number[]) {}
 foo(1,
     /* inline comment after arg, should attach to 2 */
     2, 3,

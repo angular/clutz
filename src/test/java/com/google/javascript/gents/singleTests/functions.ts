@@ -1,9 +1,11 @@
-let nop = function() {};
+// TODO(b/142972217): Add more tests, e.g. with default parameters, aliasing,
+// and multiline blocks.
+export const nop = function() {};
 
 // Function params
-let oneParam = function(n: number) {};
+export const oneParam = function(n: number) {};
 
-function twoParams(b: boolean, s: string) {}
+export function twoParams(b: boolean, s: string) {}
 
 function withDefaultValue(list: any[] = []) {}
 
@@ -50,11 +52,8 @@ const arrowNoJsDoc = (a) => {
 const implicitReturnArrow = (a) => a;
 
 // Argument descructuring
-function namedParams({a}: {a: number}) {}
+export function namedParams({a}: {a: number}) {}
 
-function namedParamsMultiLine({a}: {a: number}) {}
+export function namedParamsMultiLine({a}: {a: number}) {}
 
-function namedParamsWithDefaultValues({a = 1} = {}) {}
-
-// TODO(b/142972217): Add more tests, e.g. with default parameters, aliasing,
-// and multiline blocks.
+export function namedParamsWithDefaultValues({a = 1} = {}) {}

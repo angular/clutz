@@ -1,3 +1,5 @@
+goog.module('gents.fields');
+
 /**
  * @constructor
  * @param {number} parameterProp
@@ -49,3 +51,5 @@ A.prototype.f;
 A.g = true;
 /** @type {*} */
 A.h;
+
+exports = {A};

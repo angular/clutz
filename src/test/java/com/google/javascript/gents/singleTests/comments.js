@@ -1,3 +1,5 @@
+goog.module('gents.comments');
+
 /**
  * This comment describes a class
  * @constructor
@@ -108,3 +110,5 @@ a(
 // comment after GETPROP
 c();
 // comment in the end
+
+exports = {A, X, B};

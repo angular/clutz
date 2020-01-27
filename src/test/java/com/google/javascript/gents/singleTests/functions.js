@@ -1,3 +1,8 @@
+goog.module('gents.functions');
+
+// TODO(b/142972217): Add more tests, e.g. with default parameters, aliasing,
+// and multiline blocks.
+
 var nop = function() {};
 
 // Function params
@@ -123,5 +128,4 @@ function namedParamsMultiLine({a}) {}
 /** @param {{a: number}=} params */
 function namedParamsWithDefaultValues({a = 1} = {}) {}
 
-// TODO(b/142972217): Add more tests, e.g. with default parameters, aliasing,
-// and multiline blocks.
+exports = {nop, oneParam, twoParams, namedParams, namedParamsMultiLine, namedParamsWithDefaultValues};

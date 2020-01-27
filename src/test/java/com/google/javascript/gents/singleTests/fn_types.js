@@ -1,3 +1,5 @@
+goog.module('gents.fn_types');
+
 // 'Function' type
 /**
  * @type {Function}
@@ -69,3 +71,5 @@ const f3 = function() {
 const f4 = function() {
   return 'string';
 };
+
+exports = {f1, f2, f3, f4};
