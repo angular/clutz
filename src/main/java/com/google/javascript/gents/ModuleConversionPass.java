@@ -225,7 +225,12 @@ public final class ModuleConversionPass implements CompilerPass {
           String requiredNamespace = callNode.getLastChild().getString();
           String localName = n.getFirstChild().getQualifiedName();
           ModuleImport moduleImport =
-              new ModuleImport(n, Collections.singletonList(localName), requiredNamespace, false);
+              new ModuleImport(
+                  n,
+                  Collections.singletonList(localName),
+                  Collections.emptyMap(),
+                  requiredNamespace,
+                  false);
           if (moduleImport.validateImport()) {
             convertNonDestructuringRequireToImportStatements(n, moduleImport);
           }
@@ -235,17 +240,19 @@ public final class ModuleConversionPass implements CompilerPass {
         // var {foo, bar} = goog.require(...);
         if (isADestructuringRequireCall(node)) {
           Node importedNode = node.getFirstChild();
-          // For multiple destructuring imports, there are multiple full local names.
-          // This does not support renaming imports of the sort
-          // const {a: b} = goog.require
-          // TODO(rado): add support for that pattern.
+
           ArrayList<String> namedExports = new ArrayList<String>();
+          Map<String, String> aliases = new HashMap<>();
           while (importedNode != null) {
             namedExports.add(importedNode.getString());
+            if (!importedNode.isShorthandProperty()) {
+              aliases.put(importedNode.getString(), importedNode.getFirstChild().getString());
+            }
             importedNode = importedNode.getNext();
           }
           String requiredNamespace = node.getNext().getFirstChild().getNext().getString();
-          ModuleImport moduleImport = new ModuleImport(n, namedExports, requiredNamespace, true);
+          ModuleImport moduleImport =
+              new ModuleImport(n, namedExports, aliases, requiredNamespace, true);
           if (moduleImport.validateImport()) {
             convertDestructuringRequireToImportStatements(n, moduleImport);
           }
@@ -256,12 +263,18 @@ public final class ModuleConversionPass implements CompilerPass {
         Node callNode = n.getFirstChild();
         if (isARequireLikeCall(callNode)) {
           String requiredNamespace = callNode.getLastChild().getString();
-          // For goog.require(...) imports, the full local name is just the required namespace/module.
+          // For goog.require(...) imports, the full local name is just the required
+          // namespace/module.
           // We use the suffix from the namespace as the local name, i.e. for
-          // goog.require("a.b"), requiredNamespace = "a.b", fullLocalName = ["a.b"], localName = ["b"]
+          // goog.require("a.b"), requiredNamespace = "a.b", fullLocalName = ["a.b"], localName =
+          // ["b"]
           ModuleImport moduleImport =
               new ModuleImport(
-                  n, Collections.singletonList(requiredNamespace), requiredNamespace, false);
+                  n,
+                  Collections.singletonList(requiredNamespace),
+                  Collections.emptyMap(),
+                  requiredNamespace,
+                  false);
           if (moduleImport.validateImport()) {
             convertNonDestructuringRequireToImportStatements(n, moduleImport);
           }
@@ -315,14 +328,33 @@ public final class ModuleConversionPass implements CompilerPass {
     /**
      * LHS of the requirement statement. If the require statement has no LHS, then local name is the
      * suffix of the required namespace/module.
+     *
+     * <p>A bit of a misnomer, because when there is an alias this points to the name in the
+     * exporter not at the importer. See localNameAliases.
      */
     private List<String> localNames;
 
     /**
      * Full local name is used for rewriting imported variables in the file later on. There's a one
      * to one relationship between fullLocalNames and localNames.
+     *
+     * <p>In goog.modules fullLocalNames always match localNames. This is only useful for
+     * goog.provide files. TODO(radokirov): drop support for
      */
     private List<String> fullLocalNames;
+
+    /**
+     * In goog.modules, one can import and alias a name.
+     *
+     * <p>let {A: B} = goog.require('ns.foo'};
+     *
+     * <p>In this case the localName is 'A', the localAlias is 'B'. (Confusingly the fullLocalName
+     * is also 'A').
+     *
+     * <p>This maps from the imported name ('A' in the example above), to the local alias ('B' in
+     * the example above).
+     */
+    private Map<String, String> localNameAliases;
 
     /**
      * For {@code goog.require(...)} with no LHS and no side effects, then we use the required
@@ -357,6 +389,7 @@ public final class ModuleConversionPass implements CompilerPass {
     private ModuleImport(
         Node originalImportNode,
         List<String> fullLocalNames,
+        Map<String, String> localNameAliases,
         String requiredNamespace,
         boolean isDestructuringImport) {
       this.originalImportNode = originalImportNode;
@@ -378,6 +411,7 @@ public final class ModuleConversionPass implements CompilerPass {
           this.backupName = this.moduleSuffix + "Exports";
         }
       }
+      this.localNameAliases = localNameAliases;
     }
 
     /** Validate the module import assumptions */
@@ -535,6 +569,9 @@ public final class ModuleConversionPass implements CompilerPass {
       Node importSpec = new Node(Token.IMPORT_SPEC);
       importSpec.setShorthandProperty(true);
       importSpec.addChildToBack(IR.name(localName));
+      if (moduleImport.localNameAliases.containsKey(localName)) {
+        importSpec.addChildToBack(IR.name(moduleImport.localNameAliases.get(localName)));
+      }
       importSpecs.addChildToBack(importSpec);
     }
     Node importNode =

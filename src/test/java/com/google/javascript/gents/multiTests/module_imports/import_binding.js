@@ -4,6 +4,7 @@ goog.require("sideeffect.A.B.C");
 var A = goog.require("default.A");
 var X = goog.require("default.A");
 const {foo} = goog.require("named.A.B");
+const {foo: renamedFoo} = goog.require('named.A.B');
 var namespace = goog.require("namespace.A.B");
 const D = goog.require("both.A.B.C.D");
 const {bar} = goog.require("both.A.B.C.D");
