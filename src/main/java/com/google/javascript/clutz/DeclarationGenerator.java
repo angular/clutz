@@ -260,10 +260,38 @@ class DeclarationGenerator {
 
   /**
    * If one file defines a name and another uses it as a namespace, we have the
-   * Constants.COLLDING_PROVIDE_ALIAS_POSTFIX workaround. In partial mode, Clutz can't see all
+   * Constants.COLLIDING_PROVIDE_ALIAS_POSTFIX workaround. In partial mode, Clutz can't see all
    * definitions of a name, so the list of names that require aliases must be passed as an input.
+   * Also Closure Library uses some names as both classes and namespases. For example,
+   * `goog.ui.Component` is not only a class but also a namespace in `goog.ui.Component.EventType`.
+   * See https://github.com/google/closure-library/blob/master/closure/goog/ui/component.js
    */
-  private Set<String> collidingProvides = new LinkedHashSet<>();
+  private Set<String> collidingProvides =
+      Sets.newHashSet(
+          "goog.ui.AdvancedTooltip",
+          "goog.ui.AnimatedZippy",
+          "goog.ui.Checkbox",
+          "goog.ui.ColorPicker",
+          "goog.ui.Component",
+          "goog.ui.Container",
+          "goog.ui.Control",
+          "goog.ui.Dialog",
+          "goog.ui.FilteredMenu",
+          "goog.ui.HoverCard",
+          "goog.ui.Menu",
+          "goog.ui.MenuItem",
+          "goog.ui.ModalPopup",
+          "goog.ui.Ratings",
+          "goog.ui.ScrollFloater",
+          "goog.ui.SliderBase",
+          "goog.ui.SplitPane",
+          "goog.ui.TableSorter",
+          "goog.ui.Textarea",
+          "goog.ui.TriStateMenuItem",
+          "goog.ui.Zippy",
+          "goog.ui.editor.AbstractDialog",
+          "goog.ui.editor.LinkDialog",
+          "goog.ui.tree.BaseNode");
 
   DeclarationGenerator(Options opts) {
     this.opts = opts;
@@ -416,7 +444,7 @@ class DeclarationGenerator {
       legacyNamespaceReexportMap =
           new LegacyNamespaceReexportMapBuilder()
               .build(compiler.getParsedInputs(), opts.depgraph.getGoogProvides());
-      collidingProvides = opts.collidingProvides;
+      collidingProvides.addAll(opts.collidingProvides);
     }
 
     unknownType = compiler.getTypeRegistry().getNativeType(JSTypeNative.UNKNOWN_TYPE);
@@ -516,7 +544,7 @@ class DeclarationGenerator {
         rewrittenProvides.add(rewritenProvide);
       }
       if (needsAlias(shadowedProvides, provide, symbol)) {
-        emitName += Constants.COLLDING_PROVIDE_ALIAS_POSTFIX;
+        emitName += Constants.COLLIDING_PROVIDE_ALIAS_POSTFIX;
       }
       if (symbol == null) {
         // Sometimes goog.provide statements are used as pure markers for dependency management, or
@@ -890,7 +918,7 @@ class DeclarationGenerator {
       boolean isDefault = isDefaultExport(symbol);
       String emitName = symbol.getName();
       if (needsAlias(shadowedSymbols, symbol.getName(), symbol)) {
-        emitName += Constants.COLLDING_PROVIDE_ALIAS_POSTFIX;
+        emitName += Constants.COLLIDING_PROVIDE_ALIAS_POSTFIX;
       }
 
       // There is nothing to emit for a namespace, because all its symbols will be visited later,
@@ -1575,6 +1603,9 @@ class DeclarationGenerator {
 
     private String getAbsoluteName(ObjectType objectType) {
       String name = objectType.getDisplayName();
+      if (collidingProvides.contains(name)) {
+        name += Constants.COLLIDING_PROVIDE_ALIAS_POSTFIX;
+      }
       // Names that do not have a namespace '.' are either platform names in the top level
       // namespace like `Object` or `Element`, or they are unqualified `goog.provide`s, e.g.
       // `goog.provide('Toplevel')`. In both cases they will be found with the naked name.
@@ -1603,7 +1634,7 @@ class DeclarationGenerator {
         // Since closure inlines all aliases before this step, check against
         // the type name.
         if (!isAliasedClassOrInterface(symbol, ftype)) {
-          visitClassOrInterface(getUnqualifiedName(symbol), ftype);
+          visitClassOrInterface(getUnqualifiedName(emitName), ftype);
         } else {
           if (KNOWN_CLASS_ALIASES.containsKey(symbol.getName())) {
             visitKnownTypeValueAlias(
