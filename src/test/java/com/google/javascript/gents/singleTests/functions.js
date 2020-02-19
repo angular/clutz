@@ -43,6 +43,11 @@ function typedReturn() {
   return 4;
 }
 
+/** @return {!Promise<number>} */
+function typedReturnTwo() {
+  return Promise.resolve(4);
+}
+
 /**
  * @param {number} n
  * @param {boolean} b
@@ -82,6 +87,31 @@ var retVoid = function() {};
  * @return {undefined}
  */
 var retUndef = function() {};
+
+/** @return {undefined} */
+var retUndefTwo = function() {
+  return undefined;
+};
+
+/** @return {!Promise<undefined>} */
+var retUndefThree =
+    async function() {
+  return undefined;
+}
+
+/** @return {!Promise<void>} */
+var retUndefFour =
+    async function() {
+  return undefined;
+}
+
+/** @return {!Promise<void>} */
+var retUndefFive =
+    async function() {}
+
+/** @return {!Promise} */
+var retUndefSix =
+    async function() {}
 
 /**
  * @param {number} a

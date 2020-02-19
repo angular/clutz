@@ -21,6 +21,10 @@ let anyReturn = function(): any {
 function typedReturn(): number {
   return 4;
 }
+
+function typedReturnTwo(): Promise<number> {
+  return Promise.resolve(4);
+}
 let partiallyTyped = function(n: number, u1, b: boolean, u2) {};
 
 // Both params and returns
@@ -37,6 +41,17 @@ let paramUndef = function(u: undefined, v: undefined) {};
 // Void returns
 let retVoid = function(): void {};
 let retUndef = function(): void {};
+let retUndefTwo = function(): void {
+  return undefined;
+};
+let retUndefThree = async function(): Promise<void> {
+  return undefined;
+};
+let retUndefFour = async function(): Promise<void> {
+  return undefined;
+};
+let retUndefFive = async function(): Promise<void> {};
+let retUndefSix = async function(): Promise<any> {};
 const arrowWithJsDoc = (a: number): number => {
   return a;
 };
