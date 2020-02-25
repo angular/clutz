@@ -350,6 +350,10 @@ class DeclarationGenerator {
   }
 
   void generateDeclarations() {
+    if (!opts.partialInput) {
+      throw new RuntimeException("clutz must be run in partialInput mode");
+    }
+
     List<SourceFile> sourceFiles = new ArrayList<>();
 
     for (String source : opts.arguments) {
