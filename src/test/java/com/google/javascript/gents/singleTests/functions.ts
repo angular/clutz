@@ -52,6 +52,9 @@ let retUndefFour = async function(): Promise<void> {
 };
 let retUndefFive = async function(): Promise<void> {};
 let retUndefSix = async function(): Promise<any> {};
+let retMaybeNumber = async function(): Promise<number|null> {
+  return 0;
+};
 const arrowWithJsDoc = (a: number): number => {
   return a;
 };

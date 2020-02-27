@@ -437,15 +437,20 @@ public final class TypeAnnotationPass implements CompilerPass {
                   return indexSignatureNode;
                 case "IPromise":
                 case "Promise":
+                  // I am not sure why == TOKEN.VOID doesn't work here, but it appears
+                  // that Promise<undefined> and Promise<void> have the generic parameters as
+                  // TOKEN.String.
+                  Node genericParam = block.getFirstChild();
                   boolean promiseOfVoidOrUndefined =
-                      block.getFirstChild().getString().equals("undefined")
-                          || block.getFirstChild().getString().equals("void");
+                      genericParam.isString()
+                          && (genericParam.getString().equals("undefined")
+                              || genericParam.getString().equals("void"));
                   return parameterizedType(
                       namedType("Promise"),
                       ImmutableList.of(
                           promiseOfVoidOrUndefined
                               ? namedType("void")
-                              : convertTypeNodeAST(block.getFirstChild())));
+                              : convertTypeNodeAST(genericParam)));
                 default:
                   // N/A
               }

@@ -113,6 +113,12 @@ var retUndefFive =
 var retUndefSix =
     async function() {}
 
+/** @return {Promise<?number>} */
+var retMaybeNumber =
+    async function() {
+  return 0;
+}
+
 /**
  * @param {number} a
  * @return {number}
