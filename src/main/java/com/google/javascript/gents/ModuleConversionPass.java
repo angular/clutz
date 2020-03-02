@@ -564,16 +564,7 @@ public final class ModuleConversionPass implements CompilerPass {
     // For the rest of the function, the imported and importing files are migrating together
 
     // import {localName} from "./file"
-    Node importSpecs = new Node(Token.IMPORT_SPECS);
-    for (String localName : moduleImport.localNames) {
-      Node importSpec = new Node(Token.IMPORT_SPEC);
-      importSpec.setShorthandProperty(true);
-      importSpec.addChildToBack(IR.name(localName));
-      if (moduleImport.localNameAliases.containsKey(localName)) {
-        importSpec.addChildToBack(IR.name(moduleImport.localNameAliases.get(localName)));
-      }
-      importSpecs.addChildToBack(importSpec);
-    }
+    Node importSpecs = createNamedImports(moduleImport);
     Node importNode =
         new Node(
             Token.IMPORT, IR.empty(), importSpecs, Node.newString(moduleImport.referencedFile));
@@ -640,13 +631,7 @@ public final class ModuleConversionPass implements CompilerPass {
     // goog.require('...'); -> import '...';
     Node importSpec = IR.empty();
     if (moduleImport.isDestructuringImport) {
-      importSpec = new Node(Token.IMPORT_SPECS);
-      importSpec.setShorthandProperty(true);
-      for (String fullLocalName : moduleImport.fullLocalNames) {
-        Node spec = new Node(Token.IMPORT_SPEC, IR.name(fullLocalName));
-        spec.setShorthandProperty(true);
-        importSpec.addChildToBack(spec);
-      }
+      importSpec = createNamedImports(moduleImport);
     } else if (moduleImport.isFullModuleImport()) {
       // It is safe to assume there's one full local name because this is validated before.
       String fullLocalName = moduleImport.fullLocalNames.get(0);
@@ -656,6 +641,20 @@ public final class ModuleConversionPass implements CompilerPass {
         new Node(Token.IMPORT, IR.empty(), importSpec, Node.newString(referencedFile));
     nodeComments.replaceWithComment(moduleImport.originalImportNode, importNode);
     compiler.reportChangeToEnclosingScope(importNode);
+  }
+
+  private static Node createNamedImports(ModuleImport moduleImport) {
+    Node importSpec = new Node(Token.IMPORT_SPECS);
+    importSpec.setShorthandProperty(true);
+    for (String fullLocalName : moduleImport.fullLocalNames) {
+      Node spec = new Node(Token.IMPORT_SPEC, IR.name(fullLocalName));
+      spec.setShorthandProperty(true);
+      if (moduleImport.localNameAliases.containsKey(fullLocalName)) {
+        spec.addChildToBack(IR.name(moduleImport.localNameAliases.get(fullLocalName)));
+      }
+      importSpec.addChildToBack(spec);
+    }
+    return importSpec;
   }
 
   private void convertRequireForSideEffectOnlyImport(ModuleImport moduleImport) {
@@ -756,7 +755,7 @@ public final class ModuleConversionPass implements CompilerPass {
   }
 
   /** Creates an ExportSpecs node, which is the {...} part of an "export {name}" node. */
-  private Node createExportSpecs(Node name) {
+  private static Node createExportSpecs(Node name) {
     Node exportSpec = new Node(Token.EXPORT_SPEC, name);
     // Set the "is shorthand" property so that we "export {x}", not "export {x as x}".
     exportSpec.setShorthandProperty(true);
