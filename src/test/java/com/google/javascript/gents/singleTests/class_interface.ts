@@ -5,6 +5,10 @@ export interface IBase {
   a: number;
 
   method1(): boolean;
+
+  inferredVoidReturn(a: string): void;
+
+  explicitReturn(a: string): string;
 }
 
 export interface IExtendsUsingEs6 extends IBase {

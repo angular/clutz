@@ -110,7 +110,11 @@ public final class TypeAnnotationPass implements CompilerPass {
           // Functions are annotated with their return type
         case FUNCTION:
           if (bestJSDocInfo != null) {
-            setTypeExpression(n, bestJSDocInfo.getReturnType(), true);
+            if (n.getParent().getParent().isInterfaceMembers()) {
+              setTypeExpressionForInterfaceMethod(n, bestJSDocInfo.getReturnType(), true);
+            } else {
+              setTypeExpression(n, bestJSDocInfo.getReturnType(), true);
+            }
           }
           break;
         case CLASS:
@@ -333,6 +337,18 @@ public final class TypeAnnotationPass implements CompilerPass {
     for (Node newImport : importsNeeded.get(script.getSourceFileName())) {
       script.addChildToFront(newImport);
     }
+  }
+
+  /**
+   * Sets the annotated type expression for a interface method return type.
+   *
+   * <p>The generic setTypeExpression cannot be used, because when an explicit annotation is missing
+   * In closure it means infer 'void' while for TypeScripe we need to add : void explicitly.
+   */
+  private void setTypeExpressionForInterfaceMethod(
+      Node n, @Nullable JSTypeExpression type, boolean isReturnType) {
+    TypeDeclarationNode decl = type == null ? voidType() : convert(type, isReturnType);
+    setTypeExpression(n, decl);
   }
 
   /** Sets the annotated type expression corresponding to Node {@code n}. */

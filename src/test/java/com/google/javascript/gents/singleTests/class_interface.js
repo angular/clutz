@@ -20,6 +20,15 @@ class IBase {
   }
   /** @return {boolean} */
   method1() {}
+
+  /** @param {string} a */
+  inferredVoidReturn(a) {}
+
+  /**
+   * @param {string} a
+   * @return {string}
+   */
+  explicitReturn(a) {}
 }
 
 /**
