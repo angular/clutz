@@ -262,7 +262,7 @@ public class PlatformSymbols {
           "RTCRtpTransceiver",
           "RTCStatsElement",
           "RTCStatsResponse",
-          "RTCStreamStats",
+          "RTCRtpStreamStats",
           "RTCTrackEvent",
           "RTCVoidCallback",
           "RadioNodeList",
