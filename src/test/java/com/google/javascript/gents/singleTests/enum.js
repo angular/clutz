@@ -61,12 +61,12 @@ class C {}
 //!! module level siblings, which would lead to having to rewrite all references
 //!! too. Moreover, even checking this is makes the Syntax tests fail, because
 //!! we do not move it to a static declaration.
-//!!
-//!! /** @enum {number} */
-//!! C.InnerEnum = {
-//!!  A: 0,
-//!!  B: 1
-//!! };
+
+/** @enum {number} */
+C.InnerEnum = {
+  A: 0,
+  B: 1
+};
 
 exports.C = C;
 exports.NumEnum = NumEnum;

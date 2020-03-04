@@ -290,7 +290,9 @@ public final class TypeConversionPass implements CompilerPass {
         //         NAME MyClass
         //         STRING Type
         //     OBJECTLIST
-        parent.getGrandparent().replaceChild(parent.getParent(), newNode);
+        if (parent.getGrandparent() != null) {
+          parent.getGrandparent().replaceChild(parent.getParent(), newNode);
+        }
       } else {
         parent.replaceChild(n, newNode);
       }

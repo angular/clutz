@@ -46,3 +46,7 @@ export const OtherEnum = {
 };
 
 export class C {}
+C.InnerEnum = {
+  A: 0,
+  B: 1
+};
