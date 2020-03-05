@@ -125,3 +125,5 @@ class AnotherAbstractClass {
    */
   anotherMethod() {}
 }
+
+class DecoratedConstructor {}

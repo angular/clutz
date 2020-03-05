@@ -141,4 +141,9 @@ class AnotherAbstractClass {
   anotherMethod() {}
 }
 
+class DecoratedConstructor {
+  /** @constructor */
+  constructor() {}
+}
+
 exports = {G, ClassWithNoConstructorJsDocAndProperties, GoogDefinedClassWithConstructorAnnotation, GoogDefinedClassWithConstructorAnnotationAndParameters, GoogDefinedClassWithDeeplyNestedConstructorAnnotation, A, B, C, D, E, F};

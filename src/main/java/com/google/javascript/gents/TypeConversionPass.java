@@ -79,7 +79,9 @@ public final class TypeConversionPass implements CompilerPass {
           bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
           if (bestJSDocInfo != null
               && bestJSDocInfo.isConstructorOrInterface()
-              && !isConstructorInGoogDefineClass(n)) {
+              && !isConstructorInGoogDefineClass(n)
+              // In case that @constructor is left on an ES6 class, skip over it.
+              && !(bestJSDocInfo.isConstructor() && n.getParent().isMemberFunctionDef())) {
             convertConstructorToClass(n, bestJSDocInfo);
           }
           break;
