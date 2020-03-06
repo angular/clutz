@@ -428,6 +428,21 @@ public final class TypeAnnotationPass implements CompilerPass {
           case "void":
             return isReturnType ? voidType() : undefinedType();
           default:
+            if (typeName.equals("Array") && n.getChildCount() == 0) {
+              // This handles the case if something is annotated as type `Array` without
+              // a type parameter specified.  For example,
+              //   /** @type {Array} */ const y = [];
+              // Note that the type is just `Array` and not `Array<T>` for some type T.
+              //
+              // In this case, gents should emit an array of `any`s, because without this case here,
+              // gents would instead emit `Array`.
+              //
+              // By emitting an array of `any`s, later code in gents will update the `any` to
+              // be whatever type is specified to use as an alias of `any` (if the user
+              // provided an alias).
+              return arrayType(anyType());
+            }
+
             String newTypeName = convertTypeName(n.getSourceFileName(), typeName);
             newTypeName = convertExternNameToTypingName(newTypeName);
             TypeDeclarationNode root = namedType(newTypeName);
