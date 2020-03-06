@@ -344,7 +344,12 @@ public final class CommentLinkingPass implements CompilerPass {
           // separating the arguments is on to decide which argument to attach it to.
           String lineContents =
               compiler.getInput(new InputId(n.getSourceFileName())).getSourceFile().getLine(line);
-          String interval = lineContents.substring(endOfComment, startOfNextNode);
+          // nextNode could be on a different line.
+          int searchForCommaUntil =
+              getCurrentComment().location.end.line == n.getNext().getLineno()
+                  ? startOfNextNode
+                  : lineContents.length();
+          String interval = lineContents.substring(endOfComment, searchForCommaUntil);
           if (interval.contains(",")) {
             linkCommentBufferToNode(n);
           } else {
