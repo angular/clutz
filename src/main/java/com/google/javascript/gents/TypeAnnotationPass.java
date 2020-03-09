@@ -110,7 +110,7 @@ public final class TypeAnnotationPass implements CompilerPass {
           // Functions are annotated with their return type
         case FUNCTION:
           if (bestJSDocInfo != null) {
-            if (n.getParent().getParent().isInterfaceMembers()) {
+            if (n.getGrandparent().isInterfaceMembers()) {
               setTypeExpressionForInterfaceMethod(n, bestJSDocInfo.getReturnType(), true);
             } else {
               setTypeExpression(n, bestJSDocInfo.getReturnType(), true);
@@ -428,7 +428,7 @@ public final class TypeAnnotationPass implements CompilerPass {
           case "void":
             return isReturnType ? voidType() : undefinedType();
           default:
-            if (typeName.equals("Array") && n.getChildCount() == 0) {
+            if (typeName.equals("Array") && !n.hasChildren()) {
               // This handles the case if something is annotated as type `Array` without
               // a type parameter specified.  For example,
               //   /** @type {Array} */ const y = [];
