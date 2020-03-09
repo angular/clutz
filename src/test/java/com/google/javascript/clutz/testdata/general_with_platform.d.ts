@@ -1057,3 +1057,94 @@ declare namespace ಠ_ಠ.clutz {
     timing : AnimationEffectTiming ;
   }
 }
+// Generated from externs.zip//webassembly.js
+declare namespace ಠ_ಠ.clutz {
+  type MemoryDescriptor = { initial : number , maximum ? : number } ;
+}
+// Generated from externs.zip//webassembly.js
+declare namespace ಠ_ಠ.clutz {
+  type TableDescriptor = { element : string , initial : number , maximum ? : number } ;
+}
+// Generated from externs.zip//webassembly.js
+declare namespace ಠ_ಠ.clutz {
+  type TableFunction = ( ...a : any [] ) => any ;
+}
+// Generated from externs.zip//webassembly.js
+declare namespace ಠ_ಠ.clutz.WebAssembly {
+  class CompileError extends GlobalError {
+    private noStructuralTyping_WebAssembly_CompileError : any;
+    constructor ( ) ;
+  }
+}
+// Generated from externs.zip//webassembly.js
+declare namespace ಠ_ಠ.clutz.WebAssembly {
+  class Instance {
+    private noStructuralTyping_WebAssembly_Instance : any;
+    constructor (moduleObject : ಠ_ಠ.clutz.WebAssembly.Module , importObject ? : GlobalObject | null ) ;
+    exports : any ;
+  }
+}
+// Generated from externs.zip//webassembly.js
+declare namespace ಠ_ಠ.clutz.WebAssembly {
+  class LinkError extends GlobalError {
+    private noStructuralTyping_WebAssembly_LinkError : any;
+    constructor ( ) ;
+  }
+}
+// Generated from externs.zip//webassembly.js
+declare namespace ಠ_ಠ.clutz.WebAssembly {
+  class Memory {
+    private noStructuralTyping_WebAssembly_Memory : any;
+    constructor (memoryDescriptor : ಠ_ಠ.clutz.MemoryDescriptor ) ;
+    buffer : ArrayBuffer ;
+    grow (delta : number ) : number ;
+  }
+}
+// Generated from externs.zip//webassembly.js
+declare namespace ಠ_ಠ.clutz.WebAssembly {
+  class Module {
+    private noStructuralTyping_WebAssembly_Module : any;
+    constructor (bytes : ArrayBuffer | ArrayBufferView ) ;
+    static customSections (moduleObject : ಠ_ಠ.clutz.WebAssembly.Module , sectionName : string ) : ArrayBuffer [] ;
+    static exports (moduleObject : ಠ_ಠ.clutz.WebAssembly.Module ) : { kind : string , name : string } [] ;
+    static imports (moduleObject : ಠ_ಠ.clutz.WebAssembly.Module ) : { kind : string , module : string , name : string } [] ;
+  }
+}
+// Generated from externs.zip//webassembly.js
+declare namespace ಠ_ಠ.clutz.WebAssembly {
+  class RuntimeError extends GlobalError {
+    private noStructuralTyping_WebAssembly_RuntimeError : any;
+    constructor ( ) ;
+  }
+}
+// Generated from externs.zip//webassembly.js
+declare namespace ಠ_ಠ.clutz.WebAssembly {
+  class Table {
+    private noStructuralTyping_WebAssembly_Table : any;
+    constructor (tableDescriptor : ಠ_ಠ.clutz.TableDescriptor ) ;
+    get (index : number ) : ಠ_ಠ.clutz.TableFunction ;
+    grow (delta : number ) : number ;
+    length : number ;
+    set (index : number , value : ( ಠ_ಠ.clutz.TableFunction ) | null ) : void ;
+  }
+}
+// Generated from externs.zip//webassembly.js
+declare namespace ಠ_ಠ.clutz.WebAssembly {
+  function compile (bytes : ArrayBuffer | ArrayBufferView ) : Promise < ಠ_ಠ.clutz.WebAssembly.Module > ;
+}
+// Generated from externs.zip//webassembly.js
+declare namespace ಠ_ಠ.clutz.WebAssembly {
+  function compileStreaming (moduleStream : Promise < Response > ) : Promise < ಠ_ಠ.clutz.WebAssembly.Module > ;
+}
+// Generated from externs.zip//webassembly.js
+declare namespace ಠ_ಠ.clutz.WebAssembly {
+  function instantiate (moduleObject : ArrayBuffer | ArrayBufferView , importObject ? : GlobalObject | null ) : Promise < { instance : ಠ_ಠ.clutz.WebAssembly.Instance , module : ಠ_ಠ.clutz.WebAssembly.Module } > ;
+}
+// Generated from externs.zip//webassembly.js
+declare namespace ಠ_ಠ.clutz.WebAssembly {
+  function instantiateStreaming (moduleStream : Promise < Response > , importObject ? : GlobalObject | null ) : Promise < { instance : ಠ_ಠ.clutz.WebAssembly.Instance , module : ಠ_ಠ.clutz.WebAssembly.Module } > ;
+}
+// Generated from externs.zip//webassembly.js
+declare namespace ಠ_ಠ.clutz.WebAssembly {
+  function validate (bytes : ArrayBuffer | ArrayBufferView ) : boolean ;
+}
