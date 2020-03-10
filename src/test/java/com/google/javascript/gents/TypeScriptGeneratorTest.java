@@ -1,9 +1,9 @@
 package com.google.javascript.gents;
 
 import static com.google.common.truth.Truth.assertThat;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.collect.Lists;
-import com.google.common.io.Files;
 import com.google.javascript.clutz.DeclarationGeneratorTest;
 import com.google.javascript.gents.TypeScriptGenerator.GentsResult;
 import com.google.javascript.jscomp.SourceFile;
@@ -15,7 +15,6 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -34,12 +33,14 @@ public class TypeScriptGeneratorTest {
 
   @Parameters(name = "{index}: {0}")
   public static Iterable<File> testCases() {
-    return getTestInputFiles(DeclarationGeneratorTest.JS, singleTestPath);
+    return getTestInputFiles(DeclarationGeneratorTest.JS_NO_EXTERNS_OR_ZIP, singleTestPath);
   }
 
   static List<File> getTestInputFiles(FilenameFilter filter, String... dir) {
     File[] testFiles = getTestDirPath(dir).toFile().listFiles(filter);
-    return Arrays.asList(testFiles);
+    List<File> filesList = Lists.newArrayList(testFiles);
+
+    return DeclarationGeneratorTest.expandZipTestInputFiles(filesList);
   }
 
   static Path getTestDirPath(String... testDir) {
@@ -60,7 +61,8 @@ public class TypeScriptGeneratorTest {
   }
 
   static String getFileText(final File input) throws IOException {
-    String text = Files.asCharSource(input, StandardCharsets.UTF_8).read();
+    // SourceFile handles <zipfile>!<jsfile> paths internally.
+    String text = SourceFile.fromFile(input.getPath(), UTF_8).getCode();
     String cleanText =
         DeclarationGeneratorTest.GOLDEN_FILE_COMMENTS_REGEXP.matcher(text).replaceAll("");
     return cleanText;
@@ -80,7 +82,8 @@ public class TypeScriptGeneratorTest {
     } else if (input.getName().equals("externs_override.js")) {
       options =
           new Options(
-              TypeScriptGeneratorTest.TEST_EXTERNS_MAP, Lists.newArrayList("any:AnyDuringTs37Migration"));
+              TypeScriptGeneratorTest.TEST_EXTERNS_MAP,
+              Lists.newArrayList("any:AnyDuringTs37Migration"));
     } else {
       options = new Options();
     }

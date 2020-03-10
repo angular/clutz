@@ -94,6 +94,21 @@ public class DeclarationGeneratorTest {
     return externFile.toFile().exists() ? externFile.toString() : null;
   }
 
+  public static List<File> expandZipTestInputFiles(List<File> filesList) {
+    Stream<File> jsFiles = filesList.stream().filter(f -> !f.getName().endsWith(".zip"));
+    Stream<File> zipFiles =
+        filesList.stream()
+            .filter(f -> f.getName().endsWith(".zip"))
+            .map(File::getPath)
+            .map(DeclarationGenerator::getJsEntryPathsFromZip)
+            .flatMap(List::stream)
+            .map(Path::toFile);
+
+    List<File> fileList = Stream.concat(jsFiles, zipFiles).collect(Collectors.toList());
+    Collections.sort(fileList);
+    return fileList;
+  }
+
   public static List<File> getTestInputFiles(FilenameFilter filter) {
     File[] testFiles = getTestDataFolderPath().toFile().listFiles(filter);
     // Partial files live in 'partial' dir and run implicitly with the --partialInput option on.
@@ -117,19 +132,7 @@ public class DeclarationGeneratorTest {
     filesList.addAll(Arrays.asList(testPartialCrossModuleTypeImportsFiles));
     filesList.addAll(Arrays.asList(testOutputBaseFiles));
 
-    Stream<File> jsFiles = filesList.stream().filter(f -> !f.getName().endsWith(".zip"));
-    Stream<File> zipFiles =
-        filesList
-            .stream()
-            .filter(f -> f.getName().endsWith(".zip"))
-            .map(File::getPath)
-            .map(DeclarationGenerator::getJsEntryPathsFromZip)
-            .flatMap(List::stream)
-            .map(Path::toFile);
-
-    List<File> fileList = Stream.concat(jsFiles, zipFiles).collect(Collectors.toList());
-    Collections.sort(fileList);
-    return fileList;
+    return expandZipTestInputFiles(filesList);
   }
 
   public static List<File> getTestInputFilesNoPartial(FilenameFilter filter) {

@@ -1,6 +1,7 @@
 package com.google.javascript.gents;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.toList;
 
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteSource;
@@ -24,12 +25,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipFile;
 import org.kohsuke.args4j.CmdLineException;
 
 /**
@@ -114,7 +118,7 @@ public class TypeScriptGenerator {
     return compiler.getErrorManager().getErrorCount() > 0;
   }
 
-  private void generateTypeScript() {
+  private void generateTypeScript() throws IOException {
     List<SourceFile> srcFiles = getFiles(opts.srcFiles);
     List<SourceFile> externFiles = getFiles(opts.externs);
     Set<String> filesToConvert = Sets.newLinkedHashSet(opts.filesToConvert);
@@ -328,11 +332,31 @@ public class TypeScriptGenerator {
     }
   }
 
+  static List<Path> getJsEntryPathsFromZip(String source) throws IOException {
+    try (ZipFile zipFile = new ZipFile(source)) {
+      return zipFile.stream()
+          .filter(e -> !e.isDirectory())
+          .filter(e -> e.getName().endsWith(".js"))
+          .map(e -> source + "!/" + e.getName())
+          .map(Paths::get)
+          .collect(toList());
+    } catch (IOException e) {
+      throw new IOException("failed to read zip file " + source, e);
+    }
+  }
+
   /** Returns a list of source files from a list of file names. */
-  private static List<SourceFile> getFiles(Collection<String> fileNames) {
+  private static List<SourceFile> getFiles(Collection<String> fileNames) throws IOException {
     List<SourceFile> files = new ArrayList<>(fileNames.size());
     for (String fileName : fileNames) {
-      files.add(SourceFile.fromFile(fileName, UTF_8));
+      if (!fileName.endsWith(".zip")) {
+        files.add(SourceFile.fromFile(fileName, UTF_8));
+        continue;
+      }
+
+      getJsEntryPathsFromZip(fileName).stream()
+          .map(p -> SourceFile.fromPath(p, UTF_8))
+          .forEach(files::add);
     }
     return files;
   }
