@@ -9,6 +9,7 @@ declare namespace ಠ_ಠ.clutz.types_in_zip {
   let num : number ;
   let str : string ;
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/zipped_js_library.zip!/types_in_zip.js
 declare module 'goog:types_in_zip' {
   import types_in_zip = ಠ_ಠ.clutz.types_in_zip;
   export = types_in_zip;

@@ -11,6 +11,7 @@ declare namespace ಠ_ಠ.clutz.class_in_zip {
     a : number ;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/zipped_js_library.zip!/class_in_zip.js
 declare module 'goog:class_in_zip' {
   import class_in_zip = ಠ_ಠ.clutz.class_in_zip;
   export = class_in_zip;
