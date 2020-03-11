@@ -31,6 +31,8 @@ public final class CommentLinkingPass implements CompilerPass {
   /**
    * These RegExes delete everything except for the `block` (see BEGIN_JSDOC_LINE) and `keep`
    * capture groups. These RegExes must contain a `keep` group.
+   *
+   * <p>TODO(b/151088265) Simplify regex.
    */
   private static final Pattern[] JSDOC_REPLACEMENTS_WITH_KEEP = {
     // Removes @param and @return if there is no description
@@ -184,6 +186,7 @@ public final class CommentLinkingPass implements CompilerPass {
     /** Removes unneeded tags and markers from the comment. */
     private String filterCommentContent(Type type, String comment) {
       if (type == Type.JSDOC) {
+        comment = preprocessJsDocComment(comment);
         for (Pattern p : JSDOC_REPLACEMENTS_WITH_KEEP) {
           Matcher m = p.matcher(comment);
           if (m.find() && m.group("keep") != null && m.group("keep").trim().length() > 0) {
@@ -215,6 +218,96 @@ public final class CommentLinkingPass implements CompilerPass {
       }
 
       return isWhitespaceOnly(comment) ? "" : comment;
+    }
+
+    /**
+     * Per b/145684409, Gents used to throw away JSDoc annotations whose explanatory text was on
+     * lines following JSDoc annotation, making it unclear what the explanitory text refers to. It
+     * did this because the `filterCommentContent()` function above assumes JSDoc comments and their
+     * explanatory text will always be on the same line.
+     *
+     * <p>Rather than try to improve the implementation of `filterCommentContent()`, the following
+     * function, `preprocessJsDocComments()` was added. It takes a JSDoc Comment and returns it with
+     * all explanatory text on the same line. (Note: Auto-formatter will run afterwards, cleaning up
+     * line over-runs.)
+     *
+     * <p>Requires `comment` to be of `Type.JSDOC`.
+     */
+    private String preprocessJsDocComment(String comment) {
+      // b/145684409 only occurs when `comment` spans multiple lines. So, if `comment` isn't
+      // multiline, don't modify it.
+      if (comment.contains("\n")) {
+
+        // The following regex matches `} \n * Explanation` as follows:
+        //
+        //   \\}
+        //     exactly one right curly bracket.
+        //
+        //   \\s*
+        //     zero or more whitespaces (including tab, newline, etc.).
+        //
+        //   \\*
+        //     exactly one asterisks.
+        //
+        //   \\s{2,}(?![@,/,\n])
+        //     two or more whitespaces (including tab, newline, etc.), except whitespaces
+        //     followed by an ampersand, forward slash, or newline.
+        //
+        //     Negative lookahead disallows the following matches:
+        //       `} \n * @`    Type information followed by another JSDoc annotation
+        //       `} \n */`     Type information followed by a trailing `*/`
+        //       `} \n * \n `  Type information followed by an empty multiline comment row
+        //
+        //   (?<explanatoryText>\\S+)
+        //     one or more non whitespace characters; store matched characters in
+        //     `explanatoryText` variable.
+        //
+        // Replaces match with `} {blah} Explanation`.
+        //
+        // In other words, `@foo {blah} \n * Explanation` becomes `@foo {blah} Explanation`.
+        comment =
+            comment.replaceAll(
+                "\\}\\s*\\*\\s{2,}(?![@,/,\n])(?<explanatoryText>\\S+)", "} ${explanatoryText}");
+
+        // The following regex matches `} identifier \n * Explanation` as follows:
+        //
+        //   \\}
+        //     exactly one right curly bracket.
+        //
+        //   \\s+
+        //     one or more whitespaces (including tab, newline, etc.).
+        //
+        //   (?<identifier>\\S+)
+        //     one or more non whitespace characters; store matched characters in `identifier`
+        //     variable.
+        //
+        //   \\s*
+        //     zero or more whitespaces (including tab, newline, etc.).
+        //
+        //   \\*
+        //     exactly one asterisks.
+        //
+        //   [^\\S\\n\\r@/]{2,}
+        //     Two or more whitespace characters other than newline or line feed. Can't be ampersand
+        //     or forward slash, either.
+        //
+        //     Note: [^\\S] is a double negative equivalent to \\s. The double negative expression
+        //           [^\\S\\n\\r] can be read, "The set of \\s minus \\n and \\r".
+        //
+        //     [^\\S\\n\\r@/]{2,} disallows the following matches:
+        //       `} identifier \n * \n `  An identifier followed by an empty multiline comment row
+        //       `} identifier \n * @`    An identifier followed by another JSDoc annotation
+        //       `} identifier \n */`     An identifier followed by a trailing `*/`
+        //
+        // Replaces match with `} {blah} identifier Explanation`.
+        //
+        // In other words, `@foo {blah} identifier \n * Explanation` becomes
+        // `@foo {blah} identifier Explanation`.
+        comment =
+            comment.replaceAll(
+                "\\}\\s+(?<identifier>\\S+)\\s*\\*[^\\S\\n\\r@/]{2,}", "} ${identifier} ");
+      }
+      return comment;
     }
 
     /** Returns if the comment only contains whitespace. */
