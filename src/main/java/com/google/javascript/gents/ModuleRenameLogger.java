@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Generates a log that maps how goog.modules/goog.provides where mapped to TS modules.
+ * Generates a log that maps how goog.modules/goog.provides were mapped to TS modules.
  *
  * <p>The log contains: - the original goog.module/goog.provide name. - the name of the TypeScript
  * file that contains the converted Closure module/namespace. - Gents never uses TS default exports.
