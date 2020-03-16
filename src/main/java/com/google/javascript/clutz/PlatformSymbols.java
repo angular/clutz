@@ -262,6 +262,8 @@ public class PlatformSymbols {
           "RTCRtpTransceiver",
           "RTCStatsElement",
           "RTCStatsResponse",
+          "RTCRtpCapabilities",
+          "RTCRtpHeaderExtensionCapability",
           "RTCRtpStreamStats",
           "RTCTrackEvent",
           "RTCVoidCallback",
