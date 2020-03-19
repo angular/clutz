@@ -59,7 +59,7 @@ public final class TypeConversionPass implements CompilerPass {
       // We convert each file independently to avoid merging class methods from different files.
       if (child.isScript()) {
         this.types = new LinkedHashMap<>();
-        NodeTraversal.traverse(compiler, child, new TypeConverter());
+        NodeTraversal.traverse(compiler, child, new TypeConverter(this.nodeComments));
         NodeTraversal.traverse(compiler, child, new TypeMemberConverter());
         NodeTraversal.traverse(compiler, child, new FieldOnThisConverter());
         NodeTraversal.traverse(compiler, child, new InheritanceConverter());
@@ -71,6 +71,13 @@ public final class TypeConversionPass implements CompilerPass {
 
   /** Converts @constructor annotated functions into classes and all @typedefs. */
   private class TypeConverter extends AbstractPostOrderCallback {
+    private final NodeComments nodeComments;
+
+    public TypeConverter(NodeComments nodeComments) {
+      super();
+      this.nodeComments = nodeComments;
+    }
+
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
       JSDocInfo bestJSDocInfo = null;
@@ -141,6 +148,7 @@ public final class TypeConversionPass implements CompilerPass {
             // and a later pass will fill in the members and change to proper interface Foo.
             // TODO(radokirov): Figure out if we can just generate interface Foo {}.
             replaceExpressionOrAssignment(n, parent, constNode);
+            this.nodeComments.moveComment(n, constNode);
           } else {
             createTypeAlias(n, parent);
           }

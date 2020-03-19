@@ -26,4 +26,15 @@ let MyExportedInterface;
 /** @type {MyString} */
 const x = 'x';
 
-exports = {MyExportedInterface};
+/**
+ * This is a comment. It should not go away. It should stay here.
+ *   So should this line of overflow text.
+ *
+ * @typedef {{
+ *     a: string,
+ *     b: string
+ * }}
+ */
+let TypeDefWithComment;
+
+exports = {MyExportedInterface, TypeDefWithComment};

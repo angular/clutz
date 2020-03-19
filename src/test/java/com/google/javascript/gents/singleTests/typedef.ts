@@ -12,3 +12,13 @@ export interface MyExportedInterface {
   y: number;
 }
 const x: MyString = 'x';
+
+/**
+ * This is a comment. It should not go away. It should stay here.
+ *   So should this line of overflow text.
+ *
+ */
+export interface TypeDefWithComment {
+  a: string;
+  b: string;
+}
