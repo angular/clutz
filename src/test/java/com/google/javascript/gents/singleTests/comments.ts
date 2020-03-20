@@ -113,37 +113,6 @@ const ob1 = {
 };
 
 // on the same line as `'g'` in the RegExp constructor
-
-// object with trailing comma
-const ob2 = {
-  a: 'a',
-  b: 'b'
-};
-
-// object without trailing comma
-const ob3 = {
-  a: 'a',
-  b: 'b'
-};
-
-// array with trailing comma
-const arr1 = [1, 2];
-
-// array without trailing comma
-const arr2 = [1, 2];
-
-// handle unicode
-const bread = '\u05d7\u05e0\u05d5\u05ea \u05de\u05de\u05ea\u05e7\u05d9\u05dd';
-
-// handle various number formats
-const num1 = 1000000;
-const num2 = 1e10;
-const num3 = 0.0000001;
-const num4 = 1e-15;
-const num5 = 41;
-const num6 = 26;
-const num7 = 2748;
-
 function f1() {}
 
 // no blank line separating
@@ -163,7 +132,7 @@ function f4() {}
 // two blank lines separating
 let x3;
 
-// blank lines separating
+// three blank lines separating
 let x4;
 let p;
 
@@ -174,13 +143,3 @@ let q;
 let r;
 
 // two spaces before comment
-
-// eventual test to ensure
-//   if(){...}else if (...){...}
-// does not get translated to
-//   if(){...}else{if(...){...}}
-if (true) {
-} else {
-  if (true) {
-  }
-}

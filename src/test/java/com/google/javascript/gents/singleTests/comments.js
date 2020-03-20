@@ -144,42 +144,6 @@ const ob1 = {
   )
 };
 
-// object with trailing comma
-const ob2 = {
-  a: 'a',
-  b: 'b',
-};
-
-// object without trailing comma
-const ob3 = {
-  a: 'a',
-  b: 'b'
-};
-
-// array with trailing comma
-const arr1 = [
-  1,
-  2,
-];
-
-// array without trailing comma
-const arr2 = [
-  1,
-  2
-];
-
-// handle unicode
-const bread = 'חנות ממתקים';
-
-// handle various number formats
-const num1 = 1000000;
-const num2 = 1e10;
-const num3 = 0.0000001;
-const num4 = 1e-15;
-const num5 = 0o51;
-const num6 = 0b11010;
-const num7 = 0xaBc;
-
 function f1() {
 } // no blank line separating
 function f2() {
@@ -194,7 +158,7 @@ function f4() {
 } // two blank lines separating
 
 
-let x3; // blank lines separating
+let x3;  // three blank lines separating
 
 
 
@@ -203,13 +167,5 @@ let x4;
 let p;// no space before comment
 let q; // one space before comment
 let r;  // two spaces before comment
-
-// eventual test to ensure
-//   if(){...}else if (...){...}
-// does not get translated to
-//   if(){...}else{if(...){...}}
-if (true) {
-} else if (true) {
-}
 
 exports = {A, X, B};
