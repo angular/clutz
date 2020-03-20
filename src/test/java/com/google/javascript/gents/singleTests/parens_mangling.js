@@ -1,3 +1,5 @@
+goog.module('gents.parens.mangling');
+
 let parensVar1, parensVar2, parensVar3;
 
 function parensFunction() {}

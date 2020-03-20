@@ -95,6 +95,14 @@ public class TypeScriptGeneratorTest {
     File goldenFile = DeclarationGeneratorTest.getGoldenFile(input, ".ts");
     String goldenText = getFileText(goldenFile);
 
+    // * The 'empty' test does not need a goog.module declaration because it
+    //   is for verifying a file that contains no contents
+    // * The 'js_doc_comments" test does not need a goog.module declaration
+    //   because it is for verifying a file that contains only JSDoc comments.
+    if (!basename.equals("empty") && !basename.equals("js_doc_comments")) {
+      TestUtil.assertIsGoogModuleOrProvide(sourceText, basename);
+    }
+
     ByteArrayOutputStream errStream = new ByteArrayOutputStream();
     gents.setErrorStream(new PrintStream(errStream));
 

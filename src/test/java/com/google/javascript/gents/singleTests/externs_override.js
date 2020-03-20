@@ -1,3 +1,5 @@
+goog.module('gents.externs.override');
+
 class TimePiece {
   /**
    * Get the current time.

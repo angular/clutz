@@ -32,6 +32,23 @@ public class TypeScriptGeneratorMultiTest {
 
   static final String multiTestPath = "multiTests";
 
+  // These test are exempt from checking if they include a good.module or goog.provide
+  // declaration to maintain the current state of the tests as they were when this CL
+  // was created (March 20, 2020).
+  private static final ImmutableSet<String> GOOG_MODULE_PROVIDE_EXCEPTIONS =
+      ImmutableSet.of(
+          "third_party/java_src/clutz/src/test/java/com/google/javascript/gents/multiTests/basenames_dont_collide/a/file.js",
+          "third_party/java_src/clutz/src/test/java/com/google/javascript/gents/multiTests/basenames_dont_collide/b/file.js",
+          "third_party/java_src/clutz/src/test/java/com/google/javascript/gents/multiTests/converts_ts_module_require/converts_ts_module_require.js",
+          "third_party/java_src/clutz/src/test/java/com/google/javascript/gents/multiTests/goog_provide_rewrite/import.js",
+          "third_party/java_src/clutz/src/test/java/com/google/javascript/gents/multiTests/import_rewrite/import.js",
+          "third_party/java_src/clutz/src/test/java/com/google/javascript/gents/multiTests/jslib_imports/import_mixed_default_namespaces.js",
+          "third_party/java_src/clutz/src/test/java/com/google/javascript/gents/multiTests/module_imports/import.js",
+          "third_party/java_src/clutz/src/test/java/com/google/javascript/gents/multiTests/provide_imports/import.js",
+          "third_party/java_src/clutz/src/test/java/com/google/javascript/gents/multiTests/converts_ts_module_require/x/y/z/convert.js",
+          "third_party/java_src/clutz/src/test/java/com/google/javascript/gents/multiTests/jslib_imports/import_provided.js",
+          "third_party/java_src/clutz/src/test/java/com/google/javascript/gents/multiTests/provide_imports/import_binding.js");
+
   public static final FilenameFilter DIR =
       new FilenameFilter() {
         @Override
@@ -66,6 +83,10 @@ public class TypeScriptGeneratorMultiTest {
       String sourceText = TypeScriptGeneratorTest.getFileText(sourceFile);
       String filepath = sourceFile.getPath();
       sourceFiles.add(SourceFile.fromCode(filepath, sourceText));
+
+      if (!GOOG_MODULE_PROVIDE_EXCEPTIONS.contains(filepath)) {
+        TestUtil.assertIsGoogModuleOrProvide(sourceText, filepath);
+      }
 
       if (!filepath.endsWith("_keep.js") && !filepath.endsWith("_keep.es5.js")) {
         sourceNames.add(filepath);
