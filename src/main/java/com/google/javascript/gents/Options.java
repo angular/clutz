@@ -171,7 +171,10 @@ public class Options {
     options.setWarningLevel(DiagnosticGroups.DUPLICATE_VARS, CheckLevel.ERROR);
 
     options.setLanguage(CompilerOptions.LanguageMode.ECMASCRIPT_NEXT);
-    // For unknown to me reason, NO_TRANSPILE changes how arrow functions are emitted.
+    // We have to emit _TYPED, as any other mode triggers optimizations
+    // in the Closure code printer. Notably optimizations break typed
+    // syntax for arrow functions, by removing the surrounding parens
+    // emitting `foo(x:string => x)`, which is invalid.
     options.setLanguageOut(LanguageMode.ECMASCRIPT6_TYPED);
 
     // Do not transpile module declarations
@@ -185,6 +188,8 @@ public class Options {
     // turns off optimizations.
     options.setChecksOnly(true);
     options.setPreserveDetailedSourceInfo(true);
+    // Changing this to INCLUDE_DESCRIPTIONS_WITH_WHITESPACE, which feels more natural to the goals
+    // of gents, makes no difference in golden test. Likely we ignore this info.
     options.setParseJsDocDocumentation(Config.JsDocParsing.INCLUDE_DESCRIPTIONS_NO_WHITESPACE);
 
     options.clearConformanceConfigs();
