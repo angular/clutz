@@ -282,7 +282,7 @@ public class TypeScriptGenerator {
   private static String tryClangFormat(String code) {
     Process process = null;
     try {
-      process = Runtime.getRuntime().exec(CLANG_FORMAT);
+      process = new ProcessBuilder().command(CLANG_FORMAT).start();
       final OutputStream stdin = process.getOutputStream();
       // stdout must be final for the nested object byteSource to return it.
       final InputStream stdout = process.getInputStream();
