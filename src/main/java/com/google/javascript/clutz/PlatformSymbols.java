@@ -1156,6 +1156,7 @@ public class PlatformSymbols {
           "RTCPeerConnectionEventMap",
           "RTCPeerConnectionIceEvent",
           "RTCPeerConnectionIceEventInit",
+          "RTCPeerConnectionState",
           "RTCRTPStreamStats",
           "RTCRtcpFeedback",
           "RTCRtcpParameters",
