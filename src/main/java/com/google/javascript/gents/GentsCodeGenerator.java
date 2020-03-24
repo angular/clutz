@@ -7,6 +7,7 @@ import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
+import java.io.IOException;
 import java.util.Map;
 import javax.annotation.Nullable;
 
@@ -15,15 +16,18 @@ public class GentsCodeGenerator extends CodeGenerator {
 
   private final NodeComments nodeComments;
   private final Map<String, String> externsMap;
+  private final SourceExtractor extractor;
 
   GentsCodeGenerator(
       CodeConsumer consumer,
       CompilerOptions options,
       NodeComments nodeComments,
-      Map<String, String> externsMap) {
+      Map<String, String> externsMap,
+      SourceExtractor extractor) {
     super(consumer, options);
     this.nodeComments = nodeComments;
     this.externsMap = externsMap;
+    this.extractor = extractor;
   }
 
   @Override
@@ -133,6 +137,23 @@ public class GentsCodeGenerator extends CodeGenerator {
         add(n.getDeclaredTypeExpression());
         add(")");
         return true;
+      case NUMBER:
+      case STRING:
+        try {
+          String src = extractor.getSource(n);
+          // Do not use the literal text for goog.require statements
+          // because those statements should be replaced with import
+          // statements.
+          if (src != null && !src.contains("goog.require")) {
+            add(src);
+            return true;
+          }
+          return false;
+        } catch (IOException e) {
+          // there was a problem reading the source file
+          // so have the generator use the default emit
+          return false;
+        }
       case DEFAULT_VALUE:
       case NAME:
         // Prepend access modifiers on constructor params

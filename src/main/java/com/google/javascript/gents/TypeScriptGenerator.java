@@ -216,7 +216,8 @@ public class TypeScriptGenerator {
             new CodeGeneratorFactory() {
               @Override
               public CodeGenerator getCodeGenerator(Format outputFormat, CodeConsumer cc) {
-                return new GentsCodeGenerator(cc, compilerOpts, comments, opts.externsMap);
+                return new GentsCodeGenerator(
+                    cc, compilerOpts, comments, opts.externsMap, new SourceExtractor(srcFiles));
               }
             };
 
