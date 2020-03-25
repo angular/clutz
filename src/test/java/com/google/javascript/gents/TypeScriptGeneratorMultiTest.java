@@ -77,7 +77,7 @@ public class TypeScriptGeneratorMultiTest {
 
     Set<String> sourceNames = new HashSet<>();
     List<SourceFile> sourceFiles = new ArrayList<>();
-    Map<String, String> goldenFiles = new HashMap<>();
+    Map<File, String> goldenFiles = new HashMap<>();
 
     for (final File sourceFile : testFiles) {
       String sourceText = TypeScriptGeneratorTest.getFileText(sourceFile);
@@ -91,10 +91,9 @@ public class TypeScriptGeneratorMultiTest {
       if (!filepath.endsWith("_keep.js") && !filepath.endsWith("_keep.es5.js")) {
         sourceNames.add(filepath);
 
-        String basename = gents.pathUtil.getFilePathWithoutExtension(filepath);
         File goldenFile = DeclarationGeneratorTest.getGoldenFile(sourceFile, ".ts");
         String goldenText = TypeScriptGeneratorTest.getFileText(goldenFile);
-        goldenFiles.put(basename, goldenText);
+        goldenFiles.put(sourceFile, goldenText);
       }
     }
 
@@ -110,8 +109,21 @@ public class TypeScriptGeneratorMultiTest {
     assertThat(gents.hasErrors()).isFalse();
 
     assertThat(transpiledSource).hasSize(sourceNames.size());
-    for (String basename : goldenFiles.keySet()) {
-      String goldenText = goldenFiles.get(basename);
+    for (File sourceFile : goldenFiles.keySet()) {
+      String filepath = sourceFile.getPath();
+      String basename = gents.pathUtil.getFilePathWithoutExtension(filepath);
+      String goldenText;
+
+      // If the test was run with the UPDATE_GOLDENS environment variable
+      // set then the golden file should be updated.
+      if (System.getenv("UPDATE_GOLDENS") != null) {
+        File goldenFile = DeclarationGeneratorTest.getGoldenFile(sourceFile, ".ts");
+        goldenText = transpiledSource.get(basename);
+        Files.asCharSink(goldenFile, StandardCharsets.UTF_8).write(goldenText);
+      } else {
+        goldenText = goldenFiles.get(sourceFile);
+      }
+
       assertThat(transpiledSource).containsKey(basename);
       assertThat(transpiledSource.get(basename)).isEqualTo(goldenText);
     }

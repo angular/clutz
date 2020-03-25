@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 import com.google.javascript.clutz.DeclarationGeneratorTest;
 import com.google.javascript.gents.TypeScriptGenerator.GentsResult;
 import com.google.javascript.jscomp.SourceFile;
@@ -93,7 +94,6 @@ public class TypeScriptGeneratorTest {
     String basename = gents.pathUtil.getFilePathWithoutExtension(input.getName());
     String sourceText = getFileText(input);
     File goldenFile = DeclarationGeneratorTest.getGoldenFile(input, ".ts");
-    String goldenText = getFileText(goldenFile);
 
     // * The 'empty' test does not need a goog.module declaration because it
     //   is for verifying a file that contains no contents
@@ -119,6 +119,16 @@ public class TypeScriptGeneratorTest {
 
     assertThat(transpiledSource).hasSize(1);
     assertThat(transpiledSource).containsKey(basename);
-    assertThat(transpiledSource.get(basename)).isEqualTo(goldenText);
+
+    String transpiledOutput = transpiledSource.get(basename);
+
+    // If the test was run with the UPDATE_GOLDENS environment variable
+    // set then the golden file should be updated.
+    if (System.getenv("UPDATE_GOLDENS") != null) {
+      Files.asCharSink(goldenFile, StandardCharsets.UTF_8).write(transpiledOutput);
+    }
+
+    String goldenText = getFileText(goldenFile);
+    assertThat(transpiledOutput).isEqualTo(goldenText);
   }
 }
