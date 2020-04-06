@@ -565,6 +565,7 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_WritableStream : any;
     constructor (opt_underlyingSink ? : WritableStreamSink , opt_queuingStrategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark ? : number , size ? : (a : any ) => number } ) ;
     abort (reason : any ) : Promise < undefined > ;
+    close ( ) : Promise < undefined > ;
     getWriter ( ) : WritableStreamDefaultWriter ;
     locked : boolean ;
   }
