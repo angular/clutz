@@ -153,12 +153,12 @@ declare namespace ಠ_ಠ.clutz {
   class OffscreenCanvas implements GlobalEventTarget , Transferable {
     private noStructuralTyping_OffscreenCanvas : any;
     constructor (width : number , height : number ) ;
-    addEventListener (type : string , listener : EventListener | null | ( (a : GlobalEvent ) => any ) , opt_options ? : boolean | AddEventListenerOptions ) : void ;
+    addEventListener < THIS > (type : string , listener : EventListener | null | ( (this : THIS , a : GlobalEvent ) => any ) , opt_options ? : boolean | AddEventListenerOptions ) : void ;
     convertToBlob (opt_options ? : { quality ? : number , type ? : string } ) : Promise < Blob > ;
     dispatchEvent (evt : GlobalEvent ) : boolean ;
     getContext (contextId : string , opt_options ? : GlobalObject ) : GlobalObject ;
     height : number ;
-    removeEventListener (type : string , listener : EventListener | null | ( (a : GlobalEvent ) => any ) , opt_options ? : boolean | EventListenerOptions ) : void ;
+    removeEventListener < THIS > (type : string , listener : EventListener | null | ( (this : THIS , a : GlobalEvent ) => any ) , opt_options ? : boolean | EventListenerOptions ) : void ;
     transferToImageBitmap ( ) : ImageBitmap ;
     width : number ;
   }
@@ -917,7 +917,7 @@ declare namespace ಠ_ಠ.clutz {
   class Animation implements GlobalEventTarget {
     private noStructuralTyping_Animation : any;
     constructor (effect ? : AnimationEffectReadOnly | null , timeline ? : AnimationTimeline | null ) ;
-    addEventListener (type : string , listener : EventListener | null | ( (a : GlobalEvent ) => any ) , options ? : boolean | AddEventListenerOptions ) : void ;
+    addEventListener < THIS > (type : string , listener : EventListener | null | ( (this : THIS , a : GlobalEvent ) => any ) , options ? : boolean | AddEventListenerOptions ) : void ;
     cancel ( ) : void ;
     currentTime : number ;
     dispatchEvent (evt : GlobalEvent ) : boolean ;
@@ -932,7 +932,7 @@ declare namespace ಠ_ಠ.clutz {
     playState : string ;
     playbackRate : number ;
     ready : Promise < undefined > ;
-    removeEventListener (type : string , listener : EventListener | null | ( (a : GlobalEvent ) => any ) , options ? : boolean | EventListenerOptions ) : void ;
+    removeEventListener < THIS > (type : string , listener : EventListener | null | ( (this : THIS , a : GlobalEvent ) => any ) , options ? : boolean | EventListenerOptions ) : void ;
     reverse ( ) : void ;
     startTime : number ;
     timeline : AnimationTimeline ;
