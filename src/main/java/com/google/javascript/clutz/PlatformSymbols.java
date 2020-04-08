@@ -1155,6 +1155,8 @@ public class PlatformSymbols {
           "RTCMediaStreamTrackStats",
           "RTCOfferOptions",
           "RTCOutboundRTPStreamStats",
+          "RTCOutboundRtpStreamStats",
+          "RTCRemoteOutboundRtpStreamStats",
           "RTCPeerConnection",
           "RTCPeerConnectionErrorCallback",
           "RTCPeerConnectionEventMap",
