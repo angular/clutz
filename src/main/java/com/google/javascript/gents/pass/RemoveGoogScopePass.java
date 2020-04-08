@@ -1,7 +1,8 @@
-package com.google.javascript.gents;
+package com.google.javascript.gents.pass;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.javascript.gents.pass.AbstractTopLevelCallback;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.NodeTraversal;
@@ -26,7 +27,7 @@ public final class RemoveGoogScopePass extends AbstractTopLevelCallback implemen
   private final Set<String> providedNamespaces = new HashSet<>();
   private final Map<String, String> aliasToProvidedNamespace = new HashMap<>();
 
-  RemoveGoogScopePass(AbstractCompiler compiler) {
+  public RemoveGoogScopePass(AbstractCompiler compiler) {
     this.compiler = compiler;
   }
 

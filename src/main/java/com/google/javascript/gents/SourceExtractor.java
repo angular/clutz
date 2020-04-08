@@ -21,7 +21,7 @@ public class SourceExtractor {
    */
   private final ImmutableMap<String, SourceFile> sourceFiles;
 
-  SourceExtractor(Iterable<SourceFile> sourceFiles) {
+  public SourceExtractor(Iterable<SourceFile> sourceFiles) {
     ImmutableMap.Builder<String, SourceFile> builder = ImmutableMap.builder();
     for (SourceFile sf : sourceFiles) {
       builder.put(sf.getName(), sf);

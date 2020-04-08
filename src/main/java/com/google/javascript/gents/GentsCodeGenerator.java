@@ -18,7 +18,7 @@ public class GentsCodeGenerator extends CodeGenerator {
   private final Map<String, String> externsMap;
   private final SourceExtractor extractor;
 
-  GentsCodeGenerator(
+  public GentsCodeGenerator(
       CodeConsumer consumer,
       CompilerOptions options,
       NodeComments nodeComments,

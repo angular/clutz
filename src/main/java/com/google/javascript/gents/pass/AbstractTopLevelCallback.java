@@ -1,4 +1,4 @@
-package com.google.javascript.gents;
+package com.google.javascript.gents.pass;
 
 import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.jscomp.NodeTraversal.Callback;

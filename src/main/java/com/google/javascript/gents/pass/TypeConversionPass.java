@@ -1,9 +1,11 @@
-package com.google.javascript.gents;
+package com.google.javascript.gents.pass;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.google.javascript.gents.CollectModuleMetadata.FileModule;
+import com.google.javascript.gents.pass.CollectModuleMetadata.FileModule;
+import com.google.javascript.gents.GentsErrorManager;
+import com.google.javascript.gents.NodeComments;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.JSError;
@@ -41,7 +43,7 @@ public final class TypeConversionPass implements CompilerPass {
 
   private Map<String, String> typesToFilename;
 
-  TypeConversionPass(
+  public TypeConversionPass(
       AbstractCompiler compiler, CollectModuleMetadata modulePrepass, NodeComments nodeComments) {
     this.compiler = compiler;
     this.modulePrepass = modulePrepass;

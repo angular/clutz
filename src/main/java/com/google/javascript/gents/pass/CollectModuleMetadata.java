@@ -1,9 +1,12 @@
-package com.google.javascript.gents;
+package com.google.javascript.gents.pass;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.javascript.gents.GentsErrorManager;
+import com.google.javascript.gents.util.GentsNodeUtil;
+import com.google.javascript.gents.util.NameUtil;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.JSError;
@@ -32,7 +35,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
   private final Map<String, FileModule> fileToModule = new LinkedHashMap<>();
   private final Map<String, FileModule> namespaceToModule = new LinkedHashMap<>();
 
-  Map<String, FileModule> getFileMap() {
+  public Map<String, FileModule> getFileMap() {
     return fileToModule;
   }
 
@@ -42,12 +45,12 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     }
   }
 
-  Map<String, FileModule> getNamespaceMap() {
+  public Map<String, FileModule> getNamespaceMap() {
     return namespaceToModule;
   }
 
   /** Returns a map from all symbols in the compilation unit to their respective modules */
-  Map<String, FileModule> getSymbolMap() {
+  public Map<String, FileModule> getSymbolMap() {
     Map<String, FileModule> out = new LinkedHashMap<>();
     for (FileModule module : fileToModule.values()) {
       for (String symbol : module.importedNamespacesToSymbols.keySet()) {
@@ -57,7 +60,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
     return out;
   }
 
-  CollectModuleMetadata(AbstractCompiler compiler, NameUtil nameUtil, Set<String> filesToConvert) {
+  public CollectModuleMetadata(AbstractCompiler compiler, NameUtil nameUtil, Set<String> filesToConvert) {
     this.compiler = compiler;
     this.nameUtil = nameUtil;
     this.filesToConvert = filesToConvert;
@@ -207,7 +210,7 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
   }
 
   /** Encapsulates the module provided by each file. */
-  class FileModule {
+  public class FileModule {
     final String file;
 
     /** Module is not part of the conversion process and only exists for its exported symbols */
@@ -290,6 +293,19 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
       this.file = file;
       this.isGoogModule = isGoogModule;
       this.isJsLibrary = !filesToConvert.contains(file);
+    }
+
+    /** The filename of this module. */
+    public String getFile() {
+      return file;
+    }
+
+    /**
+     * Given a fully qualified namespace name get the corresponding export value
+     * or the supplied default value if the namespace is unknown.
+     */
+    public String getSymbolForNamespace(String namespace, String defaultValue) {
+      return exportedNamespacesToSymbols.getOrDefault(namespace, defaultValue);
     }
 
     /** Returns if the import statement for this file should use the old 'goog:' namespace syntax */

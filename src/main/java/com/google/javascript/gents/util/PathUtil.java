@@ -1,4 +1,4 @@
-package com.google.javascript.gents;
+package com.google.javascript.gents.util;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -9,7 +9,7 @@ public class PathUtil {
   private final String rootpath;
   private final String absolutePrefix;
 
-  PathUtil(String root, String absolutePrefix) {
+  public PathUtil(String root, String absolutePrefix) {
     this.rootpath = root;
     this.absolutePrefix = absolutePrefix;
   }
@@ -18,12 +18,12 @@ public class PathUtil {
    * Returns the file name without its file extension or path. The result does not include the
    * '{@code .}'.
    */
-  String getFilePathWithoutExtension(String filepath) {
+  public String getFilePathWithoutExtension(String filepath) {
     return removeExtension(new File(filepath).getPath());
   }
 
   /** Returns the file name without its file extension. */
-  String removeExtension(String filename) {
+  public String removeExtension(String filename) {
     int dotIndex = filename.lastIndexOf(".");
     return (dotIndex == -1) ? filename : filename.substring(0, dotIndex);
   }
@@ -35,7 +35,7 @@ public class PathUtil {
    * <p>NOTE: the string returned from this is not really a root-based path on disk. It only makes
    * sense as an input to a 'from '...'' clause.
    */
-  String getImportPath(String sourceFile, String referencedFile) {
+  public String getImportPath(String sourceFile, String referencedFile) {
     referencedFile = removeExtension(referencedFile);
     String relativePath = getRelativePath(sourceFile + "/..", referencedFile);
     if (relativePath.startsWith("../..")) {
@@ -46,7 +46,7 @@ public class PathUtil {
   }
 
   /** Returns the relative path between the source file and the referenced module file. */
-  String getRelativePath(String from, String to) {
+  public String getRelativePath(String from, String to) {
     Path fromPath = Paths.get(from).toAbsolutePath().normalize();
     Path toPath = Paths.get(to).toAbsolutePath().normalize();
     Path importPath = fromPath.relativize(toPath).normalize();

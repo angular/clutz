@@ -1,9 +1,10 @@
-package com.google.javascript.gents;
+package com.google.javascript.gents.pass;
 
 import static com.google.javascript.rhino.TypeDeclarationsIR.anyType;
 import static com.google.javascript.rhino.TypeDeclarationsIR.arrayType;
 
 import com.google.common.collect.Iterables;
+import com.google.javascript.gents.NodeComments;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.NodeTraversal;
@@ -18,7 +19,7 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
   private final AbstractCompiler compiler;
   private final NodeComments nodeComments;
 
-  StyleFixPass(AbstractCompiler compiler, NodeComments nodeComments) {
+  public StyleFixPass(AbstractCompiler compiler, NodeComments nodeComments) {
     this.compiler = compiler;
     this.nodeComments = nodeComments;
   }

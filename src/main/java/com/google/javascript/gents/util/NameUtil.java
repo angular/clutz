@@ -1,4 +1,4 @@
-package com.google.javascript.gents;
+package com.google.javascript.gents.util;
 
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.NodeUtil;
@@ -9,20 +9,20 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 /** Utility methods for variable naming. */
-class NameUtil {
+public class NameUtil {
   private AbstractCompiler compiler;
 
-  NameUtil(AbstractCompiler compiler) {
+  public NameUtil(AbstractCompiler compiler) {
     this.compiler = compiler;
   }
 
   /** Returns the last identifier of a qualified name string. */
-  String lastStepOfName(String name) {
+  public String lastStepOfName(String name) {
     return lastStepOfName(NodeUtil.newQName(compiler, name));
   }
 
   /** Returns the last identifier of a name node. */
-  String lastStepOfName(Node n) {
+  public String lastStepOfName(Node n) {
     return n.isGetProp() ? n.getLastChild().getString() : n.getQualifiedName();
   }
 
@@ -31,7 +31,7 @@ class NameUtil {
    * are valid prefixes.
    */
   @Nullable
-  String findLongestNamePrefix(String name, Set<String> namespaces) {
+  public String findLongestNamePrefix(String name, Set<String> namespaces) {
     return findLongestNamePrefix(NodeUtil.newQName(compiler, name), namespaces);
   }
 
@@ -40,7 +40,7 @@ class NameUtil {
    * valid prefixes.
    */
   @Nullable
-  String findLongestNamePrefix(Node name, Set<String> namespaces) {
+  public String findLongestNamePrefix(Node name, Set<String> namespaces) {
     if (namespaces.contains(name.getQualifiedName())) {
       return name.getQualifiedName();
     } else if (name.isGetProp()) {
@@ -53,7 +53,7 @@ class NameUtil {
    * Returns the new name string with a prefix replaced with the new prefix. Returns input name if
    * prefix does not exist.
    */
-  String replacePrefixInName(String name, String prefix, String newPrefix) {
+  public String replacePrefixInName(String name, String prefix, String newPrefix) {
     Node nameNode = NodeUtil.newQName(compiler, name);
     // Placeholder node to ensure name has a parent
     Node placeholder = new Node(Token.EMPTY, nameNode);
@@ -65,7 +65,7 @@ class NameUtil {
    * In-place replaces a prefix with a new prefix in a name node. Does nothing if prefix does not
    * exist.
    */
-  void replacePrefixInName(Node name, String prefix, String newPrefix) {
+  public void replacePrefixInName(Node name, String prefix, String newPrefix) {
     if (name.matchesQualifiedName(prefix)) {
       Node newName = NodeUtil.newQName(compiler, newPrefix);
       JSDocInfo jsdoc = NodeUtil.getBestJSDocInfo(name);

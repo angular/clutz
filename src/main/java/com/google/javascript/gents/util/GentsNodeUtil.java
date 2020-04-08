@@ -1,4 +1,4 @@
-package com.google.javascript.gents;
+package com.google.javascript.gents.util;
 
 import com.google.javascript.rhino.Node;
 
@@ -26,7 +26,7 @@ public class GentsNodeUtil {
    *
    * <p>TODO(rado): see if we can also support simple renaming objects like {NewName: OldName}.
    */
-  static boolean isObjLitWithSimpleRefs(Node node) {
+  public static boolean isObjLitWithSimpleRefs(Node node) {
     if (!node.isObjectLit()) return false;
     for (Node child : node.children()) {
       if (!child.isStringKey() || !child.getFirstChild().isName()) {

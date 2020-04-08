@@ -1,4 +1,4 @@
-package com.google.javascript.gents;
+package com.google.javascript.gents.pass;
 
 import static com.google.javascript.rhino.TypeDeclarationsIR.anyType;
 import static com.google.javascript.rhino.TypeDeclarationsIR.arrayType;
@@ -21,7 +21,10 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
-import com.google.javascript.gents.CollectModuleMetadata.FileModule;
+import com.google.javascript.gents.util.NameUtil;
+import com.google.javascript.gents.NodeComments;
+import com.google.javascript.gents.util.PathUtil;
+import com.google.javascript.gents.pass.CollectModuleMetadata.FileModule;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.NodeTraversal;
@@ -66,7 +69,7 @@ public final class TypeAnnotationPass implements CompilerPass {
   /** extern -> typing map for when extern and TS typing names differ */
   private final Map<String, String> externsMap;
 
-  TypeAnnotationPass(
+  public TypeAnnotationPass(
       AbstractCompiler compiler,
       PathUtil pathUtil,
       NameUtil nameUtil,

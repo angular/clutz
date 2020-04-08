@@ -1,7 +1,8 @@
-package com.google.javascript.gents;
+package com.google.javascript.gents.pass;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.javascript.gents.NodeComments;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.NodeTraversal;
@@ -81,7 +82,7 @@ public final class CommentLinkingPass implements CompilerPass {
   private final Compiler compiler;
   private final NodeComments nodeComments;
 
-  CommentLinkingPass(Compiler compiler) {
+  public CommentLinkingPass(Compiler compiler) {
     this.compiler = compiler;
     this.nodeComments = new NodeComments();
   }

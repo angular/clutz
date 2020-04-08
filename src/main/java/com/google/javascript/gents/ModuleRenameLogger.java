@@ -2,6 +2,7 @@ package com.google.javascript.gents;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.javascript.gents.pass.CollectModuleMetadata;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +24,8 @@ import java.util.Set;
  *
  * <p>Which generates the following log line: foo.bar,buz.ts,A
  */
-class ModuleRenameLogger {
-  static class LogItem {
+public class ModuleRenameLogger {
+  public static class LogItem {
     String originalName;
     String jsFile;
     String defaultRename;
@@ -65,13 +66,13 @@ class ModuleRenameLogger {
 
   private Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-  String generateModuleRewriteLog(
+  public String generateModuleRewriteLog(
       Set<String> filesToConvert, Map<String, CollectModuleMetadata.FileModule> namespaceMap) {
     List<LogItem> items = new ArrayList<>();
     for (Map.Entry<String, CollectModuleMetadata.FileModule> entry : namespaceMap.entrySet()) {
-      String file = entry.getValue().file;
+      String file = entry.getValue().getFile();
       String defaultRename =
-          entry.getValue().exportedNamespacesToSymbols.getOrDefault("exports", "");
+          entry.getValue().getSymbolForNamespace("exports", "");
       if (filesToConvert.contains(file)) {
         items.add(new LogItem(entry.getKey(), file, defaultRename));
       }

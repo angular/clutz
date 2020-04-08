@@ -5,40 +5,40 @@ import java.util.HashMap;
 import java.util.Map;
 
 /** Represents the mapping from an AST Node to its corresponding comment. */
-class NodeComments {
+public class NodeComments {
   private final Map<Node, String> nodeToComment = new HashMap<>();
 
-  void addComment(Node n, String comment) {
+  public void addComment(Node n, String comment) {
     if (hasComment(n)) {
       comment = getComment(n) + comment;
     }
     setComment(n, comment);
   }
 
-  void setComment(Node n, String comment) {
+  public void setComment(Node n, String comment) {
     nodeToComment.put(n, comment);
   }
 
-  boolean hasComment(Node n) {
+  public boolean hasComment(Node n) {
     return nodeToComment.containsKey(n);
   }
 
-  String getComment(Node n) {
+  public String getComment(Node n) {
     return nodeToComment.get(n);
   }
 
-  void clearComment(Node n) {
+  public void clearComment(Node n) {
     nodeToComment.remove(n);
   }
 
-  void moveComment(Node from, Node to) {
+  public void moveComment(Node from, Node to) {
     if (getComment(from) != null) {
       addComment(to, getComment(from));
       clearComment(from);
     }
   }
 
-  void replaceWithComment(Node oldNode, Node newNode) {
+  public void replaceWithComment(Node oldNode, Node newNode) {
     newNode.useSourceInfoFrom(newNode);
     oldNode.replaceWith(newNode);
     moveComment(oldNode, newNode);

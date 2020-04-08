@@ -13,16 +13,16 @@ import java.io.PrintStream;
  *
  * <p>This error manager is a simplified version of the {@code ClutzErrorManager} from Clutz.
  */
-final class GentsErrorManager extends PrintStreamErrorManager {
+public final class GentsErrorManager extends PrintStreamErrorManager {
 
   private final boolean debug;
 
-  static final DiagnosticType GENTS_MODULE_PASS_ERROR =
+  public static final DiagnosticType GENTS_MODULE_PASS_ERROR =
       DiagnosticType.error("GENTS_MODULE_PASS_ERROR", "{0}");
-  static final DiagnosticType GENTS_CLASS_PASS_ERROR =
+  public static final DiagnosticType GENTS_CLASS_PASS_ERROR =
       DiagnosticType.error("GENTS_CLASS_PASS_ERROR", "{0}");
 
-  GentsErrorManager(PrintStream stream, MessageFormatter formatter, boolean debug) {
+  public GentsErrorManager(PrintStream stream, MessageFormatter formatter, boolean debug) {
     super(formatter, stream);
     this.debug = debug;
   }
@@ -41,7 +41,7 @@ final class GentsErrorManager extends PrintStreamErrorManager {
     // Don't do anything
   }
 
-  void doGenerateReport() {
+  public void doGenerateReport() {
     super.generateReport();
   }
 }

@@ -1,4 +1,4 @@
-package com.google.javascript.gents;
+package com.google.javascript.gents.pass;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -6,7 +6,12 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import com.google.javascript.gents.CollectModuleMetadata.FileModule;
+import com.google.javascript.gents.util.NameUtil;
+import com.google.javascript.gents.NodeComments;
+import com.google.javascript.gents.util.PathUtil;
+import com.google.javascript.gents.pass.CollectModuleMetadata.FileModule;
+import com.google.javascript.gents.GentsErrorManager;
+import com.google.javascript.gents.util.GentsNodeUtil;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.JSError;
@@ -59,11 +64,11 @@ public final class ModuleConversionPass implements CompilerPass {
 
   private final String alreadyConvertedPrefix;
 
-  Table<String, String, String> getTypeRewrite() {
+  public Table<String, String, String> getTypeRewrite() {
     return typeRewrite;
   }
 
-  ModuleConversionPass(
+  public ModuleConversionPass(
       AbstractCompiler compiler,
       PathUtil pathUtil,
       NameUtil nameUtil,
