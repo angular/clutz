@@ -365,6 +365,7 @@ public class PlatformSymbols {
           "undefined",
           "unescape",
           "visualViewport",
+          "WebGL2ComputeRenderingContext",
           "WebGL2RenderingContext",
           "WebGLQuery",
           "WebGLSampler",
