@@ -90,7 +90,8 @@ public class DeclarationSyntaxTest {
     // across test cases.
     List<String> goldenFilePaths = new ArrayList<>();
     for (File input : inputs) {
-      goldenFilePaths.add(DeclarationGeneratorTest.getGoldenFile(input, ".d.ts").getPath());
+      goldenFilePaths.add(
+          DeclarationGeneratorTest.normalizeAndReplaceExt(input, ".d.ts").getPath());
     }
 
     List<String> tscCommand = Lists.newArrayList(TSC.toString());

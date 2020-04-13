@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.toList;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
+import com.google.javascript.gents.experimental.ExperimentTracker;
 import com.google.javascript.gents.pass.CollectModuleMetadata;
 import com.google.javascript.gents.pass.CommentLinkingPass;
 import com.google.javascript.gents.pass.ModuleConversionPass;
@@ -85,7 +86,7 @@ public class TypeScriptGenerator {
     }
     TypeScriptGenerator generator = null;
     try {
-      generator = new TypeScriptGenerator(options);
+      generator = new TypeScriptGenerator(options, ExperimentTracker.withoutExperiments());
       generator.generateTypeScript();
       if (generator.hasErrors()) {
         // Already reported through the print stream.
@@ -105,9 +106,11 @@ public class TypeScriptGenerator {
   final PathUtil pathUtil;
   private final NameUtil nameUtil;
   private GentsErrorManager errorManager;
+  private final ExperimentTracker experimentTracker;
 
-  TypeScriptGenerator(Options opts) {
+  TypeScriptGenerator(Options opts, ExperimentTracker experimentTracker) {
     this.opts = opts;
+    this.experimentTracker = experimentTracker;
     this.compiler = new Compiler();
     compiler.disableThreads();
     setErrorStream(System.err);

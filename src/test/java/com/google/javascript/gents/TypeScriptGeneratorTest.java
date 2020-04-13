@@ -6,7 +6,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.google.javascript.clutz.DeclarationGeneratorTest;
+import com.google.javascript.gents.TestUtil.TestInput;
 import com.google.javascript.gents.TypeScriptGenerator.GentsResult;
+import com.google.javascript.gents.experimental.ExperimentTracker;
+import com.google.javascript.gents.experimental.ExperimentTracker.Experiment;
 import com.google.javascript.jscomp.SourceFile;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -27,18 +30,63 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class TypeScriptGeneratorTest {
 
+  private static class SingleTestConfig {
+    private final ExperimentTracker experimentTracker;
+    private final TestInput testInput;
+
+    SingleTestConfig(ExperimentTracker experimentTracker, TestInput testInput) {
+      this.experimentTracker = experimentTracker;
+      this.testInput = testInput;
+    }
+
+    /**
+     * The result from this method is displayed as the text describing a test. This is overridden to
+     * express the input file being transformed as well whether the test does or does not have
+     * experiments enabled.
+     */
+    @Override
+    public String toString() {
+      String result = testInput.getRelativePath();
+      if (experimentTracker.hasEnabledExperiments()) {
+        return result + " (experimental)";
+      }
+      return result;
+    }
+  }
+
   static final String singleTestPath = "singleTests";
 
   static final String TEST_EXTERNS_MAP =
       TypeScriptGeneratorTest.getTestDirPath("test_externs_map.json").toString();
 
-  @Parameters(name = "{index}: {0}")
-  public static Iterable<File> testCases() {
-    return getTestInputFiles(DeclarationGeneratorTest.JS_NO_EXTERNS_OR_ZIP, singleTestPath);
+  @Parameters(name = "Test {index}: {0}")
+  public static Iterable<SingleTestConfig> testCases() throws IOException {
+    List<SingleTestConfig> configs = Lists.newArrayList();
+    List<File> testInputFiles =
+        getTestInputFiles(DeclarationGeneratorTest.JS_NO_EXTERNS_OR_ZIP, singleTestPath);
+    File inputFileRoot = getTestDirPath(singleTestPath).toFile().getCanonicalFile();
+    for (File file : testInputFiles) {
+      TestInput input =
+          new TestInput(
+              inputFileRoot.getAbsolutePath(), TestUtil.getRelativePathTo(file, inputFileRoot));
+
+      configs.add(new SingleTestConfig(ExperimentTracker.withoutExperiments(), input));
+
+      /*
+       * To specify that another experiment should be used, add the Experiment enum
+       * value for that experiment in the withExperiments() method.
+       */
+      configs.add(
+          new SingleTestConfig(
+              ExperimentTracker.withExperiments(Experiment.USE_NODE_COMMENTS), input));
+    }
+    return configs;
   }
 
   static List<File> getTestInputFiles(FilenameFilter filter, String... dir) {
-    File[] testFiles = getTestDirPath(dir).toFile().listFiles(filter);
+    File baseDir = getTestDirPath(dir).toAbsolutePath().toFile();
+
+    File[] testFiles = baseDir.listFiles(filter);
     List<File> filesList = Lists.newArrayList(testFiles);
 
     return DeclarationGeneratorTest.expandZipTestInputFiles(filesList);
@@ -69,14 +117,15 @@ public class TypeScriptGeneratorTest {
     return cleanText;
   }
 
-  private final File input;
+  private final SingleTestConfig config;
 
-  public TypeScriptGeneratorTest(File input) {
-    this.input = input;
+  public TypeScriptGeneratorTest(SingleTestConfig config) {
+    this.config = config;
   }
 
   @Test
   public void runTest() throws Exception {
+    File input = config.testInput.getInputFile();
     Options options;
     if (input.getName().equals("externs_map.js")) {
       options = new Options(TypeScriptGeneratorTest.TEST_EXTERNS_MAP);
@@ -89,11 +138,11 @@ public class TypeScriptGeneratorTest {
       options = new Options();
     }
 
-    TypeScriptGenerator gents = new TypeScriptGenerator(options);
+    TypeScriptGenerator gents = new TypeScriptGenerator(options, config.experimentTracker);
 
     String basename = gents.pathUtil.getFilePathWithoutExtension(input.getName());
     String sourceText = getFileText(input);
-    File goldenFile = DeclarationGeneratorTest.getGoldenFile(input, ".ts");
+    File goldenFile = config.testInput.getGoldenFile(config.experimentTracker);
 
     // * The 'empty' test does not need a goog.module declaration because it
     //   is for verifying a file that contains no contents
@@ -125,6 +174,10 @@ public class TypeScriptGeneratorTest {
     // If the test was run with the UPDATE_GOLDENS environment variable
     // set then the golden file should be updated.
     if (System.getenv("UPDATE_GOLDENS") != null) {
+      File parent = goldenFile.getParentFile();
+      if (parent != null && !parent.exists()) {
+        parent.mkdirs();
+      }
       Files.asCharSink(goldenFile, StandardCharsets.UTF_8).write(transpiledOutput);
     }
 
