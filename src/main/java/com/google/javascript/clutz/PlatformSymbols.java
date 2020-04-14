@@ -513,6 +513,8 @@ public class PlatformSymbols {
           "ConcatParams",
           "ConfirmSiteSpecificExceptionsInformation",
           "Console",
+          "ConstantSourceNode",
+          "ConstantSourceOptions",
           "ConstrainBoolean",
           "ConstrainBooleanParameters",
           "ConstrainDOMString",
