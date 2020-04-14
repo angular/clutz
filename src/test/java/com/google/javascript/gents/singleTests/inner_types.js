@@ -37,6 +37,7 @@ MyClass.InnerTypedefWithAssignment = {};
  */
 MyClass.InnerTypedefNonNullable = {};
 
+// Intentionally loose the nullability.
 /**
  * @typedef {?{
  *     a: number,

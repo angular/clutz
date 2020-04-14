@@ -29,7 +29,6 @@ export interface InnerTypedefNonNullable {
 }
 
 export interface InnerTypedefNullable {
-  //!! Intentionally loose the nullability.
   a: number;
   b: number;
 }

@@ -111,10 +111,7 @@ public class TypeScriptGeneratorTest {
 
   static String getFileText(final File input) throws IOException {
     // SourceFile handles <zipfile>!<jsfile> paths internally.
-    String text = SourceFile.fromFile(input.getPath(), UTF_8).getCode();
-    String cleanText =
-        DeclarationGeneratorTest.GOLDEN_FILE_COMMENTS_REGEXP.matcher(text).replaceAll("");
-    return cleanText;
+    return SourceFile.fromFile(input.getPath(), UTF_8).getCode();
   }
 
   private final SingleTestConfig config;
