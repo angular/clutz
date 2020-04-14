@@ -65,9 +65,9 @@ public class TypeScriptGenerator {
   };
 
   static {
-    // In some environments (Mac OS X programs started from Finder, like your IDE) PATH does
-    // not contain "clang-format". This property allows explicitly configuring its location.
-    String cfLocation = System.getProperty("gents.clangFormat");
+    // In some environments (Mac OS X programs started from Finder, like your IDE) PATH does not
+    // contain "clang-format". This environment variable allows explicitly configuring its location.
+    String cfLocation = System.getenv("GENTS_CLANG_FORMAT");
     if (cfLocation != null) {
       CLANG_FORMAT[0] = cfLocation;
     }
