@@ -1,5 +1,8 @@
 package com.google.javascript.gents;
 
+import static java.util.Comparator.naturalOrder;
+
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.javascript.gents.pass.CollectModuleMetadata;
@@ -69,12 +72,16 @@ public class ModuleRenameLogger {
   public String generateModuleRewriteLog(
       Set<String> filesToConvert, Map<String, CollectModuleMetadata.FileModule> namespaceMap) {
     List<LogItem> items = new ArrayList<>();
-    for (Map.Entry<String, CollectModuleMetadata.FileModule> entry : namespaceMap.entrySet()) {
-      String file = entry.getValue().getFile();
-      String defaultRename =
-          entry.getValue().getSymbolForNamespace("exports", "");
+
+    List<String> namespaces = Lists.newArrayList(namespaceMap.keySet());
+    namespaces.sort(naturalOrder());
+
+    for (String namespace : namespaces) {
+      CollectModuleMetadata.FileModule value = namespaceMap.get(namespace);
+      String file = value.getFile();
+      String defaultRename = value.getSymbolForNamespace("exports", "");
       if (filesToConvert.contains(file)) {
-        items.add(new LogItem(entry.getKey(), file, defaultRename));
+        items.add(new LogItem(namespace, file, defaultRename));
       }
     }
     return gson.toJson(items);

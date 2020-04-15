@@ -1,20 +1,5 @@
 [
   {
-    "originalName": "sideeffect.A",
-    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
-    "defaultRename": ""
-  },
-  {
-    "originalName": "value.B",
-    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
-    "defaultRename": ""
-  },
-  {
-    "originalName": "obj.C",
-    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
-    "defaultRename": ""
-  },
-  {
     "originalName": "both.D",
     "jsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
     "defaultRename": ""
@@ -35,12 +20,27 @@
     "defaultRename": ""
   },
   {
-    "originalName": "unused.W",
+    "originalName": "obj.C",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
+    "defaultRename": ""
+  },
+  {
+    "originalName": "sideeffect.A",
     "jsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
     "defaultRename": ""
   },
   {
     "originalName": "unused.V",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
+    "defaultRename": ""
+  },
+  {
+    "originalName": "unused.W",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
+    "defaultRename": ""
+  },
+  {
+    "originalName": "value.B",
     "jsFile": "src/test/java/com/google/javascript/gents/multiTests/import_rewrite/export.js",
     "defaultRename": ""
   }

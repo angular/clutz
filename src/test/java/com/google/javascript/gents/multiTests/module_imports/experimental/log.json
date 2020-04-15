@@ -1,21 +1,6 @@
 [
   {
-    "originalName": "no.empty.export.with.import",
-    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/import_assignment.js",
-    "defaultRename": ""
-  },
-  {
-    "originalName": "sideeffect.A.B.C",
-    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_sideeffect.js",
-    "defaultRename": ""
-  },
-  {
     "originalName": "both.A.B.C.D",
-    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_both.js",
-    "defaultRename": "D"
-  },
-  {
-    "originalName": "both.A.B.C.D.x",
     "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_both.js",
     "defaultRename": "D"
   },
@@ -25,24 +10,9 @@
     "defaultRename": "D"
   },
   {
-    "originalName": "named.A.B",
-    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_named.js",
-    "defaultRename": ""
-  },
-  {
-    "originalName": "named.A.B.x",
-    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_named.js",
-    "defaultRename": ""
-  },
-  {
-    "originalName": "named.A.B.foo",
-    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_named.js",
-    "defaultRename": ""
-  },
-  {
-    "originalName": "named.A.B.bar",
-    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_named.js",
-    "defaultRename": ""
+    "originalName": "both.A.B.C.D.x",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_both.js",
+    "defaultRename": "D"
   },
   {
     "originalName": "default.A",
@@ -60,12 +30,32 @@
     "defaultRename": ""
   },
   {
+    "originalName": "named.A.B",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_named.js",
+    "defaultRename": ""
+  },
+  {
+    "originalName": "named.A.B.bar",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_named.js",
+    "defaultRename": ""
+  },
+  {
+    "originalName": "named.A.B.foo",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_named.js",
+    "defaultRename": ""
+  },
+  {
+    "originalName": "named.A.B.x",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_named.js",
+    "defaultRename": ""
+  },
+  {
     "originalName": "namespace.A.B",
     "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_namespace.js",
     "defaultRename": ""
   },
   {
-    "originalName": "namespace.A.B.x",
+    "originalName": "namespace.A.B.bar",
     "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_namespace.js",
     "defaultRename": ""
   },
@@ -75,8 +65,18 @@
     "defaultRename": ""
   },
   {
-    "originalName": "namespace.A.B.bar",
+    "originalName": "namespace.A.B.x",
     "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_namespace.js",
+    "defaultRename": ""
+  },
+  {
+    "originalName": "no.empty.export.with.import",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/import_assignment.js",
+    "defaultRename": ""
+  },
+  {
+    "originalName": "sideeffect.A.B.C",
+    "jsFile": "src/test/java/com/google/javascript/gents/multiTests/module_imports/export_sideeffect.js",
     "defaultRename": ""
   }
 ]
