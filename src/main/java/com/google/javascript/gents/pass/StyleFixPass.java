@@ -4,7 +4,7 @@ import static com.google.javascript.rhino.TypeDeclarationsIR.anyType;
 import static com.google.javascript.rhino.TypeDeclarationsIR.arrayType;
 
 import com.google.common.collect.Iterables;
-import com.google.javascript.gents.NodeComments;
+import com.google.javascript.gents.pass.comments.NodeComments;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.NodeTraversal;

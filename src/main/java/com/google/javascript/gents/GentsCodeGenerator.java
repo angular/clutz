@@ -1,6 +1,7 @@
 package com.google.javascript.gents;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.javascript.gents.pass.comments.NodeComments;
 import com.google.javascript.jscomp.CodeConsumer;
 import com.google.javascript.jscomp.CodeGenerator;
 import com.google.javascript.jscomp.CompilerOptions;

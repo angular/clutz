@@ -8,12 +8,13 @@ import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
 import com.google.javascript.gents.experimental.ExperimentTracker;
 import com.google.javascript.gents.pass.CollectModuleMetadata;
-import com.google.javascript.gents.pass.CommentLinkingPass;
 import com.google.javascript.gents.pass.ModuleConversionPass;
 import com.google.javascript.gents.pass.RemoveGoogScopePass;
 import com.google.javascript.gents.pass.StyleFixPass;
 import com.google.javascript.gents.pass.TypeAnnotationPass;
 import com.google.javascript.gents.pass.TypeConversionPass;
+import com.google.javascript.gents.pass.comments.CommentLinkingPass;
+import com.google.javascript.gents.pass.comments.NodeComments;
 import com.google.javascript.gents.util.NameUtil;
 import com.google.javascript.gents.util.PathUtil;
 import com.google.javascript.jscomp.CodeConsumer;
@@ -106,11 +107,9 @@ public class TypeScriptGenerator {
   final PathUtil pathUtil;
   private final NameUtil nameUtil;
   private GentsErrorManager errorManager;
-  private final ExperimentTracker experimentTracker;
 
   TypeScriptGenerator(Options opts, ExperimentTracker experimentTracker) {
     this.opts = opts;
-    this.experimentTracker = experimentTracker;
     this.compiler = new Compiler();
     compiler.disableThreads();
     setErrorStream(System.err);

@@ -1,4 +1,4 @@
-package com.google.javascript.gents;
+package com.google.javascript.gents.pass.comments;
 
 import com.google.javascript.rhino.Node;
 import java.util.HashMap;
