@@ -1,5 +1,6 @@
 package com.google.javascript.gents;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.javascript.gents.pass.comments.NodeComments;
 import com.google.javascript.jscomp.CodeConsumer;
@@ -116,6 +117,54 @@ public class GentsCodeGenerator extends CodeGenerator {
   private boolean maybeOverrideCodeGen(Node n) {
     @Nullable Node parent = n.getParent();
     switch (n.getToken()) {
+      case CLASS:
+        // Get a list of generic types for this class declaration.
+        @SuppressWarnings("unchecked") // TODO(lukemizuhashi): Cast is checked on line below.
+        ImmutableList<String> genericTypeList =
+            (n.getProp(Node.GENERIC_TYPE_LIST) instanceof ImmutableList)
+                ? (ImmutableList<String>) n.getProp(Node.GENERIC_TYPE_LIST)
+                : ImmutableList.<String>of();
+
+        // Get references to all the child nodes of this class declaration.
+        // CLASS               The keyword `class`.
+        //   NAME              The name of this class.
+        //   (EMPTY|NAME)      The name of the parent class, empty otherwise.
+        //   CLASS_MEMBERS     The members of this class.
+        Node className = n.getFirstChild();
+        Node extendedClass = n.getSecondChild();
+        Node classMemebers = n.getLastChild();
+
+        // Get a list of generic types for this class declaration's parent class.
+        @SuppressWarnings("unchecked") // TODO(lukemizuhashi): Cast is checked on line below.
+        ImmutableList<String> extendedGenericTypeList =
+            (extendedClass.getProp(Node.GENERIC_TYPE_LIST) instanceof ImmutableList)
+                ? (ImmutableList<String>) extendedClass.getProp(Node.GENERIC_TYPE_LIST)
+                : ImmutableList.<String>of();
+
+        // If the generic type lists are empty for both this class declaration and its extended
+        // class, there's no need to perform a custom emit.
+        if (genericTypeList.isEmpty() && extendedGenericTypeList.isEmpty()) {
+          return false;
+        }
+
+        add("class "); // CLASS
+
+        add(className); // NAME
+        if (!genericTypeList.isEmpty()) {
+          add("<" + String.join(", ", genericTypeList) + ">"); // < GENERIC_TYPE_LIST >
+        }
+
+        if (extendedClass.isName()) {
+          add("extends ");
+        }
+
+        add(extendedClass); // (EMPTY|NAME)
+        if (extendedClass.isName() && !extendedGenericTypeList.isEmpty()) {
+          add("<" + String.join(", ", extendedGenericTypeList) + ">"); // < GENERIC_TYPE_LIST >
+        }
+
+        add(classMemebers);
+        return true;
       case INDEX_SIGNATURE:
         Node first = n.getFirstChild();
         if (null != first) {

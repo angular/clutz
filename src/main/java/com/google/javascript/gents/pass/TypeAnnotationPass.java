@@ -91,8 +91,51 @@ public final class TypeAnnotationPass implements CompilerPass {
   public void process(Node externs, Node root) {
     NodeTraversal.traverse(compiler, root, new TypeAnnotationConverter());
     NodeTraversal.traverse(compiler, root, new AccessModifierConverter());
+    NodeTraversal.traverse(compiler, root, new TemplateAnnotationConverter());
     for (Node script : root.children()) {
       addTypeOnlyImports(script);
+    }
+  }
+
+  /** Converts @template JSDoc anotations to TypeScript generics syntax. */
+  private static class TemplateAnnotationConverter extends AbstractPostOrderCallback {
+    private static ImmutableList<String> getExtendedTemplateTypeNames(JSDocInfo bestJSDocInfo) {
+      ImmutableList.Builder<String> extendedTemplateTypeNames = ImmutableList.<String>builder();
+      JSTypeExpression baseType = bestJSDocInfo.getBaseType();
+      if (baseType != null) {
+        Node root = baseType.getRoot();
+        if (root != null) {
+          Node firstFirstChild = root.getFirstFirstChild();
+          if (firstFirstChild != null) {
+            Iterable<Node> children = firstFirstChild.children();
+            for (Node child : children) {
+              if (child.isString()) {
+                extendedTemplateTypeNames.add(child.getString());
+              }
+            }
+          }
+        }
+      }
+      return extendedTemplateTypeNames.build();
+    }
+
+    @Override
+    public void visit(NodeTraversal t, Node n, Node parent) {
+      // TODO(lukemizuhashi): Handle @template annotations on methods, as well.
+      if (n.isClass()) {
+        JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
+        if (bestJSDocInfo != null) {
+          n.putProp(Node.GENERIC_TYPE_LIST, bestJSDocInfo.getTemplateTypeNames());
+
+          // If this class declaration extends a class, ...
+          Node extended = n.getSecondChild();
+          if (extended.isName()) {
+            extended.putProp(
+                Node.GENERIC_TYPE_LIST,
+                TemplateAnnotationConverter.getExtendedTemplateTypeNames(bestJSDocInfo));
+          }
+        }
+      }
     }
   }
 

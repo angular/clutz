@@ -87,6 +87,9 @@ public class CommentUtil {
       }
     }
 
+    // Removes @template annotations
+    comment = comment.replaceAll("\\s+\\*\\s+@template(\\s(?!\n)+\\S+)+", "");
+
     return isWhitespaceOnly(comment) ? "" : comment;
   }
 
