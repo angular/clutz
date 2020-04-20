@@ -453,9 +453,9 @@ declare namespace ಠ_ಠ.clutz {
   /**
    * A transform stream (https://streams.spec.whatwg.org/#transform-stream).
    */
-  interface ITransformStream {
-    readable : ReadableStream ;
-    writable : WritableStream ;
+  interface ITransformStream < IN_VALUE , OUT_VALUE > {
+    readable : ReadableStream < OUT_VALUE > ;
+    writable : WritableStream < IN_VALUE > ;
   }
 }
 // Generated from externs.zip//streamsapi.js
@@ -481,7 +481,7 @@ declare namespace ಠ_ಠ.clutz {
   interface ReadableStreamBYOBReader {
     cancel (reason : any ) : Promise < any > ;
     closed : Promise < undefined > ;
-    read (view : ArrayBufferView ) : Promise < { done : boolean , value : any } > ;
+    read < BUFFER > (view : BUFFER ) : Promise < IteratorResult < BUFFER > > ;
     releaseLock ( ) : void ;
   }
 }
@@ -499,23 +499,23 @@ declare namespace ಠ_ಠ.clutz {
    * The ReadableStreamDefaultController constructor cannot be used directly;
    * it only works on a ReadableStream that is in the middle of being constructed.
    */
-  interface ReadableStreamDefaultController {
+  interface ReadableStreamDefaultController < VALUE > {
     close ( ) : void ;
     desiredSize : number ;
-    enqueue (chunk : any ) : void ;
+    enqueue (chunk : VALUE ) : void ;
     error (err : any ) : void ;
   }
 }
 // Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   /**
-   * The ReadableStreamDefaultReader constructor is generally not meant to be used directly;
-   * instead, a stream’s getReader() method should be used.
+   * The ReadableStreamDefaultReader constructor is generally not meant to be used
+   * directly; instead, a stream’s getReader() method should be used.
    */
-  interface ReadableStreamDefaultReader {
+  interface ReadableStreamDefaultReader < VALUE > {
     cancel (reason : any ) : Promise < any > ;
     closed : Promise < undefined > ;
-    read ( ) : Promise < { done : boolean , value : any } > ;
+    read ( ) : Promise < IteratorResult < VALUE > > ;
     releaseLock ( ) : void ;
   }
 }
@@ -527,11 +527,11 @@ declare namespace ಠ_ಠ.clutz {
 }
 // Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
-  interface ReadableStreamSource {
+  interface ReadableStreamSource < VALUE > {
     autoAllocateChunkSize ? : number ;
     cancel ? : (a : any ) => Promise < any > | undefined ;
-    pull ? : (a : ReadableByteStreamController | ReadableStreamDefaultController ) => PromiseLike < any > | undefined ;
-    start ? : (a : ReadableByteStreamController | ReadableStreamDefaultController ) => PromiseLike < any > | undefined ;
+    pull ? : (a : ReadableByteStreamController | ReadableStreamDefaultController < VALUE > ) => PromiseLike < any > | undefined ;
+    start ? : (a : ReadableByteStreamController | ReadableStreamDefaultController < VALUE > ) => PromiseLike < any > | undefined ;
     type ? : string ;
   }
 }
@@ -544,29 +544,29 @@ declare namespace ಠ_ಠ.clutz {
    * This class cannot be directly constructed and is instead passed by the
    * TransformStream to the methods of its transformer.
    */
-  interface TransformStreamDefaultController {
+  interface TransformStreamDefaultController < OUT_VALUE > {
     desiredSize : number ;
-    enqueue (chunk : any ) : void ;
+    enqueue (chunk : OUT_VALUE ) : void ;
     error (reason : any ) : void ;
     terminate ( ) : void ;
   }
 }
 // Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
-  interface TransformStreamTransformer {
-    flush ? : (a : TransformStreamDefaultController ) => PromiseLike < any > | undefined ;
-    start ? : (a : TransformStreamDefaultController ) => PromiseLike < any > | undefined ;
-    transform ? : (a : any , b : TransformStreamDefaultController ) => PromiseLike < any > | undefined ;
+  interface TransformStreamTransformer < IN_VALUE , OUT_VALUE > {
+    flush ? : (a : TransformStreamDefaultController < OUT_VALUE > ) => PromiseLike < any > | undefined ;
+    start ? : (a : TransformStreamDefaultController < OUT_VALUE > ) => PromiseLike < any > | undefined ;
+    transform ? : (a : IN_VALUE , b : TransformStreamDefaultController < OUT_VALUE > ) => PromiseLike < any > | undefined ;
   }
 }
 // Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
-  class WritableStream {
+  class WritableStream < VALUE > {
     private noStructuralTyping_WritableStream : any;
-    constructor (opt_underlyingSink ? : WritableStreamSink , opt_queuingStrategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark ? : number , size ? : (a : any ) => number } ) ;
+    constructor (opt_underlyingSink ? : WritableStreamSink < VALUE > , opt_queuingStrategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark ? : number , size ? : (a : any ) => number } ) ;
     abort (reason : any ) : Promise < undefined > ;
     close ( ) : Promise < undefined > ;
-    getWriter ( ) : WritableStreamDefaultWriter ;
+    getWriter ( ) : WritableStreamDefaultWriter < VALUE > ;
     locked : boolean ;
   }
 }
@@ -582,23 +582,23 @@ declare namespace ಠ_ಠ.clutz {
 }
 // Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
-  interface WritableStreamDefaultWriter {
+  interface WritableStreamDefaultWriter < VALUE > {
     abort (reason : any ) : Promise < undefined > ;
     close ( ) : Promise < undefined > ;
     closed : Promise < undefined > ;
     desiredSize : number ;
     ready : Promise < number > ;
     releaseLock ( ) : void ;
-    write (chunk : any ) : Promise < undefined > ;
+    write (chunk : VALUE ) : Promise < undefined > ;
   }
 }
 // Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
-  interface WritableStreamSink {
+  interface WritableStreamSink < VALUE > {
     abort ? : (a : any ) => PromiseLike < any > | undefined ;
     close ? : ( ) => PromiseLike < any > | undefined ;
     start ? : (a : WritableStreamDefaultController ) => PromiseLike < any > | undefined ;
-    write ? : (a : any , b : WritableStreamDefaultController ) => PromiseLike < any > | undefined ;
+    write ? : (a : VALUE , b : WritableStreamDefaultController ) => PromiseLike < any > | undefined ;
   }
 }
 // Generated from externs.zip//url.js
