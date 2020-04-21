@@ -9,7 +9,6 @@ console.log('为什么这个不好');
 console.log('\u4e3a\u4ec0\u4e48\u8fd9\u4e2a\u4e0d\u597d');
 console.log(`\u4e3a\u4ec0\u4e48\u8fd9\u4e2a\u4e0d\u597d`);
 console.log(`\u4e3a\u4ec0\u4e48\u8fd9\u4e2a\u4e0d\u597d`);
-
 // This test illustrates Gents' current behavior.  Note that unicode characters
 // in literal strings are not preserved.  Also, the code in the string is not
 // emitted as `name as string`.

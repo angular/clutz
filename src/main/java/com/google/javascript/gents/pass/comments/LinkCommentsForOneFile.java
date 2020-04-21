@@ -2,6 +2,7 @@ package com.google.javascript.gents.pass.comments;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.jscomp.parsing.parser.trees.Comment;
@@ -96,18 +97,17 @@ public class LinkCommentsForOneFile implements NodeTraversal.Callback {
       linkCommentBufferToNode(n.getParent());
       return;
     }
-    StringBuilder sb = new StringBuilder();
-    String sep = "\n";
+    List<GeneralComment> generalComments = Lists.newArrayList();
     for (Comment c : commentBuffer) {
-      String comment = CommentUtil.filterCommentContent(c.value, c.type == Comment.Type.JSDOC);
-      if (!comment.isEmpty()) {
-        sb.append(sep).append(comment);
+      String text = CommentUtil.filterCommentContent(c.value, c.type == Comment.Type.JSDOC);
+      int offset = c.getAbsolutePosition();
+      if (!text.isEmpty()) {
+        generalComments.add(GeneralComment.from(text, offset));
       }
     }
 
-    String comment = sb.toString();
-    if (!comment.isEmpty()) {
-      nodeComments.addComment(n, comment);
+    if (!generalComments.isEmpty()) {
+      nodeComments.addComments(n, generalComments);
     }
     commentBuffer.clear();
   }

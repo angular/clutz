@@ -51,6 +51,14 @@ public class SourceExtractor {
     return getSourceFileName(node.getParent());
   }
 
+  public String getFullFileSource(Node node) throws IOException {
+    String name = getSourceFileName(node);
+    if (!this.sourceFiles.containsKey(name)) {
+      return null;
+    }
+    return this.sourceFiles.get(name).getCode();
+  }
+
   /**
    * Gets the original literal code for a node or <code>null</code>.
    *
@@ -60,12 +68,11 @@ public class SourceExtractor {
    */
   @Nullable
   public String getSource(Node node) throws IOException {
-    String name = getSourceFileName(node);
-    if (!this.sourceFiles.containsKey(name)) {
+    String code = getFullFileSource(node);
+    if (code == null) {
       return null;
     }
 
-    SourceFile sf = this.sourceFiles.get(name);
     int offset = node.getSourceOffset();
     int length = node.getLength();
 
@@ -73,6 +80,6 @@ public class SourceExtractor {
       return null;
     }
 
-    return sf.getCode().substring(offset, offset + length);
+    return code.substring(offset, offset + length);
   }
 }

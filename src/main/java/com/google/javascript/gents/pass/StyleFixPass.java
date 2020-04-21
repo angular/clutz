@@ -4,6 +4,7 @@ import static com.google.javascript.rhino.TypeDeclarationsIR.anyType;
 import static com.google.javascript.rhino.TypeDeclarationsIR.arrayType;
 
 import com.google.common.collect.Iterables;
+import com.google.javascript.gents.pass.comments.GeneralComment;
 import com.google.javascript.gents.pass.comments.NodeComments;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerPass;
@@ -12,6 +13,7 @@ import com.google.javascript.jscomp.NodeTraversal.AbstractPostOrderCallback;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Node.TypeDeclarationNode;
 import com.google.javascript.rhino.Token;
+import java.util.List;
 
 /** Fixes the style of the final TypeScript code to be more idiomatic. */
 public final class StyleFixPass extends AbstractPostOrderCallback implements CompilerPass {
@@ -107,9 +109,9 @@ public final class StyleFixPass extends AbstractPostOrderCallback implements Com
         if ("constructor".equals(n.getString())) {
           Node params = n.getFirstChild().getSecondChild();
           Node block = n.getFirstChild().getLastChild();
-          String comment = nodeComments.getComment(n);
+          List<GeneralComment> comments = nodeComments.getComments(n);
 
-          if (!params.hasChildren() && !block.hasChildren() && comment == null) {
+          if (!params.hasChildren() && !block.hasChildren() && comments == null) {
             compiler.reportChangeToEnclosingScope(n);
             n.detach();
           }

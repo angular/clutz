@@ -14,7 +14,6 @@ export class A {
   c: number;
   d: string;
   x: any;
-
   // These are undeclared fields
   u: any;
 

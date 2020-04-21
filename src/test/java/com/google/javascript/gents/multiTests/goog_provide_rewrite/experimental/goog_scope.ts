@@ -66,11 +66,9 @@ Foo.FruitType = {
   APPLE: 1,
   ORANGE: 2
 };
-
 // Manually export enum keys.
 Foo.FruitType['UNKNOWN'] = Foo.Container.UNKNOWN;
 Foo.FruitType['APPLE'] = Foo.Container.APPLE;
 Foo.FruitType['ORANGE'] = Foo.Container.ORANGE;
-
 // -----------------------------------------------------------------------
 const insertGoogScopeContentsAboveMe = true;

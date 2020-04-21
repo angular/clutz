@@ -1,7 +1,6 @@
 // TODO(b/142972217): Add more tests, e.g. with default parameters, aliasing,
 // and multiline blocks.
 export const nop = function() {};
-
 // Function params
 export const oneParam = function(n: number) {};
 
@@ -12,7 +11,6 @@ function withDefaultValue(list: any[] = []) {}
 function undefinedDefault(a: boolean|undefined = undefined) {}
 
 function undefinedDefaultArray(list: any[]|undefined = undefined) {}
-
 // Function returns
 let anyReturn = function(): any {
   return 'hello';
@@ -26,7 +24,6 @@ function typedReturnTwo(): Promise<number> {
   return Promise.resolve(4);
 }
 let partiallyTyped = function(n: number, u1, b: boolean, u2) {};
-
 // Both params and returns
 let complex = function(b: boolean, s: string, x: any): string|null {
   if (b) {
@@ -34,10 +31,8 @@ let complex = function(b: boolean, s: string, x: any): string|null {
   }
   return null;
 };
-
 // Undefined params
 let paramUndef = function(u: undefined, v: undefined) {};
-
 // Void returns
 let retVoid = function(): void {};
 let retUndef = function(): void {};
@@ -68,7 +63,6 @@ const arrowNoJsDoc = (a) => {
   return a;
 };
 const implicitReturnArrow = (a) => a;
-
 // Argument descructuring
 export function namedParams({a}: {a: number}) {}
 

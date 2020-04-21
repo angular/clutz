@@ -2,6 +2,10 @@ package com.google.javascript.gents;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import com.google.javascript.gents.experimental.ExperimentTracker;
+import com.google.javascript.gents.experimental.ExperimentTracker.Experiment;
+import com.google.javascript.gents.pass.comments.GeneralComment;
 import com.google.javascript.gents.pass.comments.NodeComments;
 import com.google.javascript.jscomp.CodeConsumer;
 import com.google.javascript.jscomp.CodeGenerator;
@@ -10,26 +14,74 @@ import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 
 /** Code generator for gents to add TypeScript specific code generation. */
 public class GentsCodeGenerator extends CodeGenerator {
 
+  private final NodeComments astComments;
   private final NodeComments nodeComments;
   private final Map<String, String> externsMap;
   private final SourceExtractor extractor;
+  private final Set<GeneralComment> commentsAlreadyUsed;
+  private final ExperimentTracker experimentTracker;
 
   public GentsCodeGenerator(
       CodeConsumer consumer,
       CompilerOptions options,
+      NodeComments astComments,
       NodeComments nodeComments,
       Map<String, String> externsMap,
-      SourceExtractor extractor) {
+      SourceExtractor extractor,
+      ExperimentTracker experimentTracker) {
     super(consumer, options);
+    this.astComments = astComments;
     this.nodeComments = nodeComments;
+    this.experimentTracker = experimentTracker;
     this.externsMap = externsMap;
     this.extractor = extractor;
+    /*
+     * The 'astComments' are comments associated with Nodes by the AstCommentLinkingPass that
+     * were associated with Nodes directly by JSCompiler.  The 'nodeComments' are comments
+     * associated with Nodes manually by the CommentLinkingPass, and handles some comments
+     * missed by JSCompiler, but also has comments that are also in 'astComments'.
+     *
+     * The set below is used to record which comments have already been emitted to ensure
+     * a comment is not double emitted (which would occur when both the AstCommentLinkingPass
+     * and the CommentLinkingPass know about the comment).
+     */
+    this.commentsAlreadyUsed = Sets.newHashSet();
+  }
+
+  private void addNewComments(List<GeneralComment> comments) {
+    if (comments == null) {
+      return;
+    }
+
+    for (GeneralComment c : comments) {
+      if (commentsAlreadyUsed.contains(c)) {
+        continue;
+      }
+      // CodeGernator.add("\n") doesn't append anything. Fixing the actual bug in Closure Compiler
+      // is difficult. Works around the bug by passing " \n". The extra whitespace is stripped by
+      // Closure and not emitted in the final output of Gents. An exception is when this is the
+      // first line of file Closure doesn't strip the whitespace. TypeScriptGenerator has the
+      // handling logic that removes leading empty lines, including "\n" and " \n".
+      String text = c.getText();
+      if (text.startsWith("/**")) {
+        // Ensure JSDoc comments are on their own line.  When comments are linked to
+        // Nodes, inline JSDoc comments are removed since they are needed in Closure
+        // but are not needed in TypeScript.  Thus, we don't need to worry about
+        // inline JSDoc comments here.
+        add(" \n");
+      }
+      add(text);
+      add(" \n");
+      commentsAlreadyUsed.add(c);
+    }
   }
 
   @Override
@@ -37,15 +89,32 @@ public class GentsCodeGenerator extends CodeGenerator {
     @Nullable Node parent = n.getParent();
     maybeAddNewline(n);
 
-    String comment = nodeComments.getComment(n);
-    if (comment != null) {
-      // CodeGernator.add("\n") doesn't append anything. Fixing the actual bug in Closure Compiler
-      // is difficult. Works around the bug by passing " \n". The extra whitespace is stripped by
-      // Closure and not emitted in the final output of Gents. An exception is when this is the
-      // first line of file Closure doesn't strip the whitespace. TypeScriptGenerator has the
-      // handling logic that removes leading empty lines, including "\n" and " \n".
-      add(" " + comment);
-      add(" \n");
+    if (experimentTracker.isEnabled(Experiment.USE_NODE_COMMENTS)) {
+      // First add any comments from the AstCommentLinkingPass that were found by JSCompiler
+      // and attached to nodes in the AST.
+      addNewComments(astComments.getComments(n));
+      // Next add any comments from the CommentLinkingPass that were not associated to nodes
+      // by JSCompiler but instead where manually attached to nodes in the CommentLinkingPass.
+      // This attaching process is not perfect, and when JSCompiler is able to attach all
+      // comments in a source to a node in the AST, the line below won't be needed.
+      addNewComments(nodeComments.getComments(n));
+    } else {
+      List<GeneralComment> comments = nodeComments.getComments(n);
+      if (comments != null) {
+        StringBuilder builder = new StringBuilder();
+        for (GeneralComment c : comments) {
+          builder.append('\n');
+          builder.append(c.getText());
+        }
+
+        String allComments = builder.toString();
+        if (!allComments.trim().isEmpty()) {
+          add(" " + builder);
+          // see the comment in the addNewComments() method above describing why it is necessary to
+          // add " \n" instead of "\n" to add a newline
+          add(" \n");
+        }
+      }
     }
 
     if (maybeOverrideCodeGen(n)) {

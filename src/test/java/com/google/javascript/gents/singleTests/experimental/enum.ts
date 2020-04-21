@@ -11,11 +11,9 @@ export enum NumEnum {
 }
 
 export enum NonConseqNumEnum {
-
   // Comment A
   A,
   B = 2,
-
   // Comment C
   C,
   D = -2,
@@ -46,7 +44,6 @@ export const OtherEnum = {
 };
 
 export class C {}
-
 // This cannot be easily converted without structurally changing the code.
 // TypeScript does not support inner enums. The enum and the class have to be
 // module level siblings, which would lead to having to rewrite all references

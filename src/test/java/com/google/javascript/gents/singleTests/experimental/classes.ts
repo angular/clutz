@@ -59,6 +59,7 @@ nested.klass = class {};
 
 export class F {
   // inline comment
+
   /**
    * block comment
    */

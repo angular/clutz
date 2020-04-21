@@ -1,5 +1,4 @@
 /* This is not a JSDoc commment. */
-
 /*
  * This is not a JSDoc commment.
  */
@@ -164,7 +163,6 @@
  *   comment here. Note: this test exhibits currently broken behavior in
  *   Gents. The type annotation should have been removed.
  */
-
 /*
  * @param {{}} This type annotation has an empty object literal.
  */

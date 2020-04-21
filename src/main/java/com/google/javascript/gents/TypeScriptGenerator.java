@@ -7,12 +7,14 @@ import com.google.common.collect.Sets;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
 import com.google.javascript.gents.experimental.ExperimentTracker;
+import com.google.javascript.gents.experimental.ExperimentTracker.Experiment;
 import com.google.javascript.gents.pass.CollectModuleMetadata;
 import com.google.javascript.gents.pass.ModuleConversionPass;
 import com.google.javascript.gents.pass.RemoveGoogScopePass;
 import com.google.javascript.gents.pass.StyleFixPass;
 import com.google.javascript.gents.pass.TypeAnnotationPass;
 import com.google.javascript.gents.pass.TypeConversionPass;
+import com.google.javascript.gents.pass.comments.AstCommentLinkingPass;
 import com.google.javascript.gents.pass.comments.CommentLinkingPass;
 import com.google.javascript.gents.pass.comments.NodeComments;
 import com.google.javascript.gents.util.NameUtil;
@@ -28,6 +30,7 @@ import com.google.javascript.jscomp.DiagnosticType;
 import com.google.javascript.jscomp.ErrorFormat;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.SourceFile;
+import com.google.javascript.jscomp.parsing.Config.JsDocParsing;
 import com.google.javascript.rhino.Node;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -107,9 +110,11 @@ public class TypeScriptGenerator {
   final PathUtil pathUtil;
   private final NameUtil nameUtil;
   private GentsErrorManager errorManager;
+  private final ExperimentTracker experimentTracker;
 
   TypeScriptGenerator(Options opts, ExperimentTracker experimentTracker) {
     this.opts = opts;
+    this.experimentTracker = experimentTracker;
     this.compiler = new Compiler();
     compiler.disableThreads();
     setErrorStream(System.err);
@@ -175,11 +180,27 @@ public class TypeScriptGenerator {
     GentsResult result = new GentsResult();
 
     final CompilerOptions compilerOpts = opts.getCompilerOptions();
+    if (experimentTracker.isEnabled(Experiment.USE_NODE_COMMENTS)) {
+      compilerOpts.setParseJsDocDocumentation(JsDocParsing.INCLUDE_ALL_COMMENTS);
+    }
     // Compile javascript code
     compiler.compile(externs, srcFiles, compilerOpts);
 
     Node externRoot = compiler.getRoot().getFirstChild();
     Node srcRoot = compiler.getRoot().getLastChild();
+
+    final NodeComments astComments;
+    if (experimentTracker.isEnabled(Experiment.USE_NODE_COMMENTS)) {
+      // It is important that this pass is the first pass run so that comments can be associated
+      // with the correct nodes in the AST before other passes run and modify the AST.
+      // See the documentation in the AstCommentLinkingPass for more information.
+      AstCommentLinkingPass astCommentPass =
+          new AstCommentLinkingPass(compiler, new SourceExtractor(srcFiles));
+      astCommentPass.process(externRoot, srcRoot);
+      astComments = astCommentPass.getComments();
+    } else {
+      astComments = new NodeComments();
+    }
 
     new RemoveGoogScopePass(compiler).process(externRoot, srcRoot);
 
@@ -228,7 +249,13 @@ public class TypeScriptGenerator {
               @Override
               public CodeGenerator getCodeGenerator(Format outputFormat, CodeConsumer cc) {
                 return new GentsCodeGenerator(
-                    cc, compilerOpts, comments, opts.externsMap, new SourceExtractor(srcFiles));
+                    cc,
+                    compilerOpts,
+                    astComments,
+                    comments,
+                    opts.externsMap,
+                    new SourceExtractor(srcFiles),
+                    experimentTracker);
               }
             };
 

@@ -8,6 +8,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.javascript.gents.GentsErrorManager;
 import com.google.javascript.gents.pass.CollectModuleMetadata.FileModule;
+import com.google.javascript.gents.pass.comments.GeneralComment;
 import com.google.javascript.gents.pass.comments.NodeComments;
 import com.google.javascript.gents.util.GentsNodeUtil;
 import com.google.javascript.gents.util.NameUtil;
@@ -111,7 +112,8 @@ public final class ModuleConversionPass implements CompilerPass {
             commentNode.useSourceInfoFrom(n);
             nodeComments.addComment(
                 commentNode,
-                "\n// gents: force this file to be an ES6 module (no imports or exports)");
+                GeneralComment.from(
+                    "\n// gents: force this file to be an ES6 module (no imports or exports)"));
 
             Node exportNode = new Node(Token.EXPORT, new Node(Token.EXPORT_SPECS, commentNode));
             commentNode.useSourceInfoFromForTree(n);

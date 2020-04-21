@@ -19,9 +19,11 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
 import com.google.javascript.gents.pass.CollectModuleMetadata.FileModule;
+import com.google.javascript.gents.pass.comments.GeneralComment;
 import com.google.javascript.gents.pass.comments.NodeComments;
 import com.google.javascript.gents.util.NameUtil;
 import com.google.javascript.gents.util.PathUtil;
@@ -288,12 +290,18 @@ public final class TypeAnnotationPass implements CompilerPass {
       setTypeExpression(nameNode, type, isReturnType);
       // Remove the part of comment that sets the inline type.
       String toRemove = docInfo.getOriginalCommentString();
-      String nodeComment = nodeComments.getComment(commentNode);
-      if (nodeComment == null) {
+      List<GeneralComment> comments = nodeComments.getComments(commentNode);
+      if (comments == null) {
         return;
       }
-      nodeComment = nodeComment.replaceFirst("\\n?" + Pattern.quote(toRemove), "");
-      nodeComments.setComment(commentNode, nodeComment);
+
+      List<GeneralComment> newComments = Lists.newArrayList();
+      for (GeneralComment c : comments) {
+        String newText = c.getText().replaceFirst("\\n?" + Pattern.quote(toRemove), "");
+        newComments.add(GeneralComment.from(newText, c.getOffset()));
+      }
+
+      nodeComments.setComments(commentNode, newComments);
       compiler.reportChangeToEnclosingScope(commentNode);
     }
 

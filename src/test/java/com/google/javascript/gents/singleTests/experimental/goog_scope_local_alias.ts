@@ -4,7 +4,6 @@ export class Base2 {}
 
 export class Base3 {}
 let localVarNotGoogProvided = 1;
-
 // localVarNotGoogProvided should not be exported
 localVarNotGoogProvided = localVarNotGoogProvided + 1;
 
