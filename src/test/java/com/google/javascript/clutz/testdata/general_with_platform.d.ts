@@ -620,39 +620,6 @@ declare namespace ಠ_ಠ.clutz {
     onabort : ( (a : GlobalEvent ) => any ) | null ;
   }
 }
-// Generated from externs.zip//w3c_geometry1.js
-declare namespace ಠ_ಠ.clutz {
-  class DOMPoint extends DOMPointReadOnly {
-    private noStructuralTyping_DOMPoint : any;
-    constructor (x ? : number , y ? : number , z ? : number , w ? : number ) ;
-    w : number ;
-    x : number ;
-    y : number ;
-    z : number ;
-  }
-}
-// Generated from externs.zip//w3c_geometry1.js
-declare namespace ಠ_ಠ.clutz {
-  class DOMPointInit {
-    private noStructuralTyping_DOMPointInit : any;
-    w : number ;
-    x : number ;
-    y : number ;
-    z : number ;
-  }
-}
-// Generated from externs.zip//w3c_geometry1.js
-declare namespace ಠ_ಠ.clutz {
-  class DOMPointReadOnly {
-    private noStructuralTyping_DOMPointReadOnly : any;
-    constructor (x ? : number , y ? : number , z ? : number , w ? : number ) ;
-    fromPoint (other : DOMPointInit ) : DOMPointReadOnly ;
-    w : number ;
-    x : number ;
-    y : number ;
-    z : number ;
-  }
-}
 // Generated from externs.zip//w3c_mediacapabilities.js
 declare namespace ಠ_ಠ.clutz {
   type AudioConfiguration = { bitrate ? : number , channels ? : any , contentType : string , samplerate ? : number , spatialRendering ? : boolean } ;
