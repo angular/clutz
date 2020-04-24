@@ -8,11 +8,11 @@ export class MyClass {
   constructor(data: {type: InnerTypedefWithAssignment}) {
     this.type = data.type;
   }
+
   /**
    * equal function
    * @export
    */
-
   equals(otherData: MyClass): boolean {
     return this.type.a === otherData.type.a;
   }

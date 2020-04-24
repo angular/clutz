@@ -2,6 +2,7 @@ package com.google.javascript.gents;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.javascript.gents.experimental.ExperimentTracker;
 import com.google.javascript.gents.experimental.ExperimentTracker.Experiment;
@@ -14,6 +15,7 @@ import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,15 +58,45 @@ public class GentsCodeGenerator extends CodeGenerator {
     this.commentsAlreadyUsed = Sets.newHashSet();
   }
 
-  private void addNewComments(List<GeneralComment> comments) {
-    if (comments == null) {
+  /**
+   * Add new comments to the output for a particular node. Priority is given to the comments in
+   * <code>astComments</code>, work is done to ensure comment duplication doesn't occur, and the
+   * comments are added in order by their offset.
+   *
+   * @param astComments The comments determined by the AstCommentLinkingPass a particular node
+   * @param linkedComments The comments determined by the CommentLinkingPass for the same node as
+   *     <code>astComments</code>.
+   */
+  private void addNewComments(
+      List<GeneralComment> astComments, List<GeneralComment> linkedComments) {
+    if (astComments == null && linkedComments == null) {
       return;
     }
 
-    for (GeneralComment c : comments) {
-      if (commentsAlreadyUsed.contains(c)) {
-        continue;
+    List<GeneralComment> comments = Lists.newArrayList();
+    if (astComments != null) {
+      for (GeneralComment c : astComments) {
+        if (commentsAlreadyUsed.contains(c)) {
+          continue;
+        }
+        commentsAlreadyUsed.add(c);
+        comments.add(c);
       }
+    }
+
+    if (linkedComments != null) {
+      for (GeneralComment c : linkedComments) {
+        if (commentsAlreadyUsed.contains(c)) {
+          continue;
+        }
+        commentsAlreadyUsed.add(c);
+        comments.add(c);
+      }
+    }
+
+    comments.sort(Comparator.comparingInt(GeneralComment::getOffset));
+
+    for (GeneralComment c : comments) {
       // CodeGernator.add("\n") doesn't append anything. Fixing the actual bug in Closure Compiler
       // is difficult. Works around the bug by passing " \n". The extra whitespace is stripped by
       // Closure and not emitted in the final output of Gents. An exception is when this is the
@@ -80,7 +112,6 @@ public class GentsCodeGenerator extends CodeGenerator {
       }
       add(text);
       add(" \n");
-      commentsAlreadyUsed.add(c);
     }
   }
 
@@ -90,14 +121,7 @@ public class GentsCodeGenerator extends CodeGenerator {
     maybeAddNewline(n);
 
     if (experimentTracker.isEnabled(Experiment.USE_NODE_COMMENTS)) {
-      // First add any comments from the AstCommentLinkingPass that were found by JSCompiler
-      // and attached to nodes in the AST.
-      addNewComments(astComments.getComments(n));
-      // Next add any comments from the CommentLinkingPass that were not associated to nodes
-      // by JSCompiler but instead where manually attached to nodes in the CommentLinkingPass.
-      // This attaching process is not perfect, and when JSCompiler is able to attach all
-      // comments in a source to a node in the AST, the line below won't be needed.
-      addNewComments(nodeComments.getComments(n));
+      addNewComments(astComments.getComments(n), nodeComments.getComments(n));
     } else {
       List<GeneralComment> comments = nodeComments.getComments(n);
       if (comments != null) {

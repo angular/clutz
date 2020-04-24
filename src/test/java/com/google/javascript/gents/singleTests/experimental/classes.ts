@@ -118,10 +118,10 @@ export class ClassWithNoConstructorJsDocAndProperties {
 class AbstractClass {
   method() {}
 }
+
 /**
  * My abstract class.
  */
-
 class AnotherAbstractClass {
   /**
    * My abstract method.

@@ -15,6 +15,7 @@ export class A {
 /* Still the same block */
 // Yup
 // Here too
+
 /**
  * This is a comment
  *
@@ -22,16 +23,15 @@ export class A {
  * @param notdeleted because this has a description
  * @return this also has a description
  */
-
 // This is just some extra stuff
 let foo = function(deleted: number, notdeleted: number): number {
   return deleted + notdeleted;
 };
+
+// The following comments should be mostly deleted
 /**
  * @param foo description of foo
  */
-
-// The following comments should be mostly deleted
 let x: number;
 
 const xConst: number = 1;
@@ -53,8 +53,8 @@ export class B {
   private privateConstParam: number = 3;
   constructor() {}
 }
-/** @export */
 
+/** @export */
 let m: number = 4;
 
 // head comment
