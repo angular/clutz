@@ -3,6 +3,7 @@ package com.google.javascript.gents;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toList;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
@@ -15,6 +16,7 @@ import com.google.javascript.gents.pass.StyleFixPass;
 import com.google.javascript.gents.pass.TypeAnnotationPass;
 import com.google.javascript.gents.pass.TypeConversionPass;
 import com.google.javascript.gents.pass.comments.AstCommentLinkingPass;
+import com.google.javascript.gents.pass.comments.BlankLineHandler;
 import com.google.javascript.gents.pass.comments.CommentLinkingPass;
 import com.google.javascript.gents.pass.comments.NodeComments;
 import com.google.javascript.gents.util.NameUtil;
@@ -175,9 +177,27 @@ public class TypeScriptGenerator {
 
   /** Returns a map from the basename to the TypeScript code generated for the file. */
   public GentsResult generateTypeScript(
-      Set<String> filesToConvert, List<SourceFile> srcFiles, List<SourceFile> externs)
-      throws AssertionError {
+      Set<String> filesToConvert, List<SourceFile> originalSrcFiles, List<SourceFile> externs)
+      throws IOException {
     GentsResult result = new GentsResult();
+
+    List<SourceFile> srcFiles;
+    if (experimentTracker.isEnabled(Experiment.USE_NODE_COMMENTS)) {
+      // Encode blank line information in the source files.  At the end of the pipeline,
+      // the blank line information encoded in the source files is decoded and used to
+      // ensure the output has the correct number and location of blank lines consistent
+      // with the input source.
+      srcFiles = Lists.newArrayList();
+      for (SourceFile sf : originalSrcFiles) {
+        String code = sf.getCode();
+        String encodedCode = BlankLineHandler.encodeBlankLineInformation(code);
+        srcFiles.add(SourceFile.fromCode(sf.getName(), encodedCode));
+      }
+    } else {
+      // The USE_NODE_COMMENTS experiment is not enabled and so do not
+      // alter the input code to encode blank line information.
+      srcFiles = originalSrcFiles;
+    }
 
     final CompilerOptions compilerOpts = opts.getCompilerOptions();
     if (experimentTracker.isEnabled(Experiment.USE_NODE_COMMENTS)) {
@@ -269,19 +289,31 @@ public class TypeScriptGenerator {
                 .setOutputTypes(true)
                 .build();
 
-        // For whatever reason closure sometimes prefixes the emit with an empty new line. Strip
-        // newlines not present in the original source.
-        CharSequence originalSourceCode =
-            compiler.getSourceFileContentByName(file.getSourceFileName());
+        String decoded;
+        if (experimentTracker.isEnabled(Experiment.USE_NODE_COMMENTS)) {
+          // decode blank line information from the generated source code to
+          // ensure the output has the correct placement of blank lines
+          decoded = BlankLineHandler.decodeBlankLineInformation(tsCode);
+        } else {
+          // The USE_NODE_COMMENTS experiment is not enabled and so blank
+          // line information was not encoded in the original source code.
+          // Thus, no decoding needs to be done.
+          decoded = tsCode;
 
-        Integer originalCount = countBeginningNewlines(originalSourceCode);
-        Integer newCount = countBeginningNewlines(tsCode);
+          // For whatever reason closure sometimes prefixes the emit with an empty new line. Strip
+          // newlines not present in the original source.
+          CharSequence originalSourceCode =
+              compiler.getSourceFileContentByName(file.getSourceFileName());
 
-        if (newCount > originalCount) {
-          tsCode = tsCode.substring(newCount - originalCount);
+          Integer originalCount = countBeginningNewlines(originalSourceCode);
+          Integer newCount = countBeginningNewlines(decoded);
+
+          if (newCount > originalCount) {
+            decoded = decoded.substring(newCount - originalCount);
+          }
         }
 
-        result.sourceFileMap.put(filepath, tryClangFormat(tsCode));
+        result.sourceFileMap.put(filepath, tryClangFormat(decoded));
       } catch (Throwable t) {
         System.err.println("Failed while converting " + file.getSourceFileName());
         t.printStackTrace(System.err);

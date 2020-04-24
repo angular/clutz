@@ -1,3 +1,4 @@
+
 /**
  * Note: As written in .js if num is reassigned by a consumer of the goog.module
  * L and C will still return the original value of '4'.
@@ -8,7 +9,6 @@
  * bindings are immutable and 'export let L' is syntactically preferable.
  */
 export const num = 4;
-
 export const B = function(): number {
   return num;
 };
@@ -20,7 +20,6 @@ export function C(): number {
 export const L = function(): number {
   return num;
 };
-
 export class foo {
   static z: number;
 }

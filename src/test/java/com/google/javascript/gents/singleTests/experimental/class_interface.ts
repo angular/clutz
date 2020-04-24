@@ -1,3 +1,4 @@
+
 // This file contains a mix of different ways of declaring an interface with
 // methods and properties in Closure. The only commonality is that the user
 // meant to write an interface, and attached it to an ES6 class out of
@@ -13,7 +14,6 @@
  */
 export interface IBase {
   a: number;
-
   method1(): boolean;
 
   inferredVoidReturn(a: string): void;
@@ -35,12 +35,13 @@ interface RecordClass {
   /** The number of attempts before giving up. */
   attempts: number;
   foo: boolean;
-
   /**
    * Performs the frobnication according to the given strategy.
    */
+
   frobnicate(strategy: string): boolean;
 }
+
 /**
  * Some non-trivial comments.
  */

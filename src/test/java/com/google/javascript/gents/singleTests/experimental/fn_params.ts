@@ -1,5 +1,7 @@
+
 // Optional Parameters
 export const optParams = function(n: number, s?: string, b?: boolean) {};
+
 // Variadic parameters
 export const restParams = function(n: number, ...r: any[]) {};
 

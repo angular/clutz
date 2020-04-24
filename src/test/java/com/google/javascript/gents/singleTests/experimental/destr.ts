@@ -1,7 +1,8 @@
+
 export class C {
   private a: number;
-  private b: number;
 
+  private b: number;
   /**
    * @param c with default
    */
@@ -12,4 +13,5 @@ export class C {
     this.b = b;
   }
 }
+
 let {x = 0} = {};

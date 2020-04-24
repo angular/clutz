@@ -1,3 +1,4 @@
+
 interface Interface {
   bar(a: string): number;
 }
@@ -19,7 +20,6 @@ class Y implements Interface2, Interface3 {
   bar(a: string): number {
     return 1;
   }
-
   baz(a: string): number {
     return 1;
   }
@@ -28,6 +28,7 @@ class Y implements Interface2, Interface3 {
 export interface StructuralInterface {
   bar(a: string): number;
 }
+
 const structInterfaceImpl: StructuralInterface = {
   bar: function(a: string): number {
     return 1;

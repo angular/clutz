@@ -1,9 +1,9 @@
+
 /**
  * Anonymous class
  */
 export class A {
   a: any;
-
   constructor(a: number) {
     this.a = a;
   }
@@ -15,7 +15,6 @@ export class A {
 export class B {
   a: any;
   b: any;
-
   constructor(a, b) {
     this.a = a;
     this.b = b;
@@ -27,7 +26,6 @@ export class B {
  */
 export class C extends A {
   b: any;
-
   constructor(a, b) {
     super(a);
     this.b = b;
@@ -39,7 +37,6 @@ export class C extends A {
  */
 export class D extends B {
   c: any;
-
   constructor(a, b, c) {
     super(a, b);
     this.c = c;
@@ -54,8 +51,10 @@ export class E extends C {
     super(a, b);
   }
 }
+
 let nested = {};
 nested.klass = class {};
+
 
 export class F {
   // inline comment
@@ -68,6 +67,7 @@ export class F {
   /** Do foo! */
   foo() {}
 
+
   /**
    * Returns phone number.
    */
@@ -79,12 +79,15 @@ export class F {
 /**
  * goog.defineClass with annotation
  */
-export class GoogDefinedClassWithConstructorAnnotation {}
+export class GoogDefinedClassWithConstructorAnnotation {
+  constructor() {}
+}
 
 /**
  * goog.defineClass with deeply nested annotation
  */
 export class GoogDefinedClassWithDeeplyNestedConstructorAnnotation {
+  constructor() {}
   foo() {
     return new class Klass {}
     ();
@@ -107,7 +110,6 @@ export class G {
 
 export class ClassWithNoConstructorJsDocAndProperties {
   private foo: string;
-
   constructor(foo) {
     this.foo = foo;
   }
@@ -116,10 +118,10 @@ export class ClassWithNoConstructorJsDocAndProperties {
 class AbstractClass {
   method() {}
 }
-
 /**
  * My abstract class.
  */
+
 class AnotherAbstractClass {
   /**
    * My abstract method.
@@ -127,4 +129,6 @@ class AnotherAbstractClass {
   anotherMethod() {}
 }
 
-class DecoratedConstructor {}
+class DecoratedConstructor {
+  constructor() {}
+}

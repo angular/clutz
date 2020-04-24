@@ -1,9 +1,9 @@
+
 type Foo = string;
 
 export class A {
   b: any;
   c: number;
-
   constructor(
       public a: number, b: number, c,
       private readonly parameterPropWithInferredType: Foo) {

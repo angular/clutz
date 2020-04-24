@@ -4,5 +4,7 @@ import * as nodef from 'goog:exp.nodef';
 
 both();
 let n = both.num + both.num;
+
 nodef.num;
+
 def();
