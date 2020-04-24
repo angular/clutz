@@ -20,4 +20,11 @@ function /** string */ g(/** number */ x, y, z) {
   return x + y + ' apples' + z;
 }
 
+// a single-line comment
+/**
+ * A JSDoc comment
+ */
+function /** void */ h() {
+}
+
 exports = {Foo, f, g};

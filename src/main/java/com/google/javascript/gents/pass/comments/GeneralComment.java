@@ -55,6 +55,10 @@ public class GeneralComment {
     return offset;
   }
 
+  public boolean isInlineJsDoc() {
+    return text.trim().startsWith("/**") && !text.contains("\n");
+  }
+
   @Override
   public String toString() {
     return "GeneralComment{" + "text='" + text + '\'' + ", offset=" + offset + '}';

@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 /**
@@ -147,6 +148,33 @@ public final class TypeAnnotationPass implements CompilerPass {
     public void visit(NodeTraversal t, Node n, Node parent) {
       JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
       switch (n.getToken()) {
+        case PARAM_LIST:
+          // If a parameter list has JSDoc comments associated with it, it is because those
+          // are inline JSDoc comments that appear just before a function that has a JSDoc comment
+          // as well as an inline comment above it, i.e.
+          //
+          // // a single-line comment
+          // /**
+          //  * A JSDoc comment
+          //  */
+          // function /** string */ h() {
+          // }
+          //
+          // In this case, the inline JSDoc comments should be removed (/** string */ in the
+          // above example).
+          //
+          // Note:  There is an inline JSDoc attached to a parameters list when, as in the example
+          // above, there is a // right before the JSDoc comment of a function with an inline
+          // JSDoc comment for the return type.  If the // comment is not there, the JSDoc return
+          // type annotation is not attached to the parameter list.  In that case, the
+          // OBJECT_PATTERN case below applies, and handles removing the JSDoc return type
+          // annotation.
+          List<GeneralComment> comments = nodeComments.getComments(n);
+          if (comments != null) {
+            nodeComments.setComments(n, comments.stream().filter(it -> !it.isInlineJsDoc()).collect(
+                Collectors.toList()));
+          }
+          break;
           // Fields default to any type
         case MEMBER_VARIABLE_DEF:
           if (bestJSDocInfo != null && bestJSDocInfo.getType() != null) {

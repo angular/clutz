@@ -12,3 +12,9 @@ export function f(x: number, z, y: string): string {
 export function g(x: number, y: string, z: number): string {
   return x + y + ' apples' + z;
 }
+
+// a single-line comment
+/**
+ * A JSDoc comment
+ */
+function h(): void {}
