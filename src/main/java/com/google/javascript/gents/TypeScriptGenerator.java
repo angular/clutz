@@ -92,7 +92,13 @@ public class TypeScriptGenerator {
     }
     TypeScriptGenerator generator = null;
     try {
-      generator = new TypeScriptGenerator(options, ExperimentTracker.withoutExperiments());
+      ExperimentTracker experimentTracker;
+      if (options.enableBlankLineExperiment) {
+        experimentTracker = ExperimentTracker.withExperiments(Experiment.USE_NODE_COMMENTS);
+      } else {
+        experimentTracker = ExperimentTracker.withoutExperiments();
+      }
+      generator = new TypeScriptGenerator(options, experimentTracker);
       generator.generateTypeScript();
       if (generator.hasErrors()) {
         // Already reported through the print stream.
