@@ -29,6 +29,7 @@ import com.google.javascript.jscomp.AbstractCommandLineRunner;
 import com.google.javascript.jscomp.CompilerInput;
 import com.google.javascript.jscomp.DiagnosticType;
 import com.google.javascript.jscomp.ErrorFormat;
+import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.TypedScope;
 import com.google.javascript.jscomp.TypedVar;
@@ -754,6 +755,14 @@ class DeclarationGenerator {
         if (symbolInput == null || symbolInput.isExtern()) continue;
 
         if (shouldSkipVar(symbol)) {
+          continue;
+        }
+
+        // Type inference sometimes creates symbols for undeclared qualified names when narrowing
+        // their type in a flow scope. These should not be emitted and can be detected by noticing
+        // the declaration 'node' is not used as an lvalue.
+        Node nameNode = symbol.getNode();
+        if (!NodeUtil.isLValue(nameNode) && !nameNode.getParent().isExprResult()) {
           continue;
         }
 

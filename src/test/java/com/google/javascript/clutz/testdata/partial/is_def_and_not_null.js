@@ -6,10 +6,12 @@ goog.require('some.C');
  * @param {?some.C} c
  */
 is.def.and.not.null = function (c) {
-  //!! isDefAndNotNull seems to affect the inferencer to start reporting
+  //!! isDefAndNotNull causes the inferencer to start reporting
   //!! some.C as the ? type in compiler.getTopScope().getAllSymbols().
-  //!! I am not sure why that happens, or how to fix it, so for now this
-  //!! test is solely tracking this odd behavior.
+  //!! This is because the when the inferencer narrows a qualified name's type
+  //!! inside a flow scope, it creates a symbol for that name even if it never
+  //!! saw an explicit declaration for that name.
+  //!! This test tracks that Clutz skips emitting a namespace "some.C".
   if (!goog.isDefAndNotNull(some.C)) {
     return c;
   }
