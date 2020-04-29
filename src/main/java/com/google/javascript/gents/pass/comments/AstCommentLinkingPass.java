@@ -116,6 +116,10 @@ public class AstCommentLinkingPass implements CompilerPass {
    * This is used to address bug b/154348732.
    */
   private boolean doesCommentAlignWithInput(Node node, String comment, int offset) {
+    if (node == null || comment == null) {
+      return false;
+    }
+
     try {
       String fileSource = extractor.getFullFileSource(node);
       if (fileSource == null) {
