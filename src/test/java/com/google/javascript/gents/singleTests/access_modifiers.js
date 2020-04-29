@@ -15,6 +15,16 @@ function A() {
   this.d = 0;
   /** @private {number} */
   this.e = 0;
+
+  // Const versions
+  /** @const {number} */
+  this.justConst = 0;
+  /** @public @const {number} */
+  this.publicConst = 0;
+  /** @protected @const {number} */
+  this.protectedConst = 0;
+  /** @private @const {number} */
+  this.privateConst = 0;
 }
 
 // Static field access
@@ -22,6 +32,8 @@ function A() {
 A.sa;
 /** @private {number} */
 A.sb;
+/** @const {number} */
+A.constStatic = 0;
 
 // Method access
 /** @public */

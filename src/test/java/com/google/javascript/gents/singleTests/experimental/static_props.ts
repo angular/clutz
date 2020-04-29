@@ -1,10 +1,10 @@
 
 export class SomeClass {
-  static staticPropWithJsDoc: number = 0;
+  static readonly staticPropWithJsDoc: number = 0;
 
   // Not sure why simple initiliazers get inlined, but more
   // complicated ones are left behind.
-  static staticPropWithJsDocAndNonTrivialInit: number;
+  static readonly staticPropWithJsDocAndNonTrivialInit: number;
 }
 // This is broken, we should at least declare the field like
 SomeClass.staticPropNoJsDoc = 0;

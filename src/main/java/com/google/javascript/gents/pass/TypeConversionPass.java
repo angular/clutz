@@ -394,7 +394,7 @@ public final class TypeConversionPass implements CompilerPass {
 
               // Add visibility directly to param if possible
               moveAccessModifier(declaration, param);
-              markAsConst(declaration, param);
+              maybeMarkAsConst(declaration, param);
               compiler.reportChangeToEnclosingScope(n);
               n.detach();
               return;
@@ -426,12 +426,12 @@ public final class TypeConversionPass implements CompilerPass {
         param.putProp(Node.ACCESS_MODIFIER, Visibility.PUBLIC);
       }
     }
+  }
 
-    /** Mark constructor parameter as constant, so it can be annotated readonly */
-    void markAsConst(ClassMemberDeclaration declaration, Node param) {
-      if (declaration.jsDoc != null && declaration.jsDoc.isConstant()) {
-        param.putBooleanProp(Node.IS_CONSTANT_NAME, true);
-      }
+  /** Mark node as constant, so it can be annotated as 'readonly' later */
+  void maybeMarkAsConst(ClassMemberDeclaration declaration, Node node) {
+    if (declaration.jsDoc != null && declaration.jsDoc.isConstant()) {
+      node.putBooleanProp(Node.IS_CONSTANT_NAME, true);
     }
   }
 
@@ -768,6 +768,7 @@ public final class TypeConversionPass implements CompilerPass {
       nodeComments.clearComment(declaration.exprRoot);
     }
 
+    maybeMarkAsConst(declaration, fieldNode);
     addFieldToClassMembers(classMembers, fieldNode);
     compiler.reportChangeToEnclosingScope(classMembers);
   }

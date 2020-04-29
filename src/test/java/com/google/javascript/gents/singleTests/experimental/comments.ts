@@ -50,7 +50,7 @@ export class B {
   /**
    * My special number.
    */
-  private privateConstParam: number = 3;
+  private readonly privateConstParam: number = 3;
   constructor() {}
 }
 

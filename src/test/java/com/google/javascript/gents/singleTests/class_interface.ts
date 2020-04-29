@@ -22,13 +22,13 @@ export interface IBase {
 }
 
 export interface IExtendsUsingEs6 extends IBase {
-  b: number;
+  readonly b: number;
 
   method2(): boolean;
 }
 
 export interface RExtendsUsingEs6 extends IBase {
-  c: number;
+  readonly c: number;
 }
 
 interface RecordClass {

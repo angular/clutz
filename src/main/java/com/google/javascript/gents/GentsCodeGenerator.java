@@ -148,12 +148,6 @@ public class GentsCodeGenerator extends CodeGenerator {
 
     // Default field values
     switch (n.getToken()) {
-      case MEMBER_VARIABLE_DEF:
-        if (n.hasChildren()) {
-          add(" = ");
-          add(n.getLastChild());
-        }
-        break;
       case NEW:
         // The Closure Compiler code generator drops off the extra () for new statements.
         // We add them back in to maintain a consistent style.
@@ -301,28 +295,41 @@ public class GentsCodeGenerator extends CodeGenerator {
       case NAME:
         // Prepend access modifiers on constructor params
         if (n.getParent().isParamList()) {
-          Visibility visibility = (Visibility) n.getProp(Node.ACCESS_MODIFIER);
-          if (visibility != null) {
-            switch (visibility) {
-              case PRIVATE:
-                add("private ");
-                break;
-              case PROTECTED:
-                add("protected ");
-                break;
-              case PUBLIC:
-                add("public ");
-                break;
-              default:
-                break;
-            }
-          }
-
+          // visibility must come before readonly.
+          addVisibility(n);
           if (n.getBooleanProp(Node.IS_CONSTANT_NAME)) {
             add("readonly ");
           }
         }
         return false;
+      case MEMBER_VARIABLE_DEF:
+        // The Closure code generator does not emit the 'readonly' keyword.
+        // Moreover, TypeScript requires that keywords are in the following order:
+        // [public/private/protected] then "static" then "readonly".
+        // This forces us to take over the whole emit of MEMBER_VARIABLE_DEF
+        // to insert 'readonly' in the correct place.
+
+        addVisibility(n);
+        if (n.getBooleanProp(Node.STATIC_MEMBER)) {
+          add("static ");
+        }
+
+        if (n.getBooleanProp(Node.IS_CONSTANT_NAME)) {
+          add("readonly ");
+        }
+
+        add(n.getString());
+
+        if (n.getDeclaredTypeExpression() != null) {
+          add(":");
+          add(n.getDeclaredTypeExpression());
+        }
+
+        if (n.hasChildren()) {
+          add(" = ");
+          add(n.getLastChild());
+        }
+        return true;
       case ANY_TYPE:
         // Check the externsMap for an alias to use in place of "any"
         String anyTypeName = externsMap.get("any");
@@ -356,6 +363,25 @@ public class GentsCodeGenerator extends CodeGenerator {
         return false;
       default:
         return false;
+    }
+  }
+
+  void addVisibility(Node n) {
+    Visibility visibility = (Visibility) n.getProp(Node.ACCESS_MODIFIER);
+    if (visibility != null) {
+      switch (visibility) {
+        case PRIVATE:
+          add("private ");
+          break;
+        case PROTECTED:
+          add("protected ");
+          break;
+        case PUBLIC:
+          add("public ");
+          break;
+        default:
+          break;
+      }
     }
   }
 }
