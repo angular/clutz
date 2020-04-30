@@ -283,6 +283,15 @@ public final class TypeAnnotationPass implements CompilerPass {
                 || (typedefTypeRoot.getToken() == Token.QMARK)) {
               typedefTypeRoot = typedefTypeRoot.getFirstChild();
             }
+            // For input:
+            //   /*
+            //    * @typedef{{
+            //    *   a: number,
+            //    *   b: number,
+            //    *   c
+            //    * }}
+            //    */
+            // the structure of the JSDoc comment is:
             // (BANG|QMARK)
             //     LC
             //         LB
@@ -292,12 +301,24 @@ public final class TypeAnnotationPass implements CompilerPass {
             //             COLON
             //                 STRING_KEY b
             //                 STRING number
-            for (Node colonNode : typedefTypeRoot.getFirstChild().children()) {
-              Node memberVariableDefNode =
-                  Node.newString(Token.MEMBER_VARIABLE_DEF, colonNode.getFirstChild().getString());
-              memberVariableDefNode.setDeclaredTypeExpression(
-                  convertTypeNodeAST(colonNode.getSecondChild()));
-              n.addChildToBack(memberVariableDefNode);
+            //             STRING_KEY c
+            for (Node colonOrStringNode : typedefTypeRoot.getFirstChild().children()) {
+              if (colonOrStringNode.isStringKey()) {
+                // If the typedef is of the form `key` instead of `key: type`
+                // treat the type as `any` since a type constraint wasn't specified.
+                Node memberVariableDefNode =
+                    Node.newString(Token.MEMBER_VARIABLE_DEF, colonOrStringNode.getString());
+                memberVariableDefNode.setDeclaredTypeExpression(
+                    new TypeDeclarationNode(Token.ANY_TYPE));
+                n.addChildToBack(memberVariableDefNode);
+              } else {
+                Node memberVariableDefNode =
+                    Node.newString(
+                        Token.MEMBER_VARIABLE_DEF, colonOrStringNode.getFirstChild().getString());
+                memberVariableDefNode.setDeclaredTypeExpression(
+                    convertTypeNodeAST(colonOrStringNode.getSecondChild()));
+                n.addChildToBack(memberVariableDefNode);
+              }
             }
           }
           break;

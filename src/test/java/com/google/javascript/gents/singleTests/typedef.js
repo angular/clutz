@@ -37,4 +37,13 @@ const x = 'x';
  */
 let TypeDefWithComment;
 
+/**
+ * @typedef {{
+ *  key1: string,
+ *  key2,
+ *  key3: number
+ * }}
+ */
+let TypeDefWithTypeMissing;
+
 exports = {MyExportedInterface, TypeDefWithComment};

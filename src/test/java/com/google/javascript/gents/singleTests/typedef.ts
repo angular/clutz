@@ -22,3 +22,9 @@ export interface TypeDefWithComment {
   a: string;
   b: string;
 }
+
+interface TypeDefWithTypeMissing {
+  key1: string;
+  key2: any;
+  key3: number;
+}
