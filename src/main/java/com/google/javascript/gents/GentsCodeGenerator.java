@@ -228,6 +228,8 @@ public class GentsCodeGenerator extends CodeGenerator {
                 ? (ImmutableList<String>) extendedClass.getProp(Node.GENERIC_TYPE_LIST)
                 : ImmutableList.<String>of();
 
+        addAbstractKeyword(n);
+
         // If the generic type lists are empty for both this class declaration and its extended
         // class, there's no need to perform a custom emit.
         if (genericTypeList.isEmpty() && extendedGenericTypeList.isEmpty()) {
@@ -361,6 +363,34 @@ public class GentsCodeGenerator extends CodeGenerator {
           add("(");
         }
         return false;
+      case MEMBER_FUNCTION_DEF:
+        // Using WAS_PREVIOUSLY_PROVIDED is a hack, see addAbstractKeyword.
+        // It is set in the GentsCodeGenerator.
+        if (n.getBooleanProp(Node.WAS_PREVIOUSLY_PROVIDED)) {
+          add("abstract ");
+          // We need to take over the emit here to skip emitting the BLOCK
+          // because in TS abstract methods cannot have bodies.
+          // The ast looks like:
+          // MEMBER_FUNCTION_DEF
+          //        FUNCTION
+          //            NAME
+          //            PARAM_LIST
+          //            BLOCK
+          add(n.getString());
+          Node function = n.getFirstChild();
+          add(function.getSecondChild()); // PARAM_LIST
+          add(":");
+          if (function.getDeclaredTypeExpression() != null) {
+            add(function.getDeclaredTypeExpression());
+          } else {
+            // Because in TS there is no body of abstract methods, the return type
+            // of method is always required.
+            add("void");
+          }
+          add(";");
+          return true;
+        }
+        return false;
       default:
         return false;
     }
@@ -382,6 +412,15 @@ public class GentsCodeGenerator extends CodeGenerator {
         default:
           break;
       }
+    }
+  }
+
+  void addAbstractKeyword(Node n) {
+    // This is a hack, we should be using a property like Node.IS_ABSTRACT
+    // but it doesn't exist. So I just picked a random boolean property
+    // that is not likely to be used on a class or member-function-def.
+    if (n.getBooleanProp(Node.WAS_PREVIOUSLY_PROVIDED)) {
+      add("abstract ");
     }
   }
 }

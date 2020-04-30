@@ -65,6 +65,7 @@ public final class TypeConversionPass implements CompilerPass {
         NodeTraversal.traverse(compiler, child, new TypeMemberConverter());
         NodeTraversal.traverse(compiler, child, new FieldOnThisConverter());
         NodeTraversal.traverse(compiler, child, new InheritanceConverter());
+        NodeTraversal.traverse(compiler, child, new AbstractAnnotationConverter());
         NodeTraversal.traverse(compiler, child, new EnumConverter());
       }
     }
@@ -502,6 +503,28 @@ public final class TypeConversionPass implements CompilerPass {
           break;
         case CALL:
           maybeReplaceSuperCall(n);
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  /** Converts @abstract to a node prop. */
+  private static class AbstractAnnotationConverter extends AbstractPostOrderCallback {
+    @Override
+    public void visit(NodeTraversal t, Node n, Node parent) {
+      switch (n.getToken()) {
+        case CLASS:
+        case MEMBER_FUNCTION_DEF:
+          JSDocInfo jsDoc = n.getJSDocInfo();
+          if (jsDoc != null && jsDoc.isAbstract()) {
+            // This is a hack, we should be using a property like Node.IS_ABSTRACT
+            // but it doesn't exist. So I just picked a random boolean property
+            // that is not likely to be used on a class or member-function-def.
+            // This is read in the GentsCodeGenerator.
+            n.putBooleanProp(Node.WAS_PREVIOUSLY_PROVIDED, true);
+          }
           break;
         default:
           break;

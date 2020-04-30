@@ -15,7 +15,7 @@ class ClassA {}
 /**
  * Some comment
  */
-export class SingleInheritance<T, K> extends ClassA {}
+export abstract class SingleInheritance<T, K> extends ClassA {}
 
 export class CorrectTemplateVars<SOME_OTHER_NAME, A_LONG_NAME> extends
     SimpleGenericClass<A_LONG_NAME> {}

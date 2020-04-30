@@ -125,8 +125,23 @@ class ClassWithNoConstructorJsDocAndProperties {
 
 /** @abstract */
 class AbstractClass {
-  /** @abstract */
+  /**
+   * @abstract
+   */
   method() {}
+
+  /**
+   * @abstract
+   * @return {string}
+   */
+  methodWithReturn() {}
+
+  /**
+   * @abstract
+   * @param {string} x
+   * @param {string} y
+   */
+  methodWithParams(x, y) {}
 }
 
 /**
@@ -137,6 +152,7 @@ class AnotherAbstractClass {
   /**
    * My abstract method.
    * @abstract
+   * @return {void}
    */
   anotherMethod() {}
 }

@@ -112,18 +112,22 @@ export class ClassWithNoConstructorJsDocAndProperties {
   }
 }
 
-class AbstractClass {
-  method() {}
+abstract class AbstractClass {
+  abstract method(): void;
+
+  abstract methodWithReturn(): string;
+
+  abstract methodWithParams(x: string, y: string): void;
 }
 
 /**
  * My abstract class.
  */
-class AnotherAbstractClass {
+abstract class AnotherAbstractClass {
   /**
    * My abstract method.
    */
-  anotherMethod() {}
+  abstract anotherMethod(): void;
 }
 
 class DecoratedConstructor {}
