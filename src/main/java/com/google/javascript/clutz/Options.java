@@ -137,7 +137,7 @@ public class Options {
     name = "--skipEmitRegExp",
     usage =
         "Symbols in files that match this RegExp will not be included in the emit. Note that"
-            + "the files would still be part of the internal compilation."
+            + " the files would still be part of the internal compilation."
   )
   String skipEmitRegExp = null;
 
