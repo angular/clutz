@@ -203,11 +203,7 @@ public class BlankLineHandlerTest {
             + "\n"
             + "// GENTS_BLANK_LINE_COUNT: 3\n"
             + ";";
-    final String expectedOutput =
-        "\n"
-            + "\n"
-            + "\n"
-            + "goog.module('some.module');\n"
+    final String expectedOutput = "goog.module('some.module');\n"
             + "\n"
             + "\n"
             + "const x = 0;\n"
@@ -224,5 +220,14 @@ public class BlankLineHandlerTest {
             + "\n;";
     String output = BlankLineHandler.decodeBlankLineInformation(input);
     assertThat(output).isEqualTo(expectedOutput);
+  }
+
+  @Test
+  public void removesLeadingFileBlankLines() {
+    final String input = "\n" + "\n" + "\n" + "const x = 0;\n\nconst y;";
+    final String expectedOutput = "const x = 0;\n\nconst y;\n;";
+    final String encoded = BlankLineHandler.encodeBlankLineInformation(input);
+    final String decoded = BlankLineHandler.decodeBlankLineInformation(encoded);
+    assertThat(decoded).isEqualTo(expectedOutput);
   }
 }

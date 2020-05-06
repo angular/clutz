@@ -1,4 +1,3 @@
-
 import * as ImportedClassExports from './export';
 import {aFunction} from './export';
 import {ImportedClass} from './export';

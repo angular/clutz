@@ -1,4 +1,3 @@
-
 let bar = function(): boolean {
   return true;
 };

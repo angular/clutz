@@ -1,4 +1,3 @@
-
 export class A {
   // Static field access
   protected static sa: number;

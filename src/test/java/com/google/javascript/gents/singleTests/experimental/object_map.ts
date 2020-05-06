@@ -1,4 +1,3 @@
-
 export const map1: {[key: string]: number} = {};
 
 export const map2: {[key: number]: string} = {

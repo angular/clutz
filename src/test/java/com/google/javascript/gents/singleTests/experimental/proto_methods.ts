@@ -1,4 +1,3 @@
-
 let goog: any = {};
 
 /**

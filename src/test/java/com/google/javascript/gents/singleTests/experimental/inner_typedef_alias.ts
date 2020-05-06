@@ -1,4 +1,3 @@
-
 class Inner {}
 
 export class Outer {}

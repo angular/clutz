@@ -1,5 +1,3 @@
-
-
 /* This is not a JSDoc commment. */
 
 /*

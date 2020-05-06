@@ -1,4 +1,3 @@
-
 type Foo = string;
 
 export class A {

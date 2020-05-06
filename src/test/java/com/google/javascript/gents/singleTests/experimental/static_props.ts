@@ -1,4 +1,3 @@
-
 export class SomeClass {
   static readonly staticPropWithJsDoc: number = 0;
 

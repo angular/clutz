@@ -205,19 +205,23 @@ public class BlankLineHandler {
    * comments and ensure the returned text has the correct count and location of blank lines.
    */
   public static String decodeBlankLineInformation(String text) {
+    final String[] lines = normalizeBlankLineInfo(text).split("\n", -1);
+
+    // Processing should start after any blank lines at the start of the file as well
+    // as after any "blank line summary lines" that specifies how many blank lines should
+    // be added to the start of the file.  This is done because the decoding is specifically
+    // designed to ensure there are not any blank lines at the start of file.
+    int startingIndex = 0;
+    while (startingIndex < lines.length && isBlank(lines[startingIndex])) {
+      startingIndex++;
+    }
+    while (startingIndex < lines.length && isBlankLineSummary(lines[startingIndex])) {
+      startingIndex++;
+    }
+
     StringBuilder builder = new StringBuilder();
-    // containsOnlyBlank records whether the content of the
-    // StringBuilder is either empty or contains only 'blank'
-    // characters (whitespace, newlines, etc.).
-    //
-    // This is needed so that if the input to this method
-    // has one or more blank lines at the start of the input,
-    // a newline won't be printed before printing the first
-    // non-blank line.  Without this, the string returned
-    // by this method will contain an incorrect extra blank
-    // line before the non-blank line content.
-    boolean containsOnlyBlank = true;
-    for (String line : normalizeBlankLineInfo(text).split("\n", -1)) {
+    for (int i = startingIndex; i < lines.length; i++) {
+      String line = lines[i];
       if (isBlank(line)) {
         continue;
       }
@@ -228,11 +232,10 @@ public class BlankLineHandler {
           builder.append("\n");
         }
       } else {
-        if (!containsOnlyBlank) {
+        if (i != startingIndex) {
           builder.append("\n");
         }
         builder.append(line);
-        containsOnlyBlank = false;
       }
     }
     return builder.toString();

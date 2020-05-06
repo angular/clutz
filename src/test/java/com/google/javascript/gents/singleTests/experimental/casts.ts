@@ -1,4 +1,3 @@
-
 let x;
 function foo() {
   return 0;

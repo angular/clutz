@@ -1,4 +1,3 @@
-
 let x;
 let n = 4;
 let b = true;

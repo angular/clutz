@@ -1,4 +1,3 @@
-
 export class C {
   private a: number;
 

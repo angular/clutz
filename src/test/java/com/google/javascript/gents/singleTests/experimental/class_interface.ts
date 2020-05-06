@@ -1,4 +1,3 @@
-
 // This file contains a mix of different ways of declaring an interface with
 // methods and properties in Closure. The only commonality is that the user
 // meant to write an interface, and attached it to an ES6 class out of

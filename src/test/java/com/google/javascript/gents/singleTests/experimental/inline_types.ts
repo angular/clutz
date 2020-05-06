@@ -1,4 +1,3 @@
-
 export interface Foo {}
 
 let foo: Foo = {};

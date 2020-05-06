@@ -1,4 +1,3 @@
-
 // 'Function' type
 let nop: Function = function() {};
 

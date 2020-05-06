@@ -1,4 +1,3 @@
-
 import './export_sideeffect';
 import {A} from './export_default';
 import {A as X} from './export_default';
