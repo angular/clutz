@@ -224,7 +224,14 @@ public class BlankLineHandlerTest {
 
   @Test
   public void removesLeadingFileBlankLines() {
-    final String input = "\n" + "\n" + "\n" + "const x = 0;\n\nconst y;";
+    final String input =
+        "\n"
+            + "\n"
+            + "\n"
+            + "// GENTS_BLANK_LINE_COUNT: 10\n"
+            + "\n"
+            + "\n"
+            + "const x = 0;\n\nconst y;";
     final String expectedOutput = "const x = 0;\n\nconst y;\n;";
     final String encoded = BlankLineHandler.encodeBlankLineInformation(input);
     final String decoded = BlankLineHandler.decodeBlankLineInformation(encoded);

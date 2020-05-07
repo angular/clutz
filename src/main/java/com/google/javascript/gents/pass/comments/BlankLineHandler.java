@@ -212,10 +212,8 @@ public class BlankLineHandler {
     // be added to the start of the file.  This is done because the decoding is specifically
     // designed to ensure there are not any blank lines at the start of file.
     int startingIndex = 0;
-    while (startingIndex < lines.length && isBlank(lines[startingIndex])) {
-      startingIndex++;
-    }
-    while (startingIndex < lines.length && isBlankLineSummary(lines[startingIndex])) {
+    while (startingIndex < lines.length
+        && (isBlank(lines[startingIndex]) || isBlankLineSummary(lines[startingIndex]))) {
       startingIndex++;
     }
 
