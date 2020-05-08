@@ -72,7 +72,7 @@ interface PrivateTypedef_ {
 Foo.FruitType = {
   UNKNOWN: 0,
   APPLE: 1,
-  ORANGE: 2
+  ORANGE: 2,
 };
 
 // Manually export enum keys.

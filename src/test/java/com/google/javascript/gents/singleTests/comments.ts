@@ -105,7 +105,7 @@ const ob1 = {
   d: [
     1,  // one the same line as `1,`
     2,
-    3
+    3,
   ],  // one the same line as `3,`
   // on the line after `3,`
   e: new RegExp('pattern', 'g')

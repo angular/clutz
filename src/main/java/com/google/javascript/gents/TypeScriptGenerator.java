@@ -194,7 +194,11 @@ public class TypeScriptGenerator {
     }
 
     final CompilerOptions compilerOpts = opts.getCompilerOptions();
+    // needed to associate comments with nodes for the AstCommentLinkingPass
     compilerOpts.setParseJsDocDocumentation(JsDocParsing.INCLUDE_ALL_COMMENTS);
+    // needed to print trailing commas in object literals, arrays, etc.
+    compilerOpts.setPrettyPrint(true);
+
     // Compile javascript code
     compiler.compile(externs, srcFiles, compilerOpts);
 
