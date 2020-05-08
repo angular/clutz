@@ -4,8 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.javascript.gents.experimental.ExperimentTracker;
-import com.google.javascript.gents.experimental.ExperimentTracker.Experiment;
 import com.google.javascript.gents.pass.comments.GeneralComment;
 import com.google.javascript.gents.pass.comments.NodeComments;
 import com.google.javascript.jscomp.CodeConsumer;
@@ -29,7 +27,6 @@ public class GentsCodeGenerator extends CodeGenerator {
   private final Map<String, String> externsMap;
   private final SourceExtractor extractor;
   private final Set<GeneralComment> commentsAlreadyUsed;
-  private final ExperimentTracker experimentTracker;
 
   public GentsCodeGenerator(
       CodeConsumer consumer,
@@ -37,12 +34,10 @@ public class GentsCodeGenerator extends CodeGenerator {
       NodeComments astComments,
       NodeComments nodeComments,
       Map<String, String> externsMap,
-      SourceExtractor extractor,
-      ExperimentTracker experimentTracker) {
+      SourceExtractor extractor) {
     super(consumer, options);
     this.astComments = astComments;
     this.nodeComments = nodeComments;
-    this.experimentTracker = experimentTracker;
     this.externsMap = externsMap;
     this.extractor = extractor;
     /*
@@ -120,26 +115,7 @@ public class GentsCodeGenerator extends CodeGenerator {
     @Nullable Node parent = n.getParent();
     maybeAddNewline(n);
 
-    if (experimentTracker.isEnabled(Experiment.USE_NODE_COMMENTS)) {
-      addNewComments(astComments.getComments(n), nodeComments.getComments(n));
-    } else {
-      List<GeneralComment> comments = nodeComments.getComments(n);
-      if (comments != null) {
-        StringBuilder builder = new StringBuilder();
-        for (GeneralComment c : comments) {
-          builder.append('\n');
-          builder.append(c.getText());
-        }
-
-        String allComments = builder.toString();
-        if (!allComments.trim().isEmpty()) {
-          add(" " + builder);
-          // see the comment in the addNewComments() method above describing why it is necessary to
-          // add " \n" instead of "\n" to add a newline
-          add(" \n");
-        }
-      }
-    }
+    addNewComments(astComments.getComments(n), nodeComments.getComments(n));
 
     if (maybeOverrideCodeGen(n)) {
       return;

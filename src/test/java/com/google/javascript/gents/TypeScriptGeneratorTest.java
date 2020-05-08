@@ -9,7 +9,6 @@ import com.google.javascript.clutz.DeclarationGeneratorTest;
 import com.google.javascript.gents.TestUtil.TestInput;
 import com.google.javascript.gents.TypeScriptGenerator.GentsResult;
 import com.google.javascript.gents.experimental.ExperimentTracker;
-import com.google.javascript.gents.experimental.ExperimentTracker.Experiment;
 import com.google.javascript.jscomp.SourceFile;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -76,9 +75,11 @@ public class TypeScriptGeneratorTest {
        * To specify that another experiment should be used, add the Experiment enum
        * value for that experiment in the withExperiments() method.
        */
-      configs.add(
-          new SingleTestConfig(
-              ExperimentTracker.withExperiments(Experiment.USE_NODE_COMMENTS), input));
+      // To enable testing an experiment, replace SOME_EXPERIMENT with the experiment
+      // enum value below and uncomment the next lines.
+      // configs.add(
+      //     new SingleTestConfig(
+      //         ExperimentTracker.withExperiments(Experiment.SOME_EXPERIMENT), input));
     }
     return configs;
   }

@@ -1,7 +1,7 @@
 let goog: any = {};
+
 goog.A = class {
   a: any;
-
   constructor(a: number) {
     this.a = a;
   }
@@ -20,6 +20,7 @@ goog.A = class {
     return n > 0;
   }
 };
+
 goog.A.B = {};
 
 /**
@@ -32,15 +33,12 @@ goog.A.B.baz = function(n: number): void {};
  */
 goog.B = class extends goog.A {
   static num: number = 4;
-
   constructor(a) {
     super(a);
   }
-
   static foo(): boolean {
     return false;
   }
-
   static bar(): boolean {
     return true;
   }
@@ -53,7 +51,6 @@ export class A {
 
   static anon() {
     // Anonymous function call
-
     (function() {})();
   }
 }

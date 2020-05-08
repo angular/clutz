@@ -3,21 +3,25 @@ export class A {
   f: any;
   static g: boolean = true;
   static h: any;
+
   b: boolean;
   z: number;
+
   w: any;
+
   n: any = 12;
+
   a: any;
   fieldSetFromArrowFunc: any;
+
   arrowFuncField: any;
+
   functionResultField: any;
   c: number;
   d: string;
   x: any;
-
   // These are undeclared fields
   u: any;
-
   constructor(public parameterProp: number, objectParam: {
     foo: {bar: () => number}
   }) {
@@ -33,6 +37,7 @@ export class A {
 
   foo() {
     this.c = 4;
+
     this.n = 14;
     this.x = this.a;
   }

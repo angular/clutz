@@ -11,5 +11,7 @@ let a: X = A.valA;
 let b: A.typA = A.valA;
 let c: X = A.valA;
 let d: A.typA = A.valA;
+
 let e: B.typB = B.valB;
+
 let foo = function(f: foo, g: typC, h: typD, i: E) {};

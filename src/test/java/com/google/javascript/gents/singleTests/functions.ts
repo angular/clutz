@@ -1,5 +1,6 @@
 // TODO(b/142972217): Add more tests, e.g. with default parameters, aliasing,
 // and multiline blocks.
+
 export const nop = function() {};
 
 // Function params
@@ -25,6 +26,7 @@ function typedReturn(): number {
 function typedReturnTwo(): Promise<number> {
   return Promise.resolve(4);
 }
+
 let partiallyTyped = function(n: number, u1, b: boolean, u2) {};
 
 // Both params and returns
@@ -36,37 +38,51 @@ let complex = function(b: boolean, s: string, x: any): string|null {
 };
 
 // Undefined params
+
 let paramUndef = function(u: undefined, v: undefined) {};
 
 // Void returns
+
 let retVoid = function(): void {};
+
 let retUndef = function(): void {};
+
 let retUndefTwo = function(): void {
   return undefined;
 };
+
 let retUndefThree = async function(): Promise<void> {
   return undefined;
 };
+
 let retUndefFour = async function(): Promise<void> {
   return undefined;
 };
+
 let retUndefFive = async function(): Promise<void> {};
+
 let retUndefSix = async function(): Promise<any> {};
+
 let retMaybeNumber = async function(): Promise<number|null> {
   return 0;
 };
+
 const arrowWithJsDoc = (a: number): number => {
   return a;
 };
+
 const arrowWithJsDocAndParens = (a: number): number => {
   return a;
 };
+
 const arrowWithJsDocMultiArg = (a: number, b: number): number => {
   return a;
 };
+
 const arrowNoJsDoc = (a) => {
   return a;
 };
+
 const implicitReturnArrow = (a) => a;
 
 // Argument descructuring

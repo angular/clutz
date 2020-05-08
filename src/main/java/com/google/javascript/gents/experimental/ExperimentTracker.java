@@ -13,17 +13,7 @@ public class ExperimentTracker {
    * the codebase or are under development and will be soon used in the codebase.
    */
   public enum Experiment {
-    /**
-     * Prior to this experiment, Gents used the JSCompiler `Compiler.getAllComments()` method to get
-     * all Comments in the CommentLinkingPass. Then based on the position of those comments in the
-     * code, each comment was attached to a Node in the AST. This approach was problematic and
-     * resulted in comments being attached to the wrong node.
-     *
-     * <p>In this experiment, the `setParseJsDocDocumentation(JsDocParsing.INCLUDE_ALL_COMMENTS)`
-     * JSCompiler parser flag will be used so that the compiler itself attaches comments to nodes in
-     * the AST.
-     */
-    USE_NODE_COMMENTS
+    // the current codebase does not have any active experiments
   }
 
   /** The current active experiments */

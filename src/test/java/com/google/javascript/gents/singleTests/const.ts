@@ -9,7 +9,6 @@ export function foo() {}
 class A {
   y: Object;
   x: any;
-
   constructor() {
     this.x = function() {
       console.log('before');

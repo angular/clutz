@@ -15,7 +15,9 @@ export const bar = function(s: string|null): boolean|null {
 
 // Union types
 let sn: string|number = 9;
+
 let snb: string|number|null|boolean = false;
+
 let manyNulls: string|null|number|string|null = null;
 
 export const baz = function(s: number|string|null): null|boolean {

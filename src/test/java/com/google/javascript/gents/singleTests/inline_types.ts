@@ -1,5 +1,7 @@
 export interface Foo {}
+
 let foo: Foo = {};
+
 const x: string = 'fruit';
 
 export function f(x: number, z, y: string): string {

@@ -3,7 +3,6 @@ export class A {
   protected static sa: number;
   private static sb: number;
   static readonly constStatic: number = 0;
-
   // Field access
   a: number = 0;
   b: number = 0;
@@ -19,15 +18,11 @@ export class A {
 
   // Method access
   foo() {}
-
   protected bar() {}
-
   private baz() {}
 
   // Static method access
   static fizzbuzz() {}
-
   protected static fizz() {}
-
   private static buzz() {}
 }

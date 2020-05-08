@@ -1,7 +1,6 @@
 export class MyClass {
   /** @export type property*/
   type: InnerTypedefWithAssignment;
-
   /**
    * Constructor for MyClass
    */
@@ -17,26 +16,21 @@ export class MyClass {
     return this.type.a === otherData.type.a;
   }
 }
-
 export interface InnerTypedefWithAssignment {
   a: number;
   b: number;
 }
-
 export interface InnerTypedefNonNullable {
   a: number;
   b: number;
 }
-
 export interface InnerTypedefNullable {
   a: number;
   b: number;
 }
-
 export interface InnerTypedef {
   a: number;
 }
-
 export interface InnerTypedefWithNestedTypes {
   a: {b: {c: number}};
   d: string;
@@ -54,6 +48,9 @@ interface Typedef {
   a: {b: {c: number}};
 }
 type MyStringType = string;
+
 type MyStringTypeNonNullable = string;
+
 type MyStringTypeNullable = string|null;
+
 type MyAny = any;

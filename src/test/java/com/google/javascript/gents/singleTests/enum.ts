@@ -2,6 +2,7 @@ enum NumEnumNoExport {
   A,
   B = 1000
 }
+
 /**
  * A non-trivial comment.
  */
@@ -11,11 +12,9 @@ export enum NumEnum {
 }
 
 export enum NonConseqNumEnum {
-
   // Comment A
   A,
   B = 2,
-
   // Comment C
   C,
   D = -2,
@@ -52,6 +51,7 @@ export class C {}
 // module level siblings, which would lead to having to rewrite all references
 // too. Moreover, even checking this is makes the Syntax tests fail, because
 // we do not move it to a static declaration.
+
 C.InnerEnum = {
   A: 0,
   B: 1

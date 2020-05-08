@@ -5,7 +5,6 @@ export class SomeClass {
   // complicated ones are left behind.
   static readonly staticPropWithJsDocAndNonTrivialInit: number;
 }
-
 // This is broken, we should at least declare the field like
 SomeClass.staticPropNoJsDoc = 0;
 SomeClass.staticPropWithJsDocAndNonTrivialInit = 1 + 1;

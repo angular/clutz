@@ -11,6 +11,8 @@ export interface MyExportedInterface {
   x: string;
   y: number;
 }
+
+
 const x: MyString = 'x';
 
 /**

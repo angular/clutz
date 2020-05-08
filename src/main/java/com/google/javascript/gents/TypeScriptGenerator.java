@@ -8,7 +8,6 @@ import com.google.common.collect.Sets;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
 import com.google.javascript.gents.experimental.ExperimentTracker;
-import com.google.javascript.gents.experimental.ExperimentTracker.Experiment;
 import com.google.javascript.gents.pass.CollectModuleMetadata;
 import com.google.javascript.gents.pass.ModuleConversionPass;
 import com.google.javascript.gents.pass.RemoveGoogScopePass;
@@ -92,12 +91,8 @@ public class TypeScriptGenerator {
     }
     TypeScriptGenerator generator = null;
     try {
-      ExperimentTracker experimentTracker;
-      if (options.enableBlankLineExperiment) {
-        experimentTracker = ExperimentTracker.withExperiments(Experiment.USE_NODE_COMMENTS);
-      } else {
-        experimentTracker = ExperimentTracker.withoutExperiments();
-      }
+      // options.enableBlankLineExperiment is now a no-op
+      ExperimentTracker experimentTracker = ExperimentTracker.withoutExperiments();
       generator = new TypeScriptGenerator(options, experimentTracker);
       generator.generateTypeScript();
       if (generator.hasErrors()) {
@@ -187,46 +182,32 @@ public class TypeScriptGenerator {
       throws IOException {
     GentsResult result = new GentsResult();
 
-    List<SourceFile> srcFiles;
-    if (experimentTracker.isEnabled(Experiment.USE_NODE_COMMENTS)) {
-      // Encode blank line information in the source files.  At the end of the pipeline,
-      // the blank line information encoded in the source files is decoded and used to
-      // ensure the output has the correct number and location of blank lines consistent
-      // with the input source.
-      srcFiles = Lists.newArrayList();
-      for (SourceFile sf : originalSrcFiles) {
-        String code = sf.getCode();
-        String encodedCode = BlankLineHandler.encodeBlankLineInformation(code);
-        srcFiles.add(SourceFile.fromCode(sf.getName(), encodedCode));
-      }
-    } else {
-      // The USE_NODE_COMMENTS experiment is not enabled and so do not
-      // alter the input code to encode blank line information.
-      srcFiles = originalSrcFiles;
+    // Encode blank line information in the source files.  At the end of the pipeline,
+    // the blank line information encoded in the source files is decoded and used to
+    // ensure the output has the correct number and location of blank lines consistent
+    // with the input source.
+    List<SourceFile> srcFiles = Lists.newArrayList();
+    for (SourceFile sf : originalSrcFiles) {
+      String code = sf.getCode();
+      String encodedCode = BlankLineHandler.encodeBlankLineInformation(code);
+      srcFiles.add(SourceFile.fromCode(sf.getName(), encodedCode));
     }
 
     final CompilerOptions compilerOpts = opts.getCompilerOptions();
-    if (experimentTracker.isEnabled(Experiment.USE_NODE_COMMENTS)) {
-      compilerOpts.setParseJsDocDocumentation(JsDocParsing.INCLUDE_ALL_COMMENTS);
-    }
+    compilerOpts.setParseJsDocDocumentation(JsDocParsing.INCLUDE_ALL_COMMENTS);
     // Compile javascript code
     compiler.compile(externs, srcFiles, compilerOpts);
 
     Node externRoot = compiler.getRoot().getFirstChild();
     Node srcRoot = compiler.getRoot().getLastChild();
 
-    final NodeComments astComments;
-    if (experimentTracker.isEnabled(Experiment.USE_NODE_COMMENTS)) {
-      // It is important that this pass is the first pass run so that comments can be associated
-      // with the correct nodes in the AST before other passes run and modify the AST.
-      // See the documentation in the AstCommentLinkingPass for more information.
-      AstCommentLinkingPass astCommentPass =
-          new AstCommentLinkingPass(compiler, new SourceExtractor(srcFiles));
-      astCommentPass.process(externRoot, srcRoot);
-      astComments = astCommentPass.getComments();
-    } else {
-      astComments = new NodeComments();
-    }
+    // It is important that this pass is the first pass run so that comments can be associated
+    // with the correct nodes in the AST before other passes run and modify the AST.
+    // See the documentation in the AstCommentLinkingPass for more information.
+    AstCommentLinkingPass astCommentPass =
+        new AstCommentLinkingPass(compiler, new SourceExtractor(srcFiles));
+    astCommentPass.process(externRoot, srcRoot);
+    final NodeComments astComments = astCommentPass.getComments();
 
     new RemoveGoogScopePass(compiler).process(externRoot, srcRoot);
 
@@ -280,8 +261,7 @@ public class TypeScriptGenerator {
                     astComments,
                     comments,
                     opts.externsMap,
-                    new SourceExtractor(srcFiles),
-                    experimentTracker);
+                    new SourceExtractor(srcFiles));
               }
             };
 
@@ -295,29 +275,9 @@ public class TypeScriptGenerator {
                 .setOutputTypes(true)
                 .build();
 
-        String decoded;
-        if (experimentTracker.isEnabled(Experiment.USE_NODE_COMMENTS)) {
-          // decode blank line information from the generated source code to
-          // ensure the output has the correct placement of blank lines
-          decoded = BlankLineHandler.decodeBlankLineInformation(tsCode);
-        } else {
-          // The USE_NODE_COMMENTS experiment is not enabled and so blank
-          // line information was not encoded in the original source code.
-          // Thus, no decoding needs to be done.
-          decoded = tsCode;
-
-          // For whatever reason closure sometimes prefixes the emit with an empty new line. Strip
-          // newlines not present in the original source.
-          CharSequence originalSourceCode =
-              compiler.getSourceFileContentByName(file.getSourceFileName());
-
-          Integer originalCount = countBeginningNewlines(originalSourceCode);
-          Integer newCount = countBeginningNewlines(decoded);
-
-          if (newCount > originalCount) {
-            decoded = decoded.substring(newCount - originalCount);
-          }
-        }
+        // decode blank line information from the generated source code to
+        // ensure the output has the correct placement of blank lines
+        String decoded = BlankLineHandler.decodeBlankLineInformation(tsCode);
 
         result.sourceFileMap.put(filepath, tryClangFormat(decoded));
       } catch (Throwable t) {
@@ -333,23 +293,6 @@ public class TypeScriptGenerator {
             .generateModuleRewriteLog(filesToConvert, modulePrePass.getNamespaceMap());
     errorManager.doGenerateReport();
     return result;
-  }
-
-  private Integer countBeginningNewlines(CharSequence originalSourceCode) {
-    Integer originalCount = 0;
-    for (Integer i = 0; i < originalSourceCode.length(); i++) {
-      // There's a terrible hack in GentsCodeGenerator that it sometimes adds " \n" instead of "\n".
-      // Count and strip that too.
-      if (originalSourceCode.charAt(i) == '\n'
-          || (originalSourceCode.charAt(i) == ' '
-              && i + 1 < originalSourceCode.length()
-              && originalSourceCode.charAt(i + 1) == '\n')) {
-        originalCount += 1;
-      } else {
-        break;
-      }
-    }
-    return originalCount;
   }
 
   /**

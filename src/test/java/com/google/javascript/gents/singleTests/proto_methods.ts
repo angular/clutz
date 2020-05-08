@@ -5,7 +5,6 @@ let goog: any = {};
  */
 goog.A = class {
   a: any;
-
   constructor(a: number) {
     this.a = a;
   }
@@ -23,7 +22,6 @@ goog.A = class {
  */
 export class B extends goog.A {
   b: any;
-
   constructor(a: number, b: boolean) {
     super(a);
     this.b = b;
@@ -56,7 +54,6 @@ goog.B = class extends goog.A {
   constructor(a) {
     super(a);
   }
-
   foo(): number {
     return 0;
   }

@@ -13,7 +13,6 @@
  */
 export interface IBase {
   a: number;
-
   method1(): boolean;
 
   inferredVoidReturn(a: string): void;
@@ -41,6 +40,7 @@ interface RecordClass {
    */
   frobnicate(strategy: string): boolean;
 }
+
 /**
  * Some non-trivial comments.
  */

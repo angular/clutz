@@ -35,6 +35,9 @@ class TimePiece {
 function getArray3(arr: AnyDuringTs37Migration[]): AnyDuringTs37Migration[] {
   return [];
 }
+
 const x1: AnyDuringTs37Migration[] = [];
+
 const y1: AnyDuringTs37Migration[] = [];
+
 const z1 = [];
