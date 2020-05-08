@@ -10,7 +10,7 @@ declare namespace ಠ_ಠ.clutz.index_signature {
     [ key: number ]: any ;
     length : number ;
   }
-  class ImplementsIArrayLikeWithGeneric < T > implements ArrayLike < T > {
+  class ImplementsIArrayLikeWithGeneric < T = any > implements ArrayLike < T > {
     private noStructuralTyping_index_signature_ImplementsIArrayLikeWithGeneric : any;
     [ key: number ]: T ;
     length : number ;
@@ -23,7 +23,7 @@ declare namespace ಠ_ಠ.clutz.index_signature {
     private noStructuralTyping_index_signature_ImplementsIObjectLikeBare : any;
     [ /* warning: coerced from ? */ key: string ]: any ;
   }
-  class ImplementsIObjectWithGeneric < T > implements IObject < string , T > {
+  class ImplementsIObjectWithGeneric < T = any > implements IObject < string , T > {
     private noStructuralTyping_index_signature_ImplementsIObjectWithGeneric : any;
     [ key: string ]: T ;
   }

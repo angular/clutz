@@ -2,7 +2,6 @@
 declare namespace ಠ_ಠ.clutz.implements_iterable {
   class ImplIterable implements Iterable < string > {
     private noStructuralTyping_implements_iterable_ImplIterable : any;
-    [Symbol.iterator]():  Iterator < string > ;
   }
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/implements_iterable_with_platform.js
@@ -12,9 +11,8 @@ declare module 'goog:implements_iterable.ImplIterable' {
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/implements_iterable_with_platform.js
 declare namespace ಠ_ಠ.clutz.implements_iterable {
-  class ImplIterableGeneric < T > implements Iterable < T > {
+  class ImplIterableGeneric < T = any > implements Iterable < T > {
     private noStructuralTyping_implements_iterable_ImplIterableGeneric : any;
-    [Symbol.iterator]():  Iterator < any > ;
   }
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/implements_iterable_with_platform.js

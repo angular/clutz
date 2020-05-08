@@ -5,7 +5,7 @@ declare namespace ಠ_ಠ.clutz.static_this_templated_prop {
    */
   class SomeContainer {
     private noStructuralTyping_static_this_templated_prop_SomeContainer : any;
-    static nestedClass < SCOPE > (this : SCOPE ) : void ;
+    static nestedClass < SCOPE = any > (this : SCOPE ) : void ;
   }
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/static_this_templated_prop.js

@@ -98,7 +98,7 @@ declare namespace ಠ_ಠ.clutz.namespace {
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.externs.js
 declare namespace ಠ_ಠ.clutz.namespace.atypedef {
-  class Cache < T > {
+  class Cache < T = any > {
     private noStructuralTyping_namespace_atypedef_Cache : any;
     destroy ( ) : any ;
     get (key : string ) : T ;

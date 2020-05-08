@@ -1,6 +1,6 @@
 // Generated from src/test/java/com/google/javascript/clutz/testdata/shouldResolveNamedTypes/index.js
 declare namespace ಠ_ಠ.clutz.namedType {
-  class A < U > {
+  class A < U = any > {
     private noStructuralTyping_namedType_A : any;
     fn (a : ಠ_ಠ.clutz.namedType.D < U > ) : any ;
   }
@@ -12,7 +12,7 @@ declare module 'goog:namedType.A' {
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/shouldResolveNamedTypes/dep.js
 declare namespace ಠ_ಠ.clutz.namedType {
-  class D < T > {
+  class D < T = any > {
     private noStructuralTyping_namedType_D : any;
   }
 }

@@ -13,3 +13,7 @@ declare namespace ಠ_ಠ.clutz {
     private noStructuralTyping_module$contents$module$Foo$Legacy_A : any;
   }
 }
+// Generated from src/test/java/com/google/javascript/clutz/testdata/goog_module_declare_legacy.js
+declare namespace ಠ_ಠ.clutz {
+  export import module$exports$module$Foo$Legacy = ಠ_ಠ.clutz.module$contents$module$Foo$Legacy_A ;
+}

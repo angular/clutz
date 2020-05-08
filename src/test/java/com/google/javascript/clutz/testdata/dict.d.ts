@@ -7,7 +7,7 @@ declare namespace ಠ_ಠ.clutz.dict {
   }
   class DictClass {
     private noStructuralTyping_dict_DictClass : any;
-    constructor (n : any ) ;
+    constructor (n ? : any ) ;
     [ key: string ]: any ;
     foo ( ) : void ;
   }

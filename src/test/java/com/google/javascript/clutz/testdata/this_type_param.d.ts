@@ -5,7 +5,7 @@ declare namespace ಠ_ಠ.clutz.nsThis {
     bar ( ) : ಠ_ಠ.clutz.nsThis.C ;
     foo ( ) : this ;
     foo2 (str : string ) : this ;
-    foo3 < THIS > (this : THIS , arr : THIS [] ) : this ;
+    foo3 < THIS = any > (this : THIS , arr : THIS [] ) : this ;
   }
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/this_type_param.js
@@ -26,7 +26,7 @@ declare module 'goog:nsThis.D' {
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/this_type_param.js
 declare namespace ಠ_ಠ.clutz.nsThis {
-  function arrayMap < THIS , VALUE > (callback : ( (this : THIS , a : VALUE , b : number ) => any ) | null , reciever ? : THIS ) : void ;
+  function arrayMap < THIS = any , VALUE = any > (callback : ( (this : THIS , a : VALUE , b : number ) => any ) | null , reciever ? : THIS ) : void ;
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/this_type_param.js
 declare module 'goog:nsThis.arrayMap' {

@@ -12,7 +12,7 @@ declare module 'goog:googmodule.Required' {
 // Generated from src/test/java/com/google/javascript/clutz/testdata/googModule/goog_module.js
 declare namespace ಠ_ಠ.clutz.module$exports$googmodule$TheModule {
   let a : number ;
-  let b : number ;
+  export import b = ಠ_ಠ.clutz.module$exports$googmodule$requiredModule.rm ;
   let required : ಠ_ಠ.clutz.googmodule.Required ;
   let requiredDefault : module$exports$googmodule$requiredModuleDefault ;
 }

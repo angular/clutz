@@ -12,7 +12,7 @@ declare namespace ಠ_ಠ.clutz.typedef {
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/typealias_wrong_jsdoc.js
 declare namespace ಠ_ಠ.clutz.typedef.C {
-  type T = (a : any ) => any ;
+  type T = (a ? : any ) => any ;
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/typealias_wrong_jsdoc.js
 declare module 'goog:typedef.C' {

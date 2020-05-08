@@ -153,12 +153,12 @@ declare namespace ಠ_ಠ.clutz {
   class OffscreenCanvas implements GlobalEventTarget , Transferable {
     private noStructuralTyping_OffscreenCanvas : any;
     constructor (width : number , height : number ) ;
-    addEventListener < THIS > (type : string , listener : EventListener | null | ( (this : THIS , a : GlobalEvent ) => any ) , opt_options ? : boolean | AddEventListenerOptions ) : void ;
+    addEventListener < THIS = any > (type : string , listener : EventListener | null | ( (this : THIS , a : GlobalEvent ) => any ) , opt_options ? : boolean | AddEventListenerOptions ) : void ;
     convertToBlob (opt_options ? : { quality ? : number , type ? : string } ) : Promise < Blob > ;
     dispatchEvent (evt : GlobalEvent ) : boolean ;
     getContext (contextId : string , opt_options ? : GlobalObject ) : GlobalObject ;
     height : number ;
-    removeEventListener < THIS > (type : string , listener : EventListener | null | ( (this : THIS , a : GlobalEvent ) => any ) , opt_options ? : boolean | EventListenerOptions ) : void ;
+    removeEventListener < THIS = any > (type : string , listener : EventListener | null | ( (this : THIS , a : GlobalEvent ) => any ) , opt_options ? : boolean | EventListenerOptions ) : void ;
     transferToImageBitmap ( ) : ImageBitmap ;
     width : number ;
   }
@@ -453,7 +453,7 @@ declare namespace ಠ_ಠ.clutz {
   /**
    * A transform stream (https://streams.spec.whatwg.org/#transform-stream).
    */
-  interface ITransformStream < IN_VALUE , OUT_VALUE > {
+  interface ITransformStream < IN_VALUE = any , OUT_VALUE = any > {
     readable : ReadableStream < OUT_VALUE > ;
     writable : WritableStream < IN_VALUE > ;
   }
@@ -481,7 +481,7 @@ declare namespace ಠ_ಠ.clutz {
   interface ReadableStreamBYOBReader {
     cancel (reason : any ) : Promise < any > ;
     closed : Promise < undefined > ;
-    read < BUFFER > (view : BUFFER ) : Promise < IteratorResult < BUFFER > > ;
+    read < BUFFER = any > (view : BUFFER ) : Promise < IteratorResult < BUFFER > > ;
     releaseLock ( ) : void ;
   }
 }
@@ -499,7 +499,7 @@ declare namespace ಠ_ಠ.clutz {
    * The ReadableStreamDefaultController constructor cannot be used directly;
    * it only works on a ReadableStream that is in the middle of being constructed.
    */
-  interface ReadableStreamDefaultController < VALUE > {
+  interface ReadableStreamDefaultController < VALUE = any > {
     close ( ) : void ;
     desiredSize : number ;
     enqueue (chunk : VALUE ) : void ;
@@ -512,7 +512,7 @@ declare namespace ಠ_ಠ.clutz {
    * The ReadableStreamDefaultReader constructor is generally not meant to be used
    * directly; instead, a stream’s getReader() method should be used.
    */
-  interface ReadableStreamDefaultReader < VALUE > {
+  interface ReadableStreamDefaultReader < VALUE = any > {
     cancel (reason : any ) : Promise < any > ;
     closed : Promise < undefined > ;
     read ( ) : Promise < IteratorResult < VALUE > > ;
@@ -527,7 +527,7 @@ declare namespace ಠ_ಠ.clutz {
 }
 // Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
-  interface ReadableStreamSource < VALUE > {
+  interface ReadableStreamSource < VALUE = any > {
     autoAllocateChunkSize ? : number ;
     cancel ? : (a : any ) => Promise < any > | undefined ;
     pull ? : (a : ReadableByteStreamController | ReadableStreamDefaultController < VALUE > ) => PromiseLike < any > | undefined ;
@@ -544,7 +544,7 @@ declare namespace ಠ_ಠ.clutz {
    * This class cannot be directly constructed and is instead passed by the
    * TransformStream to the methods of its transformer.
    */
-  interface TransformStreamDefaultController < OUT_VALUE > {
+  interface TransformStreamDefaultController < OUT_VALUE = any > {
     desiredSize : number ;
     enqueue (chunk : OUT_VALUE ) : void ;
     error (reason : any ) : void ;
@@ -553,7 +553,7 @@ declare namespace ಠ_ಠ.clutz {
 }
 // Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
-  interface TransformStreamTransformer < IN_VALUE , OUT_VALUE > {
+  interface TransformStreamTransformer < IN_VALUE = any , OUT_VALUE = any > {
     flush ? : (a : TransformStreamDefaultController < OUT_VALUE > ) => PromiseLike < any > | undefined ;
     start ? : (a : TransformStreamDefaultController < OUT_VALUE > ) => PromiseLike < any > | undefined ;
     transform ? : (a : IN_VALUE , b : TransformStreamDefaultController < OUT_VALUE > ) => PromiseLike < any > | undefined ;
@@ -561,7 +561,7 @@ declare namespace ಠ_ಠ.clutz {
 }
 // Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
-  class WritableStream < VALUE > {
+  class WritableStream < VALUE = any > {
     private noStructuralTyping_WritableStream : any;
     constructor (opt_underlyingSink ? : WritableStreamSink < VALUE > , opt_queuingStrategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark ? : number , size ? : (a : any ) => number } ) ;
     abort (reason : any ) : Promise < undefined > ;
@@ -582,7 +582,7 @@ declare namespace ಠ_ಠ.clutz {
 }
 // Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
-  interface WritableStreamDefaultWriter < VALUE > {
+  interface WritableStreamDefaultWriter < VALUE = any > {
     abort (reason : any ) : Promise < undefined > ;
     close ( ) : Promise < undefined > ;
     closed : Promise < undefined > ;
@@ -594,7 +594,7 @@ declare namespace ಠ_ಠ.clutz {
 }
 // Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
-  interface WritableStreamSink < VALUE > {
+  interface WritableStreamSink < VALUE = any > {
     abort ? : (a : any ) => PromiseLike < any > | undefined ;
     close ? : ( ) => PromiseLike < any > | undefined ;
     start ? : (a : WritableStreamDefaultController ) => PromiseLike < any > | undefined ;
@@ -917,7 +917,7 @@ declare namespace ಠ_ಠ.clutz {
   class Animation implements GlobalEventTarget {
     private noStructuralTyping_Animation : any;
     constructor (effect ? : AnimationEffectReadOnly | null , timeline ? : AnimationTimeline | null ) ;
-    addEventListener < THIS > (type : string , listener : EventListener | null | ( (this : THIS , a : GlobalEvent ) => any ) , options ? : boolean | AddEventListenerOptions ) : void ;
+    addEventListener < THIS = any > (type : string , listener : EventListener | null | ( (this : THIS , a : GlobalEvent ) => any ) , options ? : boolean | AddEventListenerOptions ) : void ;
     cancel ( ) : void ;
     currentTime : number ;
     dispatchEvent (evt : GlobalEvent ) : boolean ;
@@ -932,7 +932,7 @@ declare namespace ಠ_ಠ.clutz {
     playState : string ;
     playbackRate : number ;
     ready : Promise < undefined > ;
-    removeEventListener < THIS > (type : string , listener : EventListener | null | ( (this : THIS , a : GlobalEvent ) => any ) , options ? : boolean | EventListenerOptions ) : void ;
+    removeEventListener < THIS = any > (type : string , listener : EventListener | null | ( (this : THIS , a : GlobalEvent ) => any ) , options ? : boolean | EventListenerOptions ) : void ;
     reverse ( ) : void ;
     startTime : number ;
     timeline : AnimationTimeline ;

@@ -15,6 +15,6 @@ declare namespace ಠ_ಠ.clutz.used.not.provided {
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/type_used_but_not_provided.js
 declare namespace ಠ_ಠ.clutz.used.not.provided {
-  interface I < T > {
+  interface I < T = any > {
   }
 }

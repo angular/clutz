@@ -41,24 +41,15 @@ class ProgramSubject extends Subject {
   }
 
   /**
-   * A stripped down version of Closure's base.js for Clutz tests. In real total clutz runs we
-   * always pass the real closure's base.js.
-   */
-  private static final SourceFile CLUTZ_GOOG_BASE_TOTAL =
-      SourceFile.fromFile(
-          resource("src/test/java/com/google/javascript/clutz/testdata/base.js"), UTF_8);
-
-  /**
-   * A even more stripped down version of Closure's base.js for incremental Clutz tests. In
+   * A stripped down version of Closure's base.js for incremental Clutz tests. In
    * production we also use this file for every incremental run, because the original base.js is not
    * passed in.
    */
-  private static final SourceFile CLUTZ_GOOG_BASE_INCR =
+  private static final SourceFile CLUTZ_GOOG_BASE =
       SourceFile.fromFile(resource("src/resources/partial_goog_base.js"), UTF_8);
 
   private final ProgramSubject.Program actual;
   public boolean withPlatform = false;
-  public boolean partialInput = false;
   public String extraExternFile = null;
   public boolean emitBase = false;
   public String depgraph = null;
@@ -127,9 +118,7 @@ class ProgramSubject extends Subject {
     Options opts = new Options();
     opts.debug = debug;
     opts.skipEmitPattern = Pattern.compile(".*\\.skip\\.tsickle\\.js$");
-    if (partialInput) {
-      opts.partialInput = true;
-    }
+    opts.partialInput = true;
     opts.collidingProvides = ImmutableSet.of("colliding_provide.aliased");
     opts.browserResolverStrippedPrefixes = Arrays.asList("abs_strip_for_testing");
 
@@ -138,13 +127,11 @@ class ProgramSubject extends Subject {
     // base.js is needed for the type declaration of goog.require for
     // all total tests, except the base.js one itself.
     if (actual.roots.isEmpty()) {
-      sourceFiles.add(CLUTZ_GOOG_BASE_TOTAL);
+      sourceFiles.add(CLUTZ_GOOG_BASE);
     } else {
       File firstFile = actual.roots.get(0);
-      if (firstFile.getParentFile().getName().equals("partial")) {
-        sourceFiles.add(CLUTZ_GOOG_BASE_INCR);
-      } else if (!firstFile.getName().equals("base.js")) {
-        sourceFiles.add(CLUTZ_GOOG_BASE_TOTAL);
+      if (!firstFile.getName().equals("base.js")) {
+        sourceFiles.add(CLUTZ_GOOG_BASE);
       }
     }
 
@@ -167,7 +154,7 @@ class ProgramSubject extends Subject {
     }
 
     if (emitBase) {
-      roots.add(CLUTZ_GOOG_BASE_TOTAL.getName());
+      roots.add(CLUTZ_GOOG_BASE.getName());
     }
 
     List<SourceFile> externFiles;

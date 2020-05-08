@@ -27,6 +27,6 @@ declare module 'goog:aliasT.iboom' {
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/goog_scope_templatized.js
 declare namespace ಠ_ಠ.clutz.$jscomp.scope {
-  interface I < T > {
+  interface I < T = any > {
   }
 }

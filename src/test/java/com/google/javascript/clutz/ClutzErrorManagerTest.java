@@ -8,31 +8,6 @@ import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public class ClutzErrorManagerTest {
-
-  @Test
-  public void testMissingSymbolOrExtern() {
-    assertThatProgram(
-            "goog.provide('foo.x');", "/** @param {some.Unknown} y */", "foo.x = function(y) {};")
-        .diagnosticStream()
-        .containsMatch("ERROR.*missing some types");
-  }
-
-  @Test
-  public void testDuplicateSymbol() {
-    // Useful
-    assertThatProgram("/** @type {number} */ var x = 1;", "/** @type {number} */ var x = 2;")
-        .diagnosticStream()
-        .containsMatch("ERROR.*Variable x declared more than once");
-  }
-
-  @Test
-  public void testReportsSourceSnippets() {
-    assertThatProgram(
-            "goog.provide('foo.x');", "/** @param {some.Unknown} y */", "foo.x = function(y) {};")
-        .diagnosticStream()
-        .contains("foo.x = function");
-  }
-
   @Test
   public void testReportsWarningsInTests() {
     assertThatProgram("/** @see */", "var noSee;")

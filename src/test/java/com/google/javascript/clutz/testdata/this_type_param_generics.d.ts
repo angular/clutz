@@ -2,13 +2,13 @@
 declare namespace ಠ_ಠ.clutz.nsThisGenerics {
   class A {
     private noStructuralTyping_nsThisGenerics_A : any;
-    array < T > (this : T ) : T [] ;
-    foo < T > (this : T ) : ಠ_ಠ.clutz.nsThisGenerics.GenericClass < T > ;
-    object < T > (this : T ) : { [ key: string ]: T } ;
-    record < T > (this : T ) : { foo : T } ;
-    union < T > (this : T ) : ಠ_ಠ.clutz.nsThisGenerics.GenericClass < T > | null | string ;
+    array < T = any > (this : T ) : T [] ;
+    foo < T = any > (this : T ) : ಠ_ಠ.clutz.nsThisGenerics.GenericClass < T > ;
+    object < T = any > (this : T ) : { [ key: string ]: T } ;
+    record < T = any > (this : T ) : { foo : T } ;
+    union < T = any > (this : T ) : ಠ_ಠ.clutz.nsThisGenerics.GenericClass < T > | null | string ;
   }
-  class GenericClass < TYPE > {
+  class GenericClass < TYPE = any > {
     private noStructuralTyping_nsThisGenerics_GenericClass : any;
     constructor (t : TYPE ) ;
   }

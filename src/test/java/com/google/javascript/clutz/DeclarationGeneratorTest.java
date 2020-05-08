@@ -63,7 +63,6 @@ public class DeclarationGeneratorTest {
     }
     if (Arrays.asList("partial", "multifilePartial", "partialCrossModuleTypeImports")
         .contains(input.getParentFile().getName())) {
-      subject.partialInput = true;
       subject.debug = false;
     }
     if (input.getParentFile().getName().equals("partialCrossModuleTypeImports")) {

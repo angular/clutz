@@ -410,6 +410,10 @@ class DeclarationGenerator {
   String generateDeclarations(
       List<SourceFile> sourceFiles, List<SourceFile> externs, Depgraph depgraph)
       throws AssertionError {
+    if (!opts.partialInput) {
+      throw new RuntimeException("clutz must be run in partialInput mode");
+    }
+
     // Compile should always be first here, because it sets internal state.
     compiler.compile(externs, sourceFiles, opts.getCompilerOptions());
     if (opts.partialInput) {

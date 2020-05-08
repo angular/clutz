@@ -10,7 +10,7 @@ declare module 'goog:privatetype' {
 declare namespace ಠ_ಠ.clutz.privatetype {
   class Foo {
     private noStructuralTyping_privatetype_Foo : any;
-    constructor (a : any ) ;
+    constructor (a ? : any ) ;
     foo ( ) : PrivateType ;
   }
 }

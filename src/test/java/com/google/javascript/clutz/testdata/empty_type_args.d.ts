@@ -1,6 +1,6 @@
 // Generated from src/test/java/com/google/javascript/clutz/testdata/empty_type_args.js
 declare namespace ಠ_ಠ.clutz.empty_type_args {
-  interface ITemplated < T > {
+  interface ITemplated < T = any > {
   }
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/empty_type_args.js
