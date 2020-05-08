@@ -230,6 +230,7 @@ public class TypeScriptGenerator {
             modulePrePass.getFileMap(),
             modulePrePass.getNamespaceMap(),
             comments,
+            astComments,
             opts.alreadyConvertedPrefix);
     modulePass.process(externRoot, srcRoot);
 
@@ -261,7 +262,9 @@ public class TypeScriptGenerator {
                     astComments,
                     comments,
                     opts.externsMap,
-                    new SourceExtractor(srcFiles));
+                    new SourceExtractor(srcFiles),
+                    compiler,
+                    srcRoot);
               }
             };
 

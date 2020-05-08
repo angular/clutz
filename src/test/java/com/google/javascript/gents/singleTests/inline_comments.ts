@@ -1,7 +1,7 @@
 export function foo(...varargs: number[]) {}
 
-foo(1,       /* inline comment after arg, should attach to 2 */
-    2, 3, 4, /* ditto, should attach to 4 */
+foo(1, 2, /* inline comment after arg, should attach to 2 */
+    3, 4, /* ditto, should attach to 4 */
     5);
 
 foo(1, /* inline comment before arg, should attach to 2 */

@@ -13,7 +13,6 @@ export class A {
 
   a: any;
   fieldSetFromArrowFunc: any;
-
   arrowFuncField: any;
 
   functionResultField: any;
@@ -29,6 +28,7 @@ export class A {
     this.z = y + 1;
     this.w.bar = 'bar';
     this.n = 13;
+
     this.arrowFuncField = () => {
       this.fieldSetFromArrowFunc = 'f';
     };

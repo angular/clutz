@@ -82,10 +82,8 @@ Promise.resolve().then(
       a();
     });
 
-Promise.resolve()
-    .then(() => 'a')
-    .then(  // on the same line as `.then(() => 'b');`
-        () => 'b');
+Promise.resolve().then(() => 'a').then(() => 'b');
+// on the same line as `.then(() => 'b');`
 
 if (true) {
   if (true) {

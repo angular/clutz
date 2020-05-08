@@ -1,10 +1,10 @@
 export class MyClass {
-  /** @export type property*/
   type: InnerTypedefWithAssignment;
   /**
    * Constructor for MyClass
    */
   constructor(data: {type: InnerTypedefWithAssignment}) {
+    /** @export type property*/
     this.type = data.type;
   }
 

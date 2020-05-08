@@ -42,6 +42,7 @@ public final class ModuleConversionPass implements CompilerPass {
   private final PathUtil pathUtil;
   private final NameUtil nameUtil;
   private final NodeComments nodeComments;
+  private final NodeComments astComments;
 
   private final Map<String, FileModule> fileToModule;
   private final Map<String, FileModule> namespaceToModule;
@@ -76,11 +77,13 @@ public final class ModuleConversionPass implements CompilerPass {
       Map<String, FileModule> fileToModule,
       Map<String, FileModule> namespaceToModule,
       NodeComments nodeComments,
+      NodeComments astComments,
       String alreadyConvertedPrefix) {
     this.compiler = compiler;
     this.pathUtil = pathUtil;
     this.nameUtil = nameUtil;
     this.nodeComments = nodeComments;
+    this.astComments = astComments;
 
     this.fileToModule = fileToModule;
     this.namespaceToModule = namespaceToModule;
@@ -757,6 +760,7 @@ public final class ModuleConversionPass implements CompilerPass {
     export.useSourceInfoFrom(assignmentNode);
 
     nodeComments.moveComment(declarationNode, export);
+    astComments.moveComment(declarationNode, export);
     parent.addChildBefore(export, next);
     compiler.reportChangeToEnclosingScope(parent);
   }

@@ -158,13 +158,13 @@
  * explanatory text, and should go away.
  */
 
+
+/*
+ * @param {{}} This type annotation has an empty object literal.
+ */
 /**
  * @param {{someverylongnaaaaaaaaaaaaaaaaaame: string,
  *       anotheraaaaaaaaaaaaaaaaaaaaaaaaaa: string}} foo A broken up
  *   comment here. Note: this test exhibits currently broken behavior in
  *   Gents. The type annotation should have been removed.
- */
-
-/*
- * @param {{}} This type annotation has an empty object literal.
  */
