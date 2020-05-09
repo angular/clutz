@@ -45,25 +45,6 @@ public class OptionsTest {
   }
 
   @Test
-  public void testFilterSourcesWithExternsInDepgraphs() throws Exception {
-    Options opts =
-        new Options(
-            new String[] {
-              "javascript/closure/string/string.js",
-              "--externs",
-              "extern1.js",
-              "extern2.js",
-              "--depgraphs",
-              DepgraphTest.DEPGRAPH_PATH.toFile().toString(),
-              "--depgraphs_filter_sources",
-            });
-    // All depgraph externs are added to the externs list.
-    assertThat(opts.externs)
-        .containsExactly("my/root/extern.js", "my/nonroot/extern.js", "extern1.js", "extern2.js")
-        .inOrder();
-  }
-
-  @Test
   public void testClosureEntryPoint() throws Exception {
     Options opts =
         new Options(
@@ -111,20 +92,6 @@ public class OptionsTest {
   }
 
   @Test
-  public void testExternsShouldBeUnique() throws Exception {
-    Options opts =
-        new Options(
-            new String[] {
-              "--externs",
-              "my/root/extern.js",
-              "--depgraphs",
-              // Depgraph also has my/root/extern.js, and additionally my/nonroot/extern.js.
-              DepgraphTest.DEPGRAPH_PATH.toFile().toString(),
-            });
-    assertThat(opts.externs).containsExactly("my/root/extern.js", "my/nonroot/extern.js");
-  }
-
-  @Test
   public void testShouldSupportFilePathsWithSpaces() throws Exception {
     Options opts =
         new Options(
@@ -136,11 +103,10 @@ public class OptionsTest {
   }
 
   @Test
-  public void testPartialInputIgnoresDepgraphNonRootExterns() throws Exception {
+  public void testIgnoresDepgraphNonRootExterns() throws Exception {
     Options opts =
         new Options(
             new String[] {
-              "--partialInput",
               // a random file from the depgraph. Not relevant to the test, but we need at least
               // one input.
               "my/thing/static/js/0-bootstrap.js",
@@ -163,14 +129,13 @@ public class OptionsTest {
   }
 
   @Test
-  public void testPartialInputIgnoresDepgraphRootExternsIfNotPassedToExterns() throws Exception {
+  public void testIgnoresDepgraphRootExternsIfNotPassedToExterns() throws Exception {
     // Due to "exported" libraries, what the depgraph considers "root" can be incorrect for the
-    // purposes of incremental clutz. Arguments and Externs lists should only be filtered down
+    // purposes of clutz. Arguments and Externs lists should only be filtered down
     // with depgraph info and never extended.
     Options opts =
         new Options(
             new String[] {
-              "--partialInput",
               // a random file from the depgraph. Not relevant to the test, but we need at least
               // one input.
               "my/thing/static/js/0-bootstrap.js",

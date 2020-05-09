@@ -193,23 +193,6 @@ class DeclarationGenerator {
   private JSType numberType;
   private JSType stringType;
 
-  /**
-   * Iterator is the basic type that describes iteration - .next method. Iterable is the interface
-   * with the one property - [Symbol.iterator]: Iterator.
-   *
-   * <p>Both TS and JS agree up to here. However, they have two different solutions for how to mix
-   * those.
-   *
-   * <p>In TypeScript there is IterableIterator that extends Iterator and has: [Symbol.iterator]:
-   * IterableIterator.
-   *
-   * <p>In Closure there is IterableIterator that simply extends Iterator and Iterable.
-   *
-   * <p>Apart from the name swap - IterableIterator and IterableIterator disagree on the
-   * [Symbol.iterator] type.
-   */
-  @Nullable private JSType iterableType;
-
   @Nullable private JSType iteratorIterableType;
 
   @Nullable private JSType arrayType;
@@ -238,13 +221,13 @@ class DeclarationGenerator {
   private final Set<String> typesUsed = new LinkedHashSet<>();
 
   /**
-   * In partial mode, closure doesn't know the correct name of imported symbols, and importRenameMap
-   * is used to store the mappings from the closure supplied names to the correct names.
+   * Due to partial input we don't know the correct name of imported symbols, so importRenameMap is
+   * used to store the mappings from the closure supplied names to the correct names.
    */
   private Map<String, String> importRenameMap = new LinkedHashMap<>();
 
   /**
-   * In partial mode, closure doesn't give proper types for reexported symbols. This map contains
+   * Due to partial input we don't know the proper types for reexported symbols. This map contains
    * potential aliases for reexported types. See AliasMapBuilder for details.
    */
   private Map<String, String> aliasMap = new LinkedHashMap<>();
@@ -261,8 +244,8 @@ class DeclarationGenerator {
 
   /**
    * If one file defines a name and another uses it as a namespace, we have the
-   * Constants.COLLDING_PROVIDE_ALIAS_POSTFIX workaround. In partial mode, Clutz can't see all
-   * definitions of a name, so the list of names that require aliases must be passed as an input.
+   * Constants.COLLDING_PROVIDE_ALIAS_POSTFIX workaround. Clutz can't see all definitions of a name,
+   * so the list of names that require aliases must be passed as an input.
    */
   private Set<String> collidingProvides = new LinkedHashSet<>();
 
@@ -351,10 +334,6 @@ class DeclarationGenerator {
   }
 
   void generateDeclarations() {
-    if (!opts.partialInput) {
-      throw new RuntimeException("clutz must be run in partialInput mode");
-    }
-
     List<SourceFile> sourceFiles = new ArrayList<>();
 
     for (String source : opts.arguments) {
@@ -410,29 +389,22 @@ class DeclarationGenerator {
   String generateDeclarations(
       List<SourceFile> sourceFiles, List<SourceFile> externs, Depgraph depgraph)
       throws AssertionError {
-    if (!opts.partialInput) {
-      throw new RuntimeException("clutz must be run in partialInput mode");
-    }
-
     // Compile should always be first here, because it sets internal state.
     compiler.compile(externs, sourceFiles, opts.getCompilerOptions());
-    if (opts.partialInput) {
-      importRenameMap =
-          new ImportRenameMapBuilder()
-              .build(compiler.getParsedInputs(), opts.depgraph.getGoogProvides());
-      aliasMap =
-          new AliasMapBuilder().build(compiler.getParsedInputs(), opts.depgraph.getGoogProvides());
-      legacyNamespaceReexportMap =
-          new LegacyNamespaceReexportMapBuilder()
-              .build(compiler.getParsedInputs(), opts.depgraph.getGoogProvides());
-      collidingProvides = opts.collidingProvides;
-    }
+    importRenameMap =
+        new ImportRenameMapBuilder()
+            .build(compiler.getParsedInputs(), opts.depgraph.getGoogProvides());
+    aliasMap =
+        new AliasMapBuilder().build(compiler.getParsedInputs(), opts.depgraph.getGoogProvides());
+    legacyNamespaceReexportMap =
+        new LegacyNamespaceReexportMapBuilder()
+            .build(compiler.getParsedInputs(), opts.depgraph.getGoogProvides());
+    collidingProvides = opts.collidingProvides;
 
     unknownType = compiler.getTypeRegistry().getNativeType(JSTypeNative.UNKNOWN_TYPE);
     numberType = compiler.getTypeRegistry().getNativeType(JSTypeNative.NUMBER_TYPE);
     stringType = compiler.getTypeRegistry().getNativeType(JSTypeNative.STRING_TYPE);
 
-    iterableType = compiler.getTypeRegistry().getGlobalType("Iterable");
     iteratorIterableType = compiler.getTypeRegistry().getGlobalType("IteratorIterable");
 
     arrayType = compiler.getTypeRegistry().getGlobalType("Array");
@@ -1858,11 +1830,11 @@ class DeclarationGenerator {
           if (displayName.contains("IObject#")) {
             displayName = normalizeIObjectTemplateName(type, displayName);
           }
-          // When we emit partial programs, we cannot differentiate whether Foo
+          // Because we emit partial programs, we cannot differentiate whether Foo
           // is a plain type or a generic type for which closure infers '?' as
           // all type arguments.
           // To support this usecase we emit ' = any' for all generic args.
-          if (opts.partialInput && isDeclaration) {
+          if (isDeclaration) {
             displayName += " = any";
           }
 
@@ -2103,7 +2075,7 @@ class DeclarationGenerator {
      * types.
      */
     private void emitNoResolvedTypeOrDefault(NoType type, String defaultEmit) {
-      if (!opts.partialInput || !type.isNoResolvedType()) {
+      if (!type.isNoResolvedType()) {
         emit(defaultEmit);
         return;
       }
@@ -2141,8 +2113,8 @@ class DeclarationGenerator {
     }
 
     /**
-     * In partial mode, closure doesn't know the correct name of imported symbols, if the name
-     * matches one in the precomputed map, replace it with the original declared name The
+     * Because of partial input, closure doesn't know the correct name of imported symbols, if the
+     * name matches one in the precomputed map, replace it with the original declared name The
      * displayName can be of the form foo.bar, but the symbol that was goog required was just foo,
      * so just replace the part of the display name before the first period
      */
@@ -2253,7 +2225,7 @@ class DeclarationGenerator {
               // It appears that when one writes '@type {A<B>}' and both are missing from the
               // compilation
               // unit - A ends up as NoType, while B ends up as NamedType.
-              if (opts.partialInput && refType.isUnknownType()) {
+              if (refType.isUnknownType()) {
                 emitNoResolvedTypeAsumingForwardDeclare(type);
                 return null;
               }
@@ -2789,24 +2761,16 @@ class DeclarationGenerator {
         return;
       }
 
-      // It appears that iterableType is always defined. Moreover, in partial mode when extending
-      // an unknown base, the isSubtype check always returns true. This is not that surprising,
-      // because when the base is unknown the only correct answer is unknown, not true or false.
+      // When extending an unknown base, the isSubtype check always returns true. This is not that
+      // surprising, because when the base is unknown the only correct answer is unknown, not true
+      // or false.
       //
       // Emitting a [Symbol.iterator()] signature for all record/interfaces that extend an unknown
       // base is too limiting, as it doesn't allow assigning object literal to those interfaces.
-      // So instead we detect when an interface extends a base and skip emitting the extra signature
-      // in the case of unknown base.
-      // For unknown reasons instanceType.isInterface() return false, so we turn off the emit for
-      // all partial input compilations.
+      // So instead we skip emitting the extra signature in the case of unknown base.
       if (iteratorIterableType != null && instanceType.isSubtype(iteratorIterableType)) {
         implemented = iteratorIterableType;
         returnType = "IterableIterator";
-      } else if (iterableType != null
-          && instanceType.isSubtype(iterableType)
-          && !opts.partialInput) {
-        implemented = iterableType;
-        returnType = "Iterator";
       } else {
         return;
       }
@@ -3039,22 +3003,22 @@ class DeclarationGenerator {
         }
       }
 
-      // Horrible hack.  goog.async.Deferred has an @override of a TTE function, but when running
-      // in partialInput mode we can't see that.  Identify it by grabbing:
+      // Horrible hack.  goog.async.Deferred has an @override of a TTE function, but because we
+      // run with partial inputs we can't see that.  Identify it by grabbing:
       // 1) functions named .then()
       // 2) that use @override
       // 3) that have no declared parameters/return type.
-      boolean horribleHackForPartialModeWithOverrides = false;
+      boolean horribleHackForOverrides = false;
       JSDocInfo info = type.getJSDocInfo();
       if (info != null) {
         boolean isUntypedOverride =
             info.isOverride() && info.getParameterCount() == 0 && info.getReturnType() == null;
-        if (opts.partialInput && isUntypedOverride && propName.equals("then")) {
-          horribleHackForPartialModeWithOverrides = true;
+        if (isUntypedOverride && propName.equals("then")) {
+          horribleHackForOverrides = true;
         }
       }
 
-      if (!horribleHackForPartialModeWithOverrides && !hasTTE) return false;
+      if (!horribleHackForOverrides && !hasTTE) return false;
 
       // The same signature can be found in a number of classes - es6 Promise, angular.$q.Promise,
       // custom Thenable classes, etc. While the class names differ the implementations are close
@@ -3271,12 +3235,12 @@ class DeclarationGenerator {
       if (emitTemplatizedTypes) {
         visitTemplateTypes(ftype, alreadyEmittedTemplateType, true);
       }
-      // In partial mode when all the parameters to the function are unknown, it might be the
+      // When all the parameters to the function are unknown, it might be the
       // case that the function is overriding/implementing a superclass or interface that is in an
       // unseen input.
       // If so, we can't know whether the parameters are optional or not, so mark them optional.
       // This is too broad (we also affect callback types) but we can fix that if it's a problem.
-      boolean makeAllParametersOptional = opts.partialInput && allParametersUnknown(ftype);
+      boolean makeAllParametersOptional = allParametersUnknown(ftype);
       emit("(");
       Iterator<Node> parameters = ftype.getParameters().iterator();
       if (shouldEmitThis) {

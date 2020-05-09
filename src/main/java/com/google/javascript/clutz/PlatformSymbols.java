@@ -56,7 +56,7 @@ public class PlatformSymbols {
    *
    * <p>Closure has internal "externs" for some global symbols:
    * https://github.com/google/closure-compiler/blob/master/src/com/google/javascript/rhino/jstype/JSTypeRegistry.java
-   * Which will be emitted in each file that references them in partial mode. For example, using
+   * Which will be emitted in each file that references them. For example, using
    * Date in a file results in:
    *
    * <pre>

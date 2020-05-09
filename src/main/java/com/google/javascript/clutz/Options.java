@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -127,9 +126,7 @@ public class Options {
 
   @Option(
     name = "--partialInput",
-    usage =
-        "allow input of incomplete programs. All unknown types will be treated as forward"
-            + " declared."
+    usage = "no-op; currently in the process of being removed"
   )
   boolean partialInput;
 
@@ -229,10 +226,8 @@ public class Options {
     options.setPreserveDetailedSourceInfo(true);
     options.setParseJsDocDocumentation(Config.JsDocParsing.INCLUDE_DESCRIPTIONS_NO_WHITESPACE);
     options.clearConformanceConfigs();
-    if (partialInput) {
-      options.setAssumeForwardDeclaredForMissingTypes(true);
-      options.setWarningLevel(DiagnosticGroups.MISSING_SOURCES_WARNINGS, CheckLevel.OFF);
-    }
+    options.setAssumeForwardDeclaredForMissingTypes(true);
+    options.setWarningLevel(DiagnosticGroups.MISSING_SOURCES_WARNINGS, CheckLevel.OFF);
     return options;
   }
 
@@ -251,17 +246,10 @@ public class Options {
       arguments.retainAll(merged);
     }
 
-    if (!partialInput) {
-      // set union command line externs and depgraph.externs.
-      Set<String> allExterns = new LinkedHashSet<>();
-      allExterns.addAll(depgraph.getRootExterns());
-      allExterns.addAll(depgraph.getNonrootExterns());
-      allExterns.addAll(externs);
-      externs = new ArrayList<>(allExterns);
-    }
-    // Incremental clutz does not use the externs option in regular invocations. Since it is only
-    // ran on a per js_library basis, there is no way to separate sources and externs.
-    // For legacy reasons, it is seperately called on the externs_list's of files, but it those
+    // Clutz does not use the externs option in regular invocations. Since it is only
+    // ran on a js_library which only has sources, there is no way to treat sources and externs
+    // distinctly.
+    // For legacy reasons, it is separately called on the externs_list's of files, but in those
     // invocations depgraphs are not used (since they don't exist for bundles of files).
     //
     // So either there are no externs present or no depgraphs present. In either case there is no

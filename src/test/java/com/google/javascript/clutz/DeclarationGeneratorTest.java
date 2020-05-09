@@ -110,15 +110,15 @@ public class DeclarationGeneratorTest {
 
   public static List<File> getTestInputFiles(FilenameFilter filter) {
     File[] testFiles = getTestDataFolderPath().toFile().listFiles(filter);
-    // Partial files live in 'partial' dir and run implicitly with the --partialInput option on.
+    // We used to have a --partialInput option, and the files in the 'partial' dir had it on.
+    // Now it is always on, and the 'partial' dir behaves the same as its parent.
     File[] testPartialFiles = getTestDataFolderPath().resolve("partial").toFile().listFiles(filter);
-    // Test files that live in the 'multifilePartial' dir, and run with the --partialInput option
-    // The resulting .d.ts files are checked with a DeclarationSyntaxTest, and they're also
-    // compiled in a single run in MultiFileTest
+    // Test files that live in the 'multifilePartial' dir are checked with a DeclarationSyntaxTest,
+    // and they're also compiled in a single run in MultiFileTest
     File[] testMultifilePartialFiles =
         getTestDataFolderPath().resolve("multifilePartial").toFile().listFiles(filter);
     // Test files that live in the 'testPartialCrossModuleTypeImportsFiles' dir, and run with the
-    // --partialInput and --googProvides options.  The resulting .d.ts files are checked with a
+    // --googProvides option.  The resulting .d.ts files are checked with a
     // DeclarationSyntaxTest, and they're also compiled in a single run in MultiFileTest
     File[] testPartialCrossModuleTypeImportsFiles =
         getTestDataFolderPath().resolve("partialCrossModuleTypeImports").toFile().listFiles(filter);
