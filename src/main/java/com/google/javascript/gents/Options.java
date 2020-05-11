@@ -149,12 +149,6 @@ public class Options {
   )
   String absolutePathPrefix = "google3";
 
-  @Option(
-      name = "--enableBlankLineExperiment",
-      usage = "Enable the experiment that uses a new approach to preserve blank lines in output.",
-      hidden = true)
-  boolean enableBlankLineExperiment = false;
-
   @Argument
   @Option(name = "--", handler = StopOptionHandler.class)
   List<String> arguments = new ArrayList<>();
