@@ -286,9 +286,6 @@ class DeclarationGenerator {
    */
   void collectTypedefs() {
     for (TypedVar var : compiler.getTopScope().getAllSymbols()) {
-      if (shouldSkipVar(var)) {
-        continue;
-      }
       // In Closure, unlike TypeScript there is no pure type space. Thus even typedefs declare
       // symbols. The type of the symbol corresponding to the typedef is *not* the same as the type
       // declared by the typedef.
@@ -441,9 +438,6 @@ class DeclarationGenerator {
     Map<String, SourceFile> provideToFile = new HashMap<>();
 
     for (CompilerInput compilerInput : compiler.getInputsById().values()) {
-      if (shouldSkipSourceFile(compilerInput.getSourceFile())) {
-        continue;
-      }
       Collection<String> inputProvides = compilerInput.getProvides();
       Collection<String> filteredProvides = new ArrayList<>();
       // It appears closure reports 'module$...filepath...' provides
@@ -555,20 +549,6 @@ class DeclarationGenerator {
 
     checkState(indent == 0, "indent must be zero after printing, but is %s", indent);
     return out.toString();
-  }
-
-  /**
-   * Skip emit & use for variables that will not be emitted due to {@link Options#skipEmitPattern}.
-   */
-  private boolean shouldSkipVar(TypedVar var) {
-    return opts.skipEmitPattern != null
-        && opts.skipEmitPattern.matcher(var.getInputName()).matches();
-  }
-
-  /** Skip emit & use for all symbols in files matching {@link Options#skipEmitPattern}. */
-  private boolean shouldSkipSourceFile(SourceFile sourceFile) {
-    String path = sourceFile.getOriginalPath();
-    return opts.skipEmitPattern != null && opts.skipEmitPattern.matcher(path).matches();
   }
 
   /**
@@ -729,10 +709,6 @@ class DeclarationGenerator {
         // Built-ins can be indentified by having null as input file.
         CompilerInput symbolInput = this.compiler.getInput(new InputId(symbol.getInputName()));
         if (symbolInput == null || symbolInput.isExtern()) continue;
-
-        if (shouldSkipVar(symbol)) {
-          continue;
-        }
 
         // Type inference sometimes creates symbols for undeclared qualified names when narrowing
         // their type in a flow scope. These should not be emitted and can be detected by noticing

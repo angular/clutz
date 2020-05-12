@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 /** A subject that supports assertions on {@link DeclarationGenerator}'s results. */
@@ -117,7 +116,6 @@ class ProgramSubject extends Subject {
   private String[] parse() throws AssertionError {
     Options opts = new Options();
     opts.debug = debug;
-    opts.skipEmitPattern = Pattern.compile(".*\\.skip\\.tsickle\\.js$");
     opts.partialInput = true;
     opts.collidingProvides = ImmutableSet.of("colliding_provide.aliased");
     opts.browserResolverStrippedPrefixes = Arrays.asList("abs_strip_for_testing");

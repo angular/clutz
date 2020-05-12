@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -131,14 +130,6 @@ public class Options {
   boolean partialInput;
 
   @Option(
-    name = "--skipEmitRegExp",
-    usage =
-        "Symbols in files that match this RegExp will not be included in the emit. Note that"
-            + "the files would still be part of the internal compilation."
-  )
-  String skipEmitRegExp = null;
-
-  @Option(
     name = "--collidingProvides",
     usage = "file containing a list of names that we know conflict with namespaces"
   )
@@ -167,9 +158,6 @@ public class Options {
   List<String> arguments = new ArrayList<>();
 
   Depgraph depgraph;
-  // TODO(martinprobst): Remove when internal Google is upgraded to a more recent args4j
-  // library that supports Pattern arguments.
-  Pattern skipEmitPattern;
   Set<String> collidingProvides = new HashSet<>();
 
   public CompilerOptions getCompilerOptions() {
@@ -234,9 +222,6 @@ public class Options {
   Options(String[] args) throws CmdLineException {
     CmdLineParser parser = new CmdLineParser(this);
     parser.parseArgument(args);
-    if (skipEmitRegExp != null) {
-      skipEmitPattern = Pattern.compile(skipEmitRegExp);
-    }
     depgraph = Depgraph.parseFrom(depgraphFiles);
     if (filterSourcesWithDepgraphs) {
       // Clutz still takes the list of files to compile from the outside, because Closure depends

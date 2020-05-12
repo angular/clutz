@@ -69,24 +69,6 @@ public class MultiFileTest {
   }
 
   @Test
-  public void tsickleEmit() throws Exception {
-    File golden = input("tsickle_emit.d.ts");
-    assertThatProgram(
-            ImmutableList.of(input("uses_tsickle_type.js")),
-            ImmutableList.of(input("tsickle_emit.skip.tsickle.js")))
-        .generatesDeclarations(golden);
-  }
-
-  @Test
-  public void skipEmitWithTypedefs() throws Exception {
-    File golden = input("skipped.d.ts");
-    assertThatProgram(
-            ImmutableList.of(input("uses_type.js")),
-            ImmutableList.of(input("skipped_typedef.skip.tsickle.js")))
-        .generatesDeclarations(golden);
-  }
-
-  @Test
   public void multifilePartial() throws Exception {
     File golden = input("total.d.ts");
     assertThatProgram(
