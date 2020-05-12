@@ -191,6 +191,10 @@ declare namespace ಠ_ಠ.clutz {
     persisted ( ) : Promise < boolean > ;
   }
 }
+// Generated from externs.zip//html5.js
+declare namespace ಠ_ಠ.clutz {
+  type TrustTokenAttributeType = { additionalSignedHeaders : string [] , includeTimestampHeader : boolean , issuer : string , refreshPolicy : string , signRequestData : string , type : string } ;
+}
 // Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class DirectoryEntry extends Entry {
