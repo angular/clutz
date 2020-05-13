@@ -99,12 +99,7 @@ public class Options {
   )
   List<String> depgraphFiles = new ArrayList<>();
 
-  @Option(
-    name = "--strict_deps",
-    usage =
-        "generates no modules for nonroots (but does generate types), so that nonroots "
-            + "cannot be imported by TypeScript code."
-  )
+  @Option(name = "--strict_deps", usage = "noop. This is about to be deleted")
   boolean strictDeps = false;
 
   @Option(
@@ -242,9 +237,6 @@ public class Options {
 
     // Exclude externs that are already in the sources to avoid duplicated symbols.
     arguments.removeAll(externs);
-    if (!strictDeps) {
-      depgraph = depgraph.withNonrootsAsRoots();
-    }
     if (arguments.isEmpty() && externs.isEmpty()) {
       throw new CmdLineException(parser, "No files or externs were given");
     }
