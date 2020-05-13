@@ -242,6 +242,13 @@ class DeclarationGenerator {
   /** If true, add all the import rename map entries to the output as comments in the .d.ts. */
   private final boolean PRINT_IMPORT_RENAME_MAP = false;
 
+  /**
+   * If one file defines a name and another uses it as a namespace, we have the
+   * Constants.COLLDING_PROVIDE_ALIAS_POSTFIX workaround. Clutz can't see all definitions of a name,
+   * so the list of names that require aliases must be passed as an input.
+   */
+  private Set<String> collidingProvides = new LinkedHashSet<>();
+
   DeclarationGenerator(Options opts) {
     this.opts = opts;
     this.compiler = new InitialParseRetainingCompiler();
@@ -389,6 +396,7 @@ class DeclarationGenerator {
     legacyNamespaceReexportMap =
         new LegacyNamespaceReexportMapBuilder()
             .build(compiler.getParsedInputs(), opts.depgraph.getGoogProvides());
+    collidingProvides = opts.collidingProvides;
 
     unknownType = compiler.getTypeRegistry().getNativeType(JSTypeNative.UNKNOWN_TYPE);
     numberType = compiler.getTypeRegistry().getNativeType(JSTypeNative.NUMBER_TYPE);
@@ -896,6 +904,9 @@ class DeclarationGenerator {
   }
 
   private boolean needsAlias(Set<String> shadowedSymbols, String provide, TypedVar symbol) {
+    if (collidingProvides.contains(provide)) {
+      return true;
+    }
     if (!shadowedSymbols.contains(provide)) {
       return false;
     }
