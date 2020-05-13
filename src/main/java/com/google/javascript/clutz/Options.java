@@ -1,20 +1,15 @@
 package com.google.javascript.clutz;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
-import com.google.common.io.Files;
 import com.google.javascript.jscomp.*;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import com.google.javascript.jscomp.deps.ModuleLoader;
 import com.google.javascript.jscomp.parsing.Config;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -129,12 +124,6 @@ public class Options {
   )
   boolean partialInput;
 
-  @Option(
-    name = "--collidingProvides",
-    usage = "file containing a list of names that we know conflict with namespaces"
-  )
-  String collidingProvidesFile = null;
-
   // https://github.com/google/closure-compiler/blob/036a6dd24c4b0831838a63f983d63670b1f1a9b6/src/com/google/javascript/jscomp/CommandLineRunner.java#L667
   @Option(
     name = "--tracer_mode",
@@ -158,7 +147,6 @@ public class Options {
   List<String> arguments = new ArrayList<>();
 
   Depgraph depgraph;
-  Set<String> collidingProvides = new HashSet<>();
 
   public CompilerOptions getCompilerOptions() {
     final CompilerOptions options = new CompilerOptions();
@@ -247,14 +235,6 @@ public class Options {
     }
     if (arguments.isEmpty() && externs.isEmpty()) {
       throw new CmdLineException(parser, "No files or externs were given");
-    }
-
-    if (collidingProvidesFile != null) {
-      try {
-        collidingProvides.addAll(Files.readLines(new File(collidingProvidesFile), UTF_8));
-      } catch (IOException e) {
-        throw new RuntimeException("Error reading aliased names file " + collidingProvidesFile, e);
-      }
     }
   }
 
