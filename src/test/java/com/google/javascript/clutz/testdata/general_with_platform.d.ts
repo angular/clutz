@@ -193,6 +193,11 @@ declare namespace ಠ_ಠ.clutz {
 }
 // Generated from externs.zip//html5.js
 declare namespace ಠ_ಠ.clutz {
+  /**
+   * Trust Tokens operation (issuance, signing, and redemption) is specified via
+   * an instance of the following parameters struct, provided via Fetch, XHR, or
+   * the iframe tag.
+   */
   type TrustTokenAttributeType = { additionalSignedHeaders : string [] , includeTimestampHeader : boolean , issuer : string , refreshPolicy : string , signRequestData : string , type : string } ;
 }
 // Generated from externs.zip//nonstandard_fileapi.js
