@@ -5,7 +5,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.javascript.jscomp.*;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
@@ -101,12 +100,6 @@ public class Options {
 
   @Option(name = "--strict_deps", usage = "noop. This is about to be deleted")
   boolean strictDeps = false;
-
-  @Option(
-    name = "--depgraphs_filter_sources",
-    usage = "only include sources from the arguments list that appear in the given depgraphs"
-  )
-  boolean filterSourcesWithDepgraphs = false;
 
   @Option(
     name = "--closure_entry_points",
@@ -218,13 +211,6 @@ public class Options {
     CmdLineParser parser = new CmdLineParser(this);
     parser.parseArgument(args);
     depgraph = Depgraph.parseFrom(depgraphFiles);
-    if (filterSourcesWithDepgraphs) {
-      // Clutz still takes the list of files to compile from the outside, because Closure depends
-      // on source order in many places. The depgraph files are not sorted, build order is instead
-      // established by the outside tool driving compilation (e.g. bazel).
-      Set<String> merged = Sets.union(depgraph.getRoots(), depgraph.getNonroots());
-      arguments.retainAll(merged);
-    }
 
     // Clutz does not use the externs option in regular invocations. Since it is only
     // ran on a js_library which only has sources, there is no way to treat sources and externs

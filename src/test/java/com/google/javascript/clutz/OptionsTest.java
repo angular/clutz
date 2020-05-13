@@ -25,26 +25,6 @@ public class OptionsTest {
   }
 
   @Test
-  public void testFilterSourcesDepgraphs() throws Exception {
-    Options opts =
-        new Options(
-            new String[] {
-              "javascript/closure/other_file_not_in_depgraph.js",
-              "javascript/closure/string/string.js",
-              "blaze-out/blah/my/blaze-out-file.js",
-              "--depgraphs",
-              DepgraphTest.DEPGRAPH_PATH.toFile().toString(),
-              "--depgraphs_filter_sources",
-            });
-    // Arguments are filtered by what appears in the depgraph.
-    assertThat(opts.arguments)
-        .containsExactly(
-            "javascript/closure/string/string.js", // kept as a root in depgraph
-            "blaze-out/blah/my/blaze-out-file.js") // kept as a non-root in depgraph
-        .inOrder();
-  }
-
-  @Test
   public void testClosureEntryPoint() throws Exception {
     Options opts =
         new Options(
