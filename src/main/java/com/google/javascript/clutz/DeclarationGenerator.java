@@ -408,7 +408,7 @@ class DeclarationGenerator {
     if (compiler.getTopScope() != null) {
       precomputeChildLists();
       collectTypedefs();
-      dts = produceDts(depgraph);
+      dts = produceDts();
     }
     errorManager.doGenerateReport();
     return dts;
@@ -422,7 +422,7 @@ class DeclarationGenerator {
     return input.substring(0, dotIdx);
   }
 
-  String produceDts(Depgraph depgraph) {
+  String produceDts() {
     out = new StringWriter();
 
     // Note: the specific emit of this header is depended upon by tsickle.
@@ -450,13 +450,10 @@ class DeclarationGenerator {
         }
       }
       transitiveProvides.addAll(filteredProvides);
-      String originalPath = compilerInput.getSourceFile().getOriginalPath();
-      if (depgraph.isRoot(originalPath)) {
-        for (String provide : filteredProvides) {
-          provideToFile.put(provide, compilerInput.getSourceFile());
-        }
-        provides.addAll(filteredProvides);
+      for (String provide : filteredProvides) {
+        provideToFile.put(provide, compilerInput.getSourceFile());
       }
+      provides.addAll(filteredProvides);
     }
 
     if (PRINT_IMPORT_RENAME_MAP) {

@@ -1,7 +1,6 @@
 package com.google.javascript.clutz;
 
 import static com.google.javascript.clutz.ProgramSubject.assertThatProgram;
-import static java.util.Collections.singletonList;
 
 import com.google.common.collect.ImmutableList;
 import java.io.File;
@@ -18,14 +17,6 @@ import org.junit.runners.JUnit4;
 public class MultiFileTest {
 
   @Rule public TestName name = new TestName();
-
-  // Repro for https://github.com/angular/closure-to-dts/issues/101
-  @Test
-  public void shouldPruneProvidesFromNonrootFile() throws Exception {
-    File golden = input("require.d.ts");
-    assertThatProgram(singletonList(input("require.js")), singletonList(input("provide.js")))
-        .generatesDeclarations(golden);
-  }
 
   @Test
   public void shouldResolveNamedTypes() throws Exception {
@@ -53,18 +44,6 @@ public class MultiFileTest {
                 input("required.js"),
                 input("goog_module.js")),
             Collections.<File>emptyList())
-        .generatesDeclarations(golden);
-  }
-
-  @Test
-  public void depgraph() throws Exception {
-    File golden = input("depgraph.d.ts");
-    assertThatProgram(
-            ImmutableList.of(input("root.js")),
-            ImmutableList.of(
-                input("transitive.js"),
-                input("transitive_unused.js"),
-                input("transitive_namespace.js")))
         .generatesDeclarations(golden);
   }
 

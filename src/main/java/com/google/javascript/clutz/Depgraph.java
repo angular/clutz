@@ -12,10 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * Representation of the data contained in a depgraph file.
@@ -26,10 +24,6 @@ import java.util.regex.Pattern;
  */
 class Depgraph {
 
-  private final Set<String> roots = new LinkedHashSet<>();
-  private final Set<String> nonroots = new LinkedHashSet<>();
-  private final Set<String> rootExterns = new LinkedHashSet<>();
-  private final Set<String> nonrootExterns = new LinkedHashSet<>();
   /**
    * Closure's internal name for goog.provide and goog.module symbols is incompatible, and in a
    * goog.module file, it's impossible to tell which is being referenced, so information is pulled
@@ -39,35 +33,12 @@ class Depgraph {
 
   private Depgraph() {}
 
-  boolean isRoot(String fileName) {
-    // roots can only be empty if no Depgraphs were passed in, in which case we accept all files.
-    return roots.isEmpty() || roots.contains(fileName);
-  }
-
-  Set<String> getRoots() {
-    return Collections.unmodifiableSet(roots);
-  }
-
-  Set<String> getNonroots() {
-    return Collections.unmodifiableSet(nonroots);
-  }
-
-  Set<String> getRootExterns() {
-    return Collections.unmodifiableSet(rootExterns);
-  }
-
-  Set<String> getNonrootExterns() {
-    return Collections.unmodifiableSet(nonrootExterns);
-  }
-
   Set<String> getGoogProvides() {
     return Collections.unmodifiableSet(googProvides);
   }
 
   static Depgraph forRoots(Set<String> roots, Set<String> nonroots) {
     Depgraph result = new Depgraph();
-    result.roots.addAll(roots);
-    result.nonroots.addAll(nonroots);
     return result;
   }
 
@@ -90,10 +61,9 @@ class Depgraph {
                     }.getType());
 
         for (List<?> outer : list) {
-          String key = (String) outer.get(0);
           @SuppressWarnings("unchecked")
           List<List<?>> value = (List<List<?>>) outer.get(1);
-          result.collectFiles("roots".equals(key), value);
+          result.collectFiles(value);
         }
       } catch (FileNotFoundException e) {
         throw new IllegalArgumentException("depgraph file not found: " + depgraphName, e);
@@ -108,9 +78,8 @@ class Depgraph {
   }
 
   // Strip brackets from bazel's "[blaze-out/.../]foo/bar" path prefixes.
-  private static final Pattern GENERATED_FILE = Pattern.compile("^\\[([^]]+)\\]");
 
-  private void collectFiles(boolean isRoots, List<List<?>> fileList) {
+  private void collectFiles(List<List<?>> fileList) {
     for (List<?> rootDescriptor : fileList) {
       String fileName = (String) rootDescriptor.get(0);
       // *-bootstrap.js are automatically added to every rule by Bazel
@@ -119,13 +88,11 @@ class Depgraph {
       }
       @SuppressWarnings("unchecked")
       List<List<?>> fileProperties = (List<List<?>>) rootDescriptor.get(1);
-      boolean isExterns = false;
       boolean isGoogProvide = true;
       List<String> provides = new ArrayList<>();
       for (List<?> tuple : fileProperties) {
         String key = (String) tuple.get(0);
         if ("is_externs".equals(key) && Boolean.TRUE.equals(tuple.get(1))) {
-          isExterns = true;
           break;
         }
         if ("load_flags".equals(key)) {
@@ -146,16 +113,7 @@ class Depgraph {
           }
         }
       }
-      fileName = GENERATED_FILE.matcher(fileName).replaceAll("$1");
-      if (isExterns && isRoots) {
-        rootExterns.add(fileName);
-      } else if (isExterns && !isRoots) {
-        nonrootExterns.add(fileName);
-      } else if (isRoots) {
-        roots.add(fileName);
-      } else {
-        nonroots.add(fileName);
-      }
+
       if (isGoogProvide) {
         googProvides.addAll(provides);
       }
