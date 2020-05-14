@@ -1485,14 +1485,12 @@ public class PlatformSymbols {
           // experimental). By adding it to this list, we guarantee that the symbols are emitted
           // without the Clutz prefix and transparently mapped between the hand-written externs and
           // .d.ts.
-          // For more info see https://github.com/WICG/trusted-types
+          // For more info see https://github.com/w3c/webappsec-trusted-types
           "TrustedHTML",
           "TrustedScript",
           "TrustedScriptURL",
           "TrustedTypePolicy",
           "TrustedTypePolicyFactory",
-          "TrustedTypes",
-          "TrustedURL",
           "trustedTypes",
           // End of trusted types.
           "TypeError",
