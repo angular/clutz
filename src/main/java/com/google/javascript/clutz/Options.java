@@ -75,14 +75,6 @@ public class Options {
   boolean debug = false;
 
   @Option(
-    name = "--externs",
-    usage = "list of files to read externs definitions (as separate args)",
-    metaVar = "EXTERN...",
-    handler = StringArrayOptionHandler.class
-  )
-  List<String> externs = new ArrayList<>();
-
-  @Option(
     name = "--closure_env",
     usage =
         "Determines the set of builtin externs to load. Options: BROWSER, CUSTOM. "
@@ -212,19 +204,8 @@ public class Options {
     parser.parseArgument(args);
     depgraph = Depgraph.parseFrom(depgraphFiles);
 
-    // Clutz does not use the externs option in regular invocations. Since it is only
-    // ran on a js_library which only has sources, there is no way to treat sources and externs
-    // distinctly.
-    // For legacy reasons, it is separately called on the externs_list's of files, but in those
-    // invocations depgraphs are not used (since they don't exist for bundles of files).
-    //
-    // So either there are no externs present or no depgraphs present. In either case there is no
-    // point doing any union/intersection of those.
-
-    // Exclude externs that are already in the sources to avoid duplicated symbols.
-    arguments.removeAll(externs);
-    if (arguments.isEmpty() && externs.isEmpty()) {
-      throw new CmdLineException(parser, "No files or externs were given");
+    if (arguments.isEmpty()) {
+      throw new CmdLineException(parser, "No files were given");
     }
 
     if (collidingProvidesFile != null) {

@@ -16,11 +16,8 @@ public class OptionsTest {
 
   @Test
   public void testFullUsage() throws Exception {
-    Options opts =
-        new Options(
-            new String[] {"foo.js", "--externs", "extern1.js", "extern2.js", "-o", "output.d.ts"});
+    Options opts = new Options(new String[] {"foo.js", "-o", "output.d.ts"});
     assertThat(opts.arguments).containsExactly("foo.js");
-    assertThat(opts.externs).containsExactly("extern1.js", "extern2.js").inOrder();
     assertThat(opts.output).isEqualTo("output.d.ts");
   }
 
@@ -33,15 +30,11 @@ public class OptionsTest {
               "--closure_entry_points",
               "ns.entryPoint1",
               "ns.entryPoint2",
-              "--externs",
-              "extern1.js",
-              "extern2.js",
               "-o",
               "output.d.ts"
             });
     assertThat(opts.arguments).containsExactly("foo.js");
     assertThat(opts.entryPoints).containsExactly("ns.entryPoint1", "ns.entryPoint2");
-    assertThat(opts.externs).containsExactly("extern1.js", "extern2.js").inOrder();
     assertThat(opts.output).isEqualTo("output.d.ts");
   }
 
@@ -53,22 +46,8 @@ public class OptionsTest {
       new Options(new String[0]);
       fail("Should throw");
     } catch (CmdLineException expected) {
-      assertThat(expected.getMessage()).isEqualTo("No files or externs were given");
+      assertThat(expected.getMessage()).isEqualTo("No files were given");
     }
-  }
-
-  @Test
-  public void testShouldSupportExternsOnly() throws Exception {
-    Options opts = new Options(new String[] {"--externs", "extern1.js"});
-    assertThat(opts.externs).containsExactly("extern1.js");
-  }
-
-  @Test
-  public void testShouldPruneRepeatedExterns() throws Exception {
-    Options opts =
-        new Options(new String[] {"a.js", "extern1.js", "--externs", "extern1.js", "extern2.js"});
-    assertThat(opts.externs).containsExactly("extern1.js", "extern2.js");
-    assertThat(opts.arguments).containsExactly("a.js");
   }
 
   @Test
@@ -76,24 +55,10 @@ public class OptionsTest {
     Options opts =
         new Options(
             new String[] {
-              "--externs", "dir with spaces/common/dom.js", "--externs", "common/browser api.js",
+              "dir with spaces/common/dom.js", "common/browser api.js",
             });
-    assertThat(opts.externs)
+    assertThat(opts.arguments)
         .containsExactly("dir with spaces/common/dom.js", "common/browser api.js");
-  }
-
-  @Test
-  public void testIgnoresDepgraphNonRootExterns() throws Exception {
-    Options opts =
-        new Options(
-            new String[] {
-              // a random file from the depgraph. Not relevant to the test, but we need at least
-              // one input.
-              "my/thing/static/js/0-bootstrap.js",
-              "--depgraphs",
-              DepgraphTest.DEPGRAPH_PATH.toFile().toString(),
-            });
-    assertThat(opts.externs).isEmpty();
   }
 
   @Test
@@ -109,28 +74,8 @@ public class OptionsTest {
   }
 
   @Test
-  public void testIgnoresDepgraphRootExternsIfNotPassedToExterns() throws Exception {
-    // Due to "exported" libraries, what the depgraph considers "root" can be incorrect for the
-    // purposes of clutz. Arguments and Externs lists should only be filtered down
-    // with depgraph info and never extended.
-    Options opts =
-        new Options(
-            new String[] {
-              // a random file from the depgraph. Not relevant to the test, but we need at least
-              // one input.
-              "my/thing/static/js/0-bootstrap.js",
-              "--depgraphs",
-              DepgraphTest.DEPGRAPH_PATH.toFile().toString(),
-            });
-    assertThat(opts.externs).isEmpty();
-  }
-
-  @Test
   public void testStopOption() throws Exception {
-    Options opts =
-        new Options(
-            new String[] {"--externs", "extern1.js", "extern2.js", "--", "foo.js", "bar.js"});
+    Options opts = new Options(new String[] {"--", "foo.js", "bar.js"});
     assertThat(opts.arguments).containsExactly("foo.js", "bar.js").inOrder();
-    assertThat(opts.externs).containsExactly("extern1.js", "extern2.js").inOrder();
   }
 }

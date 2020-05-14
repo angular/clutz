@@ -344,9 +344,6 @@ class DeclarationGenerator {
           .forEach(sourceFiles::add);
     }
     List<SourceFile> externFiles = new ArrayList<>();
-    for (String extern : opts.externs) {
-      externFiles.add(SourceFile.fromPath(Paths.get(extern), UTF_8));
-    }
     if (opts.closureEnv != null) {
       externFiles.addAll(getDefaultExterns(opts));
     }
