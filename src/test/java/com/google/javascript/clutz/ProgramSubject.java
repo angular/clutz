@@ -6,7 +6,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.google.common.truth.FailureMetadata;
@@ -117,7 +116,6 @@ class ProgramSubject extends Subject {
     Options opts = new Options();
     opts.debug = debug;
     opts.partialInput = true;
-    opts.collidingProvides = ImmutableSet.of("colliding_provide.aliased");
     opts.browserResolverStrippedPrefixes = Arrays.asList("abs_strip_for_testing");
 
     List<SourceFile> sourceFiles = new ArrayList<>();
