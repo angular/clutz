@@ -115,7 +115,6 @@ class ProgramSubject extends Subject {
   private String[] parse() throws AssertionError {
     Options opts = new Options();
     opts.debug = debug;
-    opts.partialInput = true;
     opts.browserResolverStrippedPrefixes = Arrays.asList("abs_strip_for_testing");
 
     List<SourceFile> sourceFiles = new ArrayList<>();
