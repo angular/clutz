@@ -84,9 +84,6 @@ public class Options {
   )
   List<String> depgraphFiles = new ArrayList<>();
 
-  @Option(name = "--strict_deps", usage = "noop. This is about to be deleted")
-  boolean strictDeps = false;
-
   @Option(
     name = "--closure_entry_points",
     usage =
