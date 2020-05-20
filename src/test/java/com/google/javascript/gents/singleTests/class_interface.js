@@ -22,6 +22,9 @@ class IBase {
   /** @return {boolean} */
   method1() {}
 
+  /** @param {boolean=} a */
+  method2(a = false) {}
+
   /** @param {string} a */
   inferredVoidReturn(a) {}
 

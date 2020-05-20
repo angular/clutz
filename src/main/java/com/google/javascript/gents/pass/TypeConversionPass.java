@@ -215,7 +215,7 @@ public final class TypeConversionPass implements CompilerPass {
                   }
                 }
               } else {
-                stripFunctionBody(member);
+                stripFunctionDefaultParamsAndBody(member);
                 interfaceMembers.addChildToBack(member.detach());
               }
             }
@@ -232,16 +232,22 @@ public final class TypeConversionPass implements CompilerPass {
       }
     }
 
-    private void stripFunctionBody(Node member) {
+    private void stripFunctionDefaultParamsAndBody(Node member) {
       Node functionNode = member.getFirstChild();
       Node functionName = functionNode.getFirstChild();
       Node functionParams = functionNode.getSecondChild();
+      // Remove defaults from parameters
+      Node functionParamsNoDefaults = new Node(Token.PARAM_LIST);
+      for (Node param : functionParams.children()) {
+        Node paramNoDefault = param.isDefaultValue() ? param.getFirstChild() : param;
+        functionParamsNoDefaults.addChildToBack(paramNoDefault.detach());
+      }
       // Strip body from function definitions.
       Node newFunction =
           new Node(
               Token.FUNCTION,
               functionName.detach(),
-              functionParams.detach(),
+              functionParamsNoDefaults,
               new Node(Token.EMPTY));
       newFunction.useSourceInfoFrom(functionNode);
       nodeComments.replaceWithComment(functionNode, newFunction);

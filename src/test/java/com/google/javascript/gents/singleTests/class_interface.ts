@@ -15,6 +15,8 @@ export interface IBase {
   a: number;
   method1(): boolean;
 
+  method2(a?: boolean): void;
+
   inferredVoidReturn(a: string): void;
 
   explicitReturn(a: string): string;
