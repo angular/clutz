@@ -2147,6 +2147,12 @@ class DeclarationGenerator {
             }
 
             @Override
+            public Void caseBigIntType() {
+              emit("bigint");
+              return null;
+            }
+
+            @Override
             public Void caseNumberType() {
               emit("number");
               return null;
@@ -3560,6 +3566,11 @@ class DeclarationGenerator {
 
       @Override
       public Void caseAllType() {
+        return null;
+      }
+
+      @Override
+      public Void caseBigIntType() {
         return null;
       }
 
