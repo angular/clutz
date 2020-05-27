@@ -29,4 +29,4 @@ export class CorrectUseOfConcreteCompoundType extends SimpleGenericClass {}
  * Also, address @implements annotations.
  *
  */
-export interface Interface {}
+export interface Interface<VALUE> {}

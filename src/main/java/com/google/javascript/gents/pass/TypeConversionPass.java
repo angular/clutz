@@ -224,6 +224,8 @@ public final class TypeConversionPass implements CompilerPass {
                 new Node(Token.INTERFACE, className.detach(), interfaceExtends, interfaceMembers);
             addTypeToScope(newNode, className.getString());
             newNode.useSourceInfoFrom(n);
+            // Propagate JSDoc info to the annotations pass (e.g. to extract generics)
+            newNode.setJSDocInfo(jsDoc);
             nodeComments.replaceWithComment(n, newNode);
           }
           break;

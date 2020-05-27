@@ -76,3 +76,32 @@ const /** !ns.StructuralInterface */ structInterfaceImpl = {
     return 1;
   }
 };
+
+/**
+ * @template T
+ * @interface
+ */
+function Item() {}
+
+/**
+ * @record
+ * @template U
+ */
+function EmptyGenericRecord() {}
+
+/**
+ * @extends {Item<T>}
+ * @extends {EmptyGenericRecord<T>}
+ * @template T
+ * @interface
+ */
+class List {
+  /** @param {T} obj */
+  push(obj) {}
+
+  /**
+   * `List` usage to make TS checks happy
+   * @return {List<T>}
+   */
+  self() {}
+}

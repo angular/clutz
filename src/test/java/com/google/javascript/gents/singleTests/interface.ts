@@ -33,3 +33,14 @@ const structInterfaceImpl: StructuralInterface = {
     return 1;
   }
 };
+
+interface Item<T> {}
+interface EmptyGenericRecord<U> {}
+interface List<T> extends Item<T>, EmptyGenericRecord<T> {
+  push(obj: T): void;
+
+  /**
+   * `List` usage to make TS checks happy
+   */
+  self(): List<T>;
+}

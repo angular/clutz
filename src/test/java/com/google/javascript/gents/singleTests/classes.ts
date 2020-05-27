@@ -135,3 +135,12 @@ abstract class AnotherAbstractClass {
 class DecoratedConstructor {
   constructor() {}
 }
+
+interface Interface {}
+interface GenericInterface<T> {}
+class Class {}
+
+export class GenericClass<T> extends Class implements Interface,
+                                                      GenericInterface<T> {}
+
+export class NormalClass extends Class implements Interface {}

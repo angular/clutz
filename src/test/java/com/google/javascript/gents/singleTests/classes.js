@@ -162,4 +162,27 @@ class DecoratedConstructor {
   constructor() {}
 }
 
-exports = {G, ClassWithNoConstructorJsDocAndProperties, GoogDefinedClassWithConstructorAnnotation, GoogDefinedClassWithConstructorAnnotationAndParameters, GoogDefinedClassWithDeeplyNestedConstructorAnnotation, A, B, C, D, E, F};
+/** @interface */
+function Interface() {}
+/**
+ * @interface
+ * @template T
+ */
+class GenericInterface {}
+class Class {}
+
+/**
+ * @implements {Interface}
+ * @implements {GenericInterface<T>}
+ * @extends {Class}
+ * @template T
+ */
+class GenericClass extends Class {}
+
+/**
+ * @implements {Interface}
+ * @extends {Class}
+ */
+class NormalClass extends Class {}
+
+exports = {G, ClassWithNoConstructorJsDocAndProperties, GoogDefinedClassWithConstructorAnnotation, GoogDefinedClassWithConstructorAnnotationAndParameters, GoogDefinedClassWithDeeplyNestedConstructorAnnotation, A, B, C, D, E, F, GenericClass, NormalClass};

@@ -125,7 +125,7 @@ public final class TypeAnnotationPass implements CompilerPass {
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
       // TODO(lukemizuhashi): Handle @template annotations on methods, as well.
-      if (n.isClass()) {
+      if (n.isClass() || n.getToken() == Token.INTERFACE) {
         JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
         if (bestJSDocInfo != null) {
           n.putProp(Node.GENERIC_TYPE_LIST, bestJSDocInfo.getTemplateTypeNames());
