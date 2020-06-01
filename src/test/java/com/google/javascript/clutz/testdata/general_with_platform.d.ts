@@ -46,7 +46,6 @@ declare namespace ಠ_ಠ.clutz.u2f {
 // Generated from externs.zip//html5.js
 declare namespace ಠ_ಠ.clutz {
   abstract class BaseRenderingContext2D implements CanvasDrawingStyles , CanvasPathMethods {
-    private noStructuralTyping_BaseRenderingContext2D : any;
     arc (x : number , y : number , radius : number , startAngle : number , endAngle : number , opt_anticlockwise ? : boolean ) : void ;
     arcTo (x1 : number , y1 : number , x2 : number , y2 : number , radius : number ) : void ;
     beginPath ( ) : void ;
@@ -151,7 +150,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//html5.js
 declare namespace ಠ_ಠ.clutz {
   class OffscreenCanvas implements GlobalEventTarget , Transferable {
-    private noStructuralTyping_OffscreenCanvas : any;
     constructor (width : number , height : number ) ;
     addEventListener < THIS = any > (type : string , listener : EventListener | null | ( (this : THIS , a : GlobalEvent ) => any ) , opt_options ? : boolean | AddEventListenerOptions ) : void ;
     convertToBlob (opt_options ? : { quality ? : number , type ? : string } ) : Promise < Blob > ;
@@ -166,7 +164,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//html5.js
 declare namespace ಠ_ಠ.clutz {
   class OffscreenCanvasRenderingContext2D extends BaseRenderingContext2D {
-    private noStructuralTyping_OffscreenCanvasRenderingContext2D : any;
     canvas : OffscreenCanvas ;
   }
 }
@@ -185,7 +182,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//html5.js
 declare namespace ಠ_ಠ.clutz {
   class StorageManager {
-    private noStructuralTyping_StorageManager : any;
     estimate ( ) : Promise < ಠ_ಠ.clutz.StorageEstimate > ;
     persist ( ) : Promise < boolean > ;
     persisted ( ) : Promise < boolean > ;
@@ -203,7 +199,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class DirectoryEntry extends Entry {
-    private noStructuralTyping_DirectoryEntry : any;
     createReader ( ) : DirectoryReader ;
     getDirectory (path : string , options ? : FileSystemFlags , successCallback ? : (a : DirectoryEntry ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
     getFile (path : string , options ? : FileSystemFlags , successCallback ? : (a : FileEntry ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
@@ -213,7 +208,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class DirectoryEntrySync extends EntrySync {
-    private noStructuralTyping_DirectoryEntrySync : any;
     createReader ( ) : DirectoryReaderSync ;
     getDirectory (path : string , options ? : GlobalObject | null ) : DirectoryEntrySync ;
     getFile (path : string , options ? : GlobalObject | null ) : FileEntrySync ;
@@ -223,21 +217,18 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class DirectoryReader {
-    private noStructuralTyping_DirectoryReader : any;
     readEntries (successCallback : (a : Entry [] ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
   }
 }
 // Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class DirectoryReaderSync {
-    private noStructuralTyping_DirectoryReaderSync : any;
     readEntries ( ) : EntrySync [] ;
   }
 }
 // Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class Entry {
-    private noStructuralTyping_Entry : any;
     copyTo (parent : DirectoryEntry , newName ? : string , successCallback ? : (a : Entry ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
     filesystem : FileSystem ;
     fullPath : string ;
@@ -254,7 +245,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class EntrySync {
-    private noStructuralTyping_EntrySync : any;
     copyTo (parent : DirectoryEntrySync , newName ? : string ) : EntrySync ;
     filesystem : FileSystemSync ;
     fullPath : string ;
@@ -271,7 +261,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class FileEntry extends Entry {
-    private noStructuralTyping_FileEntry : any;
     createWriter (successCallback : (a : FileWriter ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
     file (successCallback : (a : File ) => any , errorCallback ? : (a : FileError ) => any ) : void ;
   }
@@ -279,7 +268,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class FileEntrySync extends EntrySync {
-    private noStructuralTyping_FileEntrySync : any;
     createWriter ( ) : FileWriterSync ;
     file ( ) : File ;
   }
@@ -287,7 +275,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class FileError extends DOMError {
-    private noStructuralTyping_FileError : any;
     ABORT_ERR : number ;
     ENCODING_ERR : number ;
     INVALID_MODIFICATION_ERR : number ;
@@ -318,7 +305,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class FileException {
-    private noStructuralTyping_FileException : any;
     ABORT_ERR : number ;
     ENCODING_ERR : number ;
     INVALID_MODIFICATION_ERR : number ;
@@ -349,7 +335,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class FileSaver {
-    private noStructuralTyping_FileSaver : any;
     DONE : number ;
     INIT : number ;
     WRITING : number ;
@@ -367,7 +352,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class FileSystem {
-    private noStructuralTyping_FileSystem : any;
     name : string ;
     root : DirectoryEntry ;
   }
@@ -382,7 +366,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class FileSystemSync {
-    private noStructuralTyping_FileSystemSync : any;
     name : string ;
     root : DirectoryEntrySync ;
   }
@@ -390,7 +373,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class FileWriter extends FileSaver {
-    private noStructuralTyping_FileWriter : any;
     length : number ;
     position : number ;
     seek (offset : number ) : void ;
@@ -401,7 +383,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class FileWriterSync {
-    private noStructuralTyping_FileWriterSync : any;
     length : number ;
     position : number ;
     seek (offset : number ) : void ;
@@ -415,7 +396,6 @@ declare namespace ಠ_ಠ.clutz {
    * LocalFileSystemSync interface, implemented by WorkerGlobalScope.
    */
   class LocalFileSystemSync {
-    private noStructuralTyping_LocalFileSystemSync : any;
   }
 }
 // Generated from externs.zip//nonstandard_fileapi.js
@@ -424,7 +404,6 @@ declare namespace ಠ_ಠ.clutz {
    * Metadata interface.
    */
   class Metadata {
-    private noStructuralTyping_Metadata : any;
     modificationTime : GlobalDate ;
     size : number ;
   }
@@ -440,7 +419,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   class ByteLengthQueuingStrategy {
-    private noStructuralTyping_ByteLengthQueuingStrategy : any;
     constructor (config : { highWaterMark : number } ) ;
     /**
      * If we don't want to be strict we can define chunk as {*}
@@ -452,7 +430,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   class CountQueuingStrategy {
-    private noStructuralTyping_CountQueuingStrategy : any;
     constructor (config : { highWaterMark : number } ) ;
     size (chunk : any ) : number ;
   }
@@ -571,7 +548,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//streamsapi.js
 declare namespace ಠ_ಠ.clutz {
   class WritableStream < VALUE = any > {
-    private noStructuralTyping_WritableStream : any;
     constructor (opt_underlyingSink ? : WritableStreamSink < VALUE > , opt_queuingStrategy ? : CountQueuingStrategy | ByteLengthQueuingStrategy | { highWaterMark ? : number , size ? : (a : any ) => number } ) ;
     abort (reason : any ) : Promise < undefined > ;
     close ( ) : Promise < undefined > ;
@@ -617,7 +593,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//w3c_abort.js
 declare namespace ಠ_ಠ.clutz {
   class AbortController {
-    private noStructuralTyping_AbortController : any;
     abort ( ) : void ;
     signal : AbortSignal ;
   }
@@ -719,7 +694,6 @@ declare namespace ಠ_ಠ.clutz {
    * https://wicg.github.io/largest-contentful-paint/#largestcontentfulpaint
    */
   class LargestContentfulPaint extends PerformanceEntry {
-    private noStructuralTyping_LargestContentfulPaint : any;
     element : GlobalElement | null ;
     id : string ;
     loadTime : number ;
@@ -734,7 +708,6 @@ declare namespace ಠ_ಠ.clutz {
    * https://wicg.github.io/layout-instability/#sec-layout-shift
    */
   class LayoutShift extends PerformanceEntry {
-    private noStructuralTyping_LayoutShift : any;
     hadRecentInput : boolean ;
     lastInputTime : number ;
     value : number ;
@@ -746,7 +719,6 @@ declare namespace ಠ_ಠ.clutz {
    * https://wicg.github.io/event-timing/#sec-performance-event-timing
    */
   class PerformanceEventTiming extends PerformanceEntry {
-    private noStructuralTyping_PerformanceEventTiming : any;
     cancelable : boolean ;
     processingEnd : number ;
     processingStart : number ;
@@ -758,7 +730,6 @@ declare namespace ಠ_ಠ.clutz {
    * https://w3c.github.io/paint-timing/#sec-PerformancePaintTiming
    */
   class PerformancePaintTiming extends PerformanceEntry {
-    private noStructuralTyping_PerformancePaintTiming : any;
   }
 }
 // Generated from externs.zip//w3c_payment_request.js
@@ -794,7 +765,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//w3c_payment_request.js
 declare namespace ಠ_ಠ.clutz {
   class MerchantValidationEvent extends GlobalEvent {
-    private noStructuralTyping_MerchantValidationEvent : any;
     constructor (type : string , eventInitDict ? : MerchantValidationEventInit ) ;
     complete (merchantSessionPromise : Promise < undefined > ) : void ;
     methodName : string ;
@@ -844,7 +814,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//w3c_payment_request.js
 declare namespace ಠ_ಠ.clutz {
   class PaymentMethodChangeEvent extends PaymentRequestUpdateEvent {
-    private noStructuralTyping_PaymentMethodChangeEvent : any;
     constructor (type : string , eventInitDict ? : PaymentMethodChangeEventInit ) ;
     methodDetails : GlobalObject | null ;
     methodName : string ;
@@ -878,7 +847,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//w3c_rtc.js
 declare namespace ಠ_ಠ.clutz {
   class BlobEvent extends GlobalEvent {
-    private noStructuralTyping_BlobEvent : any;
     constructor (type : string , eventInitDict : { data : Blob , timecode ? : number } ) ;
     data : Blob ;
     timecode : number ;
@@ -924,7 +892,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   class Animation implements GlobalEventTarget {
-    private noStructuralTyping_Animation : any;
     constructor (effect ? : AnimationEffectReadOnly | null , timeline ? : AnimationTimeline | null ) ;
     addEventListener < THIS = any > (type : string , listener : EventListener | null | ( (this : THIS , a : GlobalEvent ) => any ) , options ? : boolean | AddEventListenerOptions ) : void ;
     cancel ( ) : void ;
@@ -1004,7 +971,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   class DocumentTimeline implements AnimationTimeline {
-    private noStructuralTyping_DocumentTimeline : any;
     currentTime : number | null ;
     getAnimations ( ) : Animation [] ;
     play (effect : AnimationEffectReadOnly ) : Animation ;
@@ -1013,7 +979,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   class GroupEffect implements AnimationEffectReadOnly {
-    private noStructuralTyping_GroupEffect : any;
     constructor (children : AnimationEffectReadOnly [] , timing ? : AnimationEffectTimingProperties | null ) ;
     children : AnimationEffectReadOnly [] ;
     getComputedTiming ( ) : ComputedTimingProperties ;
@@ -1029,7 +994,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   class KeyframeEffect extends KeyframeEffectReadOnly {
-    private noStructuralTyping_KeyframeEffect : any;
     constructor (target : GlobalElement | null , frames : { [ key: string ]: any } [] | { [ key: string ]: any [] } , options ? : number | AnimationEffectTimingProperties | null ) ;
   }
 }
@@ -1049,7 +1013,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   class KeyframeEffectReadOnly implements AnimationEffectReadOnly {
-    private noStructuralTyping_KeyframeEffectReadOnly : any;
     constructor (target : GlobalElement | null , frames : { [ key: string ]: any } [] | { [ key: string ]: any [] } , options ? : number | AnimationEffectTimingProperties | null ) ;
     getComputedTiming ( ) : ComputedTimingProperties ;
     onsample ? : ( (a : number , b : KeyframeEffect , c : Animation ) => any ) | null ;
@@ -1060,7 +1023,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   class SequenceEffect implements AnimationEffectReadOnly {
-    private noStructuralTyping_SequenceEffect : any;
     constructor (children : AnimationEffectReadOnly [] , timing ? : AnimationEffectTimingProperties | null ) ;
     children : AnimationEffectReadOnly [] ;
     getComputedTiming ( ) : ComputedTimingProperties ;
@@ -1082,14 +1044,12 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//webassembly.js
 declare namespace ಠ_ಠ.clutz.WebAssembly {
   class CompileError extends GlobalError {
-    private noStructuralTyping_WebAssembly_CompileError : any;
     constructor ( ) ;
   }
 }
 // Generated from externs.zip//webassembly.js
 declare namespace ಠ_ಠ.clutz.WebAssembly {
   class Instance {
-    private noStructuralTyping_WebAssembly_Instance : any;
     constructor (moduleObject : ಠ_ಠ.clutz.WebAssembly.Module , importObject ? : GlobalObject | null ) ;
     exports : any ;
   }
@@ -1097,14 +1057,12 @@ declare namespace ಠ_ಠ.clutz.WebAssembly {
 // Generated from externs.zip//webassembly.js
 declare namespace ಠ_ಠ.clutz.WebAssembly {
   class LinkError extends GlobalError {
-    private noStructuralTyping_WebAssembly_LinkError : any;
     constructor ( ) ;
   }
 }
 // Generated from externs.zip//webassembly.js
 declare namespace ಠ_ಠ.clutz.WebAssembly {
   class Memory {
-    private noStructuralTyping_WebAssembly_Memory : any;
     constructor (memoryDescriptor : ಠ_ಠ.clutz.MemoryDescriptor ) ;
     buffer : ArrayBuffer ;
     grow (delta : number ) : number ;
@@ -1113,7 +1071,6 @@ declare namespace ಠ_ಠ.clutz.WebAssembly {
 // Generated from externs.zip//webassembly.js
 declare namespace ಠ_ಠ.clutz.WebAssembly {
   class Module {
-    private noStructuralTyping_WebAssembly_Module : any;
     constructor (bytes : ArrayBuffer | ArrayBufferView ) ;
     static customSections (moduleObject : ಠ_ಠ.clutz.WebAssembly.Module , sectionName : string ) : ArrayBuffer [] ;
     static exports (moduleObject : ಠ_ಠ.clutz.WebAssembly.Module ) : { kind : string , name : string } [] ;
@@ -1123,14 +1080,12 @@ declare namespace ಠ_ಠ.clutz.WebAssembly {
 // Generated from externs.zip//webassembly.js
 declare namespace ಠ_ಠ.clutz.WebAssembly {
   class RuntimeError extends GlobalError {
-    private noStructuralTyping_WebAssembly_RuntimeError : any;
     constructor ( ) ;
   }
 }
 // Generated from externs.zip//webassembly.js
 declare namespace ಠ_ಠ.clutz.WebAssembly {
   class Table {
-    private noStructuralTyping_WebAssembly_Table : any;
     constructor (tableDescriptor : ಠ_ಠ.clutz.TableDescriptor ) ;
     get (index : number ) : ಠ_ಠ.clutz.TableFunction ;
     grow (delta : number ) : number ;

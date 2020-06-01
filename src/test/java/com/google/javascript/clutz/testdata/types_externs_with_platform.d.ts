@@ -73,19 +73,16 @@ declare namespace ಠ_ಠ.clutz.functionNamespace {
 // Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.externs.js
 declare namespace ಠ_ಠ.clutz.functionNamespace {
   class privateClass {
-    private noStructuralTyping_functionNamespace_privateClass : any;
   }
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.externs.js
 declare namespace ಠ_ಠ.clutz {
   class functionNamespaceHelperClass {
-    private noStructuralTyping_functionNamespaceHelperClass : any;
   }
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.externs.js
 declare namespace ಠ_ಠ.clutz.namespace {
   class Foo {
-    private noStructuralTyping_namespace_Foo : any;
     member : string ;
     method (opt_exp ? : (a : ಠ_ಠ.clutz.namespace.Foo ) => any ) : any ;
     static staticField : string ;
@@ -99,7 +96,6 @@ declare namespace ಠ_ಠ.clutz.namespace {
 // Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.externs.js
 declare namespace ಠ_ಠ.clutz.namespace.atypedef {
   class Cache < T = any > {
-    private noStructuralTyping_namespace_atypedef_Cache : any;
     destroy ( ) : any ;
     get (key : string ) : T ;
     info ( ) : ಠ_ಠ.clutz.namespace.atypedef.Cache.Info ;

@@ -5,7 +5,6 @@ declare namespace ಠ_ಠ.clutz {
     //!! not to collide with namespace ಠ_ಠ.clutz.ExternStaticC.ns.
     //!! same for objNsLike, fn.
     //!! TODO(rado): Find a work-around so that the function fn is also available.
-    private noStructuralTyping_ExternStaticC : any;
     static literal : { foo : string } ;
   }
 }
