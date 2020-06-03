@@ -39,7 +39,10 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
         String importedModuleId = statement.getFirstFirstChild().getSecondChild().getString();
         String localVariableName = statement.getFirstChild().getString();
 
-        String importedSymbolName = buildWholeModuleExportSymbolName(importedModuleId);
+        String importedSymbolName =
+            googProvides.contains(importedModuleId)
+                ? importedModuleId
+                : buildWholeModuleExportSymbolName(importedModuleId);
         localVariableToImportedSymbolNameMap.put(localVariableName, importedSymbolName);
       } else if (isImportDestructuringAssignment(statement)) {
         // `const {C, Clazz: RenamedClazz} = goog.require()` or
@@ -60,7 +63,12 @@ public class AliasMapBuilder extends ImportBasedMapBuilder {
             localVariableName = originalName;
           }
 
-          String importedSymbolName = buildNamedExportSymbolName(importedModuleId, originalName);
+          String importedSymbolName =
+              (googProvides.contains(importedModuleId)
+                      ? importedModuleId
+                      : buildWholeModuleExportSymbolName(importedModuleId))
+                  + "."
+                  + originalName;
           localVariableToImportedSymbolNameMap.put(localVariableName, importedSymbolName);
         }
       } else if (statement.isConst() && statement.getFirstChild().isName()) {

@@ -28,3 +28,8 @@ function ClassExtendingRename() {
 exports.ClassExtendingMissingRequire = ClassExtendingMissingRequire;
 exports.ClassExtendingLegacyBaseClass = ClassExtendingLegacyBaseClass;
 exports.ClassExtendingRename = ClassExtendingRename;
+
+// Ensure that reexporting a goog.provided namespace handled correctly: clutz
+// should use "googprovide.exporter" when defining ReexportedMissingGoogRequire
+// in .d.ts.
+exports.ReexportedMissingGoogRequire = MissingGoogRequire;
