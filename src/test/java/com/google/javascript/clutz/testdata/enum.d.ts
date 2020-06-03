@@ -11,7 +11,7 @@ declare module 'goog:some.EscapedEnum' {
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/enum.js
 declare namespace ಠ_ಠ.clutz.some {
-  type MixedEnum = string | number | boolean &{clutzEnumBrand: never} ;
+  type MixedEnum = ( string | number | boolean ) &{clutzEnumBrand: never} ;
   let MixedEnum : {
     A : MixedEnum ,
     B : MixedEnum ,
@@ -25,7 +25,7 @@ declare module 'goog:some.MixedEnum' {
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/enum.js
 declare namespace ಠ_ಠ.clutz.some {
-  type NumberAsKey = string &{clutzEnumBrand: never} |'a' |'b' ;
+  type NumberAsKey = ( string ) &{clutzEnumBrand: never} |'a' |'b' ;
   let NumberAsKey : {
     1 : 'a' ,
     2 : 'b' ,
@@ -38,7 +38,7 @@ declare module 'goog:some.NumberAsKey' {
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/enum.js
 declare namespace ಠ_ಠ.clutz.some {
-  type ObjectValuedEnum = X &{clutzEnumBrand: never} ;
+  type ObjectValuedEnum = ( X ) &{clutzEnumBrand: never} ;
   let ObjectValuedEnum : {
     A : ObjectValuedEnum ,
     B : ObjectValuedEnum ,
@@ -51,7 +51,7 @@ declare module 'goog:some.ObjectValuedEnum' {
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/enum.js
 declare namespace ಠ_ಠ.clutz.some {
-  type PartialLiteralStringEnum = string &{clutzEnumBrand: never} |'1' |'2' ;
+  type PartialLiteralStringEnum = ( string ) &{clutzEnumBrand: never} |'1' |'2' ;
   let PartialLiteralStringEnum : {
     A : '1' ,
     B : PartialLiteralStringEnum ,
@@ -90,7 +90,7 @@ declare module 'goog:some.StringEnum' {
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/enum.js
 declare namespace ಠ_ಠ.clutz.some {
-  type StringVariableEnum = string &{clutzEnumBrand: never} ;
+  type StringVariableEnum = ( string ) &{clutzEnumBrand: never} ;
   let StringVariableEnum : {
     A : StringVariableEnum ,
     B : StringVariableEnum ,

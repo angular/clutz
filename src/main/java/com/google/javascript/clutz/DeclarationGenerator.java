@@ -1826,7 +1826,7 @@ class DeclarationGenerator {
 
     private void visitTypeAlias(
         JSType registryType, String unqualifiedName, boolean emitNeverBrand) {
-      emitTypeAliasPrefix(registryType, unqualifiedName);
+      emitTypeAliasPrefix(registryType, unqualifiedName, emitNeverBrand);
       // emit a brand to prevent accidental compatibility of values with an enum.
       if (emitNeverBrand) emit("&{clutzEnumBrand: never}");
       emit(";");
@@ -1835,7 +1835,7 @@ class DeclarationGenerator {
 
     private void visitTypeAliasForMixedStringEnums(
         JSType registryType, String unqualifiedName, Set<String> literalTypes) {
-      emitTypeAliasPrefix(registryType, unqualifiedName);
+      emitTypeAliasPrefix(registryType, unqualifiedName, /* branded */ true);
       emit("&{clutzEnumBrand: never}");
       // Inline all literal types in the type alias.
       for (String n : literalTypes) {
@@ -1845,11 +1845,19 @@ class DeclarationGenerator {
       emitBreak();
     }
 
-    private void emitTypeAliasPrefix(JSType registryType, String unqualifiedName) {
+    private void emitTypeAliasPrefix(JSType registryType, String unqualifiedName, boolean branded) {
       emit("type");
       emit(unqualifiedName);
       emit("=");
+      // if branded, parenthesize the type so the intersection doesn't take precedence over e.g. a
+      // union type. This is not always done as to not mess up emit for plain type aliases.
+      if (branded) {
+        emit("(");
+      }
       visitType(registryType, true, false);
+      if (branded) {
+        emit(")");
+      }
     }
 
     private void visitEnumType(String symbolName, String qualifiedName, EnumType type, Node node) {

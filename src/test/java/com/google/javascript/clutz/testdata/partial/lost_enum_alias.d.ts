@@ -7,7 +7,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$lost$enum$alias {
   /**
    * Partial alias of some of the enum fields.
    */
-  type EAlias = ಠ_ಠ.clutz.module$exports$some$other$Enum.E &{clutzEnumBrand: never} ;
+  type EAlias = ( ಠ_ಠ.clutz.module$exports$some$other$Enum.E ) &{clutzEnumBrand: never} ;
   let EAlias : {
     A : EAlias ,
   };

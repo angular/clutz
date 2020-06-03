@@ -4,7 +4,7 @@ declare namespace ಠ_ಠ.clutz.module$exports$enums$imported$types {
     //!! TODO(b/145557994): this should include SubEnum
     source ? : null ;
   }
-  type SubEnum = ಠ_ಠ.clutz.module$exports$other$enums.ImportedEnum &{clutzEnumBrand: never} ;
+  type SubEnum = ( ಠ_ಠ.clutz.module$exports$other$enums.ImportedEnum ) &{clutzEnumBrand: never} ;
   let SubEnum : {
     AUTO : SubEnum ,
     CUSTOM : SubEnum ,
