@@ -42,6 +42,7 @@ import com.google.javascript.rhino.StaticSourceFile;
 import com.google.javascript.rhino.jstype.EnumElementType;
 import com.google.javascript.rhino.jstype.EnumType;
 import com.google.javascript.rhino.jstype.FunctionType;
+import com.google.javascript.rhino.jstype.FunctionType.Parameter;
 import com.google.javascript.rhino.jstype.JSType;
 import com.google.javascript.rhino.jstype.JSTypeNative;
 import com.google.javascript.rhino.jstype.JSTypeRegistry;
@@ -3169,7 +3170,7 @@ class DeclarationGenerator {
     }
 
     private boolean allParametersUnknown(FunctionType ftype) {
-      for (Node param : ftype.getParameters()) {
+      for (Parameter param : ftype.getParameters()) {
         JSType type = param.getJSType();
         // Note: template types (e.g. the T in Array<T>) return true for isUnknownType,
         // so we check that first.
@@ -3217,7 +3218,7 @@ class DeclarationGenerator {
       // This is too broad (we also affect callback types) but we can fix that if it's a problem.
       boolean makeAllParametersOptional = allParametersUnknown(ftype);
       emit("(");
-      Iterator<Node> parameters = ftype.getParameters().iterator();
+      Iterator<Parameter> parameters = ftype.getParameters().iterator();
       if (shouldEmitThis) {
         emitThisParameter(ftype, parameters);
       }
@@ -3242,8 +3243,8 @@ class DeclarationGenerator {
 
       int paramCount = 0;
       while (parameters.hasNext()) {
-        Node param = parameters.next();
-        if (param.isVarArgs()) {
+        Parameter param = parameters.next();
+        if (param.isVariadic()) {
           emit("...");
         }
 
@@ -3263,11 +3264,11 @@ class DeclarationGenerator {
         paramCount++;
 
         // In TypeScript ...a?: any[] is illegal, so we can only make non-varargs optional.
-        if ((param.isOptionalArg() || makeAllParametersOptional) && !param.isVarArgs()) {
+        if ((param.isOptional() || makeAllParametersOptional) && !param.isVariadic()) {
           emit("?");
-          visitTypeDeclaration(param.getJSType(), param.isVarArgs(), true);
+          visitTypeDeclaration(param.getJSType(), param.isVariadic(), true);
         } else {
-          visitTypeDeclaration(param.getJSType(), param.isVarArgs(), false);
+          visitTypeDeclaration(param.getJSType(), param.isVariadic(), false);
         }
         if (parameters.hasNext()) {
           emit(", ");
@@ -3288,9 +3289,8 @@ class DeclarationGenerator {
         return true;
       }
 
-      Iterator<Node> parameters = ftype.getParameters().iterator();
-      while (parameters.hasNext()) {
-        final JSType paramType = parameters.next().getJSType();
+      for (Parameter parameter : ftype.getParameters()) {
+        JSType paramType = parameter.getJSType();
         if (!paramType.isTemplatizedType()) {
           continue;
         }
@@ -3311,7 +3311,7 @@ class DeclarationGenerator {
      *
      * <p>TODO: emit for non-templatized this like `function(this: HTMLElement)`
      */
-    private void emitThisParameter(FunctionType ftype, Iterator<Node> parameters) {
+    private void emitThisParameter(FunctionType ftype, Iterator<Parameter> parameters) {
       final JSType typeOfThis = ftype.getTypeOfThis();
       // Don't emit for a constructor like `function(new: T)`.
       // A `this` parameter in a constructor is not allowed in TypeScript.
