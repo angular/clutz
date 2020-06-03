@@ -323,6 +323,27 @@ public class GentsCodeGenerator extends CodeGenerator {
         add(interfaceMembers);
         return true;
       }
+      case IF:
+        // If the body of a conditional is written without a block, Rhino will wrap the body in
+        // a synthetic block. In the case that "else" body is an "if" statement that was implictly
+        // wrapped this way, it is nicer to flatten the "if" body to its original "else if" form.
+        //   if (0) {} else if (1) {} -> if (0) {} else {* if(1) {} *} -> if (0) else if (1) {}
+        //                                              ^^          ^^ -- synthetic block
+        boolean hasElse = n.getChildCount() == 3;
+        if (!hasElse ||
+            // If `isAddedBlock` is true, then the node is a synthetic block.
+            !n.getLastChild().isAddedBlock() ||
+            !n.getLastChild().getFirstChild().isIf()) {
+          return false;
+        }
+
+        add("if (");
+        add(n.getFirstChild());
+        add(")");
+        add(n.getSecondChild());
+        add("else");
+        add(n.getLastChild().getFirstChild());
+        return true;
       case INDEX_SIGNATURE:
         Node first = n.getFirstChild();
         if (null != first) {
