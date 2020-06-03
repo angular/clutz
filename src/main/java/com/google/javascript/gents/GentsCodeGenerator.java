@@ -383,6 +383,19 @@ public class GentsCodeGenerator extends CodeGenerator {
           // so have the generator use the default emit
           return false;
         }
+      case STRING_KEY:
+        // Taking over the string key emit so that we can emit optional properties like foo?,
+        // without closure quoting the whole key as 'foo?'.
+        if (!n.getString().contains("?")) return false;
+        if (n.isShorthandProperty()) {
+          return false;
+        }
+        add(n.getString());
+        if (n.hasOneChild()) {
+          add(": ");
+          add(n.getFirstChild());
+        }
+        return true;
       case DEFAULT_VALUE:
       case NAME:
         // Prepend access modifiers on constructor params

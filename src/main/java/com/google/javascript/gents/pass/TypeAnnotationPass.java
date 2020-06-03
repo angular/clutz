@@ -456,8 +456,20 @@ public final class TypeAnnotationPass implements CompilerPass {
 
   /** Sets the annotated type expression corresponding to Node {@code n}. */
   private void setTypeExpression(Node n, @Nullable JSTypeExpression type, boolean isReturnType) {
-    TypeDeclarationNode node = convert(type, isReturnType);
-    setTypeExpression(n, node);
+    TypeDeclarationNode typeNode = convert(type, isReturnType);
+
+    // If the type of a member variable contains "undefined", we emit prop? and drop the undefined in TypeScript.
+    // This is a better translation which matches closure semantics that a field with
+    // optional undefined can be completely omitted from the assigned object.
+    //   /** @private {string|undefined} */ this.a -> a? : string
+    if (n.isMemberVariableDef() &&
+        typeNode.getToken() == Token.UNION_TYPE &&
+        unionContainsUndefined(typeNode)) {
+      n.setString(n.getString() + "?");
+      typeNode = getUnionTypeNoUndefined(typeNode);
+    }
+
+    setTypeExpression(n, typeNode);
   }
 
   /** Sets the annotated type expression corresponding to Node {@code n}. */
@@ -610,8 +622,19 @@ public final class TypeAnnotationPass implements CompilerPass {
           }
           TypeDeclarationNode fieldType =
               isFieldTypeDeclared ? convertTypeNodeAST(field.getLastChild()) : null;
+
+          // If the union contains "undefined", we emit prop? and drop the undefined in TypeScript.
+          // This is a better translation which matches closure semantics that a field with
+          // optional undefined can be completely omitted from the assigned object.
+          if (fieldType.getToken() == Token.UNION_TYPE && unionContainsUndefined(fieldType)) {
+            TypeDeclarationNode unionNoUndefined = getUnionTypeNoUndefined(fieldType);
+            fieldName += "?";
+            fieldType = unionNoUndefined;
+          }
+
           properties.put(fieldName, fieldType);
         }
+
         return recordType(properties);
         // Convert unions
       case PIPE:
@@ -682,6 +705,28 @@ public final class TypeAnnotationPass implements CompilerPass {
       default:
         throw new IllegalArgumentException("Unsupported node type:\n" + n.toStringTree());
     }
+  }
+
+  /** Returns whether a union type contains `undefined`. */
+  private static boolean unionContainsUndefined(TypeDeclarationNode union) {
+    for (Node unionChild : union.children()) {
+      if (unionChild.getToken() == Token.UNDEFINED_TYPE) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /** Converts a union type to one without `undefined`, if it is present, detaching the original union. */
+  private static TypeDeclarationNode getUnionTypeNoUndefined(TypeDeclarationNode union) {
+    List<TypeDeclarationNode> nonUndefinedChildren = new ArrayList<>();
+    for (Node unionChild : union.children()) {
+      if (unionChild.getToken() != Token.UNDEFINED_TYPE) {
+        nonUndefinedChildren.add((TypeDeclarationNode) unionChild);
+      }
+    }
+    union.detachChildren();
+    return unionType(nonUndefinedChildren);
   }
 
   /** Returns a new node representing an index signature type. */
