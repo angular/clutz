@@ -19,6 +19,10 @@ declare namespace ಠ_ಠ.clutz.enums {
   }
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/enum_with_method.js
+declare namespace ಠ_ಠ.clutz.enums.EnumWithMethod {
+  function getColor ( ) : any ;
+}
+// Generated from src/test/java/com/google/javascript/clutz/testdata/enum_with_method.js
 declare module 'goog:enums.EnumWithMethod' {
   import EnumWithMethod = ಠ_ಠ.clutz.enums.EnumWithMethod;
   export default EnumWithMethod;

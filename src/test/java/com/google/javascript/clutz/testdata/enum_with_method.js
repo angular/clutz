@@ -1,5 +1,5 @@
-goog.provide('enums.EnumWithMethod');
 goog.provide('enums.EnumWithInlineMethod');
+goog.provide('enums.EnumWithMethod');
 
 /** @enum {number} */
 enums.EnumWithMethod = {
@@ -7,15 +7,16 @@ enums.EnumWithMethod = {
   BANANA: 2
 };
 
-//!! Known issue: does not get emitted.
-enums.EnumWithMethod.getColor = function() { return 'RED' /* all fruit are */; }
+enums.EnumWithMethod.getColor = function() {
+  return 'RED' /* all fruit are */;
+};
 
 /** @enum {number} */
 enums.EnumWithInlineMethod = {
   A: 1 + 1,
   B: f(0),
   C: 42,
-}
+};
 
 /**
  * @param {number} input

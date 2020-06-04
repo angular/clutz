@@ -915,16 +915,28 @@ class DeclarationGenerator {
     return isDefaultExport(symbol);
   }
 
-  private boolean isDefaultExport(TypedVar symbol) {
+  private static boolean isDefaultExport(TypedVar symbol) {
     if (symbol.getType() == null) return true;
     ObjectType otype = symbol.getType().toMaybeObjectType();
     if (otype != null && otype.getOwnPropertyNames().size() == 0) return true;
-    return !symbol.getType().isObject()
-        || symbol.getType().isInterface()
-        || symbol.getType().isInstanceType()
-        || symbol.getType().isEnumType()
-        || symbol.getType().isFunctionType()
-        || isTypedef(symbol.getType());
+    return !isNamespaceType(symbol.getType());
+  }
+
+  /**
+   * A type representing an object literal that is inferred through goog.provide(...) or @const {}
+   * and assigning properties to it.
+   *
+   * <p>We start with object types and narrow away known non-namespace types.
+   *
+   * <p>The terminology "namespace" type is non-standard.
+   */
+  private static boolean isNamespaceType(JSType type) {
+    if (!type.isObject()) return false;
+    return !type.isInterface()
+        && !type.isInstanceType()
+        && !type.isEnumType()
+        && !type.isFunctionType()
+        && !isTypedef(type);
   }
 
   /**
@@ -1129,6 +1141,9 @@ class DeclarationGenerator {
    * in TS, so we have to generate a namespace-class pair in TS. In the case of the externs, however
    * we *do* go through all symbols so this pass is not needed. In the case of aliased classes, we
    * cannot emit inner classes, due to a var-namespace clash.
+   *
+   * <p>Similarly, for "namespace" types - i.e. @const on an inferred {}, we cannot safely emit
+   * namespace pair.
    */
   private void maybeQueueForInnerWalk(
       boolean isExtern,
@@ -1136,7 +1151,10 @@ class DeclarationGenerator {
       TypedVar propertySymbol,
       String propertyName) {
     ObjectType oType = propertySymbol.getType().toMaybeObjectType();
-    if (!isExtern && oType != null && !isAliasedClassOrInterface(propertySymbol, oType)) {
+    if (!isExtern
+        && oType != null
+        && !isAliasedClassOrInterface(propertySymbol, oType)
+        && !isNamespaceType(oType)) {
       symbolsToInnerWalk.put(propertyName, oType);
     }
   }
@@ -1218,7 +1236,7 @@ class DeclarationGenerator {
   // This indirection exists because the name in the Closure APIs is confusing.
   // TODO(rado): figure out if NoType can be created through other means and more filtering is
   // needed here.
-  private boolean isTypedef(JSType type) {
+  private static boolean isTypedef(JSType type) {
     return type.isNoType();
   }
 
@@ -3402,6 +3420,13 @@ class DeclarationGenerator {
                     + propName
                     + " but type not found in Closure type registry.");
           }
+        } else if (!isClassLike(type) && pType.isFunctionType()) {
+          if (!foundNamespaceMembers) {
+            emitGeneratedFromFileComment(sourceFile);
+            emitNamespaceBegin(innerNamespace);
+            foundNamespaceMembers = true;
+          }
+          visitFunctionExpression(propName, (FunctionType) pType);
         }
         // Non-type defining static properties are handled for provided and unprovided
         // interfaces in visitClassOrInterface.
