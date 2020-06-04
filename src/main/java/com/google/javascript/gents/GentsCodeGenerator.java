@@ -467,20 +467,23 @@ public class GentsCodeGenerator extends CodeGenerator {
         }
         return false;
       case MEMBER_FUNCTION_DEF:
-        // Using WAS_PREVIOUSLY_PROVIDED is a hack, see addAbstractKeyword.
-        // It is set in the GentsCodeGenerator.
-        if (n.getBooleanProp(Node.WAS_PREVIOUSLY_PROVIDED)) {
-          add("abstract ");
+        if (isAbstractNode(n)) {
+          addAbstractKeyword(n);
           // We need to take over the emit here to skip emitting the BLOCK
           // because in TS abstract methods cannot have bodies.
           // The ast looks like:
           // MEMBER_FUNCTION_DEF
           //        FUNCTION
-          //            NAME
+          //            NAME (GENERICS)?
           //            PARAM_LIST
           //            BLOCK
           add(n.getString());
           Node function = n.getFirstChild();
+          // If this member function has generics, they were added on the function name during the type annotation pass.
+          Node name = function.getFirstChild();
+          if (name.getProp(Node.GENERIC_TYPE_LIST) != null) {
+            add((Node) name.getProp(Node.GENERIC_TYPE_LIST)); // GENERICS
+          }
           add(function.getSecondChild()); // PARAM_LIST
           add(":");
           if (function.getDeclaredTypeExpression() != null) {
@@ -516,6 +519,13 @@ public class GentsCodeGenerator extends CodeGenerator {
           break;
       }
     }
+  }
+
+  boolean isAbstractNode(Node n) {
+    // This is a hack, we should be using a property like Node.IS_ABSTRACT
+    // but it doesn't exist. So I just picked a random boolean property
+    // that is not likely to be used on a class or member-function-def.
+    return n.getBooleanProp(Node.WAS_PREVIOUSLY_PROVIDED);
   }
 
   void addAbstractKeyword(Node n) {

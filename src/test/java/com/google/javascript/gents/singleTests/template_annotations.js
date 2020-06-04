@@ -52,6 +52,33 @@ class CorrectUseOfConcreteCompoundType extends SimpleGenericClass {}
  */
 class Interface {}
 
+/**
+ * @abstract
+ */
+class HasGenericMethods {
+  /**
+   * @template T, U
+   * @return {void}
+   */
+  genericMethod() {}
+
+  /**
+   * @template T, U
+   * @abstract
+   */
+  abstractGenericMethod() {}
+}
+
+/**
+ * @template T, U
+ * @param {T} t
+ * @param {U} u
+ * @return {T}
+ */
+function genericFn(t, u) {
+  return t;
+}
+
 exports = {
   InvalidAnnotation,
   SimpleGenericClass,
@@ -61,5 +88,7 @@ exports = {
   CorrectTemplateVars,
   CorrectUseOfConcreteType,
   CorrectUseOfConcreteCompoundType,
-  Interface
+  Interface,
+  HasGenericMethods,
+  genericFn,
 };

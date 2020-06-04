@@ -30,3 +30,13 @@ export class CorrectUseOfConcreteCompoundType extends SimpleGenericClass {}
  *
  */
 export interface Interface<VALUE> {}
+
+export abstract class HasGenericMethods {
+  genericMethod<T, U>(): void {}
+
+  abstract abstractGenericMethod<T, U>(): void;
+}
+
+export function genericFn<T, U>(t: T, u: U): T {
+  return t;
+}

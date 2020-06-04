@@ -124,19 +124,33 @@ public final class TypeAnnotationPass implements CompilerPass {
 
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
-      // TODO(lukemizuhashi): Handle @template annotations on methods, as well.
-      if (n.isClass() || n.getToken() == Token.INTERFACE) {
-        JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
-        if (bestJSDocInfo != null) {
-          n.putProp(Node.GENERIC_TYPE_LIST, bestJSDocInfo.getTemplateTypeNames());
+      JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
+      if (bestJSDocInfo == null) {
+        return;
+      }
 
-          // If this class declaration extends a class, ...
-          Node extended = n.getSecondChild();
-          if (extended.isName()) {
-            extended.putProp(
-                Node.GENERIC_TYPE_LIST,
-                TemplateAnnotationConverter.getExtendedTemplateTypeNames(bestJSDocInfo));
-          }
+      List<String> generics = bestJSDocInfo.getTemplateTypeNames();
+      if (n.isFunction() && !generics.isEmpty()) {
+        // JSComp will handle emitting generics for a function if they are a node on the
+        // GENERIC_TYPE_LIST property of the function's name. The function name is always the first
+        // child of the function node.
+        Node genericsList = new Node(Token.GENERIC_TYPE_LIST);
+        for (String generic : generics) {
+          genericsList.addChildToBack(Node.newString(Token.GENERIC_TYPE, generic));
+        }
+        n.getFirstChild().putProp(Node.GENERIC_TYPE_LIST, genericsList);
+      } else if (n.isClass() || n.getToken() == Token.INTERFACE) {
+        // TODO(ahafiz): JSComp will also emit generics for classes and interfaces if the generics
+        // are on the declaration names; see if we can use that here.
+        n.putProp(Node.GENERIC_TYPE_LIST, bestJSDocInfo.getTemplateTypeNames());
+
+        // If the node is a class or interface declaration, the second child might be an "extends"
+        // clause, in which case we want to grab the generics of those as well.
+        Node extended = n.getSecondChild();
+        if (extended != null && extended.isName()) {
+          extended.putProp(
+              Node.GENERIC_TYPE_LIST,
+              TemplateAnnotationConverter.getExtendedTemplateTypeNames(bestJSDocInfo));
         }
       }
     }
