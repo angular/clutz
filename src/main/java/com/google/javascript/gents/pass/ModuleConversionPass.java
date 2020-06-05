@@ -700,16 +700,37 @@ public final class ModuleConversionPass implements CompilerPass {
     if (lhs.matchesQualifiedName(exportedNamespace)) {
       rhs.detach();
       if (GentsNodeUtil.isObjLitWithSimpleRefs(rhs)) {
+        List<Node> aliases = new ArrayList<>();
         for (Node child : rhs.children()) {
-          ExportedSymbol symbolToExport =
-              ExportedSymbol.fromExportAssignment(
-                  child.getFirstChild(), exportedNamespace, child.getString(), fileName);
-          Node exportNode = exportsToNodes.get(symbolToExport);
-          if (exportNode != null) {
-            moveExportStmtToADeclKeyword(assign, exportNode);
+          if (!child.hasChildren() || child.getString().equals(child.getFirstChild().getString())) {
+            // We are in the simple case of exports = {..., A: B, ...}.
+            ExportedSymbol symbolToExport =
+                ExportedSymbol.fromExportAssignment(
+                    child.getFirstChild(), exportedNamespace, child.getString(), fileName);
+            Node exportNode = exportsToNodes.get(symbolToExport);
+            if (exportNode != null) {
+              moveExportStmtToADeclKeyword(assign, exportNode);
+            }
+          } else {
+            // We are in the alias case of exports = {..., A: B, ...}.
+            aliases.add(
+                new Node(
+                    Token.EXPORT_SPEC,
+                    Node.newString(Token.NAME, child.getFirstChild().getString()),
+                    Node.newString(Token.NAME, child.getString())));
           }
         }
-        exprNode.detach();
+        if (!aliases.isEmpty()) {
+          Node exportSpecs = new Node(Token.EXPORT_SPECS);
+          for (Node alias : aliases) {
+            exportSpecs.addChildToBack(alias);
+          }
+          Node exportNode = new Node(Token.EXPORT, exportSpecs);
+          exportNode.setJSDocInfo(jsDoc);
+          nodeComments.replaceWithComment(exprNode, exportNode);
+        } else {
+          exprNode.detach();
+        }
         return;
       }
       ExportedSymbol symbolToExport =

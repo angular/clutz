@@ -13,26 +13,22 @@ public class GentsNodeUtil {
   private GentsNodeUtil() {}
 
   /**
-   * Returns true is the object is an object literal where all values are symbols that match the
-   * name:
+   * Returns true is the object is an object literal where all values are simple symbols references:
    *
    * <p>{A, B, C} -> true
    *
    * <p>{A, B: B} -> true
    *
-   * <p>{A: C} -> false
+   * <p>{A: C} -> true
    *
    * <p>{A: A + 1} -> false
    *
-   * <p>TODO(rado): see if we can also support simple renaming objects like {NewName: OldName}.
+   * <p>{A: f(1)} -> false
    */
   public static boolean isObjLitWithSimpleRefs(Node node) {
     if (!node.isObjectLit()) return false;
     for (Node child : node.children()) {
       if (!child.isStringKey() || !child.getFirstChild().isName()) {
-        return false;
-      }
-      if (!child.getString().equals(child.getFirstChild().getString())) {
         return false;
       }
     }
