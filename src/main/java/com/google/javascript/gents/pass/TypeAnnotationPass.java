@@ -124,33 +124,39 @@ public final class TypeAnnotationPass implements CompilerPass {
 
     @Override
     public void visit(NodeTraversal t, Node n, Node parent) {
+      if (!n.isFunction() && !n.isClass() && n.getToken() != Token.INTERFACE) {
+        return;
+      }
       JSDocInfo bestJSDocInfo = NodeUtil.getBestJSDocInfo(n);
       if (bestJSDocInfo == null) {
         return;
       }
 
       List<String> generics = bestJSDocInfo.getTemplateTypeNames();
-      if (n.isFunction() && !generics.isEmpty()) {
-        // JSComp will handle emitting generics for a function if they are a node on the
-        // GENERIC_TYPE_LIST property of the function's name. The function name is always the first
-        // child of the function node.
+      if (!generics.isEmpty()) {
+        // JSComp will handle emitting generics for function/class/interface if they are a node on the
+        // GENERIC_TYPE_LIST property of the declaration name. The declaration name is the first
+        // child of the node generics are being retrieved for.
         Node genericsList = new Node(Token.GENERIC_TYPE_LIST);
         for (String generic : generics) {
           genericsList.addChildToBack(Node.newString(Token.GENERIC_TYPE, generic));
         }
         n.getFirstChild().putProp(Node.GENERIC_TYPE_LIST, genericsList);
-      } else if (n.isClass() || n.getToken() == Token.INTERFACE) {
-        // TODO(ahafiz): JSComp will also emit generics for classes and interfaces if the generics
-        // are on the declaration names; see if we can use that here.
-        n.putProp(Node.GENERIC_TYPE_LIST, bestJSDocInfo.getTemplateTypeNames());
+      }
 
-        // If the node is a class or interface declaration, the second child might be an "extends"
-        // clause, in which case we want to grab the generics of those as well.
-        Node extended = n.getSecondChild();
-        if (extended != null && extended.isName()) {
-          extended.putProp(
-              Node.GENERIC_TYPE_LIST,
-              TemplateAnnotationConverter.getExtendedTemplateTypeNames(bestJSDocInfo));
+      // If the node is a class, the second child might be an "extends" clause, in which
+      // case we should check if the super class has any generics.
+      Node superClass = n.getSecondChild();
+      if (n.isClass() && superClass != null && superClass.isName()) {
+        ImmutableList<String> superClassGenerics = TemplateAnnotationConverter.getExtendedTemplateTypeNames(bestJSDocInfo);
+        if (!superClassGenerics.isEmpty()) {
+          // Convert the super class into a parameterized type. The first child is the class
+          // name, all other children are type parameters.
+          superClass.setToken(Token.PARAMETERIZED_TYPE);
+          superClass.addChildToBack(new Node(Token.NAMED_TYPE, Node.newString(Token.NAME, superClass.getString())));
+          for (String generic : superClassGenerics) {
+            superClass.addChildToBack(new Node(Token.NAMED_TYPE, Node.newString(Token.NAME, generic)));
+          }
         }
       }
     }

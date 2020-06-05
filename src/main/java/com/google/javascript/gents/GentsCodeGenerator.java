@@ -1,6 +1,5 @@
 package com.google.javascript.gents;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -16,7 +15,6 @@ import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
 import java.io.IOException;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -210,119 +208,10 @@ public class GentsCodeGenerator extends CodeGenerator {
   private boolean maybeOverrideCodeGen(Node n) {
     @Nullable Node parent = n.getParent();
     switch (n.getToken()) {
-      case CLASS: {
-        // Get a list of generic types for this class declaration.
-        @SuppressWarnings("unchecked") // TODO(lukemizuhashi): Cast is checked on line below.
-        ImmutableList<String> genericTypeList =
-            (n.getProp(Node.GENERIC_TYPE_LIST) instanceof ImmutableList)
-                ? (ImmutableList<String>) n.getProp(Node.GENERIC_TYPE_LIST)
-                : ImmutableList.<String>of();
-
-        // Get references to all the child nodes of this class declaration.
-        // CLASS               The keyword `class`.
-        //   NAME              The name of this class.
-        //   (EMPTY|NAME)      The name of the parent class, empty otherwise.
-        //   CLASS_MEMBERS     The members of this class.
-        Node className = n.getFirstChild();
-        Node extendedClass = n.getSecondChild();
-        Node classMemebers = n.getLastChild();
-
-        // Get a list of generic types for this class declaration's parent class.
-        @SuppressWarnings("unchecked") // TODO(lukemizuhashi): Cast is checked on line below.
-        ImmutableList<String> extendedGenericTypeList =
-            (extendedClass.getProp(Node.GENERIC_TYPE_LIST) instanceof ImmutableList)
-                ? (ImmutableList<String>) extendedClass.getProp(Node.GENERIC_TYPE_LIST)
-                : ImmutableList.<String>of();
-
+      case CLASS:
+        // Add "abstract" if it's relevant and then let JSComp take over.
         addAbstractKeyword(n);
-
-        // If the generic type lists are empty for both this class declaration and its extended
-        // class, there's no need to perform a custom emit.
-        if (genericTypeList.isEmpty() && extendedGenericTypeList.isEmpty()) {
-          return false;
-        }
-
-        add("class "); // CLASS
-
-        add(className); // NAME
-        if (!genericTypeList.isEmpty()) {
-          add("<" + String.join(", ", genericTypeList) + ">"); // < GENERIC_TYPE_LIST >
-        }
-
-        if (extendedClass.isName()) {
-          add("extends ");
-        }
-
-        add(extendedClass); // (EMPTY|NAME)
-        if (extendedClass.isName() && !extendedGenericTypeList.isEmpty()) {
-          add("<" + String.join(", ", extendedGenericTypeList) + ">"); // < GENERIC_TYPE_LIST >
-        }
-
-
-        if (n.getProp(Node.IMPLEMENTS) instanceof Node) {
-          // Add a list of implemented interfaces for the class declaration in
-          // the form
-          //  class ... implements A, B, C
-          Iterable<Node> implementedInterfaces = ((Node) n.getProp(Node.IMPLEMENTS)).children();
-
-          add("implements ");
-          for (Iterator<Node> it = implementedInterfaces.iterator(); it.hasNext();) {
-            add(it.next());
-            if (it.hasNext()) {
-              add(", ");
-            }
-          }
-        }
-
-        add(classMemebers);
-        return true;
-      }
-      case INTERFACE: {
-        // Get a list of generic types for this interface declaration.
-        @SuppressWarnings("unchecked") // TODO(ahafiz): Cast is checked on line below.
-        ImmutableList<String> genericTypeList =
-            (n.getProp(Node.GENERIC_TYPE_LIST) instanceof ImmutableList)
-                ? (ImmutableList<String>) n.getProp(Node.GENERIC_TYPE_LIST)
-                : ImmutableList.<String>of();
-
-        // Get references to all the child nodes of this interface declaration.
-        // INTERFACE           The keyword `interface`.
-        //   NAME              The name of this interface.
-        //   (EMPTY|NAME)      The name of the extended interfaces, if any.
-        //   CLASS_MEMBERS     The members of this interface.
-        Node interfaceName = n.getFirstChild();
-        Node extendedInterfaces = n.getSecondChild();
-        Node interfaceMembers = n.getLastChild();
-
-        // If the generic type lists are empty for this interface declaration,
-        // there's no need to perform a custom emit.
-        if (genericTypeList.isEmpty()) {
-          return false;
-        }
-
-        add("interface "); // INTERFACE
-
-        add(interfaceName); // NAME
-        if (!genericTypeList.isEmpty()) {
-          add("<" + String.join(", ", genericTypeList) + ">"); // < GENERIC_TYPE_LIST >
-        }
-
-        if (extendedInterfaces.hasChildren()) {
-          // Add a list of extended interfaces for the interface declaration in
-          // the form
-          //  interface ... extends A, B, C
-          add("extends ");
-          for (Iterator<Node> it = extendedInterfaces.children().iterator(); it.hasNext();) {
-            add(it.next());
-            if (it.hasNext()) {
-              add(", ");
-            }
-          }
-        }
-
-        add(interfaceMembers);
-        return true;
-      }
+        return false;
       case IF:
         // If the body of a conditional is written without a block, Rhino will wrap the body in
         // a synthetic block. In the case that "else" body is an "if" statement that was implictly
