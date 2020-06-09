@@ -1,0 +1,3 @@
+/** @pintomodule */
+
+export class SomeClass {}
