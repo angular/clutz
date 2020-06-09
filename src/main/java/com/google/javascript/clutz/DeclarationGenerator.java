@@ -2217,13 +2217,19 @@ class DeclarationGenerator {
               // It appears that when one writes '@type {A<B>}' and both are missing from the
               // compilation
               // unit - A ends up as NoType, while B ends up as NamedType.
-              if (refType.isUnknownType()) {
-                emitNoResolvedTypeAsumingForwardDeclare(type);
-                return null;
-              }
+
               // Handle "typeof expr" constructions, which translate directly to TypeScript.
               if (type.hasReferenceName() && type.getReferenceName().startsWith("typeof ")) {
-                emit(type.getReferenceName());
+                if (refType.isUnknownType()) {
+                  // TODO(b/157514400: emit a proper type.
+                  emit("any");
+                } else {
+                  emit(type.getReferenceName());
+                }
+                return null;
+              }
+              if (refType.isUnknownType()) {
+                emitNoResolvedTypeAsumingForwardDeclare(type);
                 return null;
               }
               visitType(refType);
