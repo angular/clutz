@@ -1,6 +1,8 @@
 export function aFunction() {}
 
-export class ImportedClass {}
+export class ImportedClass {
+  static NotProvidedSubclass: any;
+}
 
 export class ProvidedSubclass {}
 

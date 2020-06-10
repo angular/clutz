@@ -336,10 +336,7 @@ public final class TypeConversionPass implements CompilerPass {
           if (declaration.rhs != null && declaration.rhs.isFunction()) {
             moveMethodsIntoClasses(declaration);
           } else {
-            // Ignore field declarations without a type annotation
-            if (declaration.jsDoc != null && declaration.jsDoc.getType() != null) {
-              moveFieldsIntoClasses(declaration);
-            }
+            moveFieldsIntoClasses(declaration);
           }
           break;
         default:
@@ -435,6 +432,11 @@ public final class TypeConversionPass implements CompilerPass {
         param.putProp(Node.ACCESS_MODIFIER, Visibility.PUBLIC);
       }
     }
+  }
+
+  /** Determine whether a member declaration is marked as const. */
+  boolean isConst(ClassMemberDeclaration declaration) {
+    return declaration.jsDoc != null && declaration.jsDoc.isConstant();
   }
 
   /** Mark node as constant, so it can be annotated as 'readonly' later */
@@ -782,7 +784,8 @@ public final class TypeConversionPass implements CompilerPass {
 
   /**
    * Attempts to move a field declaration into a class definition. This generates a new
-   * MEMBER_VARIABLE_DEF Node while persisting the old node in the AST.
+   * MEMBER_VARIABLE_DEF Node while persisting the old node in the AST. The old node is removed if
+   * the member initializer is raised into the class definition.
    */
   private void moveFieldsIntoClasses(ClassMemberDeclaration declaration) {
     Node classMembers = declaration.classNode.getLastChild();
@@ -805,15 +808,29 @@ public final class TypeConversionPass implements CompilerPass {
   }
 
   /**
-   * Check if we can safely generate a field initializer. We don't do this if the assignment rhs is
-   * not a literal or the enclosing function is not a constructor.
+   * Check if we can safely generate a field initializer. We only do this if
+   * - the assignment receiver is marked as const and there is no enclosing function
+   *   - in general we should only try to raise the initializer of a static field if it is in the
+   *     same scope as the class declaration. Calculating this is challenging, so currently we
+   *     assume that if this static is the top-level of a module it has the same scope as the class
+   *     declaration.
+   * - the assignment rhs is a literal and there is no enclosing function, or it is a constructor.
+   *   - class members' initializers should be raised only if the original initializer is on a class
+   *     property or in the constructor, the two places where a member could get initialized. Since
+   *     a non-literal initializer in the constructor may be using items only in the scope of the
+   *     constructor, we don't try to raise this case.
    */
   private boolean canPromoteFieldInitializer(ClassMemberDeclaration declaration) {
+    Node fnNode = NodeUtil.getEnclosingFunction(declaration.exprRoot);
+
+    if (isConst(declaration) && fnNode == null) {
+      return true;
+    }
+
     if (!NodeUtil.isLiteralValue(declaration.rhs, false)) {
       return false;
     }
 
-    Node fnNode = NodeUtil.getEnclosingFunction(declaration.exprRoot);
     if (fnNode != null) {
       String fnName = getEnclosingFunctionName(fnNode);
       if (!"constructor".equals(fnName)) {

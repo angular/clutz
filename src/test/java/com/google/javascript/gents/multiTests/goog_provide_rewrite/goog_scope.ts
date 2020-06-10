@@ -13,6 +13,13 @@ let instanceofNotProvidedAlias = new ImportedClass.NotProvidedSubclass();
 
 export class Foo {
   static num: number = 8;
+
+
+  static FruitType: any = {
+    UNKNOWN: 0,
+    APPLE: 1,
+    ORANGE: 2,
+  };
   constructor(public n: number) {}
 
 
@@ -69,11 +76,6 @@ export interface InnerTypedefWithAssignment {
 interface PrivateTypedef_ {
   myFunction: (p1: any) => PrivateTypedef_;
 }
-Foo.FruitType = {
-  UNKNOWN: 0,
-  APPLE: 1,
-  ORANGE: 2,
-};
 
 // Manually export enum keys.
 Foo.FruitType['UNKNOWN'] = Foo.Container.UNKNOWN;
