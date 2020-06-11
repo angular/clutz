@@ -314,12 +314,24 @@ public class GentsCodeGenerator extends CodeGenerator {
 
         add(n.getString());
 
+        boolean hasInitializer = n.hasChildren();
+
         if (n.getDeclaredTypeExpression() != null) {
-          add(":");
-          add(n.getDeclaredTypeExpression());
+          Node type = n.getDeclaredTypeExpression();
+          // If this member has an initializer, the TS typechecker will likely be able to infer a
+          // narrower type than `any`, so let's elide the explicit `any` here.
+          // Note that we *will* keep non-`any` type annotations, as these are intentional can make
+          // a difference TS type resolution. For example, in
+          //   const x: string = 'hi';
+          // The type of `x` is `string`, but if the type annotation is removed, the type of `x`
+          // becomes `'hi'`.
+          if (!(type.getToken() == Token.ANY_TYPE && hasInitializer)) {
+            add(":");
+            add(n.getDeclaredTypeExpression());
+          }
         }
 
-        if (n.hasChildren()) {
+        if (hasInitializer) {
           add(" = ");
           add(n.getLastChild());
         }

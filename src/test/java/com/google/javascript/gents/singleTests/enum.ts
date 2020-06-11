@@ -45,7 +45,7 @@ export const OtherEnum = {
 };
 
 export class C {
-  static InnerEnum: any = {A: 0, B: 1};
+  static InnerEnum = {A: 0, B: 1};
 }
 
 // This cannot be easily converted without structurally changing the code.

@@ -15,7 +15,7 @@ export class Foo {
   static num: number = 8;
 
 
-  static FruitType: any = {
+  static FruitType = {
     UNKNOWN: 0,
     APPLE: 1,
     ORANGE: 2,

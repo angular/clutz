@@ -9,7 +9,7 @@ export class A {
 
   w: any;
 
-  n: any = 12;
+  n = 12;
 
   a: any;
   fieldSetFromArrowFunc: any;

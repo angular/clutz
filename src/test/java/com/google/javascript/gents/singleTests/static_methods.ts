@@ -1,7 +1,7 @@
 let goog: any = {};
 
 goog.A = class {
-  static B: any = {};
+  static B = {};
   a: any;
   constructor(a: number) {
     this.a = a;

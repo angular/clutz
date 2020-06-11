@@ -1,5 +1,5 @@
 export class C {
-  static x: any = '';
+  static x = '';
   f() {
     return C.x;
   }
