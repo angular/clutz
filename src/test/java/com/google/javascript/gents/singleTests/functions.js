@@ -164,4 +164,14 @@ function namedParamsMultiLine({a}) {}
 /** @param {{a: number}=} params */
 function namedParamsWithDefaultValues({a = 1} = {}) {}
 
+/** @return {string} */
+const hi1 = (/** number */ one, /** number */ two) => {
+  return `Hello ${one}, ${two}.`;
+};
+
+/** @return {string} */
+function hi2(/** number */ one, /** number */ two) {
+  return `Hello ${one}, ${two}.`;
+};
+
 exports = {nop, oneParam, twoParams, namedParams, namedParamsMultiLine, namedParamsWithDefaultValues};

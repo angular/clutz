@@ -91,3 +91,11 @@ export function namedParams({a}: {a: number}) {}
 export function namedParamsMultiLine({a}: {a: number}) {}
 
 export function namedParamsWithDefaultValues({a = 1} = {}) {}
+
+const hi1 = (one: number, two: number): string => {
+  return `Hello ${one}, ${two}.`;
+};
+
+function hi2(one: number, two: number): string {
+  return `Hello ${one}, ${two}.`;
+}
