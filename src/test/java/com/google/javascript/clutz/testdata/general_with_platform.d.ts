@@ -1113,3 +1113,28 @@ declare namespace ಠ_ಠ.clutz.WebAssembly {
 declare namespace ಠ_ಠ.clutz.WebAssembly {
   function validate (bytes : ArrayBuffer | ArrayBufferView ) : boolean ;
 }
+// Generated from externs.zip//wicg_uach.js
+declare namespace ಠ_ಠ.clutz {
+  interface NavigatorUABrandVersion {
+    brand : string ;
+    version : string ;
+  }
+}
+// Generated from externs.zip//wicg_uach.js
+declare namespace ಠ_ಠ.clutz {
+  interface NavigatorUAData {
+    brands : string [] ;
+    getHighEntropyValues (a : string [] ) : Promise < UADataValues > ;
+    mobile : boolean ;
+  }
+}
+// Generated from externs.zip//wicg_uach.js
+declare namespace ಠ_ಠ.clutz {
+  interface UADataValues {
+    architecture : string ;
+    model : string ;
+    platform : string ;
+    platformVersion : string ;
+    uaFullVersion : string ;
+  }
+}
