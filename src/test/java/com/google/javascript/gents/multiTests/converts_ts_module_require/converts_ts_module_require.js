@@ -3,3 +3,4 @@ const wholeModule = goog.require("google3.src.test.java.com.google.javascript.ge
 goog.require("google3.src.test.java.com.google.javascript.gents.multiTests.converts_ts_module_require.already_converted_to_ts_keep");
 
 const wholeModuleClosure = goog.require("google3noperiod.module");
+const objLitModule = goog.require('obj.lit.module');

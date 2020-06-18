@@ -134,7 +134,8 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
         }
 
         Node maybeExportNode = child.getFirstChild();
-        if (maybeExportNode == null) {
+        Node assignmentValue = child.getSecondChild();
+        if (maybeExportNode == null || assignmentValue == null) {
           break;
         }
         String maybeExportString = maybeExportNode.getQualifiedName();
@@ -147,20 +148,23 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
             // a default export, we want to treat it like the equivalent
             // exports.A = A; exports.B = B; exports.C = C;
             // pattern.
-            if (GentsNodeUtil.isObjLitWithSimpleRefs(child.getSecondChild())) {
+            if (GentsNodeUtil.isObjLitWithSimpleRefs(assignmentValue)) {
               String fullname = module.providesObjectChildren.keySet().iterator().next();
 
-              Node obj = child.getSecondChild();
-              for (Node symbol : obj.children()) {
+              for (Node symbol : assignmentValue.children()) {
                 String identifier = symbol.getString();
                 module.addExport(
                     maybeExportString + '.' + identifier, fullname + '.' + identifier, identifier);
               }
               break;
             }
-            module.namespaceHasDefaultExport.put(
-                Iterables.getOnlyElement(module.jsNamespaces), true);
-
+            // For the non-simple case exports = {A: ..., B: ..., C: ...},
+            // we don't want to declare this as default export, because
+            // clutz will not generate default export either.
+            if (!assignmentValue.isObjectLit()) {
+              module.namespaceHasDefaultExport.put(
+                  Iterables.getOnlyElement(module.jsNamespaces), true);
+            }
           } else {
             module.namespaceHasDefaultExport.put(maybeExportString, true);
           }
