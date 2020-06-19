@@ -157,10 +157,13 @@ public class AstCommentLinkingPass implements CompilerPass {
               // matches the literal text in the input source file
               if (nonJSDocInfo != null
                   && doesCommentAlignWithInput(
-                      n, nonJSDocInfo.getCommentString(), nonJSDocInfo.getBeginOffset())) {
+                      n,
+                      nonJSDocInfo.getCommentString(),
+                      nonJSDocInfo.getStartPosition().getOffset())) {
                 comments.addAll(
                     splitAndFilterCommentText(
-                        nonJSDocInfo.getCommentString(), nonJSDocInfo.getBeginOffset()));
+                        nonJSDocInfo.getCommentString(),
+                        nonJSDocInfo.getStartPosition().getOffset()));
               }
 
               // address b/154348732 by only using a comment reported by JSCompiler if it

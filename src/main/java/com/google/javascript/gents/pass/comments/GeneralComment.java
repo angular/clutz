@@ -36,7 +36,7 @@ public class GeneralComment {
   }
 
   public static GeneralComment from(NonJSDocComment comment) {
-    return new GeneralComment(comment.getCommentString(), comment.getBeginOffset());
+    return new GeneralComment(comment.getCommentString(), comment.getStartPosition().getOffset());
   }
 
   public static GeneralComment from(String text, int offset) {
