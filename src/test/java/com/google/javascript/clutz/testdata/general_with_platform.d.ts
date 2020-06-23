@@ -196,6 +196,67 @@ declare namespace ಠ_ಠ.clutz {
    */
   type TrustTokenAttributeType = { additionalSignedHeaders : string [] , includeTimestampHeader : boolean , issuer : string , refreshPolicy : string , signRequestData : string , type : string } ;
 }
+// Generated from externs.zip//html5.js
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * The metadata provided by the callback given to
+   * HTMLVideoElement.requestVideoFrameCallback().
+   *
+   * See https://wicg.github.io/video-rvfc/#video-frame-metadata
+   */
+  interface VideoFrameMetadata {
+    /**
+     * For video frames coming from either a local or remote source, this is the
+     * time at which the frame was captured by the camera.
+     */
+    captureTime ? : number ;
+    /**
+     * The time at which the user agent expects the frame to be visible.
+     */
+    expectedDisplayTime : number ;
+    /**
+     * The height of the video frame, in media pixels.
+     */
+    height : number ;
+    /**
+     * The media presentation timestamp (PTS) in seconds of the frame presented
+     * (e.g. its timestamp on the video.currentTime timeline).
+     */
+    mediaTime : number ;
+    /**
+     * The time at which the user agent submitted the frame for composition.
+     */
+    presentationTime : number ;
+    /**
+     * A count of the number of frames submitted for composition.
+     */
+    presentedFrames : number ;
+    /**
+     * The elapsed duration in seconds from submission of the encoded packet with
+     * the same presentation timestamp (PTS) as this frame (e.g. same as the
+     * mediaTime) to the decoder until the decoded frame was ready for presentation.
+     */
+    processingDuration ? : number ;
+    /**
+     * For video frames coming from a remote source, this is the time the encoded
+     * frame was received by the platform, i.e., the time at which the last packet
+     * belonging to this frame was received over the network.
+     */
+    receiveTime ? : number ;
+    /**
+     * The RTP timestamp associated with this video frame.
+     */
+    rtpTimestamp ? : number ;
+    /**
+     * The width of the video frame, in media pixels.
+     */
+    width : number ;
+  }
+}
+// Generated from externs.zip//html5.js
+declare namespace ಠ_ಠ.clutz {
+  type VideoFrameRequestCallback = (a : number , b : VideoFrameMetadata | null ) => void ;
+}
 // Generated from externs.zip//nonstandard_fileapi.js
 declare namespace ಠ_ಠ.clutz {
   class DirectoryEntry extends Entry {
