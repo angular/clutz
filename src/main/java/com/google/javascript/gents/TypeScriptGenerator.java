@@ -148,6 +148,13 @@ public class TypeScriptGenerator {
     for (String filename : filesToConvert) {
       String relativePath = pathUtil.getRelativePath(".", filename);
       String filepath = pathUtil.getFilePathWithoutExtension(relativePath);
+      if (!resultFileMap.containsKey(filepath)) {
+        System.err.println(
+            "No emit for "
+                + relativePath
+                + ". File is unsupported, remove it from srcs and rerun.");
+        System.exit(4);
+      }
       String tsCode = resultFileMap.get(filepath);
       if ("-".equals(opts.output)) {
         System.out.println("========================================");
