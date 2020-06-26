@@ -16,7 +16,7 @@ namespace.bar(namespace.x);
 foo();
 
 // Use import from a file that has both default and named exports.
-const D;
+const d = new D();
 bar(DExports.x);
 
 // Use imports with default and local names.

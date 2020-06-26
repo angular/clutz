@@ -321,12 +321,18 @@ public final class ModuleConversionPass implements CompilerPass {
 
         Map<String, String> rewriteMap = valueRewrite.rowMap().get(n.getSourceFileName());
         String importedNamespace = nameUtil.findLongestNamePrefix(n, rewriteMap.keySet());
-        if (importedNamespace != null) {
+        // Don't rename patterns like `const rewriteCandidate = ...`
+        if (importedNamespace != null && !isDeclaration(n)) {
           nameUtil.replacePrefixInName(n, importedNamespace, rewriteMap.get(importedNamespace));
           return false;
         }
       }
       return true;
+    }
+
+    private boolean isDeclaration(Node n) {
+      Node parent = n.getParent();
+      return parent.isConst() || parent.isLet() || parent.isVar();
     }
   }
 
