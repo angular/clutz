@@ -91,11 +91,13 @@ declare namespace ಠ_ಠ.clutz {
     scale (x : number , y : number ) : void ;
     /**
      * Note: WebKit only
+     * @deprecated
      */
     setFillColor (opt_a ? : number | string , opt_b ? : number , opt_c ? : number , opt_d ? : number , opt_e ? : number ) : void ;
     setLineDash (segments : number [] | null ) : void ;
     /**
      * Note: WebKit only
+     * @deprecated
      */
     setStrokeColor (opt_a ? : number | string , opt_b ? : number , opt_c ? : number , opt_d ? : number , opt_e ? : number ) : void ;
     setTransform (m11 : number , m12 : number , m21 : number , m22 : number , dx : number , dy : number ) : void ;

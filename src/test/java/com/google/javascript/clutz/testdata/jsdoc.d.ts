@@ -19,6 +19,18 @@ declare namespace ಠ_ಠ.clutz.x {
      */
     field : string ;
     /**
+     * Docs on a deprecated method.
+     * @param foo This is a param doc.
+     * @deprecated
+     */
+    deprecatedMethod1 (foo : string ) : void ;
+    /**
+     * Docs on a deprecated method, with a reason.
+     * @param foo This is a param doc.
+     * @deprecated This is really deprecated - do not use!
+     */
+    deprecatedMethod2 (foo : string ) : void ;
+    /**
      * Docs on a method!
      * @param foo This is a param doc.
      */

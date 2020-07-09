@@ -1693,6 +1693,14 @@ class DeclarationGenerator {
           emitBreak();
         }
       }
+      if (docs.isDeprecated()) {
+        emit(" * @deprecated");
+        String deprecationReason = docs.getDeprecationReason();
+        if (deprecationReason != null) {
+          emit(deprecationReason);
+        }
+        emitBreak();
+      }
       emit(" */");
       emitBreak();
     }
