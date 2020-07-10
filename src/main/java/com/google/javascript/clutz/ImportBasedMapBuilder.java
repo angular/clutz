@@ -1,7 +1,12 @@
 package com.google.javascript.clutz;
 
 import com.google.javascript.rhino.Node;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * ImportBasedMapBuilder is a base class for walking the closure AST and gathering information about
@@ -286,7 +291,7 @@ public abstract class ImportBasedMapBuilder {
    * https://github.com/angular/clutz/issues/596
    */
   protected static String buildWholeModuleExportSymbolName(String importedModuleId) {
-    return "module$exports$" + importedModuleId.replace(".", "$");
+    return "module$exports$" + importedModuleId.replace('.', '$');
   }
 
   /**
@@ -299,10 +304,10 @@ public abstract class ImportBasedMapBuilder {
    * https://github.com/angular/clutz/issues/596
    */
   protected static String buildNamedExportSymbolName(String importedModuleId, String originalName) {
-    return "module$exports$" + importedModuleId.replace(".", "$") + "." + originalName;
+    return "module$exports$" + importedModuleId.replace('.', '$') + "." + originalName;
   }
 
   protected static String buildLocalSymbolName(String importingModuleId, String variableName) {
-    return "module$contents$" + importingModuleId.replace(".", "$") + "_" + variableName;
+    return "module$contents$" + importingModuleId.replace('.', '$') + "_" + variableName;
   }
 }
