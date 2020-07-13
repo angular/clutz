@@ -9,7 +9,9 @@ import static com.google.javascript.rhino.jstype.JSTypeNative.ALL_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.ARRAY_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.OBJECT_TYPE;
 import static com.google.javascript.rhino.jstype.JSTypeNative.STRING_TYPE;
+import static java.lang.Math.max;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.joining;
 import static org.apache.commons.text.StringEscapeUtils.escapeEcmaScript;
 
 import com.google.common.base.CharMatcher;
@@ -20,6 +22,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
@@ -70,7 +73,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -89,9 +91,10 @@ class DeclarationGenerator {
    *
    * <p>To regenerate this list use the following script with a list of candidates.
    *
-   * <pre>$ for k in $(cat /tmp/keywords); do echo "namespace foo.$k {};" > /tmp/test.ts; \
+   * <pre>{@code
+   * $ for k in $(cat /tmp/keywords); do echo "namespace foo.$k {};" > /tmp/test.ts; \
    * tsc /tmp/test.ts >/dev/null || echo \"$k\",; done;
-   * </pre>
+   * }</pre>
    */
   private static final ImmutableSet<String> RESERVED_JS_WORDS =
       ImmutableSet.of(
@@ -175,7 +178,7 @@ class DeclarationGenerator {
         // Already reported through the print stream.
         System.exit(2);
       }
-    } catch (Exception e) {
+    } catch (RuntimeException e) {
       e.printStackTrace(System.err);
       System.err.println("Uncaught exception in clutz, exiting.");
       System.exit(3);
@@ -241,7 +244,7 @@ class DeclarationGenerator {
   private Map<String, String> legacyNamespaceReexportMap = new LinkedHashMap<>();
 
   /** If true, add all the import rename map entries to the output as comments in the .d.ts. */
-  private final boolean PRINT_IMPORT_RENAME_MAP = false;
+  private static final boolean PRINT_IMPORT_RENAME_MAP = false;
 
   DeclarationGenerator(Options opts) {
     this.opts = opts;
@@ -268,7 +271,7 @@ class DeclarationGenerator {
   void precomputeChildLists() {
     for (TypedVar var : compiler.getTopScope().getAllSymbols()) {
       String namespace = getNamespace(var.getName());
-      if (!namespace.equals("")) {
+      if (!namespace.isEmpty()) {
         childListMap.put(namespace, var);
       }
     }
@@ -375,8 +378,7 @@ class DeclarationGenerator {
   }
 
   String generateDeclarations(
-      List<SourceFile> sourceFiles, List<SourceFile> externs, Depgraph depgraph)
-      throws AssertionError {
+      List<SourceFile> sourceFiles, List<SourceFile> externs, Depgraph depgraph) {
     // Compile should always be first here, because it sets internal state.
     compiler.compile(externs, sourceFiles, opts.getCompilerOptions());
     importRenameMap =
@@ -451,11 +453,11 @@ class DeclarationGenerator {
 
     if (PRINT_IMPORT_RENAME_MAP) {
       emitComment(String.format("import rename map contains %d entries", importRenameMap.size()));
-      for (Entry<String, String> e : importRenameMap.entrySet()) {
+      for (Map.Entry<String, String> e : importRenameMap.entrySet()) {
         emitComment(String.format("Rename %s to %s", e.getKey(), e.getValue()));
       }
       emitComment(String.format("alias map contains %d entries", aliasMap.size()));
-      for (Entry<String, String> e : aliasMap.entrySet()) {
+      for (Map.Entry<String, String> e : aliasMap.entrySet()) {
         emitComment(String.format("Alias %s to %s", e.getKey(), e.getValue()));
       }
     }
@@ -596,7 +598,9 @@ class DeclarationGenerator {
       if (RESERVED_JS_WORDS.contains(getUnqualifiedName(reservedProvide))) {
         TypedVar var = topScope.getOwnSlot(reservedProvide);
         String namespace = getNamespace(reservedProvide);
-        if (collapsedNamespaces.contains(namespace)) continue;
+        if (collapsedNamespaces.contains(namespace)) {
+          continue;
+        }
         collapsedNamespaces.add(namespace);
         Set<String> properties = getSubNamespace(provides, namespace);
         if (var != null) {
@@ -616,7 +620,9 @@ class DeclarationGenerator {
           } else {
             emit("any");
           }
-          if (bundledIt.hasNext()) emit(",");
+          if (bundledIt.hasNext()) {
+            emit(",");
+          }
         }
         emit("};");
         emitBreak();
@@ -628,10 +634,7 @@ class DeclarationGenerator {
       }
     }
     // Remove the symbols that we have emitted above.
-    Iterator<String> it = provides.iterator();
-    while (it.hasNext()) {
-      if (collapsedNamespaces.contains(getNamespace(it.next()))) it.remove();
-    }
+    provides.removeIf((String elem) -> collapsedNamespaces.contains(getNamespace(elem)));
   }
 
   private Set<String> getSubNamespace(TreeSet<String> symbols, String namespace) {
@@ -695,7 +698,9 @@ class DeclarationGenerator {
         // Skip extern symbols (they have a separate pass) and skip built-ins.
         // Built-ins can be indentified by having null as input file.
         CompilerInput symbolInput = this.compiler.getInput(new InputId(symbol.getInputName()));
-        if (symbolInput == null || symbolInput.isExtern()) continue;
+        if (symbolInput == null || symbolInput.isExtern()) {
+          continue;
+        }
 
         // Type inference sometimes creates symbols for undeclared qualified names when narrowing
         // their type in a flow scope. These should not be emitted and can be detected by noticing
@@ -710,23 +715,20 @@ class DeclarationGenerator {
         if (symbol.getType() == null) {
           JSType typedef = compiler.getTypeRegistry().getGlobalType(name);
           if (typedef != null) {
-            declareTypedefNamespace(symbol, typedef, Collections.emptySet());
+            declareTypedefNamespace(symbol, typedef, ImmutableSet.of());
             typesEmitted.add(name);
           }
           continue;
         }
 
         declareNamespace(
-            namespace,
-            symbol,
-            name,
-            /* isDefault */ true,
-            Collections.<String>emptySet(),
-            /* isExtern */ false);
+            namespace, symbol, name, /* isDefault */ true, ImmutableSet.of(), /* isExtern */ false);
         typesEmitted.add(name);
       }
       // if no new types seen, safely break out.
-      if (typesUsed.size() == typesUsedCount) break;
+      if (typesUsed.size() == typesUsedCount) {
+        break;
+      }
       maxTypeUsedDepth--;
     }
   }
@@ -752,7 +754,7 @@ class DeclarationGenerator {
    */
   private void declareLegacyNamespaceAliases() {
     if (!legacyNamespaceReexportMap.isEmpty()) {
-      for (Entry<String, String> e : legacyNamespaceReexportMap.entrySet()) {
+      for (Map.Entry<String, String> e : legacyNamespaceReexportMap.entrySet()) {
         String namespace;
         String googModuleStyleName;
         if (e.getKey().contains(".")) {
@@ -797,10 +799,14 @@ class DeclarationGenerator {
       JSType type = symbol.getType();
       // Closure treats all prototypes as separate symbols, but we handle them in conjunction with
       // parent symbol.
-      if (symbol.getName().contains(".prototype")) continue;
+      if (symbol.getName().contains(".prototype")) {
+        continue;
+      }
 
       // Sub-parts of namespaces in externs can appear as unknown if they miss a @const.
-      if (type.isUnknownType()) continue;
+      if (type.isUnknownType()) {
+        continue;
+      }
 
       if (type.isEnumType()) {
         EnumType eType = (EnumType) type;
@@ -847,11 +853,15 @@ class DeclarationGenerator {
 
       // There is nothing to emit for a namespace, because all its symbols will be visited later,
       // thus implicitly defining the namespace.
-      if (isLikelyNamespace(symbol.getJSDocInfo())) continue;
+      if (isLikelyNamespace(symbol.getJSDocInfo())) {
+        continue;
+      }
 
       // Do not emit static fields as symbols, since they were already emitted in the class
       // definition.
-      if (!isDefiningType(symbol.getType()) && visitedClassLikes.contains(parentPath)) continue;
+      if (!isDefiningType(symbol.getType()) && visitedClassLikes.contains(parentPath)) {
+        continue;
+      }
 
       declareNamespace(
           isDefault ? parentPath : symbol.getName(),
@@ -861,7 +871,9 @@ class DeclarationGenerator {
           shadowedSymbols,
           true);
 
-      if (isDefault && isClassLike(symbol.getType())) visitedClassLikes.add(symbol.getName());
+      if (isDefault && isClassLike(symbol.getType())) {
+        visitedClassLikes.add(symbol.getName());
+      }
       // we do not declare modules or goog.require support, because externs types should not be
       // visible from TS code.
     }
@@ -871,7 +883,9 @@ class DeclarationGenerator {
       Ordering.natural()
           .onResultOf(
               input -> {
-                if (input == null) return null;
+                if (input == null) {
+                  return null;
+                }
                 return input.getInputName();
               });
 
@@ -879,7 +893,9 @@ class DeclarationGenerator {
       Ordering.natural()
           .onResultOf(
               input -> {
-                if (input == null) return null;
+                if (input == null) {
+                  return null;
+                }
                 return input.getName();
               });
 
@@ -916,9 +932,13 @@ class DeclarationGenerator {
   }
 
   private static boolean isDefaultExport(TypedVar symbol) {
-    if (symbol.getType() == null) return true;
+    if (symbol.getType() == null) {
+      return true;
+    }
     ObjectType otype = symbol.getType().toMaybeObjectType();
-    if (otype != null && otype.getOwnPropertyNames().size() == 0) return true;
+    if (otype != null && otype.getOwnPropertyNames().isEmpty()) {
+      return true;
+    }
     return !isNamespaceType(symbol.getType());
   }
 
@@ -931,7 +951,9 @@ class DeclarationGenerator {
    * <p>The terminology "namespace" type is non-standard.
    */
   private static boolean isNamespaceType(JSType type) {
-    if (!type.isObject()) return false;
+    if (!type.isObject()) {
+      return false;
+    }
     return !type.isInterface()
         && !type.isInstanceType()
         && !type.isEnumType()
@@ -946,7 +968,9 @@ class DeclarationGenerator {
   private boolean shouldAvoidGeneratingExterns(String filePath, String symbolName) {
     // This file is built in to Clutz for testing, so special-case it here.
     String fileName = new File(filePath).getName();
-    if (fileName.equals("es6_min.js")) return true;
+    if (fileName.equals("es6_min.js")) {
+      return true;
+    }
 
     // If asked about a symbol like "window.Array", perform the below lookups on just
     // "Array".
@@ -961,13 +985,20 @@ class DeclarationGenerator {
     }
 
     // Don't emit externs for Closure types that nobody uses.
-    if (PlatformSymbols.CLOSURE_EXTERNS_NOT_USED_IN_TYPESCRIPT.contains(symbolName)) return true;
-    if (PlatformSymbols.ADDITIONAL_CLOSURE_EXTERNS_NOT_USED_IN_TYPESCRIPT.contains(symbolName))
+    if (PlatformSymbols.CLOSURE_EXTERNS_NOT_USED_IN_TYPESCRIPT.contains(symbolName)) {
       return true;
+    }
+    if (PlatformSymbols.ADDITIONAL_CLOSURE_EXTERNS_NOT_USED_IN_TYPESCRIPT.contains(symbolName)) {
+      return true;
+    }
     // Don't emit externs for Closure types that have TypeScript equivalents.
-    if (PlatformSymbols.CLOSURE_TO_TYPESCRIPT.containsKey(symbolName)) return true;
+    if (PlatformSymbols.CLOSURE_TO_TYPESCRIPT.containsKey(symbolName)) {
+      return true;
+    }
     // Don't emit externs for Closure types that exist in TypeScript already.
-    if (PlatformSymbols.TYPESCRIPT_LIB_D_TS.contains(symbolName)) return true;
+    if (PlatformSymbols.TYPESCRIPT_LIB_D_TS.contains(symbolName)) {
+      return true;
+    }
 
     return false;
   }
@@ -1026,7 +1057,7 @@ class DeclarationGenerator {
       ObjectType objType = symbol.getType().toMaybeObjectType();
       // Can be null if the symbol is provided, but not defined.
       Set<String> propertyNames =
-          objType != null ? objType.getOwnPropertyNames() : Collections.<String>emptySet();
+          objType != null ? objType.getOwnPropertyNames() : ImmutableSet.of();
       for (String property : propertyNames) {
         // When parsing externs, namespaces are explicitly declared with a var of Object type
         // Do not emit the var declaration, as it will conflict with the namespace.
@@ -1047,7 +1078,7 @@ class DeclarationGenerator {
         while (!toRemove.isEmpty()) {
           desiredSymbols.remove(toRemove);
           // Also remove their implicit parent namespaces
-          toRemove = toRemove.substring(0, Math.max(0, toRemove.lastIndexOf('.')));
+          toRemove = toRemove.substring(0, max(0, toRemove.lastIndexOf('.')));
         }
       }
 
@@ -1095,7 +1126,7 @@ class DeclarationGenerator {
         // type from the module object type map.
         for (String desiredSymbol : desiredSymbols) {
           List<String> parts = DOT_SPLITTER.splitToList(desiredSymbol);
-          String propName = parts.get(parts.size() - 1);
+          String propName = Iterables.getLast(parts);
           if (!isValidJSProperty(propName)) {
             emitComment("skipping property " + propName + " because it is not a valid symbol.");
             continue;
@@ -1120,12 +1151,7 @@ class DeclarationGenerator {
           boolean isStatic = forcePropDeclaration;
           boolean isNamespace = true;
           treeWalker.visitProperty(
-              propName,
-              oType,
-              isStatic,
-              forcePropDeclaration,
-              isNamespace,
-              Collections.<String>emptyList());
+              propName, oType, isStatic, forcePropDeclaration, isNamespace, ImmutableList.of());
         }
       }
     }
@@ -1198,7 +1224,9 @@ class DeclarationGenerator {
    * verify that there are child properties (an empty namespace is not useful).
    */
   private boolean isLikelyNamespace(JSDocInfo doc) {
-    if (doc == null) return false;
+    if (doc == null) {
+      return false;
+    }
     // Authors should prefer @const to express a namespace in externs, and just goog.provide it
     // in non-extern code. However, there are still usages of @type {Object}.
     JSTypeExpression type = doc.getType();
@@ -1284,7 +1312,7 @@ class DeclarationGenerator {
     return DOT_SPLITTER
         .splitToStream(namespace)
         .map(t -> RESERVED_JS_WORDS.contains(t) ? t + "_" : t)
-        .collect(Collectors.joining("."));
+        .collect(joining("."));
   }
 
   private void emitNamespaceEnd() {
@@ -1340,7 +1368,9 @@ class DeclarationGenerator {
 
   private boolean isPrivate(String name) {
     TypedVar var = compiler.getTopScope().getOwnSlot(name);
-    if (var == null) return false;
+    if (var == null) {
+      return false;
+    }
     return isPrivate(var.getJSDocInfo());
   }
 
@@ -1387,7 +1417,9 @@ class DeclarationGenerator {
     String alias = getUnqualifiedName(name);
 
     // Make sure we don't emit a variable named after a keyword.
-    if (RESERVED_JS_WORDS.contains(alias)) alias += "_";
+    if (RESERVED_JS_WORDS.contains(alias)) {
+      alias += "_";
+    }
 
     // workaround for https://github.com/Microsoft/TypeScript/issues/4325
     emit("import " + alias + " = ");
@@ -1399,7 +1431,9 @@ class DeclarationGenerator {
     emitBreak();
     if (isDefault) {
       emitNoSpace("export default " + alias);
-      if (inParentNamespace) emitNoSpace("." + getUnqualifiedName(name));
+      if (inParentNamespace) {
+        emitNoSpace("." + getUnqualifiedName(name));
+      }
       emitNoSpace(";");
     } else {
       emitNoSpace("export = " + alias + ";");
@@ -1493,9 +1527,13 @@ class DeclarationGenerator {
 
   private ObjectType getSuperType(FunctionType type) {
     ObjectType proto = type.getPrototype();
-    if (proto == null) return null;
+    if (proto == null) {
+      return null;
+    }
     ObjectType implicitProto = proto.getImplicitPrototype();
-    if (implicitProto == null) return null;
+    if (implicitProto == null) {
+      return null;
+    }
     return "Object".equals(implicitProto.getDisplayName()) ? null : implicitProto;
   }
 
@@ -1512,7 +1550,7 @@ class DeclarationGenerator {
     if (dotIdx == -1) {
       return input;
     }
-    return input.substring(dotIdx + 1, input.length());
+    return input.substring(dotIdx + 1);
   }
 
   private class TreeWalker {
@@ -1548,8 +1586,12 @@ class DeclarationGenerator {
       // However a goog.provide'd name can collide with a re-declared top-level symbol, e.g. if some
       // code goog.provide's `Element`.
       // TODO(martinprobst): Consider aliasing all global symbols into the clutz namespace.
-      if (name.indexOf('.') == -1) return name;
-      if (this.isGoogNamespace && name.startsWith("goog.")) return name;
+      if (name.indexOf('.') == -1) {
+        return name;
+      }
+      if (this.isGoogNamespace && name.startsWith("goog.")) {
+        return name;
+      }
       return Constants.INTERNAL_NAMESPACE + "." + name;
     }
 
@@ -1628,9 +1670,9 @@ class DeclarationGenerator {
 
     /**
      * Used to differentiate a function with a constructor function type, from ordinary ones.
-     * <pre>
+     * <pre>{@code
      * @type {function(new:X)} foo.x;
-     * </pre>
+     * }</pre>
      * isNominalConstructor cannot be used because it returns
      * true for all classes/interfaces that have = function() {} (even if they are structural
      * interfaces!).
@@ -1681,12 +1723,16 @@ class DeclarationGenerator {
       emitBreak();
       for (String line : Splitter.on('\n').split(desc)) {
         emit(" *");
-        if (!line.isEmpty()) emit(line);
+        if (!line.isEmpty()) {
+          emit(line);
+        }
         emitBreak();
       }
       if (!ignoreParams) {
         for (String name : docs.getParameterNames()) {
-          if (docs.getDescriptionForParameter(name) == null) continue;
+          if (docs.getDescriptionForParameter(name) == null) {
+            continue;
+          }
           emit(" * @param");
           emit(name);
           emit(docs.getDescriptionForParameter(name));
@@ -1729,7 +1775,7 @@ class DeclarationGenerator {
       } else if (ftype.isInterface()) {
         emit("interface");
       } else {
-        checkState(false, "Unexpected function type " + ftype);
+        throw new IllegalStateException("Unexpected function type " + ftype);
       }
       emit(name);
 
@@ -1783,18 +1829,18 @@ class DeclarationGenerator {
     }
 
     private void visitTemplateTypes(ObjectType type) {
-      visitTemplateTypes(type, Collections.<String>emptyList(), true);
+      visitTemplateTypes(type, ImmutableList.of(), true);
     }
 
     /**
-     * Emits template types for a given type. For example for <code>T<A,B></code>, this method will
-     * emit <code><A,B></code>.
+     * Emits template types for a given type. For example for {@code T<A,B>}, this method will emit
+     * {@code <A,B>}.
      *
      * @param type the type in question
      * @param alreadyEmittedTemplateType when visiting methods the class template types will be
      *     reported by closure, but should not be emitted.
-     * @param isDeclaration isDeclaration {@pre true} if this type declares the template types,
-     *     {@pre false} if it instantiates a generic type. In the former case, Clutz emits defaults
+     * @param isDeclaration isDeclaration {@code true} if this type declares the template types,
+     *     {@code false} if it instantiates a generic type. In the former case, Clutz emits defaults
      *     for the template parameters.
      */
     private void visitTemplateTypes(
@@ -1855,7 +1901,9 @@ class DeclarationGenerator {
         JSType registryType, String unqualifiedName, boolean emitNeverBrand) {
       emitTypeAliasPrefix(registryType, unqualifiedName, emitNeverBrand);
       // emit a brand to prevent accidental compatibility of values with an enum.
-      if (emitNeverBrand) emit("&{clutzEnumBrand: never}");
+      if (emitNeverBrand) {
+        emit("&{clutzEnumBrand: never}");
+      }
       emit(";");
       emitBreak();
     }
@@ -2058,7 +2106,9 @@ class DeclarationGenerator {
         } else {
           visitType(type, false, isOptionalPosition);
         }
-        if (isVarArgs) emit("[]");
+        if (isVarArgs) {
+          emit("[]");
+        }
       }
     }
 
@@ -2101,7 +2151,7 @@ class DeclarationGenerator {
       }
       emit(displayName);
       List<JSType> templateTypes = type.getTemplateTypes();
-      if (templateTypes != null && templateTypes.size() > 0) {
+      if (templateTypes != null && !templateTypes.isEmpty()) {
         emitGenericTypeArguments(type.getTemplateTypes());
       }
     }
@@ -2341,7 +2391,7 @@ class DeclarationGenerator {
           };
       try {
         typeToVisit.visit(visitor);
-      } catch (Exception e) {
+      } catch (RuntimeException e) {
         throw new RuntimeException("Failed to emit type " + typeToVisit, e);
       }
     }
@@ -2533,7 +2583,7 @@ class DeclarationGenerator {
       if (inOptionalPosition) {
         alts = Collections2.filter(alts, input -> !input.isVoidType());
       }
-      if (alts.size() == 0) {
+      if (alts.isEmpty()) {
         // If the only type was "undefined" and it got filtered, emit it explicitly.
         emit("undefined");
         return;
@@ -2588,19 +2638,15 @@ class DeclarationGenerator {
       JSType instanceType = type.getTypeOfThis();
       checkArgument(
           instanceType.isObject(),
-          "expected an ObjectType for this, but got "
-              + instanceType
-              + " which is a "
-              + instanceType.getClass().getSimpleName());
+          "expected an ObjectType for this, but got %s which is a %s",
+          instanceType,
+          instanceType.getClass().getSimpleName());
       // TODO(evanm): investigate passing superClassFields in as skipNames.
       // We were accidentally passing it in for the wrong param, so
       // I "fixed" it by removing it, but maybe we should restore the
       // original intent.
       visitInstanceProperties(
-          (ObjectType) instanceType,
-          Collections.<String>emptySet(),
-          Collections.<String>emptySet(),
-          Collections.<String>emptyList());
+          (ObjectType) instanceType, ImmutableSet.of(), ImmutableSet.of(), ImmutableList.of());
 
       // Bracket-style property access for dictionnary...
       if (instanceType.isDict()) {
@@ -2617,7 +2663,9 @@ class DeclarationGenerator {
       Set<ObjectType> implementedInterfaces = getAllDirectlyImplementedInterfaces(type);
       boolean implementsIArrayLike = false;
       for (ObjectType implementedInterface : implementedInterfaces) {
-        if (implementedInterface.getDisplayName().equals("IArrayLike")) implementsIArrayLike = true;
+        if (implementedInterface.getDisplayName().equals("IArrayLike")) {
+          implementsIArrayLike = true;
+        }
       }
       for (ObjectType implementedInterface : implementedInterfaces) {
         String displayName = implementedInterface.getDisplayName();
@@ -2631,7 +2679,7 @@ class DeclarationGenerator {
             emitIndexSignature(unknownType, unknownType, true);
           }
         } else if ("IArrayLike".equals(displayName)) {
-          if (templateTypes != null && templateTypes.size() > 0) {
+          if (templateTypes != null && !templateTypes.isEmpty()) {
             emitIndexSignature(numberType, templateTypes.get(0), true);
           } else {
             emitIndexSignature(numberType, unknownType, true);
@@ -2670,10 +2718,16 @@ class DeclarationGenerator {
      */
     private boolean mustEmitConstructor(FunctionType type) {
       while (type != null) {
-        if (type.getParameters().iterator().hasNext()) return true;
+        if (type.getParameters().iterator().hasNext()) {
+          return true;
+        }
         ObjectType oType = getSuperType(type);
-        if (oType == null) return false;
-        if (oType.isNoResolvedType()) return true;
+        if (oType == null) {
+          return false;
+        }
+        if (oType.isNoResolvedType()) {
+          return true;
+        }
         type = oType.getConstructor();
       }
       return false;
@@ -2721,13 +2775,7 @@ class DeclarationGenerator {
             emit("function");
           }
         }
-        visitProperty(
-            propName,
-            objType,
-            !isInNamespace,
-            false,
-            isInNamespace,
-            Collections.<String>emptyList());
+        visitProperty(propName, objType, !isInNamespace, false, isInNamespace, ImmutableList.of());
       }
     }
 
@@ -2737,7 +2785,9 @@ class DeclarationGenerator {
         Set<String> forceProps,
         List<String> classTemplateTypeNames) {
       for (String propName : getTypePropertyNamesToEmit(objType, false)) {
-        if (skipNames.contains(propName)) continue;
+        if (skipNames.contains(propName)) {
+          continue;
+        }
         visitProperty(
             propName, objType, false, forceProps.contains(propName), false, classTemplateTypeNames);
       }
@@ -2845,7 +2895,9 @@ class DeclarationGenerator {
         List<String> classTemplateTypeNames) {
       JSType propertyType = objType.getPropertyType(propName);
       // The static methods from the function prototype are provided by lib.d.ts.
-      if (isStatic && isFunctionPrototypeProp(propName)) return;
+      if (isStatic && isFunctionPrototypeProp(propName)) {
+        return;
+      }
       JSDocInfo jsdoc = objType.getOwnPropertyJSDocInfo(propName);
       maybeEmitJsDoc(jsdoc, /* ignoreParams */ false);
       boolean isProtected = isProtectedProperty(objType, propName);
@@ -2890,10 +2942,13 @@ class DeclarationGenerator {
         boolean forcePropDeclaration,
         boolean isNamespace,
         List<String> classTemplateTypeNames) {
-      if (handleSpecialTTEFunctions(propertyType, propName, isStatic, classTemplateTypeNames))
+      if (handleSpecialTTEFunctions(propertyType, propName, isStatic, classTemplateTypeNames)) {
         return;
+      }
 
-      if (isProtected) emit("protected");
+      if (isProtected) {
+        emit("protected");
+      }
       // "static abstract" is illegal TypeScript, drop "abstract"
       if (isStatic) {
         emit("static");
@@ -2919,8 +2974,7 @@ class DeclarationGenerator {
           return;
         }
         // Avoid re-emitting template variables defined on the class level if method is not static.
-        List<String> skipTemplateParams =
-            isStatic ? Collections.emptyList() : classTemplateTypeNames;
+        List<String> skipTemplateParams = isStatic ? ImmutableList.of() : classTemplateTypeNames;
         visitFunctionDeclaration(ftype, skipTemplateParams);
       }
       emit(";");
@@ -2929,9 +2983,9 @@ class DeclarationGenerator {
 
     /**
      * Closure Compiler does not support tuple types, and thus cannot express the proper type for
-     * "Map<K, V>.entries()", which is an IterableIterator of a [K, V] tuple. The tighter tuple type
-     * [K, V] allows destructuring loops "for (const [x, y] of ...)" with the tuple values getting
-     * the right types assigned.
+     * {@code Map<K, V>.entries()}, which is an IterableIterator of a [K, V] tuple. The tighter
+     * tuple type [K, V] allows destructuring loops "for (const [x, y] of ...)" with the tuple
+     * values getting the right types assigned.
      *
      * <p>Given that maps are very common, as are for loops over them, this special cases methods
      * called "entries" that have the right return type.
@@ -3001,7 +3055,9 @@ class DeclarationGenerator {
     private boolean handleSpecialTTEFunctions(
         JSType type, String propName, boolean isStatic, List<String> classTemplateTypeNames) {
       FunctionType ftype = type.toMaybeFunctionType();
-      if (ftype == null) return false;
+      if (ftype == null) {
+        return false;
+      }
 
       boolean hasTTE = false;
       for (TemplateType templateKey : ftype.getTemplateTypeMap().getTemplateKeys()) {
@@ -3026,7 +3082,9 @@ class DeclarationGenerator {
         }
       }
 
-      if (!horribleHackForOverrides && !hasTTE) return false;
+      if (!horribleHackForOverrides && !hasTTE) {
+        return false;
+      }
 
       // The same signature can be found in a number of classes - es6 Promise, angular.$q.Promise,
       // custom Thenable classes, etc. While the class names differ the implementations are close
@@ -3052,7 +3110,9 @@ class DeclarationGenerator {
       String className =
           Constants.INTERNAL_NAMESPACE + "." + getNamespace(getNamespace(ftype.getDisplayName()));
       Iterator<String> templateTypeNames = classTemplateTypeNames.iterator();
-      if (!templateTypeNames.hasNext()) return null;
+      if (!templateTypeNames.hasNext()) {
+        return null;
+      }
 
       String templateVarName = templateTypeNames.next();
 
@@ -3155,14 +3215,14 @@ class DeclarationGenerator {
           // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/angular/index.d.ts#L1014
         case "all":
           return "all(promises : " + className + " < any > [] ) : " + className + " < any [] > ;";
-        default:
+        default: // fall out
       }
       return null;
     }
 
-    private List<String> getTemplateTypeNames(ObjectType objType) {
+    private ImmutableList<String> getTemplateTypeNames(ObjectType objType) {
       if (objType.getTemplateTypeMap() == null) {
-        return Collections.emptyList();
+        return ImmutableList.of();
       }
       return objType.getTemplateTypeMap().getTemplateKeys().stream()
           .map(jsType -> jsType != null ? jsType.getDisplayName() : "")
@@ -3174,7 +3234,9 @@ class DeclarationGenerator {
       JSType type = ftype.getReturnType();
       final JSType typeOfThis = ftype.getTypeOfThis();
 
-      if (type == null) return;
+      if (type == null) {
+        return;
+      }
       emit(":");
       // Closure conflates 'undefined' and 'void', and in general visitType always emits `undefined`
       // for that type.
@@ -3206,13 +3268,15 @@ class DeclarationGenerator {
         JSType type = param.getJSType();
         // Note: template types (e.g. the T in Array<T>) return true for isUnknownType,
         // so we check that first.
-        if (type.isTemplateType() || !type.isUnknownType()) return false;
+        if (type.isTemplateType() || !type.isUnknownType()) {
+          return false;
+        }
       }
       return true;
     }
 
     private void visitFunctionParameters(FunctionType ftype) {
-      visitFunctionParameters(ftype, true, Collections.<String>emptyList());
+      visitFunctionParameters(ftype, true, ImmutableList.of());
     }
 
     /** Gets the string name from a function parameter node, or "" if we cannot find one. */
@@ -3270,7 +3334,7 @@ class DeclarationGenerator {
         Iterable<Node> parameterNodes = functionSource.getFirstChild().getNext().children();
         // TODO(bradfordcsmith): This will need to be updated when transpilation of default
         //   and destructured parameters stops happening in checks-only compilation.
-        names = transform(parameterNodes, (node) -> this.getParameterName(node)).iterator();
+        names = transform(parameterNodes, this::getParameterName).iterator();
       }
 
       int paramCount = 0;
@@ -3383,8 +3447,9 @@ class DeclarationGenerator {
       } else {
         Map<String, Node> nodes = new LinkedHashMap<>();
         for (TypedVar symbol : childListMap.get(innerNamespace)) {
-          if (symbol.getName() != null && symbol.getNode() != null)
+          if (symbol.getName() != null && symbol.getNode() != null) {
             nodes.put(symbol.getName(), symbol.getNode());
+          }
         }
         for (String propName : getEmittablePropertyNames(type)) {
           innerProps.put(
@@ -3398,7 +3463,9 @@ class DeclarationGenerator {
         String propName = namedType.name;
         JSType pType = namedType.type;
         String qualifiedName = innerNamespace + '.' + propName;
-        if (provides.contains(qualifiedName)) continue;
+        if (provides.contains(qualifiedName)) {
+          continue;
+        }
         Node node = innerProps.get(namedType);
         // Node might be null in some edge cases. For example when "type not found in Closure
         // type registry" comment emmited below.
@@ -3445,13 +3512,17 @@ class DeclarationGenerator {
         // Non-type defining static properties are handled for provided and unprovided
         // interfaces in visitClassOrInterface.
       }
-      if (foundNamespaceMembers) emitNamespaceEnd();
+      if (foundNamespaceMembers) {
+        emitNamespaceEnd();
+      }
 
       // Recursively repeat the process for inner types of inner types.
       for (NamedTypePair namedType : innerProps.keySet()) {
         JSType pType = namedType.type;
         String qualifiedName = innerNamespace + '.' + namedType.name;
-        if (provides.contains(qualifiedName)) continue;
+        if (provides.contains(qualifiedName)) {
+          continue;
+        }
 
         // This probably could be extended to enums and interfaces, but I rather wait for for some
         // real world use-cases before supporting what seems like a bad way to organize closure
@@ -3465,7 +3536,7 @@ class DeclarationGenerator {
     private void visitFunctionExpression(String propName, FunctionType ftype) {
       emit("function");
       emit(propName);
-      visitFunctionDeclaration(ftype, Collections.<String>emptyList());
+      visitFunctionDeclaration(ftype, ImmutableList.of());
       emit(";");
       emitBreak();
     }
@@ -3523,7 +3594,7 @@ class DeclarationGenerator {
       if (PlatformSymbols.GLOBAL_SYMBOL_ALIASES.contains(name)) {
         // See comment on GLOBAL_SYMBOL_ALIASES.
         globalName = getGlobalSymbolNamespacePrefix() + "Global" + name;
-      } else if (PlatformSymbols.CLOSURE_TO_TYPESCRIPT.get(name) != null) {
+      } else if (PlatformSymbols.CLOSURE_TO_TYPESCRIPT.containsKey(name)) {
         globalName = PlatformSymbols.CLOSURE_TO_TYPESCRIPT.get(name);
       } else if (PlatformSymbols.TYPESCRIPT_LIB_D_TS.contains(name)) {
         // Assume it's safe to emit the name as-is.
@@ -3652,7 +3723,9 @@ class DeclarationGenerator {
       @Override
       public int compareTo(NamedTypePair other) {
         int nameCmp = name.compareTo(other.name);
-        if (nameCmp != 0) return nameCmp;
+        if (nameCmp != 0) {
+          return nameCmp;
+        }
         return type.toString().compareTo(other.type.toString());
       }
     }
@@ -3680,8 +3753,12 @@ class DeclarationGenerator {
 
   private boolean isAliasedClassOrInterface(TypedVar symbol, JSType type) {
     // Confusingly typedefs are constructors. However, they cannot be aliased AFAICT.
-    if (type.isNoType()) return false;
-    if (!type.isConstructor() && !type.isInterface()) return false;
+    if (type.isNoType()) {
+      return false;
+    }
+    if (!type.isConstructor() && !type.isInterface()) {
+      return false;
+    }
     String symbolName = symbol.getName();
     String typeName = type.getDisplayName();
     // Turns out that for aliases the symbol and type name differ.
