@@ -6,6 +6,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.google.common.truth.FailureMetadata;
@@ -50,7 +52,7 @@ class ProgramSubject extends Subject {
   public boolean withPlatform = false;
   public String extraExternFile = null;
   public boolean emitBase = false;
-  public String depgraph = null;
+  public String summaryFile = null;
   public boolean debug = true;
 
   static ProgramSubject assertThatProgram(String... sourceLines) {
@@ -163,10 +165,13 @@ class ProgramSubject extends Subject {
           Lists.newArrayList(SourceFile.fromFile(resource("src/resources/es6_min.js"), UTF_8));
     }
 
-    if (depgraph != null) {
-      opts.depgraph = DepgraphTest.parseFile(depgraph);
+    if (summaryFile != null) {
+      opts.googProvides =
+          Options.extractGoogProvides(
+              ImmutableList.of(
+                  DeclarationGeneratorTest.getTestInputFile(summaryFile).toFile().toString()));
     } else {
-      opts.depgraph = Depgraph.forRoots(roots, nonroots);
+      opts.googProvides = ImmutableSet.of();
     }
 
     if (extraExternFile != null) {
@@ -180,9 +185,7 @@ class ProgramSubject extends Subject {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       System.setErr(new PrintStream(out));
       DeclarationGenerator generator = new DeclarationGenerator(opts);
-      String dts =
-          generator.generateDeclarations(
-              sourceFiles, externFiles, Depgraph.forRoots(roots, nonroots));
+      String dts = generator.generateDeclarations(sourceFiles, externFiles);
       String diagnostics = out.toString();
       return new String[] {dts, diagnostics};
     } finally {

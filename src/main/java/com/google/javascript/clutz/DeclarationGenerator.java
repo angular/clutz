@@ -237,7 +237,7 @@ class DeclarationGenerator {
   private Map<String, String> aliasMap = new LinkedHashMap<>();
 
   /**
-   * declareLegacyNamespace modules declare goog.provides symbols, but depgraph analysis shows them
+   * declareLegacyNamespace modules declare goog.provides symbols, but JsTrimmer summaries show them
    * as goog.modules. This map contains aliases for the symbols in goog.module style, so they can be
    * imported from other goog.modules. See LegacyNamespaceReexportMapBuilder for more details.
    */
@@ -327,37 +327,6 @@ class DeclarationGenerator {
     return realType.isRecordType() || realType.isTemplatizedType() || realType.isFunctionType();
   }
 
-  void generateDeclarations() {
-    List<SourceFile> sourceFiles = new ArrayList<>();
-
-    for (String source : opts.arguments) {
-      if (!source.endsWith(".zip")) {
-        sourceFiles.add(SourceFile.fromPath(Paths.get(source), UTF_8));
-        continue;
-      }
-
-      getJsEntryPathsFromZip(source).stream()
-          .map(p -> SourceFile.fromPath(p, UTF_8))
-          .forEach(sourceFiles::add);
-    }
-    List<SourceFile> externFiles = new ArrayList<>();
-    if (opts.closureEnv != null) {
-      externFiles.addAll(getDefaultExterns(opts));
-    }
-    String result = generateDeclarations(sourceFiles, externFiles, opts.depgraph);
-
-    if ("-".equals(opts.output)) {
-      System.out.println(result);
-    } else {
-      File output = new File(opts.output);
-      try {
-        Files.asCharSink(output, UTF_8).write(result);
-      } catch (IOException e) {
-        throw new IllegalArgumentException("Unable to write to file " + opts.output, e);
-      }
-    }
-  }
-
   /**
    * Helper function helps read the entries in a zipfile and returns a list of only the javascript
    * files (i.e files ending in .js).
@@ -377,18 +346,46 @@ class DeclarationGenerator {
     }
   }
 
-  String generateDeclarations(
-      List<SourceFile> sourceFiles, List<SourceFile> externs, Depgraph depgraph) {
+  void generateDeclarations() {
+    List<SourceFile> sourceFiles = new ArrayList<>();
+
+    for (String source : opts.arguments) {
+      if (!source.endsWith(".zip")) {
+        sourceFiles.add(SourceFile.fromPath(Paths.get(source), UTF_8));
+        continue;
+      }
+
+      getJsEntryPathsFromZip(source).stream()
+          .map(p -> SourceFile.fromPath(p, UTF_8))
+          .forEach(sourceFiles::add);
+    }
+    List<SourceFile> externFiles = new ArrayList<>();
+    if (opts.closureEnv != null) {
+      externFiles.addAll(getDefaultExterns(opts));
+    }
+    String result = generateDeclarations(sourceFiles, externFiles);
+
+    if ("-".equals(opts.output)) {
+      System.out.println(result);
+    } else {
+      File output = new File(opts.output);
+      try {
+        Files.asCharSink(output, UTF_8).write(result);
+      } catch (IOException e) {
+        throw new IllegalArgumentException("Unable to write to file " + opts.output, e);
+      }
+    }
+  }
+
+  String generateDeclarations(List<SourceFile> sourceFiles, List<SourceFile> externs) {
     // Compile should always be first here, because it sets internal state.
     compiler.compile(externs, sourceFiles, opts.getCompilerOptions());
     importRenameMap =
-        new ImportRenameMapBuilder()
-            .build(compiler.getParsedInputs(), opts.depgraph.getGoogProvides());
-    aliasMap =
-        new AliasMapBuilder().build(compiler.getParsedInputs(), opts.depgraph.getGoogProvides());
+        new ImportRenameMapBuilder().build(compiler.getParsedInputs(), opts.googProvides);
+    aliasMap = new AliasMapBuilder().build(compiler.getParsedInputs(), opts.googProvides);
     legacyNamespaceReexportMap =
         new LegacyNamespaceReexportMapBuilder()
-            .build(compiler.getParsedInputs(), opts.depgraph.getGoogProvides());
+            .build(compiler.getParsedInputs(), opts.googProvides);
 
     unknownType = compiler.getTypeRegistry().getNativeType(JSTypeNative.UNKNOWN_TYPE);
     numberType = compiler.getTypeRegistry().getNativeType(JSTypeNative.NUMBER_TYPE);

@@ -66,7 +66,10 @@ public class DeclarationGeneratorTest {
       subject.debug = false;
     }
     if (input.getParentFile().getName().equals("partialCrossModuleTypeImports")) {
-      subject.depgraph = "partialCrossModuleTypeImports/cross_module_type.depgraph";
+      // To update this file, run
+      // tools/js/blaze/JsTrimmerRunnerRelease.jar extractor  --output \
+      // third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/cross_module_type.summary --input third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/goog_legacy_namespace_exporter.js --input third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/goog_module_importer.js --input third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/goog_provide_exporter.js
+      subject.summaryFile = "partialCrossModuleTypeImports/cross_module_type.summary";
     }
     // using async/await causes warnings inside closure's standard library, so ignore them for our
     // tests

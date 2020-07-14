@@ -1,0 +1,7 @@
+
+√
+êçthird_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/goog_legacy_namespace_exporter.js"goog.legacy.namespace.exporter"googX
+Ì
+ÜÉthird_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/goog_module_importer.jsgoog.module.importer"goog""goog.legacy.namespace.exporter"googprovide.exporterX
+∞
+áÑthird_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/goog_provide_exporter.jsgoogprovide.exporter"googX

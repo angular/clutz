@@ -1,13 +1,27 @@
 package com.google.javascript.clutz;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.devtools.javascript.jstrimmer.FileSummary;
+import com.google.devtools.javascript.jstrimmer.Symbol;
+import com.google.devtools.javascript.jstrimmer.TargetSummary;
 import com.google.javascript.jscomp.*;
+import com.google.javascript.jscomp.CheckLevel;
+import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
+import com.google.javascript.jscomp.DependencyOptions;
+import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.deps.ModuleLoader;
 import com.google.javascript.jscomp.parsing.Config;
+import com.google.protobuf.ExtensionRegistry;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -77,12 +91,11 @@ public class Options {
   CompilerOptions.Environment closureEnv = null;
 
   @Option(
-    name = "--depgraphs",
-    usage = "only generate output for files listed as a root in the given depgraphs",
-    metaVar = "file.depgraph...",
-    handler = StringArrayOptionHandler.class
-  )
-  List<String> depgraphFiles = new ArrayList<>();
+      name = "--summaries",
+      usage = "JsTrimmer summaries for JS dependencies",
+      metaVar = "file.summary...",
+      handler = StringArrayOptionHandler.class)
+  List<String> summaryFiles = new ArrayList<>();
 
   @Option(
     name = "--closure_entry_points",
@@ -116,7 +129,7 @@ public class Options {
   @Option(name = "--", handler = StopOptionHandler.class)
   List<String> arguments = new ArrayList<>();
 
-  Depgraph depgraph;
+  ImmutableSet<String> googProvides;
 
   public CompilerOptions getCompilerOptions() {
     final CompilerOptions options = new CompilerOptions();
@@ -180,10 +193,29 @@ public class Options {
   Options(String[] args) throws CmdLineException {
     CmdLineParser parser = new CmdLineParser(this);
     parser.parseArgument(args);
-    depgraph = Depgraph.parseFrom(depgraphFiles);
+    googProvides = extractGoogProvides(summaryFiles);
 
     if (arguments.isEmpty()) {
       throw new CmdLineException(parser, "No files were given");
+    }
+  }
+
+  @VisibleForTesting
+  static ImmutableSet<String> extractGoogProvides(List<String> summaryFiles) {
+    return summaryFiles.stream()
+        .map(Options::readJsSummaryFile)
+        .flatMap(s -> s.getFilesList().stream())
+        .filter(f -> f.getModuleType() == FileSummary.ModuleType.GOOG_PROVIDE)
+        .flatMap(f -> f.getProvidedSymbolsList().stream())
+        .map(Symbol::getName)
+        .collect(toImmutableSet());
+  }
+
+  private static TargetSummary readJsSummaryFile(String path) {
+    try (FileInputStream stream = new FileInputStream(path)) {
+      return TargetSummary.parseFrom(stream, ExtensionRegistry.getEmptyRegistry());
+    } catch (IOException ex) {
+      throw new VerifyException(ex);
     }
   }
 
