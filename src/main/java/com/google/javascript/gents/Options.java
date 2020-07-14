@@ -136,11 +136,23 @@ public class Options {
   List<String> externsOverride = new ArrayList<>();
 
   @Option(
-    name = "--alreadyConvertedPrefix",
-    usage = "Goog.modules starting with this prefix are assumed to be already in TypeScript",
-    metaVar = "ALREADY_CONVERTED_PREFIX"
-  )
-  String alreadyConvertedPrefix = "google3";
+      name = "--binDirectory",
+      usage =
+          "Directory containing built dependencies of the target project being converted.\n"
+              + "Goog.modules provided by a .closure.js file in this folder are assumed to come"
+              + " from TS files.",
+      metaVar = "BIN_DIRECTORY")
+  String binDirectory = "bazel-bin";
+
+  @Option(
+      name = "--generatedDirectory",
+      usage =
+          "Directory containing sources generated from the target project being converted.\n"
+              + "Goog.modules provided by a file G in this folder, that shares a common path"
+              + " prefix with a file to convert F, is assumed to become a TS file when F becomes a"
+              + " TS file.",
+      metaVar = "GENERATED_DIRECTORY")
+  String generatedDirectory = "bazel-genfiles";
 
   @Option(
     name = "--absolutePathPrefix",

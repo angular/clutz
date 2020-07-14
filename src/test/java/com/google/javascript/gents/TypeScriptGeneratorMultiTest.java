@@ -146,7 +146,9 @@ public class TypeScriptGeneratorMultiTest {
         TestUtil.assertIsGoogModuleOrProvide(sourceText, filepath);
       }
 
-      if (!filepath.endsWith("_keep.js") && !filepath.endsWith("_keep.es5.js")) {
+      if (!filepath.endsWith("_keep.js")
+          && !filepath.endsWith("_keep.closure.js")
+          && !filepath.endsWith("_generated.js")) {
         sourceNames.add(filepath);
 
         File goldenFile = testInput.getGoldenFile(config.experimentTracker);

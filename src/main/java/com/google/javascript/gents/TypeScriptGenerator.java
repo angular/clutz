@@ -242,7 +242,10 @@ public class TypeScriptGenerator {
             modulePrePass.getNamespaceMap(),
             comments,
             astComments,
-            opts.alreadyConvertedPrefix);
+            opts.binDirectory,
+            opts.generatedDirectory,
+            opts.absolutePathPrefix,
+            filesToConvert);
     modulePass.process(externRoot, srcRoot);
 
     new TypeConversionPass(compiler, modulePrePass, comments).process(externRoot, srcRoot);
