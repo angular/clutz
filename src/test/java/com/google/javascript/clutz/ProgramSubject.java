@@ -18,13 +18,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import javax.annotation.Nullable;
 
 /** A subject that supports assertions on {@link DeclarationGenerator}'s results. */
@@ -61,11 +57,11 @@ class ProgramSubject extends Subject {
   }
 
   static ProgramSubject assertThatProgram(File singleInput) {
-    return assertThatProgram(singletonList(singleInput), Collections.<File>emptyList());
+    return assertThatProgram(singletonList(singleInput));
   }
 
-  static ProgramSubject assertThatProgram(List<File> roots, List<File> nonroots) {
-    Program program = new Program(roots, nonroots);
+  static ProgramSubject assertThatProgram(List<File> files) {
+    Program program = new Program(files);
     return assert_().about(ProgramSubject.FACTORY).that(program);
   }
 
@@ -85,7 +81,7 @@ class ProgramSubject extends Subject {
 
   void generatesDeclarations(File golden) throws IOException {
     String[] parseResult = parse();
-    assertThat(parseResult[1]).isEqualTo("");
+    assertThat(parseResult[1]).isEmpty();
     String actual = parseResult[0];
     String stripped =
         DeclarationGeneratorTest.GOLDEN_FILE_COMMENTS_REGEXP.matcher(actual).replaceAll("");
@@ -93,13 +89,13 @@ class ProgramSubject extends Subject {
     String expectedClean =
         DeclarationGeneratorTest.GOLDEN_FILE_COMMENTS_REGEXP.matcher(expected).replaceAll("");
     if (!stripped.equals(expectedClean)) {
-      // If the `UPDATE_GOLDENS` flag is set, overwrite the golden files, unless it's a `_with_platform.d.ts`
-      // which have 2 golden files that are concatenated, or if the golden has comments, both of which
-      // shouldn't be blindly overwritten
+      // If the `UPDATE_GOLDENS` flag is set, overwrite the golden files, unless it's a
+      // `_with_platform.d.ts` which have 2 golden files that are concatenated, or if the golden has
+      // comments, both of which shouldn't be blindly overwritten.
       if (System.getenv("UPDATE_GOLDENS") != null
           && !golden.getName().endsWith("_with_platform.d.ts")
           && expected.equals(expectedClean)) {
-        Files.asCharSink(golden, StandardCharsets.UTF_8).write(stripped);
+        Files.asCharSink(golden, UTF_8).write(stripped);
       } else {
         check("generatedDeclarations()")
             .withMessage("Verifying %s", golden.getName())
@@ -114,44 +110,29 @@ class ProgramSubject extends Subject {
     return assertThat(parseResult[1]);
   }
 
-  private String[] parse() throws AssertionError {
+  private String[] parse() {
     Options opts = new Options();
     opts.debug = debug;
     opts.browserResolverStrippedPrefixes = Arrays.asList("abs_strip_for_testing");
-
     List<SourceFile> sourceFiles = new ArrayList<>();
 
     // base.js is needed for the type declaration of goog.require for
     // all total tests, except the base.js one itself.
-    if (actual.roots.isEmpty()) {
+    if (actual.files.isEmpty()) {
       sourceFiles.add(CLUTZ_GOOG_BASE);
     } else {
-      File firstFile = actual.roots.get(0);
+      File firstFile = actual.files.get(0);
       if (!firstFile.getName().equals("base.js")) {
         sourceFiles.add(CLUTZ_GOOG_BASE);
       }
     }
 
-    Set<String> nonroots = new LinkedHashSet<>();
-    for (File nonroot : actual.nonroots) {
-      sourceFiles.add(SourceFile.fromPath(nonroot.toPath(), UTF_8));
-      nonroots.add(nonroot.getPath().replace(System.getProperty("file.separator"), "/"));
-    }
-
-    Set<String> roots = new LinkedHashSet<>();
-
-    for (File root : actual.roots) {
+    for (File root : actual.files) {
       sourceFiles.add(SourceFile.fromPath(root.toPath(), UTF_8));
-      roots.add(root.getPath().replace(System.getProperty("file.separator"), "/"));
     }
 
     if (actual.sourceText != null) {
       sourceFiles.add(SourceFile.fromCode("main.js", actual.sourceText));
-      roots.add("main.js");
-    }
-
-    if (emitBase) {
-      roots.add(CLUTZ_GOOG_BASE.getName());
     }
 
     List<SourceFile> externFiles;
@@ -194,19 +175,16 @@ class ProgramSubject extends Subject {
   }
 
   static class Program {
-    private final List<File> roots;
-    private final List<File> nonroots;
+    private final ImmutableList<File> files;
     @Nullable private final String sourceText;
 
     Program(String sourceText) {
-      this.roots = Collections.emptyList();
-      this.nonroots = Collections.emptyList();
+      this.files = ImmutableList.of();
       this.sourceText = sourceText;
     }
 
-    Program(List<File> roots, List<File> nonroots) {
-      this.roots = roots;
-      this.nonroots = nonroots;
+    Program(List<File> files) {
+      this.files = ImmutableList.copyOf(files);
       this.sourceText = null;
     }
   }

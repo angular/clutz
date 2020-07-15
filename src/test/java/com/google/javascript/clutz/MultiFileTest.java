@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableList;
 import java.io.File;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.Collections;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -21,16 +20,14 @@ public class MultiFileTest {
   @Test
   public void shouldResolveNamedTypes() throws Exception {
     File golden = input("index.d.ts");
-    assertThatProgram(
-            ImmutableList.of(input("index.js"), input("dep.js")), Collections.<File>emptyList())
+    assertThatProgram(ImmutableList.of(input("index.js"), input("dep.js")))
         .generatesDeclarations(golden);
   }
 
   @Test
   public void shouldWorkWithOutOfOrderProvides() throws Exception {
     File golden = input("index.d.ts");
-    assertThatProgram(
-            ImmutableList.of(input("index.js"), input("dep.js")), Collections.<File>emptyList())
+    assertThatProgram(ImmutableList.of(input("index.js"), input("dep.js")))
         .generatesDeclarations(golden);
   }
 
@@ -42,8 +39,7 @@ public class MultiFileTest {
                 input("required_module.js"),
                 input("required_module_default.js"),
                 input("required.js"),
-                input("goog_module.js")),
-            Collections.<File>emptyList())
+                input("goog_module.js")))
         .generatesDeclarations(golden);
   }
 
@@ -51,21 +47,19 @@ public class MultiFileTest {
   public void multifilePartial() throws Exception {
     File golden = input("total.d.ts");
     assertThatProgram(
-            ImmutableList.of(input("missing_imported_base.js")),
             ImmutableList.of(
                 input("named_base_exporter.js"),
                 input("default_base_exporter.js"),
-                input("default_object_exporter.js")))
+                input("default_object_exporter.js"),
+                input("missing_imported_base.js")))
         .generatesDeclarations(golden);
   }
 
   @Test
   public void partialCrossModuleTypeImports() throws Exception {
+    // createProgramSubject() automatically adds a JsTrimmer summary file for this test only.
     File golden = input("total.d.ts");
-    assertThatProgram(
-            ImmutableList.of(input("goog_module_importer.js")),
-            ImmutableList.of(
-                input("goog_provide_exporter.js"), input("goog_legacy_namespace_exporter.js")))
+    assertThatProgram(ImmutableList.of(input("goog_module_importer.js")))
         .generatesDeclarations(golden);
   }
 
@@ -74,8 +68,7 @@ public class MultiFileTest {
     File golden = input("aliasedInterface.d.ts");
     assertThatProgram(
             ImmutableList.of(
-                input("alias_for_interface.js"), input("aliased_interface_with_static.js")),
-            Collections.<File>emptyList())
+                input("alias_for_interface.js"), input("aliased_interface_with_static.js")))
         .generatesDeclarations(golden);
   }
 

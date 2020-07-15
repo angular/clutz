@@ -9,10 +9,12 @@ import java.util.Set;
 /**
  * When a goog.module imports a symbol, there's an ambiguity about whether the symbol is from a
  * goog.provide style file or a goog.module style file. Normally this ambiguity is resolved by
- * consulting depgraphs, but a goog.module can declareLegacyNamespace, in which case it's exports
- * are in goog.provide style, but the depgraph says it's a goog.module. To resolve this ambiguity,
+ * consulting JsSummary, but a goog.module can declareLegacyNamespace, in which case its exports are
+ * in goog.provide style, but the JsSummary says it's a goog.module. To resolve this ambiguity,
  * LegacyNamespaceReexportMapBuilder generates mappings from the goog.module style symbols to the
  * normally declared symbols, so DeclarationGenerator can produce aliases.
+ *
+ * TODO(b/161134788): Consume this information from JsTrimmer summaries instead of this class.
  */
 public class LegacyNamespaceReexportMapBuilder extends ImportBasedMapBuilder {
 
