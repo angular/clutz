@@ -32,4 +32,15 @@ var complex = function(n, o, r) {
   return n;
 };
 
+/**
+ * @param {{
+ *   name: (string|undefined),
+ *   age: (string|undefined)
+ * }} person1
+ * @param {{
+ *   name: (string|undefined), age: (string|undefined)
+ * }} person2
+ */
+const paramHasOptProps = function(person1, {name, age}) {};
+
 exports = {optParams, restParams, restParamsTyped, complex};
