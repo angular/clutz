@@ -14,6 +14,7 @@ import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.Node;
+import com.google.javascript.rhino.Token;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -146,13 +147,50 @@ public final class CollectModuleMetadata extends AbstractTopLevelCallback implem
           if (module.isGoogModule) {
             // This is the exports = {A, B, C} pattern, despite it looking like
             // a default export, we want to treat it like the equivalent
-            // exports.A = A; exports.B = B; exports.C = C;
-            // pattern.
-            if (GentsNodeUtil.isObjLitWithSimpleRefs(assignmentValue)) {
+            // exports.A = A; exports.B = B; exports.C = C; pattern.
+            if (GentsNodeUtil.isObjLitWithJSIdentifierKeys(assignmentValue)) {
+              // Each key in the default export object is a valid JS identifier, so we can raise
+              // each property to an exported variable declaration.
               String fullname = module.providesObjectChildren.keySet().iterator().next();
 
               for (Node symbol : assignmentValue.children()) {
                 String identifier = symbol.getString();
+
+                Node propertyAsgn = symbol.getFirstChild();
+                // If the RHS of the exports property is an identifier name, the object to export
+                // already exists and there is nothing for us to raise.
+                // Otherwise, we lift the property to a constant declaration on the root of the
+                // module and reassign the value of the exports property to be the lifted
+                // identifier, as in the above case.
+                //   exports = {X} -> exports = {X}
+                //   exports = {X: Y} -> exports = {X: Y}
+                //   exports = {X: 1 + 2} -> const X = 1 + 2; exports = {X: X}
+                // NB: there is a risk of collisions here, for example in the code
+                //   const x = 0;
+                //   exports = {x: 1 + 2, y: x};
+                if (!propertyAsgn.isName()) {
+                  Node raisedExport;
+                  Node raisedExportName = Node.newString(Token.NAME, identifier);
+                  if (symbol.isMemberFunctionDef() || symbol.getFirstChild().isFunction()) {
+                    // Function definition
+                    raisedExport = symbol.removeFirstChild();
+                    raisedExport.getFirstChild().setString(identifier);
+                  } else {
+                    // String key -> expression
+                    raisedExportName.addChildToBack(symbol.removeFirstChild());
+                    raisedExport = new Node(Token.CONST, raisedExportName);
+                  }
+
+                  raisedExportName.setStaticSourceFileFrom(symbol);
+                  raisedExport.setLineno(symbol.getLineno());
+                  raisedExport.setStaticSourceFileFrom(symbol);
+                  raisedExport.setJSDocInfo(symbol.getJSDocInfo());
+                  raisedExport.setNonJSDocComment(symbol.getNonJSDocComment());
+
+                  parent.addChildBefore(raisedExport, n);
+                  symbol.addChildToFront(raisedExportName.cloneNode());
+                }
+
                 module.addExport(
                     maybeExportString + '.' + identifier, fullname + '.' + identifier, identifier);
               }

@@ -1,6 +1,7 @@
 package com.google.javascript.gents.util;
 
 import com.google.javascript.rhino.Node;
+import com.google.javascript.rhino.TokenStream;
 
 /**
  * Utility methods for dealing with Closure's AST patterns used in Gents.
@@ -13,22 +14,23 @@ public class GentsNodeUtil {
   private GentsNodeUtil() {}
 
   /**
-   * Returns true is the object is an object literal where all values are simple symbols references:
+   * Returns true is the object is an object literal where all keys are valid JS identifiers:
    *
    * <p>{A, B, C} -> true
    *
-   * <p>{A, B: B} -> true
+   * <p>{A, B: B, foo() {}} -> true
    *
-   * <p>{A: C} -> true
+   * <p>{'abc-def': 0} -> false
    *
-   * <p>{A: A + 1} -> false
+   * <p>{123: 123} -> false
    *
-   * <p>{A: f(1)} -> false
+   * <p>{[foo()]: 0} -> false
    */
-  public static boolean isObjLitWithSimpleRefs(Node node) {
+  public static boolean isObjLitWithJSIdentifierKeys(Node node) {
     if (!node.isObjectLit()) return false;
     for (Node child : node.children()) {
-      if (!child.isStringKey() || !child.getFirstChild().isName()) {
+      if (!(child.isStringKey() || child.isMemberFunctionDef())
+          || !TokenStream.isJSIdentifier(child.getString())) {
         return false;
       }
     }

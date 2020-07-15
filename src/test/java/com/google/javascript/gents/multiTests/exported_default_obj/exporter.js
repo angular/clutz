@@ -7,4 +7,8 @@ class C {}
  */
 class I {}
 
-exports = {C, I};
+exports = {
+  C,
+  I,
+  badPi: 22 / 7,
+};

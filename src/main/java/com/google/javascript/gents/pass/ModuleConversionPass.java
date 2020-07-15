@@ -200,7 +200,7 @@ public final class ModuleConversionPass implements CompilerPass {
 
           if (exportedNamespace != null) {
             exportedSymbol = symbols.get(exportedNamespace);
-          } else if (GentsNodeUtil.isObjLitWithSimpleRefs(child.getSecondChild())) {
+          } else if (GentsNodeUtil.isObjLitWithJSIdentifierKeys(child.getSecondChild())) {
             // Special case the exports = {A, B, C} pattern. The rewritter code
             // already handles this pattern, but we need to pick a non-null symbol to
             // proceed.
@@ -752,11 +752,16 @@ public final class ModuleConversionPass implements CompilerPass {
 
     if (lhs.matchesQualifiedName(exportedNamespace)) {
       rhs.detach();
-      if (GentsNodeUtil.isObjLitWithSimpleRefs(rhs)) {
+      if (GentsNodeUtil.isObjLitWithJSIdentifierKeys(rhs)) {
+        // The module metadata collector would have rewritten the export object literal to consist
+        // of identifier->identifier KV pairs, so at this point we just need to handle two cases:
+        //   1. export identifier is local identifier ({A} or {A: A})
+        //   1. export identifier aliases local identifier ({A: B})
         List<Node> aliases = new ArrayList<>();
         for (Node child : rhs.children()) {
           if (!child.hasChildren() || child.getString().equals(child.getFirstChild().getString())) {
-            // We are in the simple case of exports = {..., A: B, ...}.
+            // (1) We are in the simple case of exports = {..., A, ...} or exports = {..., A: A,
+            // ...}.
             ExportedSymbol symbolToExport =
                 ExportedSymbol.fromExportAssignment(
                     child.getFirstChild(), exportedNamespace, child.getString(), fileName);
@@ -765,7 +770,7 @@ public final class ModuleConversionPass implements CompilerPass {
               moveExportStmtToADeclKeyword(assign, exportNode);
             }
           } else {
-            // We are in the alias case of exports = {..., A: B, ...}.
+            // (2) We are in the alias case of exports = {..., A: B, ...}.
             aliases.add(
                 new Node(
                     Token.EXPORT_SPEC,
