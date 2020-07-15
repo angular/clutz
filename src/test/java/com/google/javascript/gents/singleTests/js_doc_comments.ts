@@ -147,15 +147,10 @@
 
 /**
  * An object literal type annotation that spans multiple lines.
- * @param {{someverylongnaaaaaaaaaaaaaaaaaame: string,
- *       anotheraaaaaaaaaaaaaaaaaaaaaaaaaa: string}} foo Note: this test
- *   exhibits currently broken behavior in Gents. The type annotation should
- *   have been removed.
- */
-
-/**
- * This JSDoc comment has an empty type annotation, identifier, no explanatory
- * explanatory text, and should go away.
+ * @param foo param description
+ * @param foo2 second param
+ *       description
+ * @return my cool return value
  */
 
 
@@ -163,8 +158,6 @@
  * @param {{}} This type annotation has an empty object literal.
  */
 /**
- * @param {{someverylongnaaaaaaaaaaaaaaaaaame: string,
- *       anotheraaaaaaaaaaaaaaaaaaaaaaaaaa: string}} foo A broken up
- *   comment here. Note: this test exhibits currently broken behavior in
- *   Gents. The type annotation should have been removed.
+ * This JSDoc comment has an empty type annotation, identifier, no explanatory
+ * explanatory text, and should go away.
  */

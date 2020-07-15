@@ -26,7 +26,8 @@ public class CommentUtil {
     Pattern.compile(
         BEGIN_JSDOC_LINE + "@param[ \t]*(\\{[^@]*\\})[ \t]*[\\w\\$]+[ \t]*(?<keep>\\*\\/|\n)"),
     Pattern.compile(BEGIN_JSDOC_LINE + "@returns?[ \t]*(\\{.*\\})[ \t]*(?<keep>\\*\\/|\n)"),
-    Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@(param|returns?))[ \t]*(\\{.*\\})"),
+    Pattern.compile(
+        BEGIN_JSDOC_LINE + "(?<keep>@(param|returns?))[ \t]*(\\{[^@]*\\})", Pattern.DOTALL),
     // Remove type annotation from @export
     Pattern.compile(BEGIN_JSDOC_LINE + "(?<keep>@export)[ \t]*(\\{.*\\})"),
   };
