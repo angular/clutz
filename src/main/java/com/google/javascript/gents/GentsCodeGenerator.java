@@ -165,6 +165,27 @@ public class GentsCodeGenerator extends CodeGenerator {
           add(")");
         }
         break;
+      case OBJECT_PATTERN:
+        if (n.getBooleanProp(Node.OPT_ES6_TYPED)) {
+          // Unlike names, binding patterns cannot be marked optional with `?`. Instead, we
+          // add a default of an empty object literal after the binding pattern declaration.
+          // NB: this would change the runtime behavior for a code like
+          //   /** @param {{n: (string|undefined)}=} */
+          //   function foo({n}) {
+          //     return n;
+          //   }
+          //   foo();
+          // which is accepted by JSComp, but `f()` leads to the destructuring `{n} = undefined`,
+          // resulting in a runtime type error. Converting this code to
+          //   function foo({n}: {n?: string} = {}) {
+          //     return n;
+          //   }
+          //   foo();
+          // no longer results in a runtime type error, because the destructuring `{n} = {}` is
+          // legal.
+          add(" = {}");
+        }
+        break;
       default:
         break;
     }

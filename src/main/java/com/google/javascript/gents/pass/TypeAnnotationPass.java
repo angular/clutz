@@ -402,7 +402,15 @@ public final class TypeAnnotationPass implements CompilerPass {
       }
       // Modify the AST to represent an optional parameter
       if (parameterType.getRoot().getToken() == Token.EQUALS) {
-        attachTypeExpr = IR.name(node.getString());
+        if (node.isObjectPattern()) {
+          List<Node> bindings = new ArrayList<>();
+          for (Node binding : node.children()) {
+            bindings.add(binding.cloneTree());
+          }
+          attachTypeExpr = IR.objectPattern(bindings.toArray(new Node[node.getChildCount()]));
+        } else {
+          attachTypeExpr = IR.name(node.getString());
+        }
         if (!node.getParent().isDefaultValue()) {
           attachTypeExpr.putBooleanProp(Node.OPT_ES6_TYPED, true);
         } else if (node.getParent().getSecondChild().isName()

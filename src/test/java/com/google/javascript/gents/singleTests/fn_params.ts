@@ -11,5 +11,5 @@ export const complex = function(n: number, o?: boolean, ...r: any[]): number {
 };
 
 function paramHasOptProps(
-    person1: {name?: string, age?: string},
-    {name, age}: {name?: string, age?: string}) {}
+    person1?: {name?: string, age?: string},
+    {name, age}: {name?: string, age?: string} = {}) {}

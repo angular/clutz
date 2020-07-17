@@ -36,10 +36,10 @@ var complex = function(n, o, r) {
  * @param {{
  *   name: (string|undefined),
  *   age: (string|undefined)
- * }} person1
+ * }=} person1
  * @param {{
  *   name: (string|undefined), age: (string|undefined)
- * }} person2
+ * }=} person2
  */
 const paramHasOptProps = function(person1, {name, age}) {};
 
