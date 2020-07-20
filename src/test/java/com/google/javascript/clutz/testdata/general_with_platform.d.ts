@@ -196,7 +196,7 @@ declare namespace ಠ_ಠ.clutz {
    * an instance of the following parameters struct, provided via Fetch, XHR, or
    * the iframe tag.
    */
-  type TrustTokenAttributeType = { additionalSignedHeaders : string [] , includeTimestampHeader : boolean , issuer : string , refreshPolicy : string , signRequestData : string , type : string } ;
+  type TrustTokenAttributeType = { additionalSignedHeaders ? : string [] , additionalSigningData ? : string , includeTimestampHeader : boolean , issuer : string , refreshPolicy : string , signRequestData : string , type : string } ;
 }
 // Generated from externs.zip//html5.js
 declare namespace ಠ_ಠ.clutz {
