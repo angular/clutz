@@ -5,7 +5,7 @@ export class C {
    * @param c with default
    */
   constructor(
-      {a}: {a: number}, {b} = {b: 1}, private c: number = 0,
+      {a}: {a: number}, {b}: {b: number} = {b: 1}, private c: number = 0,
       private d: number) {
     this.a = a;
 

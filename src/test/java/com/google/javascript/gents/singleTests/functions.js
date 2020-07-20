@@ -161,7 +161,7 @@ function namedParams({a}) {}
  */
 function namedParamsMultiLine({a}) {}
 
-/** @param {{a: number}=} params */
+/** @param {{a: (number|undefined)}=} params */
 function namedParamsWithDefaultValues({a = 1} = {}) {}
 
 /** @return {string} */

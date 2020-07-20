@@ -273,7 +273,7 @@ public final class TypeAnnotationPass implements CompilerPass {
           // actual parameter.
         case DEFAULT_VALUE:
           Node paramNode = n.getFirstChild();
-          if (parent != null && parent.isParamList() && paramNode != null && paramNode.isName()) {
+          if (parent != null && parent.isParamList() && paramNode != null) {
             boolean wasSetFromFunctionDoc = setParameterTypeFromFunctionDoc(paramNode, parent);
             if (!wasSetFromFunctionDoc) {
               // If we didn't set the parameter type from the functions's JsDoc, then maybe the type
@@ -389,10 +389,15 @@ public final class TypeAnnotationPass implements CompilerPass {
       if (parentDocInfo == null) {
         return false;
       }
-      String parameterName =
-          node.isObjectPattern()
-              ? parentDocInfo.getParameterNameAt(parent.getIndexOfChild(node))
-              : node.getString();
+      String parameterName;
+      if (node.isObjectPattern()) {
+        // If the object pattern has a default value, the recorded parameter root is actually that
+        // of the default value node.
+        Node parameter = node.getParent().isDefaultValue() ? node.getParent() : node;
+        parameterName = parentDocInfo.getParameterNameAt(parent.getIndexOfChild(parameter));
+      } else {
+        parameterName = node.getString();
+      }
       JSTypeExpression parameterType = parentDocInfo.getParameterType(parameterName);
       if (parameterType == null) {
         return false;
