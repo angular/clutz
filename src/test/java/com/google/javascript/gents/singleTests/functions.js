@@ -174,4 +174,18 @@ function hi2(/** number */ one, /** number */ two) {
   return `Hello ${one}, ${two}.`;
 };
 
+/**
+ * @this {!Array}
+ * @param {any} searchElement
+ * @param {number=} fromIndex
+ */
+Array.prototype.indexOf = function(searchElement, fromIndex) {
+  for (let i = fromIndex || 0; i < this.length; ++i) {
+    if (this[i] === searchElement) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 exports = {nop, oneParam, twoParams, namedParams, namedParamsMultiLine, namedParamsWithDefaultValues};

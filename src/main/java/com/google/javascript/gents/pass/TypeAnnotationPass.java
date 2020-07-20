@@ -206,6 +206,12 @@ public final class TypeAnnotationPass implements CompilerPass {
           // Functions are annotated with their return type
         case FUNCTION:
           if (bestJSDocInfo != null) {
+            if (bestJSDocInfo.hasThisType()) {
+              Node thisParam = IR.name("this");
+              n.getSecondChild().addChildToFront(thisParam);
+              setTypeExpression(thisParam, bestJSDocInfo.getThisType(), /* isReturnType */ false);
+              thisParam.setStaticSourceFile(n.getStaticSourceFile());
+            }
             if (n.getGrandparent().isInterfaceMembers()) {
               setTypeExpressionForInterfaceMethod(n, bestJSDocInfo.getReturnType(), true);
             } else {

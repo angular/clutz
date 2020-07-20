@@ -37,7 +37,7 @@ public class CommentUtil {
    * and finish with EOL.
    */
   private static final Pattern[] JSDOC_REPLACEMENTS_NO_KEEP = {
-    Pattern.compile(BEGIN_JSDOC_LINE + "@(extends|implements|type)[ \t]*(\\{[^@]*\\})[ \t]*" + EOL),
+    Pattern.compile(BEGIN_JSDOC_LINE + "@(extends|implements|type|this)[ \t]*(\\{[^@]*\\})[ \t]*" + EOL),
     Pattern.compile(BEGIN_JSDOC_LINE + "@(constructor|interface|record)[ \t]*" + EOL),
     Pattern.compile(
         BEGIN_JSDOC_LINE

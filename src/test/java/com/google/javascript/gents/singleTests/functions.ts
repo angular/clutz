@@ -99,3 +99,13 @@ const hi1 = (one: number, two: number): string => {
 function hi2(one: number, two: number): string {
   return `Hello ${one}, ${two}.`;
 }
+
+Array.prototype.indexOf = function(
+    this: any[], searchElement: any, fromIndex?: number) {
+  for (let i = fromIndex || 0; i < this.length; ++i) {
+    if (this[i] === searchElement) {
+      return i;
+    }
+  }
+  return -1;
+};
