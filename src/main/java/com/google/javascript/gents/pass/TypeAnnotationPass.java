@@ -692,11 +692,12 @@ public final class TypeAnnotationPass implements CompilerPass {
         }
         // Convert function types
       case FUNCTION:
-        Node returnType = anyType();
+        Node returnType = null;
         LinkedHashMap<String, TypeDeclarationNode> requiredParams = new LinkedHashMap<>();
         LinkedHashMap<String, TypeDeclarationNode> optionalParams = new LinkedHashMap<>();
         String restName = null;
         TypeDeclarationNode restType = null;
+        boolean isNew = false;
         for (Node child2 : n.children()) {
           if (child2.isParamList()) {
             int paramIdx = 1;
@@ -714,19 +715,23 @@ public final class TypeAnnotationPass implements CompilerPass {
               }
             }
           } else if (child2.isNew()) {
-            // keep the constructor signatures on the tree, and emit them following
-            // the syntax in TypeScript 1.8 spec, section 3.8.9 Constructor Type Literals
+            returnType = convertTypeNodeAST(child2.getFirstChild(), /* isReturnType */ true);
+            isNew = true;
           } else if (child2.isThis()) {
-            // Not expressible in TypeScript syntax, so we omit them from the tree.
-            // They could be added as properties on the result node.
-          } else {
+            requiredParams.put("this", convertTypeNodeAST(child2.getFirstChild()));
+          } else if (returnType == null) {
             returnType = convertTypeNodeAST(child2, true);
-            if (returnType == null) {
-              returnType = anyType();
-            }
           }
         }
-        return functionType(returnType, requiredParams, optionalParams, restName, restType);
+        if (returnType == null) {
+          returnType = anyType();
+        }
+        TypeDeclarationNode fn =
+            functionType(returnType, requiredParams, optionalParams, restName, restType);
+        if (isNew) {
+          fn.putBooleanProp(Node.CONSTRUCT_SIGNATURE, true);
+        }
+        return fn;
         // Variable function parameters are encoded as an array.
       case ITER_REST:
         Node arrType = convertTypeNodeAST(n.getFirstChild());

@@ -39,3 +39,11 @@ export const f3: (() => string)|(() => string) = function() {
 export function f4(): string|(() => string) {
   return 'string';
 }
+
+function f5<T>(
+    ctor: new (p1: number, ...p2) => T, n: number, ...extraArgs: any[]): T {
+  return new ctor(n, ...extraArgs);
+}
+
+const indexOf: (this: any[], p1: any, p2?: undefined|number) => number =
+    Array.prototype.indexOf;

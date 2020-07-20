@@ -72,4 +72,18 @@ const f4 = function() {
   return 'string';
 };
 
+/**
+ * @template T
+ * @param {function(new: T, number, ...)} ctor
+ * @param {number} n
+ * @param {...} extraArgs
+ * @return {T}
+ */
+function f5(ctor, n, extraArgs) {
+  return new ctor(n, ...extraArgs);
+}
+
+/** @type {function(this: (!Array<?>), ?, (undefined|number)=): number} */
+const indexOf = Array.prototype.indexOf;
+
 exports = {f1, f2, f3, f4};
