@@ -752,7 +752,7 @@ public final class ModuleConversionPass implements CompilerPass {
 
     if (lhs.matchesQualifiedName(exportedNamespace)) {
       rhs.detach();
-      if (GentsNodeUtil.isObjLitWithJSIdentifierKeys(rhs)) {
+      if (exportedNamespace.equals(EXPORTS) && GentsNodeUtil.isObjLitWithJSIdentifierKeys(rhs)) {
         // The module metadata collector would have rewritten the export object literal to consist
         // of identifier->identifier KV pairs, so at this point we just need to handle two cases:
         //   1. export identifier is local identifier ({A} or {A: A})

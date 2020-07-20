@@ -52,3 +52,8 @@ export class C {
 // TypeScript does not support inner enums. The enum and the class have to be
 // module level siblings, which would lead to having to rewrite all references
 // too.
+
+export enum Numbers {
+  ONE = 1,
+  TWO
+}

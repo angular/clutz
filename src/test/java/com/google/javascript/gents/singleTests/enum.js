@@ -74,3 +74,9 @@ exports.RepeatedNumEnum = RepeatedNumEnum;
 exports.EnumWithArithmetics = EnumWithArithmetics;
 exports.StrEnum = StrEnum;
 exports.OtherEnum = OtherEnum;
+
+/** @enum {number} */
+exports.Numbers = {
+  ONE: 1,
+  TWO: 2,
+};
