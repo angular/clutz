@@ -393,6 +393,9 @@ public class GentsCodeGenerator extends CodeGenerator {
         return false;
       case MEMBER_FUNCTION_DEF:
         if (isAbstractNode(n)) {
+          // Order is important here as TS requires visibility modifiers, before
+          // abstract modifiers.
+          addVisibility(n);
           addAbstractKeyword(n);
           // We need to take over the emit here to skip emitting the BLOCK
           // because in TS abstract methods cannot have bodies.
@@ -402,8 +405,11 @@ public class GentsCodeGenerator extends CodeGenerator {
           //            NAME (GENERICS)?
           //            PARAM_LIST
           //            BLOCK
-          add(n.getString());
           Node function = n.getFirstChild();
+          if (function.isAsyncFunction()) {
+            add("async");
+          }
+          add(n.getString());
           // If this member function has generics, they were added on the function name during the type annotation pass.
           Node name = function.getFirstChild();
           if (name.getProp(Node.GENERIC_TYPE_LIST) != null) {
