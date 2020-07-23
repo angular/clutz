@@ -778,7 +778,18 @@ public final class TypeAnnotationPass implements CompilerPass {
       TypeDeclarationNode keyType, TypeDeclarationNode valueType) {
     TypeDeclarationNode node = new TypeDeclarationNode(Token.INDEX_SIGNATURE);
     TypeDeclarationNode first = new TypeDeclarationNode(Token.STRING_KEY, "key");
-    first.setDeclaredTypeExpression(keyType);
+    // In TypeScript index signatures can only have string or number types, everything
+    // else is a type error. It cannot even be a type alias.
+    System.out.println(keyType);
+    if (keyType.getToken() == Token.STRING_TYPE || keyType.getToken() == Token.NUMBER_TYPE) {
+      first.setDeclaredTypeExpression(keyType);
+    } else {
+      // We don't have info about what was the original type, so we emit 'string' which is the
+      // closest to the runtime behavior and the most general widening. At the end object keys are
+      // strings at runtime.
+      // TODO(radokirov): add a comment describing the original type.
+      first.setDeclaredTypeExpression(new TypeDeclarationNode(Token.STRING_KEY, "string"));
+    }
     node.addChildToBack(first);
     node.setDeclaredTypeExpression(valueType);
     return node;

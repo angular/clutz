@@ -13,3 +13,19 @@ export const map3: {[key: number]: string|number} = {
 export const map4: {[key: string]: {[key: number]: number}} = {
   'foo': {1: 1}
 };
+
+export enum StrEnum {
+  A = 'a',
+  B = 'b'
+}
+
+export const map5: {[key: string]: string} = {};
+map5[StrEnum.A] = 'foo';
+
+export enum E {
+  A,
+  B
+}
+
+export const map6: {[key: string]: string} = {};
+map6[E.A] = 'foo';
