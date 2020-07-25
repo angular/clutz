@@ -195,8 +195,9 @@ declare namespace ಠ_ಠ.clutz {
    * Trust Tokens operation (issuance, signing, and redemption) is specified via
    * an instance of the following parameters struct, provided via Fetch, XHR, or
    * the iframe tag.
+   * TODO(b/161890603): Trust Token: Remove the 'issuer' fields after Chrome 86 hits stable.
    */
-  type TrustTokenAttributeType = { additionalSignedHeaders ? : string [] , additionalSigningData ? : string , includeTimestampHeader : boolean , issuer : string , refreshPolicy : string , signRequestData : string , type : string } ;
+  type TrustTokenAttributeType = { additionalSignedHeaders ? : string [] , additionalSigningData ? : string , includeTimestampHeader : boolean , issuer ? : string , issuers ? : string [] , refreshPolicy : string , signRequestData : string , type : string } ;
 }
 // Generated from externs.zip//html5.js
 declare namespace ಠ_ಠ.clutz {
