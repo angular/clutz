@@ -774,7 +774,19 @@ declare namespace ಠ_ಠ.clutz {
   class LayoutShift extends PerformanceEntry {
     hadRecentInput : boolean ;
     lastInputTime : number ;
+    sources : LayoutShiftAttribution [] ;
     value : number ;
+  }
+}
+// Generated from externs.zip//w3c_navigation_timing.js
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * https://wicg.github.io/layout-instability/#sec-layout-shift
+   */
+  class LayoutShiftAttribution {
+    currentRect : DOMRectReadOnly ;
+    node : Node | null ;
+    previousRect : DOMRectReadOnly ;
   }
 }
 // Generated from externs.zip//w3c_navigation_timing.js
