@@ -192,16 +192,6 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//html5.js
 declare namespace ಠ_ಠ.clutz {
   /**
-   * Trust Tokens operation (issuance, signing, and redemption) is specified via
-   * an instance of the following parameters struct, provided via Fetch, XHR, or
-   * the iframe tag.
-   * TODO(b/161890603): Trust Token: Remove the 'issuer' fields after Chrome 86 hits stable.
-   */
-  type TrustTokenAttributeType = { additionalSignedHeaders ? : string [] , additionalSigningData ? : string , includeTimestampHeader : boolean , issuer ? : string , issuers ? : string [] , refreshPolicy : string , signRequestData : string , type : string } ;
-}
-// Generated from externs.zip//html5.js
-declare namespace ಠ_ಠ.clutz {
-  /**
    * The metadata provided by the callback given to
    * HTMLVideoElement.requestVideoFrameCallback().
    *
@@ -1188,6 +1178,35 @@ declare namespace ಠ_ಠ.clutz.WebAssembly {
 // Generated from externs.zip//webassembly.js
 declare namespace ಠ_ಠ.clutz.WebAssembly {
   function validate (bytes : ArrayBuffer | ArrayBufferView ) : boolean ;
+}
+// Generated from externs.zip//wicg_trust_token.js
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * Trust Tokens operation (issuance, signing, and redemption) is specified via
+   * an instance of the following parameters struct, provided via Fetch, XHR, or
+   * the iframe tag
+   * TODO(b/161890603): Trust Token: Remove the 'issuer' fields after Chrome 86
+   * hits stable.
+   */
+  interface TrustTokenAttributeType {
+    additionalSignedHeaders ? : string [] ;
+    additionalSigningData ? : string ;
+    includeTimestampHeader ? : boolean ;
+    issuer ? : string ;
+    issuers ? : string [] ;
+    /**
+     * Possible values: 'none', 'refresh'
+     */
+    refreshPolicy ? : string ;
+    /**
+     * Possible values: 'omit', 'include', 'headers-only'
+     */
+    signRequestData ? : string ;
+    /**
+     * Possible values: 'token-request', 'send-srr', 'srr-token-redemption'
+     */
+    type : string ;
+  }
 }
 // Generated from externs.zip//wicg_uach.js
 declare namespace ಠ_ಠ.clutz {
