@@ -2615,7 +2615,17 @@ class DeclarationGenerator {
         // to emit a private property name that's specific to this type.
         String suffix = type.hasDisplayName() ? escapeForJSProperty(type.getDisplayName()) : "";
         emitNoSpace(suffix);
-        emit(": any;");
+        if (classTemplateTypeNames.isEmpty()) {
+          emit(": any;");
+        } else {
+          // To prevent structural matching of a generic type with different generic type arguments,
+          // e.g. a class used as a type tag like goog.events.EventId or wiz.events.EventType,
+          // ensure the generic type tags are used in the class by emitting a tuple type using the
+          // generic type argument.
+          emit(": [");
+          emit(String.join(",", classTemplateTypeNames));
+          emit("];");
+        }
         emitBreak();
       }
       // Constructors.

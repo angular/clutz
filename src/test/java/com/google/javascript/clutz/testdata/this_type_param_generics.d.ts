@@ -9,7 +9,7 @@ declare namespace ಠ_ಠ.clutz.nsThisGenerics {
     union < T = any > (this : T ) : ಠ_ಠ.clutz.nsThisGenerics.GenericClass < T > | null | string ;
   }
   class GenericClass < TYPE = any > {
-    private noStructuralTyping_nsThisGenerics_GenericClass : any;
+    private noStructuralTyping_nsThisGenerics_GenericClass : [ TYPE ];
     constructor (t : TYPE ) ;
   }
 }

@@ -1,7 +1,7 @@
 // Generated from src/test/java/com/google/javascript/clutz/testdata/ctor_func.js
 declare namespace ಠ_ಠ.clutz.ctor_func {
   class Ctor < T = any > {
-    private noStructuralTyping_ctor_func_Ctor : any;
+    private noStructuralTyping_ctor_func_Ctor : [ T ];
     constructor (a : string , b : number ) ;
   }
   let ctorFuncField : { new (a : string , b : number ) : ಠ_ಠ.clutz.ctor_func.Ctor < any > } ;

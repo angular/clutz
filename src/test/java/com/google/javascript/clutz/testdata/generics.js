@@ -78,3 +78,16 @@ generics.ImplementsGenericInterface = function() {};
  * @extends {generics.Foo<TYPE, number>}
  */
 generics.ExtendsGenericClass = function() {};
+
+/**
+ * Check that generic types that don't use the type argument, e.g. an EventType,
+ * don't structurally match.  The private field emitted by Clutz to enforce
+ * nominal typing on Closure classes must use the generic type to ensure this.
+ *
+ * @constructor
+ * @param {string} name
+ * @template T
+ */
+generics.DoesNotUseType = function(name) {
+  this.name = name;
+}

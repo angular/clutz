@@ -12,7 +12,7 @@ declare module 'goog:implements_iterable.ImplIterable' {
 // Generated from src/test/java/com/google/javascript/clutz/testdata/implements_iterable_with_platform.js
 declare namespace ಠ_ಠ.clutz.implements_iterable {
   class ImplIterableGeneric < T = any > implements Iterable < T > {
-    private noStructuralTyping_implements_iterable_ImplIterableGeneric : any;
+    private noStructuralTyping_implements_iterable_ImplIterableGeneric : [ T ];
   }
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/implements_iterable_with_platform.js

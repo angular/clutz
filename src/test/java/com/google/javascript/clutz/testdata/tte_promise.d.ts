@@ -1,7 +1,7 @@
 // Generated from src/test/java/com/google/javascript/clutz/testdata/tte_promise.js
 declare namespace ಠ_ಠ.clutz.angular.$q {
   class Promise < T = any > {
-    private noStructuralTyping_angular_$q_Promise : any;
+    private noStructuralTyping_angular_$q_Promise : [ T ];
     // matching ng.IPromise in angular.d.ts.
     then<TResult1 = T, TResult2 = never>(
         successCallback?:
@@ -36,7 +36,7 @@ declare module 'goog:angular.$q.Promise' {
 // Generated from src/test/java/com/google/javascript/clutz/testdata/tte_promise.js
 declare namespace ಠ_ಠ.clutz.angular.$q {
   class PromiseService < T = any > {
-    private noStructuralTyping_angular_$q_PromiseService : any;
+    private noStructuralTyping_angular_$q_PromiseService : [ T ];
     all(promises : ಠ_ಠ.clutz.angular.$q.PromiseService.Promise < any > [] ) : ಠ_ಠ.clutz.angular.$q.PromiseService.Promise < any [] > ;
   }
 }

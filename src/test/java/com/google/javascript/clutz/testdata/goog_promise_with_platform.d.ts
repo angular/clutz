@@ -1,7 +1,7 @@
 // Generated from src/test/java/com/google/javascript/clutz/testdata/goog_promise_with_platform.js
 declare namespace ಠ_ಠ.clutz.goog {
   class Promise < TYPE = any , RESOLVER_CONTEXT = any > implements ಠ_ಠ.clutz.goog.Thenable < TYPE > {
-    private noStructuralTyping_goog_Promise : any;
+    private noStructuralTyping_goog_Promise : [ TYPE,RESOLVER_CONTEXT ];
     constructor (resolver : (this : RESOLVER_CONTEXT , a : (a ? : TYPE | PromiseLike < TYPE > | null | { then : any } ) => any , b : (a ? : any ) => any ) => void , opt_context ? : RESOLVER_CONTEXT ) ;
     then < RESULT > (opt_onFulfilled ? : ( (a : TYPE ) => PromiseLike < RESULT > | RESULT ) | null , opt_onRejected ? : ( (a : any ) => any ) | null) :  any ;
     static all < TYPE = any > (promises : any [] ) : ಠ_ಠ.clutz.goog.Promise < TYPE [] , any > ;

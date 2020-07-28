@@ -1,7 +1,7 @@
 // Generated from src/test/java/com/google/javascript/clutz/testdata/methods_generics.js
 declare namespace ಠ_ಠ.clutz.method_generics {
   class Foo < T = any > {
-    private noStructuralTyping_method_generics_Foo : any;
+    private noStructuralTyping_method_generics_Foo : [ T ];
     constructor (a : T ) ;
     /**
      * T is defined on the constructor and should not be redefined on the method level in the resulting
