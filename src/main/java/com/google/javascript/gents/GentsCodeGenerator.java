@@ -379,9 +379,6 @@ public class GentsCodeGenerator extends CodeGenerator {
         }
         return false;
       case FUNCTION_TYPE:
-        if (n.getBooleanProp(Node.CONSTRUCT_SIGNATURE)) {
-          add("new ");
-        }
         // In some cases we need to add a pair of "(" and ")" around the function type. We don't
         // want to override the default code generation for FUNCTION_TYPE because the default code
         // generation uses private APIs. Therefore we emit a "(" here, then let the default code
@@ -389,6 +386,9 @@ public class GentsCodeGenerator extends CodeGenerator {
         // Union binding has higher precedence than "=>" in TypeScript.
         if (parent != null && parent.getToken() == Token.UNION_TYPE) {
           add("(");
+        }
+        if (n.getBooleanProp(Node.CONSTRUCT_SIGNATURE)) {
+          add("new ");
         }
         return false;
       case MEMBER_FUNCTION_DEF:

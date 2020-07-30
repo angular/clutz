@@ -86,4 +86,9 @@ function f5(ctor, n, extraArgs) {
 /** @type {function(this: (!Array<?>), ?, (undefined|number)=): number} */
 const indexOf = Array.prototype.indexOf;
 
+/**
+ * @param {function(new: String)=} p1
+ */
+function f6(p1 = undefined) {}
+
 exports = {f1, f2, f3, f4};

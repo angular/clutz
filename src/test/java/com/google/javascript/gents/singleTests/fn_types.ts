@@ -47,3 +47,5 @@ function f5<T>(
 
 const indexOf: (this: any[], p1: any, p2?: undefined|number) => number =
     Array.prototype.indexOf;
+
+function f6(p1: (new () => String)|undefined = undefined) {}
