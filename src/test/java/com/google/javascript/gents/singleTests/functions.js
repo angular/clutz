@@ -113,6 +113,9 @@ var retUndefFive =
 var retUndefSix =
     async function() {}
 
+/** @return {number|void} */
+var retVoidUnion = function () {}
+
 /** @return {Promise<?number>} */
 var retMaybeNumber =
     async function() {

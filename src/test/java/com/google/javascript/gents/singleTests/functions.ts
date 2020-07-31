@@ -63,6 +63,8 @@ let retUndefFive = async function(): Promise<void> {};
 
 let retUndefSix = async function(): Promise<any> {};
 
+let retVoidUnion = function(): number|void {};
+
 let retMaybeNumber = async function(): Promise<number|null> {
   return 0;
 };

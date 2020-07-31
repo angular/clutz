@@ -679,7 +679,7 @@ public final class TypeAnnotationPass implements CompilerPass {
       case PIPE:
         ImmutableList<TypeDeclarationNode> types =
             FluentIterable.from(n.children())
-                .transform(this::convertTypeNodeAST)
+                .transform(node -> convertTypeNodeAST(node, isReturnType))
                 .filter(Predicates.notNull())
                 .toList();
         switch (types.size()) {
