@@ -38,7 +38,7 @@ public class AstCommentLinkingPassTest {
     final int startOffset = 10;
     List<GeneralComment> comments =
         AstCommentLinkingPass.splitAndFilterCommentText(input, startOffset);
-    assertThat(comments.size()).isEqualTo(9);
+    assertThat(comments).hasSize(9);
     assertThat(comments.get(0)).isEqualTo(GeneralComment.from("// comment 1", startOffset));
     assertThat(comments.get(1)).isEqualTo(GeneralComment.from("// comment 2", 14 + startOffset));
     assertThat(comments.get(2)).isEqualTo(GeneralComment.from("// comment 3", 27 + startOffset));
