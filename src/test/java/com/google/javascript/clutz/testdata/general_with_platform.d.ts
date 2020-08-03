@@ -3,6 +3,13 @@ declare namespace ಠ_ಠ.clutz {
   interface Transferable {
   }
 }
+// Generated from externs.zip//es6.js
+declare namespace ಠ_ಠ.clutz {
+  class WeakRef < TYPE = any > {
+    constructor (value : TYPE ) ;
+    deref ( ) : TYPE ;
+  }
+}
 // Generated from externs.zip//fido.js
 declare namespace ಠ_ಠ.clutz.u2f {
   /**
