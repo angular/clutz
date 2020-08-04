@@ -24,7 +24,7 @@ class RecordClass {
 
 class Klass {
   /**
-   * TODO(ahafiz): bar = undefined should become bar?: string
+   * TODO(lukemizuhashi): bar = undefined should become bar?: string
    * @param {string=} foo
    * @param {string=} bar
    */

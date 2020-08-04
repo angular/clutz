@@ -10,7 +10,7 @@ export class Klass {
   private foo?: string;
   private bar?: string;
   /**
-   * TODO(ahafiz): bar = undefined should become bar?: string
+   * TODO(lukemizuhashi): bar = undefined should become bar?: string
    */
   constructor(foo?: string, bar: string|undefined = undefined) {
     this.foo = foo;
