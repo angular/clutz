@@ -479,7 +479,7 @@ public final class ModuleConversionPass implements CompilerPass {
       // namespace, not the original source file.
       // Cases where the import file is being converted but its namespace does not match the future
       // TS import name are handled in `convertNonDestructuringRequireToImportStatements`.
-      // TODO(ahafiz): see if we can reduce the number of special cases here.
+      // NB: The number of special cases here can probably be reduced.
       if (requiredNamespace.startsWith(absolutePathPrefix + ".")
           && filesToConvert.contains(module.file)) {
         return true;
