@@ -27,4 +27,6 @@ function /** string */ g(/** number */ x, y, z) {
 function /** void */ h() {
 }
 
+function i(/** {n: number} */ {n}, /** number= */ opt_num, /** ...boolean */ etc) {}
+
 exports = {Foo, f, g};

@@ -20,3 +20,5 @@ export function g(x: number, y: string, z: number): string {
  * A JSDoc comment
  */
 function h(): void {}
+
+function i({n}: {n: number}, opt_num?: number, ...etc: boolean[]) {}

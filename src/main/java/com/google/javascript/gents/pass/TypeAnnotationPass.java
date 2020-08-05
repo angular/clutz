@@ -362,7 +362,15 @@ public final class TypeAnnotationPass implements CompilerPass {
       if (type == null) {
         return;
       }
-      setTypeExpression(nameNode, type, isReturnType);
+
+      if (nameNode.getParent() != null && nameNode.getParent().isParamList()) {
+        // `setParameterType` may change the node representing the parameter, so update the
+        // parameter name and comment name accordingly.
+        commentNode = nameNode = setParameterType(nameNode, type);
+      } else {
+        setTypeExpression(nameNode, type, isReturnType);
+      }
+
       // Remove the part of comment that sets the inline type.
       String toRemove = docInfo.getOriginalCommentString();
       List<GeneralComment> comments = nodeComments.getComments(commentNode);
@@ -402,8 +410,16 @@ public final class TypeAnnotationPass implements CompilerPass {
       if (parameterType == null) {
         return false;
       }
+      setParameterType(node, parameterType);
+      return true;
+    }
+
+    /**
+     * Sets the type of a parameter identifier. Returns a node representing the parameter, which may
+     * be changed by this function.
+     */
+    private Node setParameterType(Node node, JSTypeExpression parameterType) {
       TypeDeclarationNode parameterTypeNode = convertTypeNodeAST(parameterType.getRoot());
-      // Parameter is declared using verbose @param syntax before the function definition.
       Node attachTypeExpr = node;
       // Modify the primary AST to represent a function parameter as a
       // REST node, if the type indicates it is a rest parameter.
@@ -432,7 +448,7 @@ public final class TypeAnnotationPass implements CompilerPass {
         nodeComments.replaceWithComment(node, attachTypeExpr);
       }
       setTypeExpression(attachTypeExpr, parameterTypeNode);
-      return true;
+      return attachTypeExpr;
     }
   }
 
