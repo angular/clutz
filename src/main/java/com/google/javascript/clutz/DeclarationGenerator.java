@@ -3190,41 +3190,36 @@ class DeclarationGenerator {
             + ";";
       }
       String promiseName = className + ".Promise";
-      return getPromiseMethod(propName, promiseName);
+      return getPromiseMethod(propName, promiseName, /* !isStatic */ false);
     }
 
     private String getSignatureForStaticTTEFn(String propName, FunctionType ftype) {
       // If ftype is foo.bar.Promise.all, extract className as ಠ_ಠ.clutz.foo.bar.Promise.
       String className = Constants.INTERNAL_NAMESPACE + "." + getNamespace(ftype.getDisplayName());
-      String maybePromiseMethod = getPromiseMethod(propName, className);
-      if (maybePromiseMethod != null) {
-        return "static " + maybePromiseMethod;
-      }
-      return null;
+      return getPromiseMethod(propName, className, /* isStatic */ true);
     }
 
-    private String getPromiseMethod(String propName, String className) {
+    private String getPromiseMethod(String propName, String className, boolean isStatic) {
+      String prefix = isStatic ? "static " : "";
       switch (propName) {
         case "resolve":
-          // TODO(lucassloan): goog.Promise has bad types that are coerced to any, so explicitly
-          // emit any
-          // and change to the proper type `(value: googPromise< T , any > | T): googPromise<T,
-          // any>`
-          // when the callers have been fixed.
+          // TODO(evanm): goog.Promise had bad types that were coerced to any.
+          // Once users are cleaned up, change the below 'any' to instead return the proper type.
           if (className.equals("ಠ_ಠ.clutz.goog.Promise")) {
-            return "resolve < T >(value: PromiseLike < T > | T): any;";
+            return prefix + "resolve < T >(): Promise < void >;\n"
+                + prefix + "resolve < T >(value: PromiseLike < T > | T): any;";
           } else {
-            return "resolve < T >(value: PromiseLike < T > | T): " + className + " < T >;";
+            return prefix + "resolve < T >(value: PromiseLike < T > | T): " + className + " < T >;";
           }
         case "race":
-          return "race < T > (values : T [] ) : " + className + " < T > ;";
+          return prefix + "race < T > (values : T [] ) : " + className + " < T > ;";
           // TODO(rado): angular.d.ts has improved types for .all, replace with all overrides from
           // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/angular/index.d.ts#L1014
         case "all":
-          return "all(promises : " + className + " < any > [] ) : " + className + " < any [] > ;";
-        default: // fall out
+          return prefix + "all(promises : " + className + " < any > [] ) : " + className + " < any [] > ;";
+        default:
+          return null;
       }
-      return null;
     }
 
     private ImmutableList<String> getTemplateTypeNames(ObjectType objType) {

@@ -6,7 +6,8 @@ declare namespace ಠ_ಠ.clutz.goog {
     then < RESULT > (opt_onFulfilled ? : ( (a : TYPE ) => PromiseLike < RESULT > | RESULT ) | null , opt_onRejected ? : ( (a : any ) => any ) | null) :  any ;
     static all < TYPE = any > (promises : any [] ) : ಠ_ಠ.clutz.goog.Promise < TYPE [] , any > ;
     static race < TYPE = any > (promises : any [] ) : ಠ_ಠ.clutz.goog.Promise < TYPE , any > ;
-    static resolve < T >(value: PromiseLike < T > | T): any;
+    static resolve < T >(): Promise < void >;
+static resolve < T >(value: PromiseLike < T > | T): any;
   }
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/goog_promise_with_platform.js
