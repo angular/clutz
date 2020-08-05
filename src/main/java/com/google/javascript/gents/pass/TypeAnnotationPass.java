@@ -660,7 +660,7 @@ public final class TypeAnnotationPass implements CompilerPass {
             fieldName = fieldName.substring(1, fieldName.length() - 1);
           }
           TypeDeclarationNode fieldType =
-              isFieldTypeDeclared ? convertTypeNodeAST(field.getLastChild()) : null;
+              isFieldTypeDeclared ? convertTypeNodeAST(field.getLastChild()) : anyType();
 
           // If the union contains "undefined", we emit prop? and drop the undefined in TypeScript.
           // This is a better translation which matches closure semantics that a field with

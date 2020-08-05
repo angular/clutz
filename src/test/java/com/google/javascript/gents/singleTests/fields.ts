@@ -42,3 +42,5 @@ export class A {
     this.x = this.a;
   }
 }
+
+function f(a: {string: any}[]) {}

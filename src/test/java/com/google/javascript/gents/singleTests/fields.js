@@ -52,4 +52,7 @@ A.g = true;
 /** @type {*} */
 A.h;
 
+/** @param {!Array<{string}>} a */
+function f(a) {}
+
 exports = {A};
