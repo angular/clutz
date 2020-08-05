@@ -18,7 +18,9 @@ let sn: string|number = 9;
 
 let snb: string|number|null|boolean = false;
 
-let manyNulls: string|null|number|string|null = null;
+let manyNulls: string|null|number = null;
+
+let manyNulls2: string|null|number = null;
 
 export const baz = function(s: number|string|null): null|boolean {
   return null;

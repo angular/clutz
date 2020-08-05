@@ -880,15 +880,9 @@ public final class TypeAnnotationPass implements CompilerPass {
 
   /** Helper function to recursively flatten union types. */
   private void flatten(
-      Iterable<TypeDeclarationNode> types, List<TypeDeclarationNode> result, boolean hasNull) {
+      Iterable<TypeDeclarationNode> types, List<TypeDeclarationNode> result, Set<Token> seenPrimitives) {
     for (TypeDeclarationNode t : types) {
       switch (t.getToken()) {
-        case NULL:
-          if (!hasNull) {
-            result.add(new TypeDeclarationNode(Token.NULL));
-            hasNull = true;
-          }
-          break;
         case UNION_TYPE:
           Iterable<TypeDeclarationNode> children =
               FluentIterable.from(t.children())
@@ -896,9 +890,15 @@ public final class TypeAnnotationPass implements CompilerPass {
                   .toList();
           // We had to invoke .toList() as detachChildren() breaks the Iterable.
           t.detachChildren();
-          flatten(children, result, hasNull);
+          flatten(children, result, seenPrimitives);
           break;
         default:
+          if (!t.hasChildren()) {
+            if (seenPrimitives.contains(t.getToken())) {
+              break;
+            }
+            seenPrimitives.add(t.getToken());
+          }
           result.add(t);
           break;
       }
@@ -912,7 +912,8 @@ public final class TypeAnnotationPass implements CompilerPass {
    */
   private TypeDeclarationNode flatUnionType(Iterable<TypeDeclarationNode> types) {
     List<TypeDeclarationNode> flatTypes = new ArrayList<>();
-    flatten(types, flatTypes, false);
+    Set<Token> seenPrimitives = new HashSet<>();
+    flatten(types, flatTypes, seenPrimitives);
     return unionType(flatTypes);
   }
 }

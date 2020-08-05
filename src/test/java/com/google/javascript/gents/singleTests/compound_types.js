@@ -35,6 +35,9 @@ var snb = false;
 /** @type {?(?string | ?number | string)} */
 var manyNulls = null;
 
+/** @type {?string | null | ?number} */
+var manyNulls2 = null;
+
 /**
  * @param {number | ?string} s
  * @return {null | boolean}
