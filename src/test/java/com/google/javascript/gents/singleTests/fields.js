@@ -55,4 +55,19 @@ A.h;
 /** @param {!Array<{string}>} a */
 function f(a) {}
 
+let bar = null;
+
+const x = {
+  /** @type {string|null} */
+  foo: /* my fun comment */ null,
+  /** @type {string|null} */
+  'foo2': null,
+  /** @type {string|null} */
+  ['foo3']: null,
+  /** @type {string|null} */
+  0: null,
+  /** @type {string|null} */
+  bar,
+};
+
 exports = {A};

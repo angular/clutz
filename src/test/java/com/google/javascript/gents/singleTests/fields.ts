@@ -44,3 +44,14 @@ export class A {
 }
 
 function f(a: {string: any}[]) {}
+
+let bar = null;
+
+const x = {
+  foo: (/* my fun comment */
+        null as string | null),
+  'foo2': (null as string | null),
+  ['foo3']: (null as string | null),
+  0: (null as string | null),
+  bar: (bar as string | null),
+};

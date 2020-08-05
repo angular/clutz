@@ -348,6 +348,17 @@ public final class TypeAnnotationPass implements CompilerPass {
             }
           }
           break;
+        case STRING_KEY:
+        case COMPUTED_PROP:
+          if (parent.isObjectLit() && bestJSDocInfo != null && bestJSDocInfo.getType() != null) {
+            // The propery assignment looks like {a: b} or {a}. In the case of the shorthand property
+            // assignment, use the key name as the value to cast to a new type.
+            Node value = n.hasChildren() ? n.getLastChild().detach() : Node.newString(n.getString());
+            Node castValue = new Node(Token.CAST, value);
+            n.addChildToBack(castValue);
+            setTypeExpression(castValue, bestJSDocInfo.getType(), /* isReturnType */ false);
+          }
+          break;
         default:
           break;
       }
