@@ -111,3 +111,7 @@ Array.prototype.indexOf = function(
   }
   return -1;
 };
+
+function mkstr(strCls: typeof String) {
+  return new strCls('sydney opera house');
+}

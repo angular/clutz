@@ -746,6 +746,8 @@ public final class TypeAnnotationPass implements CompilerPass {
         return convertTypeNodeAST(n.getFirstChild());
       case NAME:
         return namedType(n.getString());
+      case TYPEOF:
+        return new TypeDeclarationNode(Token.TYPEOF, convertTypeNodeAST(n.getFirstChild()));
       default:
         throw new IllegalArgumentException("Unsupported node type:\n" + n.toStringTree());
     }

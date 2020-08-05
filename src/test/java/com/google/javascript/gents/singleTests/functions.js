@@ -191,4 +191,11 @@ Array.prototype.indexOf = function(searchElement, fromIndex) {
   return -1;
 }
 
+/**
+ * @param {typeof String} strCls
+ */
+function mkstr(strCls) {
+  return new strCls('sydney opera house');
+}
+
 exports = {nop, oneParam, twoParams, namedParams, namedParamsMultiLine, namedParamsWithDefaultValues};
