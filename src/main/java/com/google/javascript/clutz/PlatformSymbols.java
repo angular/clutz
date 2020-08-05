@@ -462,6 +462,8 @@ public class PlatformSymbols {
           "AudioTrackListEventMap",
           "BarProp",
           "BeforeUnloadEvent",
+          "BigInt",
+          "BigIntConstructor",
           "BiquadFilterNode",
           "BiquadFilterType",
           "Blob",
