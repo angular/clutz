@@ -11,10 +11,13 @@ declare module 'goog:googmodule.Required' {
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/googModule/goog_module.js
 declare namespace ಠ_ಠ.clutz.module$exports$googmodule$TheModule {
+  export import Required = ಠ_ಠ.clutz.googmodule.Required ;
+  export import RequiredDefault = ಠ_ಠ.clutz.module$exports$googmodule$requiredModuleDefault ;
   let a : number ;
   export import b = ಠ_ಠ.clutz.module$exports$googmodule$requiredModule.rm ;
-  let required : ಠ_ಠ.clutz.googmodule.Required ;
-  let requiredDefault : module$exports$googmodule$requiredModuleDefault ;
+  function instantiateRequiredDefault (requiredDefaultCtor : { new ( ) : module$exports$googmodule$requiredModuleDefault } ) : module$exports$googmodule$requiredModuleDefault ;
+  let requiredDefaultInstance : module$exports$googmodule$requiredModuleDefault ;
+  let requiredInstance : ಠ_ಠ.clutz.googmodule.Required ;
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/googModule/goog_module.js
 declare module 'goog:googmodule.TheModule' {

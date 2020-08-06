@@ -10,11 +10,25 @@ exports.a = 1;
 /** @const */
 exports.b = requiredModule.rm;
 
+/** @type {typeof Required} */
+exports.Required = Required;
+
 /** @type {!Required} */
-exports.required;
+exports.requiredInstance = new Required();
+
+/** @type {typeof RequiredDefault} */
+exports.RequiredDefault = RequiredDefault;
 
 /** @type {!RequiredDefault} */
-exports.requiredDefault;
+exports.requiredDefaultInstance = new RequiredDefault();
+
+/**
+ * @param {typeof RequiredDefault} requiredDefaultCtor
+ * @return {!RequiredDefault}
+ */
+exports.instantiateRequiredDefault = function(requiredDefaultCtor) {
+  return new requiredDefaultCtor();
+};
 
 /** @type {number} */
 var scopedVariable;
