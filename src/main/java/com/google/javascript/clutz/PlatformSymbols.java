@@ -464,6 +464,8 @@ public class PlatformSymbols {
           "BeforeUnloadEvent",
           "BigInt",
           "BigIntConstructor",
+          "BigInt64Array",
+          "BigUint64Array",
           "BiquadFilterNode",
           "BiquadFilterType",
           "Blob",
