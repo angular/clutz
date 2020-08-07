@@ -14,3 +14,10 @@ export class C {
 }
 
 let {x = 0} = {};
+
+function concat4(
+    [a, b, c, d]: string[], [prefix, suffix]: string[] = ['', '']): string {
+  return prefix + a + b + c + d + suffix;
+}
+
+let [y = 0] = [];

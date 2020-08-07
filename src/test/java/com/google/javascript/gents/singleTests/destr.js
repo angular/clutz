@@ -24,4 +24,15 @@ class C {
 
 let {x = 0} = {};
 
+/**
+ * @param {!Array<string>} abcd
+ * @param {!Array<string>} prefixSuffix
+ * @return {string}
+ */
+function concat4([a, b, c, d], [prefix, suffix] = ['', '']) {
+  return prefix + a + b + c + d + suffix;
+}
+
+let [y = 0] = [];
+
 exports = {C};

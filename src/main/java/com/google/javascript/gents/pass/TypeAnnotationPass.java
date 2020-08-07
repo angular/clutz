@@ -251,6 +251,7 @@ public final class TypeAnnotationPass implements CompilerPass {
         case NAME:
         case GETPROP:
         case OBJECT_PATTERN:
+        case ARRAY_PATTERN:
           if (parent == null) {
             break;
           }
@@ -409,7 +410,7 @@ public final class TypeAnnotationPass implements CompilerPass {
         return false;
       }
       String parameterName;
-      if (node.isObjectPattern()) {
+      if (node.isObjectPattern() || node.isArrayPattern()) {
         // If the object pattern has a default value, the recorded parameter root is actually that
         // of the default value node.
         Node parameter = node.getParent().isDefaultValue() ? node.getParent() : node;
