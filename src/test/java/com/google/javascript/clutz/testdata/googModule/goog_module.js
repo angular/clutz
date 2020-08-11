@@ -3,7 +3,6 @@ goog.module('googmodule.TheModule');
 var Required = goog.require('googmodule.Required');
 var RequiredDefault = goog.require('googmodule.requiredModuleDefault');
 var requiredModule = goog.require('googmodule.requiredModule');
-let {MissingClass} = goog.require('missing.module');
 
 /** @type {number} */
 exports.a = 1;
@@ -29,20 +28,6 @@ exports.requiredDefaultInstance = new RequiredDefault();
  */
 exports.instantiateRequiredDefault = function(requiredDefaultCtor) {
   return new requiredDefaultCtor();
-};
-
-/** @type {!typeof MissingClass} */
-exports.MissingClass = MissingClass;
-
-/** @type {!MissingClass} */
-exports.missingClassInstance = new MissingClass();
-
-/**
- * @param {typeof MissingClass} missingClassCtor
- * @return {!MissingClass}
- */
-exports.instantiateMissingClass = function(missingClassCtor) {
-  return new missingClassCtor();
 };
 
 /** @type {number} */

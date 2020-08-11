@@ -11,14 +11,11 @@ declare module 'goog:googmodule.Required' {
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/googModule/goog_module.js
 declare namespace ಠ_ಠ.clutz.module$exports$googmodule$TheModule {
-  export import MissingClass = ಠ_ಠ.clutz.module$exports$missing$module.MissingClass ;
   export import Required = ಠ_ಠ.clutz.googmodule.Required ;
   export import RequiredDefault = ಠ_ಠ.clutz.module$exports$googmodule$requiredModuleDefault ;
   let a : number ;
   export import b = ಠ_ಠ.clutz.module$exports$googmodule$requiredModule.rm ;
-  function instantiateMissingClass (missingClassCtor : typeof module$contents$googmodule$TheModule_MissingClass ) : ಠ_ಠ.clutz.module$exports$missing$module.MissingClass ;
   function instantiateRequiredDefault (requiredDefaultCtor : { new ( ) : module$exports$googmodule$requiredModuleDefault } ) : module$exports$googmodule$requiredModuleDefault ;
-  let missingClassInstance : ಠ_ಠ.clutz.module$exports$missing$module.MissingClass ;
   let requiredDefaultInstance : module$exports$googmodule$requiredModuleDefault ;
   let requiredInstance : ಠ_ಠ.clutz.googmodule.Required ;
 }
