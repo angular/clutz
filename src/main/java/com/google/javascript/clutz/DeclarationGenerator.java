@@ -218,6 +218,14 @@ class DeclarationGenerator {
    */
   private final Map<JSType, String> typedefs = new HashMap<>();
 
+  /** Whether to use the symbolic name of a type or expand its full declaration. */
+  private enum KnownTypes {
+    /** Emit a known type symbolically when visiting using the collected name. */
+    SYMBOLIC,
+    /** Expand a type into its full declaration instead of using the collected name. */
+    EXPANDED
+  }
+
   /**
    * Aggregates all emitted types, used in a final pass to find types emitted in type position but
    * not declared, possibly due to missing goog.provides.
@@ -1550,6 +1558,17 @@ class DeclarationGenerator {
     return input.substring(dotIdx + 1);
   }
 
+  /**
+   * Whether a parameter is required, optional, or a rest parameter determines how it's emitted.
+   *
+   * <p>See uses in the visit... functions in TreeWalker.
+   */
+  private enum ParameterKind {
+    REQUIRED,
+    OPTIONAL,
+    REST
+  }
+
   private class TreeWalker {
     private final JSTypeRegistry typeRegistry;
     private final Set<String> provides;
@@ -1820,7 +1839,7 @@ class DeclarationGenerator {
     private void visitVarDeclaration(String name, JSType type) {
       emit("let");
       emit(name);
-      visitTypeDeclaration(type, false, false);
+      visitTypeDeclaration(type, ParameterKind.REQUIRED);
       emit(";");
       emitBreak();
     }
@@ -1926,7 +1945,7 @@ class DeclarationGenerator {
       if (branded) {
         emit("(");
       }
-      visitType(registryType, true, false);
+      visitType(registryType, KnownTypes.EXPANDED, ParameterKind.REQUIRED);
       if (branded) {
         emit(")");
       }
@@ -2092,18 +2111,18 @@ class DeclarationGenerator {
       return true;
     }
 
-    private void visitTypeDeclaration(JSType type, boolean isVarArgs, boolean isOptionalPosition) {
+    private void visitTypeDeclaration(JSType type, ParameterKind paramKind) {
       if (type != null) {
         emit(":");
         // From https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#a-grammar
         // ArrayType:
         // PrimaryType [no LineTerminator here] [ ]
-        if (isVarArgs) {
+        if (paramKind == ParameterKind.REST) {
           visitTypeAsPrimary(type);
         } else {
-          visitType(type, false, isOptionalPosition);
+          visitType(type, KnownTypes.SYMBOLIC, paramKind);
         }
-        if (isVarArgs) {
+        if (paramKind == ParameterKind.REST) {
           emit("[]");
         }
       }
@@ -2188,7 +2207,7 @@ class DeclarationGenerator {
     }
 
     private void visitType(JSType typeToVisit) {
-      visitType(typeToVisit, false, false);
+      visitType(typeToVisit, KnownTypes.SYMBOLIC, ParameterKind.REQUIRED);
     }
 
     /** The namespace prefix for symbols in closure.lib.d.ts. */
@@ -2201,9 +2220,9 @@ class DeclarationGenerator {
     }
 
     private void visitType(
-        JSType typeToVisit, boolean skipDefCheck, final boolean inOptionalPosition) {
+        JSType typeToVisit, KnownTypes knownTypes, final ParameterKind paramKind) {
       // Known typedefs will be emitted symbolically instead of expanded.
-      if (!skipDefCheck && typedefs.containsKey(typeToVisit)) {
+      if (knownTypes == KnownTypes.SYMBOLIC && typedefs.containsKey(typeToVisit)) {
         String typedefName = typedefs.get(typeToVisit);
         emit(Constants.INTERNAL_NAMESPACE + "." + typedefName);
         typesUsed.add(typedefName);
@@ -2259,7 +2278,7 @@ class DeclarationGenerator {
 
             @Override
             public Void caseUnionType(UnionType type) {
-              visitUnionType(type, inOptionalPosition);
+              visitUnionType(type, paramKind);
               return null;
             }
 
@@ -2506,9 +2525,9 @@ class DeclarationGenerator {
         if (unionType != null && unionType.getAlternates().stream().anyMatch(JSType::isVoidType)) {
           emit("?");
 
-          visitTypeDeclaration(propType, false, true);
+          visitTypeDeclaration(propType, ParameterKind.OPTIONAL);
         } else {
-          visitTypeDeclaration(propType, false, false);
+          visitTypeDeclaration(propType, ParameterKind.REQUIRED);
         }
 
         if (it.hasNext()) {
@@ -2569,7 +2588,7 @@ class DeclarationGenerator {
       return new TreeSet<>(elements);
     }
 
-    private void visitUnionType(UnionType ut, boolean inOptionalPosition) {
+    private void visitUnionType(UnionType ut, ParameterKind paramKind) {
 
       Collection<JSType> alts = ut.getAlternates();
 
@@ -2577,7 +2596,7 @@ class DeclarationGenerator {
       // TypeScript will augment the provided type with an union of undefined, i.e. `foo?: T` will
       // means defacto `foo` has type `T | undefined` in the body.
       // Skip explicitly emitting the undefined union in such cases.
-      if (inOptionalPosition) {
+      if (paramKind == ParameterKind.OPTIONAL) {
         alts = Collections2.filter(alts, input -> !input.isVoidType());
       }
       if (alts.isEmpty()) {
@@ -2850,7 +2869,7 @@ class DeclarationGenerator {
       // Known issue: ttMap does not expose getUnresolvedTemplateType, which would be required
       // to correctly emit unbound template parameters, e.g. "<T>".
       JSType resolvedTemplateType = ttMap.getResolvedTemplateType(templateType);
-      visitType(resolvedTemplateType, false, false);
+      visitType(resolvedTemplateType);
       emit(">");
       emit(";");
       emitBreak();
@@ -2965,16 +2984,16 @@ class DeclarationGenerator {
       emit(propName);
       if (!propertyType.isFunctionType() || forcePropDeclaration) {
         UnionType unionType = propertyType.toMaybeUnionType();
-        boolean isOptionalProperty = false;
+        ParameterKind paramKind = ParameterKind.REQUIRED;
         // emitProperty is used to emit properties on object, as well as namespaces.  The ? optional
         // syntax is only valid for objects.
         if (unionType != null
             && unionType.getAlternates().stream().anyMatch(JSType::isVoidType)
             && !isNamespace) {
           emit("?");
-          isOptionalProperty = true;
+          paramKind = ParameterKind.OPTIONAL;
         }
-        visitTypeDeclaration(propertyType, false, isOptionalProperty);
+        visitTypeDeclaration(propertyType, paramKind);
       } else {
         FunctionType ftype = (FunctionType) propertyType;
         if (specialCaseMapEntries(propName, ftype)) {
@@ -3216,7 +3235,12 @@ class DeclarationGenerator {
           // TODO(rado): angular.d.ts has improved types for .all, replace with all overrides from
           // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/angular/index.d.ts#L1014
         case "all":
-          return prefix + "all(promises : " + className + " < any > [] ) : " + className + " < any [] > ;";
+          return prefix
+              + "all(promises : "
+              + className
+              + " < any > [] ) : "
+              + className
+              + " < any [] > ;";
         default:
           return null;
       }
@@ -3362,12 +3386,14 @@ class DeclarationGenerator {
         paramCount++;
 
         // In TypeScript ...a?: any[] is illegal, so we can only make non-varargs optional.
-        if ((param.isOptional() || makeAllParametersOptional) && !param.isVariadic()) {
+        ParameterKind paramKind = ParameterKind.REQUIRED;
+        if (param.isVariadic()) {
+          paramKind = ParameterKind.REST;
+        } else if (param.isOptional() || makeAllParametersOptional) {
           emit("?");
-          visitTypeDeclaration(param.getJSType(), param.isVariadic(), true);
-        } else {
-          visitTypeDeclaration(param.getJSType(), param.isVariadic(), false);
+          paramKind = ParameterKind.OPTIONAL;
         }
+        visitTypeDeclaration(param.getJSType(), paramKind);
         if (parameters.hasNext()) {
           emit(", ");
         }
