@@ -12,6 +12,12 @@ import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+/**
+ * Tests that operate on multiple input source files.
+ *
+ * <p>NOTE: For each test method there is a directory under testdata/ with the same name.
+ * File names passed to the `input(path)` method will be found in that directory.
+ */
 @RunWith(JUnit4.class)
 public class MultiFileTest {
 

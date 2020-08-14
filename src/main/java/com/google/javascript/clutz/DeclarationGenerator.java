@@ -2149,21 +2149,29 @@ class DeclarationGenerator {
         return;
       }
 
-      emitNoResolvedTypeAsumingForwardDeclare(type);
+      emitNoResolvedTypeAssumingForwardDeclare(type);
     }
 
     /**
      * Emits a type that is not resolved by closure, as the literal string that was in the original
      * code. Special care is taken for templatized types.
      */
-    private void emitNoResolvedTypeAsumingForwardDeclare(ObjectType type) {
-      String displayName = maybeRewriteImportedName(type.getDisplayName());
+    private void emitNoResolvedTypeAssumingForwardDeclare(ObjectType type) {
+      String displayName = type.getDisplayName();
+      boolean isTypeof = displayName.startsWith("typeof ");
+      if (isTypeof) {
+        displayName = displayName.substring(7);
+      }
+      displayName = maybeRewriteImportedName(displayName);
       String maybeGlobalName = maybeRenameGlobalType(displayName);
       if (maybeGlobalName == null) {
         typesUsed.add(displayName);
         displayName = Constants.INTERNAL_NAMESPACE + "." + displayName;
       } else {
         displayName = maybeGlobalName;
+      }
+      if (isTypeof) {
+        displayName = "typeof " + displayName;
       }
       emit(displayName);
       List<JSType> templateTypes = type.getTemplateTypes();
@@ -2284,13 +2292,17 @@ class DeclarationGenerator {
 
             @Override
             public Void caseNamedType(NamedType type) {
+              if (type.isNoResolvedType()) {
+                // When we dealing with partial inputs, we often end up with named type, without a
+                // corresponding referencedType. Instead of emitting 'any', we emit literally the
+                // name of the type as originally written.
+                // It appears that when one writes '@type {A<B>}' and both are missing from the
+                // compilation
+                // unit - A ends up as NoType, while B ends up as NamedType.
+                emitNoResolvedTypeAssumingForwardDeclare(type);
+                return null;
+              }
               JSType refType = type.getReferencedType();
-              // When we dealing with partial inputs, we often end up with named type, without a
-              // corresponding referencedType. Instead of emitting 'any', we emit literally the
-              // name of the type as originally written.
-              // It appears that when one writes '@type {A<B>}' and both are missing from the
-              // compilation
-              // unit - A ends up as NoType, while B ends up as NamedType.
 
               // Handle "typeof expr" constructions, which translate directly to TypeScript.
               if (type.hasReferenceName() && type.getReferenceName().startsWith("typeof ")) {
@@ -2300,10 +2312,6 @@ class DeclarationGenerator {
                 } else {
                   emit(type.getReferenceName());
                 }
-                return null;
-              }
-              if (refType.isUnknownType()) {
-                emitNoResolvedTypeAsumingForwardDeclare(type);
                 return null;
               }
               visitType(refType);
