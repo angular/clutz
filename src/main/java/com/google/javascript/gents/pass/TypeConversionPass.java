@@ -15,7 +15,6 @@ import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.rhino.IR;
 import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.JSDocInfo.Visibility;
-import com.google.javascript.rhino.JSDocInfoBuilder;
 import com.google.javascript.rhino.JSTypeExpression;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
@@ -332,8 +331,9 @@ public final class TypeConversionPass implements CompilerPass {
         case EXPR_RESULT:
           ClassMemberDeclaration declaration = ClassMemberDeclaration.newDeclaration(n, types);
           if (declaration == null) {
-            maybeAnnotateThisType(n);
-          } else if (declaration.rhs != null && declaration.rhs.isFunction()) {
+            break;
+          }
+          if (declaration.rhs != null && declaration.rhs.isFunction()) {
             moveMethodsIntoClasses(declaration);
           } else {
             moveFieldsIntoClasses(declaration);
@@ -341,17 +341,6 @@ public final class TypeConversionPass implements CompilerPass {
           break;
         default:
           break;
-      }
-    }
-
-    private void maybeAnnotateThisType(Node n) {
-      Node maybeFn = n.getFirstChild().getLastChild();
-      ClassMemberDeclaration.ClassMemberInfo cls = ClassMemberDeclaration.getClassMemberInfo(n);
-      if (cls != null && !cls.isStatic && maybeFn.isFunction()) {
-        JSDocInfo jsdoc = NodeUtil.getBestJSDocInfo(maybeFn);
-        JSDocInfoBuilder newJSDoc = jsdoc == null ? new JSDocInfoBuilder(false) : JSDocInfoBuilder.copyFrom(jsdoc);
-        newJSDoc.recordThisType(new JSTypeExpression(Node.newString(Token.NAME, cls.className), maybeFn.getSourceFileName()));
-        maybeFn.setJSDocInfo(newJSDoc.build());
       }
     }
   }
@@ -1085,17 +1074,6 @@ public final class TypeConversionPass implements CompilerPass {
       this.memberName = memberName;
     }
 
-    /** Describes a class name and whether it is static. */
-    static class ClassMemberInfo {
-      String className;
-      boolean isStatic;
-
-      private ClassMemberInfo(String className, boolean isStatic) {
-        this.className = className;
-        this.isStatic = isStatic;
-      }
-    }
-
     /** Returns whether the rhs is the same as the method name being declared eg. this.a = a; */
     boolean rhsEqualToField() {
       return rhs != null && rhs.matchesQualifiedName(memberName);
@@ -1119,16 +1097,25 @@ public final class TypeConversionPass implements CompilerPass {
     @Nullable
     static ClassMemberDeclaration newDeclaration(Node n, Map<String, Node> classes) {
       Node fullName = getFullName(n);
-      ClassMemberInfo cls = getClassMemberInfo(n);
-
-      // Class must exist in scope
-      if (cls == null || !classes.containsKey(cls.className)) {
+      // Node MUST NOT start with "this."
+      if (!fullName.isGetProp() || containsThis(fullName)) {
         return null;
       }
-      Node classNode = classes.get(cls.className);
+
+      boolean isStatic = isStatic(fullName);
+      String className =
+          isStatic
+              ? fullName.getFirstChild().getQualifiedName()
+              : fullName.getFirstFirstChild().getQualifiedName();
+
+      // Class must exist in scope
+      if (!classes.containsKey(className)) {
+        return null;
+      }
+      Node classNode = classes.get(className);
       String memberName = fullName.getLastChild().getString();
 
-      return new ClassMemberDeclaration(n, cls.isStatic, classNode, memberName);
+      return new ClassMemberDeclaration(n, isStatic, classNode, memberName);
     }
 
     /**
@@ -1161,23 +1148,6 @@ public final class TypeConversionPass implements CompilerPass {
       }
 
       return new ClassMemberDeclaration(n, false, classNode, memberName);
-    }
-
-    /** Returns information about the class member being declared. */
-    static ClassMemberInfo getClassMemberInfo(Node n) {
-      Node fullName = getFullName(n);
-      // Node MUST NOT start with "this."
-      if (!fullName.isGetProp() || containsThis(fullName)) {
-        return null;
-      }
-
-      boolean isStatic = isStatic(fullName);
-      String className =
-          isStatic
-              ? fullName.getFirstChild().getQualifiedName()
-              : fullName.getFirstFirstChild().getQualifiedName();
-
-      return new ClassMemberInfo(className, isStatic);
     }
 
     /** Returns the full name of the class member being declared. */

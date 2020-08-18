@@ -55,25 +55,12 @@ B.prototype.baz = function(n) {
   return B.base(this, 'foo', n) > 0;
 };
 
-// Methods on C are not collapsed into a ES6 class declaration because the
-// definition of C itself does not exist in this file.
-
 /**
  * Unconverted method
  * @param {number} n
  * @return {void}
  */
 C.prototype.baz = function(n) {};
-
-C.prototype.baq = function() {};
-
-/**
- * @param {number} n
- * @this {B}
- */
-C.prototype.faz = function(n) {};
-
-C.staticMember = function() {};
 
 /**
  * goog.defineClass based classes

@@ -42,19 +42,10 @@ export class B extends goog.A {
   }
 }
 
-// Methods on C are not collapsed into a ES6 class declaration because the
-// definition of C itself does not exist in this file.
-
 /**
  * Unconverted method
  */
-C.prototype.baz = function(this: C, n: number): void {};
-
-C.prototype.baq = function(this: C) {};
-
-C.prototype.faz = function(this: B, n: number) {};
-
-C.staticMember = function() {};
+C.prototype.baz = function(n: number): void {};
 
 /**
  * goog.defineClass based classes

@@ -810,6 +810,7 @@ public final class TypeAnnotationPass implements CompilerPass {
     TypeDeclarationNode first = new TypeDeclarationNode(Token.STRING_KEY, "key");
     // In TypeScript index signatures can only have string or number types, everything
     // else is a type error. It cannot even be a type alias.
+    System.out.println(keyType);
     if (keyType.getToken() == Token.STRING_TYPE || keyType.getToken() == Token.NUMBER_TYPE) {
       first.setDeclaredTypeExpression(keyType);
     } else {
