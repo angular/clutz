@@ -1569,6 +1569,16 @@ class DeclarationGenerator {
     REST
   }
 
+  /**
+   * Function context is used to control whether it may have a void return type.
+   *
+   * <p>See TreeWalker.visitUnionType.
+   */
+  private enum FunctionTypeContext {
+    DECLARATION,
+    CALLBACK
+  }
+
   private class TreeWalker {
     private final JSTypeRegistry typeRegistry;
     private final Set<String> provides;
@@ -1839,7 +1849,7 @@ class DeclarationGenerator {
     private void visitVarDeclaration(String name, JSType type) {
       emit("let");
       emit(name);
-      visitTypeDeclaration(type, ParameterKind.REQUIRED);
+      visitTypeDeclaration(type, ParameterKind.REQUIRED, FunctionTypeContext.DECLARATION);
       emit(";");
       emitBreak();
     }
@@ -1945,7 +1955,11 @@ class DeclarationGenerator {
       if (branded) {
         emit("(");
       }
-      visitType(registryType, KnownTypes.EXPANDED, ParameterKind.REQUIRED);
+      visitType(
+          registryType,
+          KnownTypes.EXPANDED,
+          ParameterKind.REQUIRED,
+          FunctionTypeContext.DECLARATION);
       if (branded) {
         emit(")");
       }
@@ -2111,7 +2125,8 @@ class DeclarationGenerator {
       return true;
     }
 
-    private void visitTypeDeclaration(JSType type, ParameterKind paramKind) {
+    private void visitTypeDeclaration(
+        JSType type, ParameterKind paramKind, FunctionTypeContext funcContext) {
       if (type != null) {
         emit(":");
         // From https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#a-grammar
@@ -2120,7 +2135,7 @@ class DeclarationGenerator {
         if (paramKind == ParameterKind.REST) {
           visitTypeAsPrimary(type);
         } else {
-          visitType(type, KnownTypes.SYMBOLIC, paramKind);
+          visitType(type, KnownTypes.SYMBOLIC, paramKind, funcContext);
         }
         if (paramKind == ParameterKind.REST) {
           emit("[]");
@@ -2215,7 +2230,11 @@ class DeclarationGenerator {
     }
 
     private void visitType(JSType typeToVisit) {
-      visitType(typeToVisit, KnownTypes.SYMBOLIC, ParameterKind.REQUIRED);
+      visitType(
+          typeToVisit,
+          KnownTypes.SYMBOLIC,
+          ParameterKind.REQUIRED,
+          FunctionTypeContext.DECLARATION);
     }
 
     /** The namespace prefix for symbols in closure.lib.d.ts. */
@@ -2228,7 +2247,10 @@ class DeclarationGenerator {
     }
 
     private void visitType(
-        JSType typeToVisit, KnownTypes knownTypes, final ParameterKind paramKind) {
+        JSType typeToVisit,
+        KnownTypes knownTypes,
+        final ParameterKind paramKind,
+        final FunctionTypeContext funcContext) {
       // Known typedefs will be emitted symbolically instead of expanded.
       if (knownTypes == KnownTypes.SYMBOLIC && typedefs.containsKey(typeToVisit)) {
         String typedefName = typedefs.get(typeToVisit);
@@ -2286,7 +2308,7 @@ class DeclarationGenerator {
 
             @Override
             public Void caseUnionType(UnionType type) {
-              visitUnionType(type, paramKind);
+              visitUnionType(type, paramKind, funcContext);
               return null;
             }
 
@@ -2401,7 +2423,7 @@ class DeclarationGenerator {
                 if (returnType.isVoidType()) {
                   emit("void");
                 } else {
-                  visitType(returnType);
+                  visitType(returnType, KnownTypes.SYMBOLIC, ParameterKind.REQUIRED, funcContext);
                 }
               }
               return null;
@@ -2533,9 +2555,9 @@ class DeclarationGenerator {
         if (unionType != null && unionType.getAlternates().stream().anyMatch(JSType::isVoidType)) {
           emit("?");
 
-          visitTypeDeclaration(propType, ParameterKind.OPTIONAL);
+          visitTypeDeclaration(propType, ParameterKind.OPTIONAL, FunctionTypeContext.DECLARATION);
         } else {
-          visitTypeDeclaration(propType, ParameterKind.REQUIRED);
+          visitTypeDeclaration(propType, ParameterKind.REQUIRED, FunctionTypeContext.DECLARATION);
         }
 
         if (it.hasNext()) {
@@ -2596,7 +2618,8 @@ class DeclarationGenerator {
       return new TreeSet<>(elements);
     }
 
-    private void visitUnionType(UnionType ut, ParameterKind paramKind) {
+    private void visitUnionType(
+        UnionType ut, ParameterKind paramKind, FunctionTypeContext funcContext) {
 
       Collection<JSType> alts = ut.getAlternates();
 
@@ -2608,11 +2631,14 @@ class DeclarationGenerator {
         alts = Collections2.filter(alts, input -> !input.isVoidType());
       }
       if (alts.isEmpty()) {
-        // If the only type was "undefined" and it got filtered, emit it explicitly.
+        // This should not be possible as any union type must have at least two types, but if this
+        // is ever reached, emit undefined.
         emit("undefined");
         return;
       }
       if (alts.size() == 1) {
+        // This is only possible for optional types, where undefined is removed from the union.
+        // Note that function return types may never be optional.
         visitType(alts.iterator().next());
         return;
       }
@@ -2621,7 +2647,13 @@ class DeclarationGenerator {
         // See https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#a-grammar
         // UnionType:
         // UnionOrIntersectionOrPrimaryType | IntersectionOrPrimaryType
-        visitTypeAsPrimary(it.next());
+        JSType next = it.next();
+        if (next.isVoidType() && funcContext == FunctionTypeContext.CALLBACK) {
+          // Emit void for callback return types to allow void functions.
+          emit("void");
+        } else {
+          visitTypeAsPrimary(next);
+        }
         if (it.hasNext()) {
           emit("|");
         }
@@ -3001,7 +3033,7 @@ class DeclarationGenerator {
           emit("?");
           paramKind = ParameterKind.OPTIONAL;
         }
-        visitTypeDeclaration(propertyType, paramKind);
+        visitTypeDeclaration(propertyType, paramKind, FunctionTypeContext.DECLARATION);
       } else {
         FunctionType ftype = (FunctionType) propertyType;
         if (specialCaseMapEntries(propName, ftype)) {
@@ -3401,7 +3433,13 @@ class DeclarationGenerator {
           emit("?");
           paramKind = ParameterKind.OPTIONAL;
         }
-        visitTypeDeclaration(param.getJSType(), paramKind);
+        FunctionTypeContext funcContext = FunctionTypeContext.DECLARATION;
+        if (param.getJSType().isFunctionType()) {
+          // FunctionTypeContext.CALLBACK is used to emit void for callback return types in union
+          // types.  This allows assigning void functions that omit a return statement.
+          funcContext = FunctionTypeContext.CALLBACK;
+        }
+        visitTypeDeclaration(param.getJSType(), paramKind, funcContext);
         if (parameters.hasNext()) {
           emit(", ");
         }

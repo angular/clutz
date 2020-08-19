@@ -52,13 +52,17 @@ declare namespace ಠ_ಠ.clutz.undefinedns {
   function returnsUndefUnionAlias (union : boolean | undefined ) : boolean | undefined ;
   /**
    * A function parameter that returns a type alias that includes undefined will
-   * still return undefined in TypeScript.
+   * return void in TypeScript.
    *
-   * This requires passing a function that explicitly returns undefined, but
-   * since there's no way to know how the alias is used otherwise, it's not safe
-   * to emit void.
+   * This is due to alias expansion in the emitted TypeScript code.  The
+   * expanded type of the alias will have void in place of undefined, but a
+   * value of the alias type can still be passed, since undefined is assignable
+   * to void (but not vice-versa).
+   *
+   * The void return type here is safe because the function is invoked from
+   * JavaScript.
    */
-  function takesUndefAliasFunc (undefAliasFunc : ( ) => boolean | undefined ) : void ;
+  function takesUndefAliasFunc (undefAliasFunc : ( ) => boolean | void ) : void ;
   /**
    * A function parameter that returns undefined returns void in TypeScript.
    *
@@ -76,15 +80,12 @@ declare namespace ಠ_ಠ.clutz.undefinedns {
   function takesUndefFuncRecord (undefFuncRecord : { func : ಠ_ಠ.clutz.undefinedns.FuncReturnsUndefAlias } ) : void ;
   /**
    * A function that returns a union type including undefined as a parameter
-   * returns undefined in TypeScript.
+   * returns void in TypeScript.
    *
-   * Clutz will only emit void for functions that only return undefined, to
-   * avoid having void value types.
-   *
-   * TODO(b/162851479): Allow void here since this function is invoked from
-   * JavaScript, where the void return type is treated as undefined.
+   * This is safe because the function is invoked from JavaScript, not
+   * TypeScript, where void is treated as undefined.
    */
-  function takesUndefUnionFunc (undefUnionFunc : ( ) => string | undefined ) : void ;
+  function takesUndefUnionFunc (undefUnionFunc : ( ) => string | void ) : void ;
   /**
    * A function parameter that returns void returns void in TypeScript.
    *
