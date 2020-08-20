@@ -388,7 +388,9 @@ public final class TypeConversionPass implements CompilerPass {
             // The class member declaration on "this" will not have "=" in the JSDoc most of the
             // time. Therefore we need to remove the "=" from the JSDoc of the parameter
             // declaration so we can compare the types and collapse the parameter property.
-            if (param.isDefaultValue() && Token.EQUALS.equals(paramType.getRoot().getToken())) {
+            if (paramType != null
+                && param.isDefaultValue()
+                && Token.EQUALS.equals(paramType.getRoot().getToken())) {
               paramType =
                   new JSTypeExpression(
                       paramType.getRoot().getFirstChild(), paramType.getSourceName());

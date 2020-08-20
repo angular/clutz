@@ -20,3 +20,7 @@ export class B {
 export class C {
   constructor(public readonly a: string = 'default value') {}
 }
+
+export class DefaultValueWithoutAnnotation {
+  constructor(public readonly a = 'default value') {}
+}

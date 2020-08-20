@@ -49,4 +49,16 @@ class C {
   }
 }
 
-exports = {A, B, C};
+class DefaultValueWithoutAnnotation {
+  constructor(a = 'default value') {
+    /** @const */
+    this.a = a;
+  }
+}
+
+exports = {
+  A,
+  B,
+  C,
+  DefaultValueWithoutAnnotation
+};
