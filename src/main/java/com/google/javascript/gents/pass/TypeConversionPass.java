@@ -175,17 +175,37 @@ public final class TypeConversionPass implements CompilerPass {
             Node className = n.getFirstChild();
             Node classExtends = n.getSecondChild();
             Node classMembers = n.getLastChild();
-            // Change CLASS_EXTENDS to INTERFACE_EXTENDS
-            Node interfaceExtends =
-                classExtends.isEmpty()
-                    ? classExtends.detach()
-                    : new Node(Token.INTERFACE_EXTENDS, classExtends.detach());
-            // Also merge with any @extends if present.
+
+            // We will be changing CLASS_EXTENDS to INTERFACE_EXTENDS
+            Node interfaceExtends = new Node(Token.INTERFACE_EXTENDS);
+            classExtends.detach();
+            // Because this is using ES6 extends sytnax, there can be a single ES6 syntax
+            // extends even for an interface.
+            String classExtendsName = classExtends.isName() ? classExtends.getString() : "";
+            // Special care needs to be had with the pattern `@extends Foo<T>` together with `class
+            // X extends Foo`. The ES6 extends is less expressive as on cannot write the generic
+            // parameter there. So default to keeping the @extends clause when the names match.
+            boolean repeatedExtends = false;
+            // Merge with any @extends if present.
             for (JSTypeExpression extendedInterface : jsDoc.getExtendedInterfaces()) {
-              if (interfaceExtends.isEmpty()) {
-                interfaceExtends = new Node(Token.INTERFACE_EXTENDS);
+              Node typeRoot = extendedInterface.getRoot();
+              // The root for @extends and @implements is aways an implicit ! Bang node.
+              // It is an error in closure to explicitly add it in the source, but it is
+              // always added during the AST construction.
+              if (typeRoot.hasChildren()
+                  && typeRoot.getFirstChild().getString().equals(classExtendsName)) {
+                repeatedExtends = true;
               }
-              interfaceExtends.addChildToBack(extendedInterface.getRoot());
+              interfaceExtends.addChildToBack(typeRoot);
+            }
+
+            if (classExtends.isName() && !repeatedExtends) {
+              interfaceExtends.addChildToBack(classExtends);
+            }
+
+            // Having INTERFACE_EXTENDS node without any children is an invalid AST node.
+            if (!interfaceExtends.hasChildren()) {
+              interfaceExtends = IR.empty();
             }
 
             // Collect MEMBER_VARIABLE_DEF's and MEMBER_FUNCTION_DEF's and use those as the new interface members.

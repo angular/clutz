@@ -157,6 +157,23 @@ class AnotherAbstractClass {
   anotherMethod() {}
 }
 
+/**
+ * @abstract
+ * @template T
+ */
+class AbstractGenericClass {}
+
+/**
+ * @abstract
+ */
+class AbstractClassExtends extends AbstractClass {}
+
+/**
+ * @abstract
+ * @extends {AbstractGenericClass<string>}
+ */
+class AbstractClassExtendsGeneric extends AbstractGenericClass {}
+
 class DecoratedConstructor {
   /** @constructor */
   constructor() {}
@@ -184,5 +201,10 @@ class GenericClass extends Class {}
  * @extends {Class}
  */
 class NormalClass extends Class {}
+
+/**
+ * @extends {GenericClass<string>}
+ */
+class ExtendsGenericClass extends GenericClass {}
 
 exports = {G, ClassWithNoConstructorJsDocAndProperties, GoogDefinedClassWithConstructorAnnotation, GoogDefinedClassWithConstructorAnnotationAndParameters, GoogDefinedClassWithDeeplyNestedConstructorAnnotation, A, B, C, D, E, F, GenericClass, NormalClass};

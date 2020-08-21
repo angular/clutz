@@ -84,7 +84,33 @@ class IExtendsUsingClosure {
   method3() {}
 }
 
+/**
+ * @interface
+ * @template T
+ */
+class TemplateType {}
+
+/**
+ * @interface
+ * @extends {TemplateType<string>}
+ */
+class ExtendsTemplatedType extends TemplateType {}
+
+/**
+ * @template T
+ */
+class TemplateClass {}
+
+/**
+ * @extends {TemplateClass<string>}
+ */
+class ExtendsTemplatedClass extends TemplateClass {}
+
 exports.IBase = IBase;
 exports.IExtendsUsingEs6 = IExtendsUsingEs6;
 exports.RExtendsUsingEs6 = RExtendsUsingEs6;
 exports.IExtendsUsingClosure = IExtendsUsingClosure;
+exports.TemplateType = TemplateType;
+exports.ExtendsTemplatedType = ExtendsTemplatedType;
+exports.TemplateClass = TemplateClass;
+exports.ExtendsTemplatedClass = ExtendsTemplatedClass;

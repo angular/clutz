@@ -132,6 +132,13 @@ abstract class AnotherAbstractClass {
   abstract anotherMethod(): void;
 }
 
+abstract class AbstractGenericClass<T> {}
+
+abstract class AbstractClassExtends extends AbstractClass {}
+
+abstract class AbstractClassExtendsGeneric extends
+    AbstractGenericClass<string> {}
+
 class DecoratedConstructor {
   constructor() {}
 }
@@ -144,3 +151,5 @@ export class GenericClass<T> extends Class implements Interface,
                                                       GenericInterface<T> {}
 
 export class NormalClass extends Class implements Interface {}
+
+class ExtendsGenericClass extends GenericClass<string> {}

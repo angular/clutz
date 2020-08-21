@@ -49,3 +49,11 @@ interface RecordClass {
 export interface IExtendsUsingClosure extends IBase {
   method3(): boolean;
 }
+
+export interface TemplateType<T> {}
+
+export interface ExtendsTemplatedType extends TemplateType<string> {}
+
+export class TemplateClass<T> {}
+
+export class ExtendsTemplatedClass extends TemplateClass<string> {}
