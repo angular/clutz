@@ -485,8 +485,17 @@ public final class TypeConversionPass implements CompilerPass {
           String enumTypeStr = enumExp.getRoot().getString();
           if (!enumTypeStr.equals("number") && !enumTypeStr.equals("string")) return;
 
-          Node name = n.removeFirstChild();
-          Node members = name.removeFirstChild();
+          Node name = n.getFirstChild();
+          Node members = name.getFirstChild();
+
+          // There are still cases where @enum is used on an alias.
+          // /** @enum */ const EAlias = E;
+          // This is incorrect closure, as it should be `/** @const */` but Closure does not
+          // ban it. For now we just skip over as there is no good translation to be made.
+          if (members != null && !members.isObjectLit()) return;
+
+          name.detach();
+          members.detach();
 
           Node enumMembers = transformMembers(members, enumTypeStr.equals("number"));
           Node enumNode = new Node(Token.ENUM, name, enumMembers);
