@@ -37,7 +37,12 @@ public class CommentUtil {
    * and finish with EOL.
    */
   private static final Pattern[] JSDOC_REPLACEMENTS_NO_KEEP = {
-    Pattern.compile(BEGIN_JSDOC_LINE + "@(extends|implements|type|this)[ \t]*(\\{[^@]*\\})[ \t]*" + EOL),
+    Pattern.compile(
+        BEGIN_JSDOC_LINE + "@(extends|implements|type|this)[ \t]*(\\{[^@]*\\})[ \t]*" + EOL),
+    // JS Compiler accepts extends and implements without braces too. Because it is harder to know
+    // when does the clause end without the braces, this regexp only handles single line clauses for
+    // now.
+    Pattern.compile(BEGIN_JSDOC_LINE + "@(extends|implements) ([^\n@]*)[ \t]*" + EOL),
     Pattern.compile(BEGIN_JSDOC_LINE + "@(constructor|interface|record)[ \t]*" + EOL),
     Pattern.compile(
         BEGIN_JSDOC_LINE

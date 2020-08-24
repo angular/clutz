@@ -1,5 +1,6 @@
 goog.provide('ns.Interface2');
 goog.provide('ns.Interface3');
+goog.provide('ns.NoBraceExtends');
 goog.provide('ns.StructuralInterface');
 
 /** @interface */
@@ -105,3 +106,11 @@ class List {
    */
   self() {}
 }
+
+/**
+ * In Closure, extends and implements clauses have optional braces.
+ * @interface
+ * @extends ns.Interface2
+ * @extends EmptyGenericRecord<number>
+ */
+ns.NoBraceExtends = function() {};

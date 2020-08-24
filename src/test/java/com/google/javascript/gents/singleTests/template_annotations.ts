@@ -26,7 +26,7 @@ export class CorrectUseOfConcreteCompoundType extends SimpleGenericClass {}
 /**
  * TODO(lukemizuhashi): Investigate parent classes and interfaces in G3 ES6
  * annotated with and @template annotations.
- * Also, address @implements annotations.
+ * Also, address implements annotations.
  *
  */
 export interface Interface<VALUE> {}

@@ -44,3 +44,9 @@ interface List<T> extends Item<T>, EmptyGenericRecord<T> {
    */
   self(): List<T>;
 }
+
+/**
+ * In Closure, extends and implements clauses have optional braces.
+ */
+export interface NoBraceExtends extends Interface2,
+                                        EmptyGenericRecord<number> {}
