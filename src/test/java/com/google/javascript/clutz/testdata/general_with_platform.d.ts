@@ -927,6 +927,28 @@ declare namespace ಠ_ಠ.clutz {
 }
 // Generated from externs.zip//w3c_rtc.js
 declare namespace ಠ_ಠ.clutz {
+  interface RTCError {
+    errorDetail : string ;
+    httpRequestStatusCode ? : number ;
+    receivedAlert ? : number ;
+    sctpCauseCode ? : number ;
+    sdpLineNumber ? : number ;
+    sentAlert ? : number ;
+  }
+}
+// Generated from externs.zip//w3c_rtc.js
+declare namespace ಠ_ಠ.clutz {
+  type RTCErrorDetailType = string ;
+}
+// Generated from externs.zip//w3c_rtc.js
+declare namespace ಠ_ಠ.clutz {
+  interface RTCErrorEvent {
+    error : RTCError ;
+    message : string ;
+  }
+}
+// Generated from externs.zip//w3c_rtc.js
+declare namespace ಠ_ಠ.clutz {
   interface RTCRtpSendParameters {
     /**
      * Possible string values are "maintain-framerate", "maintain-resolution", and
