@@ -7,7 +7,7 @@ declare namespace ಠ_ಠ.clutz.goog {
     static all < TYPE = any > (promises : any [] ) : ಠ_ಠ.clutz.goog.Promise < TYPE [] , any > ;
     static race < TYPE = any > (promises : any [] ) : ಠ_ಠ.clutz.goog.Promise < TYPE , any > ;
     static resolve < T >(): Promise < void >;
-static resolve < T >(value: PromiseLike < T > | T): any;
+static resolve < T >(value: PromiseLike < T > | T): ಠ_ಠ.clutz.goog.Promise < T >;
   }
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/goog_promise_with_platform.js

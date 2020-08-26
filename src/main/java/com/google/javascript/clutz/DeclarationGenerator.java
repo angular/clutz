@@ -3262,14 +3262,8 @@ class DeclarationGenerator {
       String prefix = isStatic ? "static " : "";
       switch (propName) {
         case "resolve":
-          // TODO(evanm): goog.Promise had bad types that were coerced to any.
-          // Once users are cleaned up, change the below 'any' to instead return the proper type.
-          if (className.equals("ಠ_ಠ.clutz.goog.Promise")) {
-            return prefix + "resolve < T >(): Promise < void >;\n"
-                + prefix + "resolve < T >(value: PromiseLike < T > | T): any;";
-          } else {
-            return prefix + "resolve < T >(value: PromiseLike < T > | T): " + className + " < T >;";
-          }
+          return (prefix + "resolve < T >(): Promise < void >;\n")
+              + (prefix + "resolve < T >(value: PromiseLike < T > | T): " + className + " < T >;");
         case "race":
           return prefix + "race < T > (values : T [] ) : " + className + " < T > ;";
           // TODO(rado): angular.d.ts has improved types for .all, replace with all overrides from
