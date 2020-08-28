@@ -665,6 +665,19 @@ declare namespace ಠ_ಠ.clutz {
     onabort : ( (a : GlobalEvent ) => any ) | null ;
   }
 }
+// Generated from externs.zip//w3c_keyboardlock.js
+declare namespace ಠ_ಠ.clutz {
+  /**
+   * Keyboard API object.
+   */
+  class Keyboard {
+    /**
+     * Lock the specified keys for this page, or all keys if keyCodes is omitted.
+     */
+    lock (keyCodes ? : string [] | null ) : Promise < undefined > ;
+    unlock ( ) : any ;
+  }
+}
 // Generated from externs.zip//w3c_mediacapabilities.js
 declare namespace ಠ_ಠ.clutz {
   type AudioConfiguration = { bitrate ? : number , channels ? : any , contentType : string , samplerate ? : number , spatialRendering ? : boolean } ;
