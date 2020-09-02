@@ -82,12 +82,7 @@ public abstract class ImportBasedMapBuilder {
 
     Node rightHandSide = statement.getFirstFirstChild();
 
-    return rightHandSide != null
-        && rightHandSide.isCall()
-        && (rightHandSide.getFirstChild().matchesQualifiedName("goog.require")
-            || rightHandSide.getFirstChild().matchesQualifiedName("goog.module.get")
-            || rightHandSide.getFirstChild().matchesQualifiedName("goog.forwardDeclare")
-            || rightHandSide.getFirstChild().matchesQualifiedName("goog.requireType"));
+    return isGoogImportCall(rightHandSide);
   }
 
   /** Matches destructing from a variable ie `const {foo, bar: baz} = quux;` */
@@ -108,8 +103,8 @@ public abstract class ImportBasedMapBuilder {
   }
 
   /**
-   * Matches either `const {foo} = goog.require()` or `const {foo} = goog.module.get()` depending on
-   * if statement is in a goog.module or a goog.scope.
+   * Matches Closure import statements that import specific names from a module or provided
+   * namespace.
    */
   protected static boolean isImportDestructuringAssignment(Node statement) {
     if (!(statement.isConst() || statement.isVar() || statement.isLet())) {
@@ -124,9 +119,16 @@ public abstract class ImportBasedMapBuilder {
 
     Node rightHandSide = destructuringAssignment.getSecondChild();
 
-    return rightHandSide.isCall()
-        && (rightHandSide.getFirstChild().matchesQualifiedName("goog.require")
-            || rightHandSide.getFirstChild().matchesQualifiedName("goog.module.get"));
+    return isGoogImportCall(rightHandSide);
+  }
+
+  private static boolean isGoogImportCall(Node expression) {
+    return expression != null
+        && expression.isCall()
+        && (expression.getFirstChild().matchesQualifiedName("goog.require")
+            || expression.getFirstChild().matchesQualifiedName("goog.module.get")
+            || expression.getFirstChild().matchesQualifiedName("goog.forwardDeclare")
+            || expression.getFirstChild().matchesQualifiedName("goog.requireType"));
   }
 
   protected static String getGoogModuleId(Node astRoot) {
