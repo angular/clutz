@@ -2668,7 +2668,7 @@ class DeclarationGenerator {
       // Prevent accidental structural typing - emit every class with a private field.  Do not do
       // this for externs as we do want structural compatibility with .d.ts declarations. This is an
       // intentional tradeoff.
-      if (!isExtern && type.isNominalConstructor() && !type.isInterface()) {
+      if (!isExtern && type.isNominalConstructorOrInterface() && !type.isInterface()) {
         emit("private noStructuralTyping_");
         // TypeScript does not allow overriding private properties from superclasses, so make sure
         // to emit a private property name that's specific to this type.
