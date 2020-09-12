@@ -89,12 +89,15 @@ class ProgramSubject extends Subject {
     String expectedClean =
         DeclarationGeneratorTest.GOLDEN_FILE_COMMENTS_REGEXP.matcher(expected).replaceAll("");
     if (!stripped.equals(expectedClean)) {
-      // If the `UPDATE_GOLDENS` flag is set, overwrite the golden files, unless it's a
-      // `_with_platform.d.ts` which have 2 golden files that are concatenated, or if the golden has
-      // comments, both of which shouldn't be blindly overwritten.
-      if (System.getenv("UPDATE_GOLDENS") != null
-          && !golden.getName().endsWith("_with_platform.d.ts")
-          && expected.equals(expectedClean)) {
+      // If the `UPDATE_GOLDENS` flag is set, overwrite the golden files, unless the golden has
+      // comments, which shouldn't be blindly overwritten.
+      if (System.getenv("UPDATE_GOLDENS") != null && expected.equals(expectedClean)) {
+        if (golden.getName().endsWith("_with_platform.d.ts")) {
+          // If including externs, update to include all up to the first declarations generated from
+          // externs. This isn't guaranteed to be correct, but should normally match what the user
+          // wants.
+          stripped = stripped.substring(0, stripped.indexOf("// Generated from externs"));
+        }
         Files.asCharSink(golden, UTF_8).write(stripped);
       } else {
         check("generatedDeclarations()")
