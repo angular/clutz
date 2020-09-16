@@ -39,10 +39,10 @@ declare namespace ಠ_ಠ.clutz.undefinedns {
    */
   function funcReturnsVoid ( ) : void ;
   /**
-   * A function parameter that matches a predefined alias will be emitted as
+   * A function parameter that matches a predefined alias is not emitted as
    * that alias, meaning it will still return undefined.
    */
-  function matchesFuncAlias (funcAlias : ಠ_ಠ.clutz.undefinedns.FuncReturnsUndefUnionAlias ) : void ;
+  function matchesFuncAlias (funcAlias : ( ) => number | void ) : void ;
   /**
    * A function accepting and returning a union type including undefined will
    * still return undefined in TypeScript.
@@ -66,18 +66,16 @@ declare namespace ಠ_ಠ.clutz.undefinedns {
   /**
    * A function parameter that returns undefined returns void in TypeScript.
    *
-   * This is safe because the return value is unused. Note that this matches
-   * FuncReturnsUndefAlias, so that alias is used for the type in TypeScript.
+   * This is safe because the return value is unused.
    */
-  function takesUndefFunc (undefFunc : ಠ_ಠ.clutz.undefinedns.FuncReturnsUndefAlias ) : void ;
+  function takesUndefFunc (undefFunc : ( ) => void ) : void ;
   /**
    * A record parameter with a function that returns undefined returns void in
    * TypeScript.
    *
-   * This is safe for similar reasons to the above.  Note that this matches the
-   * FuncReturnsUndefAlias, so that alias is used in TypeScript.
+   * This is safe for similar reasons to the above.
    */
-  function takesUndefFuncRecord (undefFuncRecord : { func : ಠ_ಠ.clutz.undefinedns.FuncReturnsUndefAlias } ) : void ;
+  function takesUndefFuncRecord (undefFuncRecord : { func : ( ) => void } ) : void ;
   /**
    * A function that returns a union type including undefined as a parameter
    * returns void in TypeScript.
@@ -92,7 +90,7 @@ declare namespace ಠ_ಠ.clutz.undefinedns {
    * This allows passing functions that omit a return value, and is safe because
    * the return value of the parameter function is not used.
    */
-  function takesVoidFunc (voidFunc : ಠ_ಠ.clutz.undefinedns.FuncReturnsUndefAlias ) : void ;
+  function takesVoidFunc (voidFunc : ( ) => void ) : void ;
   /**
    * Omitting the return type of a function causes it to return void in TS.
    */

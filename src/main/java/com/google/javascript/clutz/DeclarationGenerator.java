@@ -68,6 +68,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -214,9 +215,14 @@ class DeclarationGenerator {
    *
    * <p>This is a reverse subset of the private map namesToTypes that Closure keeps in TypeRegistry.
    *
+   * <p>We use an identity map because the JSTypes underlying different typedefs may compare equal;
+   * we want to preserve whatever typedef name the user used, not just the name of some equal type.
+   * Additionally, equality on unsuccessfully resolved types is buggy, and Clutz processes a lot of
+   * those, so depending on equality is unwise.
+   *
    * <p>Currently, this map only contains templatized types and record types.
    */
-  private final Map<JSType, String> typedefs = new HashMap<>();
+  private final IdentityHashMap<JSType, String> typedefs = new IdentityHashMap<>();
 
   /** Whether to use the symbolic name of a type or expand its full declaration. */
   private enum KnownTypes {

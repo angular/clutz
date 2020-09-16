@@ -30,9 +30,6 @@ typedefs.a = new typedefs.Aclass();
 /** @typedef {!Array<!typedefs.Aclass>} */
 typedefs.arrayA;
 
-// code below should use arrayA over otherArrayA, earlier typedefs should win to avoid
-// using very library specific typedefs.
-
 /** @typedef {!Array<!typedefs.Aclass>} */
 typedefs.otherArrayA;
 

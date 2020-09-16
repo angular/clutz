@@ -79,7 +79,7 @@ undefinedns.funcReturnsUndefined = function() {};
 undefinedns.funcReturnsVoid = function() {};
 
 /**
- * A function parameter that matches a predefined alias will be emitted as
+ * A function parameter that matches a predefined alias is not emitted as
  * that alias, meaning it will still return undefined.
  *
  * @param {function():(number | undefined)} funcAlias
@@ -116,8 +116,7 @@ undefinedns.takesUndefAliasFunc = function(undefAliasFunc) {};
 /**
  * A function parameter that returns undefined returns void in TypeScript.
  *
- * This is safe because the return value is unused. Note that this matches
- * FuncReturnsUndefAlias, so that alias is used for the type in TypeScript.
+ * This is safe because the return value is unused.
  *
  * @param {function(): undefined} undefFunc
  */
@@ -127,8 +126,7 @@ undefinedns.takesUndefFunc = function(undefFunc) {};
  * A record parameter with a function that returns undefined returns void in
  * TypeScript.
  *
- * This is safe for similar reasons to the above.  Note that this matches the
- * FuncReturnsUndefAlias, so that alias is used in TypeScript.
+ * This is safe for similar reasons to the above.
  *
  * @param {{func: function():undefined}} undefFuncRecord
  */
