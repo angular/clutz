@@ -12,4 +12,11 @@ declare namespace ಠ_ಠ.clutz.innerTypeDef.Foo {
 declare module 'goog:innerTypeDef.Foo' {
   import Foo = ಠ_ಠ.clutz.innerTypeDef.Foo;
   export default Foo;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/inner_typedef';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/inner_typedef' {
+  import Foo = ಠ_ಠ.clutz.innerTypeDef.Foo;
+  export { Foo };
+  const __clutz_strip_property: 'Foo';
+  const __clutz_actual_namespace: 'innerTypeDef.Foo';
 }

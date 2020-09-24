@@ -6,4 +6,10 @@ declare namespace ಠ_ಠ.clutz.module$exports$bare$named$reexport {
 declare module 'goog:bare.named.reexport' {
   import reexport = ಠ_ಠ.clutz.module$exports$bare$named$reexport;
   export = reexport;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/bare_named_reexport';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/bare_named_reexport' {
+  import reexport = ಠ_ಠ.clutz.module$exports$bare$named$reexport;
+  export = reexport;
+  const __clutz_actual_namespace: 'bare.named.reexport';
 }

@@ -17,4 +17,10 @@ declare namespace ಠ_ಠ.clutz.nsThisGenerics {
 declare module 'goog:nsThisGenerics' {
   import nsThisGenerics = ಠ_ಠ.clutz.nsThisGenerics;
   export = nsThisGenerics;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/this_type_param_generics';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/this_type_param_generics' {
+  import nsThisGenerics = ಠ_ಠ.clutz.nsThisGenerics;
+  export = nsThisGenerics;
+  const __clutz_actual_namespace: 'nsThisGenerics';
 }

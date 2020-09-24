@@ -9,4 +9,10 @@ declare namespace ಠ_ಠ.clutz.module$exports$circular$obj {
 declare module 'goog:circular.obj' {
   import obj = ಠ_ಠ.clutz.module$exports$circular$obj;
   export = obj;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/circular_prototype';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/circular_prototype' {
+  import obj = ಠ_ಠ.clutz.module$exports$circular$obj;
+  export = obj;
+  const __clutz_actual_namespace: 'circular.obj';
 }

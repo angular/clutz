@@ -9,6 +9,13 @@ declare namespace ಠ_ಠ.clutz.rec {
 declare module 'goog:rec.Aclass' {
   import Aclass = ಠ_ಠ.clutz.rec.Aclass;
   export default Aclass;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/recursive_typedef';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/recursive_typedef' {
+  import Aclass = ಠ_ಠ.clutz.rec.Aclass;
+  export { Aclass };
+  const __clutz_strip_property: 'Aclass';
+  const __clutz_actual_namespace: 'rec.Aclass';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/recursive_typedef.js
 declare namespace ಠ_ಠ.clutz.rec.ns {
@@ -23,4 +30,8 @@ declare namespace ಠ_ಠ.clutz.rec.ns {
 declare module 'goog:rec.ns' {
   import ns = ಠ_ಠ.clutz.rec.ns;
   export = ns;
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/recursive_typedef' {
+  export {};
+  const __clutz_multiple_provides: true;
 }

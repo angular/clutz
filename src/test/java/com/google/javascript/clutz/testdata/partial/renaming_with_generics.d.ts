@@ -7,4 +7,10 @@ declare namespace ಠ_ಠ.clutz.module$exports$renaming$with$generics {
 declare module 'goog:renaming.with.generics' {
   import generics = ಠ_ಠ.clutz.module$exports$renaming$with$generics;
   export = generics;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/renaming_with_generics';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/renaming_with_generics' {
+  import generics = ಠ_ಠ.clutz.module$exports$renaming$with$generics;
+  export = generics;
+  const __clutz_actual_namespace: 'renaming.with.generics';
 }

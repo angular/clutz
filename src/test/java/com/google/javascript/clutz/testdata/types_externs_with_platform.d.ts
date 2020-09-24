@@ -22,6 +22,12 @@ declare namespace ಠ_ಠ.clutz.typesWithExterns {
 declare module 'goog:typesWithExterns' {
   import typesWithExterns = ಠ_ಠ.clutz.typesWithExterns;
   export = typesWithExterns;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform' {
+  import typesWithExterns = ಠ_ಠ.clutz.typesWithExterns;
+  export = typesWithExterns;
+  const __clutz_actual_namespace: 'typesWithExterns';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/types_externs_with_platform.js
 declare namespace ಠ_ಠ.clutz.typesWithExterns {

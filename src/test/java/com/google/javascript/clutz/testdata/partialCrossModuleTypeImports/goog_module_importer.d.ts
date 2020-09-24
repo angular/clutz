@@ -9,6 +9,12 @@ declare namespace ಠ_ಠ.clutz.module$exports$goog$module$importer {
 declare module 'goog:goog.module.importer' {
   import importer = ಠ_ಠ.clutz.module$exports$goog$module$importer;
   export = importer;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/goog_module_importer';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/goog_module_importer' {
+  import importer = ಠ_ಠ.clutz.module$exports$goog$module$importer;
+  export = importer;
+  const __clutz_actual_namespace: 'goog.module.importer';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/goog_module_importer.js
 declare namespace ಠ_ಠ.clutz {

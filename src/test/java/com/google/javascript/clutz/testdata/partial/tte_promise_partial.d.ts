@@ -6,6 +6,12 @@ declare namespace ಠ_ಠ.clutz.module$exports$tte$Promise$Partial {
 declare module 'goog:tte.Promise.Partial' {
   import Partial = ಠ_ಠ.clutz.module$exports$tte$Promise$Partial;
   export = Partial;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/tte_promise_partial';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/tte_promise_partial' {
+  import Partial = ಠ_ಠ.clutz.module$exports$tte$Promise$Partial;
+  export = Partial;
+  const __clutz_actual_namespace: 'tte.Promise.Partial';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/partial/tte_promise_partial.js
 declare namespace ಠ_ಠ.clutz {

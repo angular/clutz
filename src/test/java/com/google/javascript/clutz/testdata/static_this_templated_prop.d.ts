@@ -12,4 +12,10 @@ declare namespace ಠ_ಠ.clutz.static_this_templated_prop {
 declare module 'goog:static_this_templated_prop' {
   import static_this_templated_prop = ಠ_ಠ.clutz.static_this_templated_prop;
   export = static_this_templated_prop;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/static_this_templated_prop';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/static_this_templated_prop' {
+  import static_this_templated_prop = ಠ_ಠ.clutz.static_this_templated_prop;
+  export = static_this_templated_prop;
+  const __clutz_actual_namespace: 'static_this_templated_prop';
 }

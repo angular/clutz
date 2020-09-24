@@ -8,4 +8,10 @@ declare namespace ಠ_ಠ.clutz.union {
 declare module 'goog:union' {
   import union = ಠ_ಠ.clutz.union;
   export = union;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/union';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/union' {
+  import union = ಠ_ಠ.clutz.union;
+  export = union;
+  const __clutz_actual_namespace: 'union';
 }

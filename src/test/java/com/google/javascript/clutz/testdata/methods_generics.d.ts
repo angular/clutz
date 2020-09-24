@@ -28,4 +28,10 @@ declare namespace ಠ_ಠ.clutz.method_generics {
 declare module 'goog:method_generics' {
   import method_generics = ಠ_ಠ.clutz.method_generics;
   export = method_generics;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/methods_generics';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/methods_generics' {
+  import method_generics = ಠ_ಠ.clutz.method_generics;
+  export = method_generics;
+  const __clutz_actual_namespace: 'method_generics';
 }

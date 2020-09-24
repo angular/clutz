@@ -26,4 +26,11 @@ declare namespace ಠ_ಠ.clutz.module$exports$iterated$innerclass.B.C {
 declare module 'goog:iterated.innerclass' {
   import innerclass = ಠ_ಠ.clutz.module$exports$iterated$innerclass;
   export default innerclass;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/double_inner_class';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/double_inner_class' {
+  import innerclass = ಠ_ಠ.clutz.module$exports$iterated$innerclass;
+  export { innerclass };
+  const __clutz_strip_property: 'innerclass';
+  const __clutz_actual_namespace: 'iterated.innerclass';
 }

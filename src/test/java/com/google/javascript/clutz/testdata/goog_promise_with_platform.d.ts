@@ -14,6 +14,13 @@ static resolve < T >(value: PromiseLike < T > | T): ಠ_ಠ.clutz.goog.Promise <
 declare module 'goog:goog.Promise' {
   import Promise = ಠ_ಠ.clutz.goog.Promise;
   export default Promise;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/goog_promise_with_platform';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/goog_promise_with_platform' {
+  import Promise = ಠ_ಠ.clutz.goog.Promise;
+  export { Promise };
+  const __clutz_strip_property: 'Promise';
+  const __clutz_actual_namespace: 'goog.Promise';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/goog_promise_with_platform.js
 declare namespace ಠ_ಠ.clutz.goog {
@@ -30,4 +37,8 @@ declare namespace ಠ_ಠ.clutz.goog {
 declare module 'goog:goog.Thenable' {
   import Thenable = ಠ_ಠ.clutz.goog.Thenable;
   export default Thenable;
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/goog_promise_with_platform' {
+  export {};
+  const __clutz_multiple_provides: true;
 }

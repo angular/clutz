@@ -9,4 +9,10 @@ declare namespace ಠ_ಠ.clutz.ns.lots.of.args {
 declare module 'goog:ns.lots.of.args' {
   import args = ಠ_ಠ.clutz.ns.lots.of.args;
   export = args;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/lots_of_fn_args';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/lots_of_fn_args' {
+  import args = ಠ_ಠ.clutz.ns.lots.of.args;
+  export = args;
+  const __clutz_actual_namespace: 'ns.lots.of.args';
 }

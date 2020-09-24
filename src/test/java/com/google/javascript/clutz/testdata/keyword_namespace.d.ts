@@ -13,4 +13,10 @@ declare namespace ಠ_ಠ.clutz.keyword.delete_.namespace {
 declare module 'goog:keyword.delete.namespace' {
   import namespace = ಠ_ಠ.clutz.keyword.delete_.namespace;
   export = namespace;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/keyword_namespace';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/keyword_namespace' {
+  import namespace = ಠ_ಠ.clutz.keyword.delete_.namespace;
+  export = namespace;
+  const __clutz_actual_namespace: 'keyword.delete.namespace';
 }

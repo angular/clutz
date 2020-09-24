@@ -8,4 +8,10 @@ declare namespace ಠ_ಠ.clutz.module$exports$generators {
 declare module 'goog:generators' {
   import generators = ಠ_ಠ.clutz.module$exports$generators;
   export = generators;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/generator_partial';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/generator_partial' {
+  import generators = ಠ_ಠ.clutz.module$exports$generators;
+  export = generators;
+  const __clutz_actual_namespace: 'generators';
 }

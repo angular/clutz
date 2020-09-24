@@ -115,4 +115,10 @@ declare namespace ಠ_ಠ.clutz.undefinedns {
 declare module 'goog:undefinedns' {
   import undefinedns = ಠ_ಠ.clutz.undefinedns;
   export = undefinedns;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/undefined_type';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/undefined_type' {
+  import undefinedns = ಠ_ಠ.clutz.undefinedns;
+  export = undefinedns;
+  const __clutz_actual_namespace: 'undefinedns';
 }

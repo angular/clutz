@@ -8,4 +8,10 @@ declare namespace ಠ_ಠ.clutz.module$exports$enum_alias {
 declare module 'goog:enum_alias' {
   import enum_alias = ಠ_ಠ.clutz.module$exports$enum_alias;
   export = enum_alias;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/enum_alias_exports_obj';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/enum_alias_exports_obj' {
+  import enum_alias = ಠ_ಠ.clutz.module$exports$enum_alias;
+  export = enum_alias;
+  const __clutz_actual_namespace: 'enum_alias';
 }

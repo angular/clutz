@@ -44,4 +44,10 @@ declare namespace ಠ_ಠ.clutz.generics {
 declare module 'goog:generics' {
   import generics = ಠ_ಠ.clutz.generics;
   export = generics;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/generics';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/generics' {
+  import generics = ಠ_ಠ.clutz.generics;
+  export = generics;
+  const __clutz_actual_namespace: 'generics';
 }

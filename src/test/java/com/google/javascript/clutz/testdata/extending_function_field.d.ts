@@ -6,6 +6,13 @@ declare namespace ಠ_ಠ.clutz.a {
 declare module 'goog:a.messesWithB' {
   import messesWithB = ಠ_ಠ.clutz.a.messesWithB;
   export default messesWithB;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/extending_function_field';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/extending_function_field' {
+  import messesWithB = ಠ_ಠ.clutz.a.messesWithB;
+  export { messesWithB };
+  const __clutz_strip_property: 'messesWithB';
+  const __clutz_actual_namespace: 'a.messesWithB';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/extending_function_field.js
 declare namespace ಠ_ಠ.clutz.ns {
@@ -19,6 +26,10 @@ declare module 'goog:ns.A' {
   import A = ಠ_ಠ.clutz.ns.A;
   export default A;
 }
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/extending_function_field' {
+  export {};
+  const __clutz_multiple_provides: true;
+}
 // Generated from src/test/java/com/google/javascript/clutz/testdata/extending_function_field.js
 declare namespace ಠ_ಠ.clutz.ns {
   class B extends ಠ_ಠ.clutz.ns.A {
@@ -30,4 +41,8 @@ declare namespace ಠ_ಠ.clutz.ns {
 declare module 'goog:ns.B' {
   import B = ಠ_ಠ.clutz.ns.B;
   export default B;
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/extending_function_field' {
+  export {};
+  const __clutz_multiple_provides: true;
 }

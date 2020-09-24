@@ -13,4 +13,10 @@ declare namespace ಠ_ಠ.clutz.types_in_zip {
 declare module 'goog:types_in_zip' {
   import types_in_zip = ಠ_ಠ.clutz.types_in_zip;
   export = types_in_zip;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/zipped_js_library.zip!/types_in_zip';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/zipped_js_library.zip!/types_in_zip' {
+  import types_in_zip = ಠ_ಠ.clutz.types_in_zip;
+  export = types_in_zip;
+  const __clutz_actual_namespace: 'types_in_zip';
 }

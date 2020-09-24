@@ -6,6 +6,13 @@ declare namespace ಠ_ಠ.clutz.module.Foo {
 declare module 'goog:module.Foo.Legacy' {
   import Legacy = ಠ_ಠ.clutz.module.Foo.Legacy;
   export default Legacy;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/goog_module_declare_legacy';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/goog_module_declare_legacy' {
+  import Legacy = ಠ_ಠ.clutz.module.Foo.Legacy;
+  export { Legacy };
+  const __clutz_strip_property: 'Legacy';
+  const __clutz_actual_namespace: 'module.Foo.Legacy';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/goog_module_declare_legacy.js
 declare namespace ಠ_ಠ.clutz {

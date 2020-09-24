@@ -8,6 +8,12 @@ declare namespace ಠ_ಠ.clutz.module$exports$inherit_visibility {
 declare module 'goog:inherit_visibility' {
   import inherit_visibility = ಠ_ಠ.clutz.module$exports$inherit_visibility;
   export = inherit_visibility;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/inherit_visibility';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/inherit_visibility' {
+  import inherit_visibility = ಠ_ಠ.clutz.module$exports$inherit_visibility;
+  export = inherit_visibility;
+  const __clutz_actual_namespace: 'inherit_visibility';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/inherit_visibility.js
 declare namespace ಠ_ಠ.clutz {

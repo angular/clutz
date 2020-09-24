@@ -24,4 +24,10 @@ declare namespace ಠ_ಠ.clutz.types {
 declare module 'goog:types' {
   import types = ಠ_ಠ.clutz.types;
   export = types;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/types';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/types' {
+  import types = ಠ_ಠ.clutz.types;
+  export = types;
+  const __clutz_actual_namespace: 'types';
 }

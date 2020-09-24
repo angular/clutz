@@ -8,6 +8,12 @@ declare namespace ಠ_ಠ.clutz.module$exports$missing$extend {
 declare module 'goog:missing.extend' {
   import extend = ಠ_ಠ.clutz.module$exports$missing$extend;
   export = extend;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/missing_direct_ref_base';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/missing_direct_ref_base' {
+  import extend = ಠ_ಠ.clutz.module$exports$missing$extend;
+  export = extend;
+  const __clutz_actual_namespace: 'missing.extend';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/partial/missing_direct_ref_base.js
 declare namespace ಠ_ಠ.clutz {

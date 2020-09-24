@@ -10,4 +10,10 @@ declare namespace ಠ_ಠ.clutz.module$exports$protected {
 declare module 'goog:protected' {
   import protected = ಠ_ಠ.clutz.module$exports$protected;
   export = protected;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/protected';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/protected' {
+  import protected = ಠ_ಠ.clutz.module$exports$protected;
+  export = protected;
+  const __clutz_actual_namespace: 'protected';
 }

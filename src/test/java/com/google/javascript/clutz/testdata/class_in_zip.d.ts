@@ -15,4 +15,10 @@ declare namespace ಠ_ಠ.clutz.class_in_zip {
 declare module 'goog:class_in_zip' {
   import class_in_zip = ಠ_ಠ.clutz.class_in_zip;
   export = class_in_zip;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/zipped_js_library.zip!/class_in_zip';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/zipped_js_library.zip!/class_in_zip' {
+  import class_in_zip = ಠ_ಠ.clutz.class_in_zip;
+  export = class_in_zip;
+  const __clutz_actual_namespace: 'class_in_zip';
 }

@@ -18,4 +18,11 @@ declare namespace ಠ_ಠ.clutz.typedef.C {
 declare module 'goog:typedef.C' {
   import C = ಠ_ಠ.clutz.typedef.C;
   export default C;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/typealias_wrong_jsdoc';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/typealias_wrong_jsdoc' {
+  import C = ಠ_ಠ.clutz.typedef.C;
+  export { C };
+  const __clutz_strip_property: 'C';
+  const __clutz_actual_namespace: 'typedef.C';
 }

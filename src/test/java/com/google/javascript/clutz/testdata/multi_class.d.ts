@@ -27,4 +27,10 @@ declare namespace ಠ_ಠ.clutz.multi_class {
 declare module 'goog:multi_class' {
   import multi_class = ಠ_ಠ.clutz.multi_class;
   export = multi_class;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/multi_class';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/multi_class' {
+  import multi_class = ಠ_ಠ.clutz.multi_class;
+  export = multi_class;
+  const __clutz_actual_namespace: 'multi_class';
 }

@@ -7,4 +7,10 @@ declare namespace ಠ_ಠ.clutz.module$exports$collapsed$union {
 declare module 'goog:collapsed.union' {
   import union = ಠ_ಠ.clutz.module$exports$collapsed$union;
   export = union;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/all_optional_type';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/all_optional_type' {
+  import union = ಠ_ಠ.clutz.module$exports$collapsed$union;
+  export = union;
+  const __clutz_actual_namespace: 'collapsed.union';
 }

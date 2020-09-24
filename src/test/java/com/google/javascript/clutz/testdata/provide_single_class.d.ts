@@ -24,4 +24,11 @@ declare namespace ಠ_ಠ.clutz.foo.bar.Baz {
 declare module 'goog:foo.bar.Baz' {
   import Baz = ಠ_ಠ.clutz.foo.bar.Baz;
   export default Baz;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/provide_single_class';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/provide_single_class' {
+  import Baz = ಠ_ಠ.clutz.foo.bar.Baz;
+  export { Baz };
+  const __clutz_strip_property: 'Baz';
+  const __clutz_actual_namespace: 'foo.bar.Baz';
 }

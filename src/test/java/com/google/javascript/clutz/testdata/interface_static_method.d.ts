@@ -18,4 +18,10 @@ declare namespace ಠ_ಠ.clutz.module$exports$interface_static_method {
 declare module 'goog:interface_static_method' {
   import interface_static_method = ಠ_ಠ.clutz.module$exports$interface_static_method;
   export = interface_static_method;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/interface_static_method';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/interface_static_method' {
+  import interface_static_method = ಠ_ಠ.clutz.module$exports$interface_static_method;
+  export = interface_static_method;
+  const __clutz_actual_namespace: 'interface_static_method';
 }

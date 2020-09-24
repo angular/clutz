@@ -5,6 +5,12 @@ declare namespace ಠ_ಠ.clutz.privatetype {
 declare module 'goog:privatetype' {
   import privatetype = ಠ_ಠ.clutz.privatetype;
   export = privatetype;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/private_type';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/private_type' {
+  import privatetype = ಠ_ಠ.clutz.privatetype;
+  export = privatetype;
+  const __clutz_actual_namespace: 'privatetype';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/private_type.js
 declare namespace ಠ_ಠ.clutz.privatetype {

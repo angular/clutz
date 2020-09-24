@@ -26,4 +26,10 @@ declare namespace ಠ_ಠ.clutz.fn.field {
 declare module 'goog:fn.field' {
   import field = ಠ_ಠ.clutz.fn.field;
   export = field;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/function_extends_field';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/function_extends_field' {
+  import field = ಠ_ಠ.clutz.fn.field;
+  export = field;
+  const __clutz_actual_namespace: 'fn.field';
 }

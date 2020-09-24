@@ -33,6 +33,13 @@ static resolve < T >(value: PromiseLike < T > | T): ಠ_ಠ.clutz.angular.$q.Pro
 declare module 'goog:angular.$q.Promise' {
   import Promise = ಠ_ಠ.clutz.angular.$q.Promise;
   export default Promise;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/tte_promise';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/tte_promise' {
+  import Promise = ಠ_ಠ.clutz.angular.$q.Promise;
+  export { Promise };
+  const __clutz_strip_property: 'Promise';
+  const __clutz_actual_namespace: 'angular.$q.Promise';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/tte_promise.js
 declare namespace ಠ_ಠ.clutz.angular.$q {
@@ -50,4 +57,8 @@ declare namespace ಠ_ಠ.clutz.angular.$q.PromiseService {
 declare module 'goog:angular.$q.PromiseService' {
   import PromiseService = ಠ_ಠ.clutz.angular.$q.PromiseService;
   export default PromiseService;
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/tte_promise' {
+  export {};
+  const __clutz_multiple_provides: true;
 }

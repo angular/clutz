@@ -8,4 +8,10 @@ declare namespace ಠ_ಠ.clutz.module$exports$exports$local$prop {
 declare module 'goog:exports.local.prop' {
   import prop = ಠ_ಠ.clutz.module$exports$exports$local$prop;
   export = prop;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/export_local_prop';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/export_local_prop' {
+  import prop = ಠ_ಠ.clutz.module$exports$exports$local$prop;
+  export = prop;
+  const __clutz_actual_namespace: 'exports.local.prop';
 }

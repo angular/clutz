@@ -6,6 +6,12 @@ declare namespace ಠ_ಠ.clutz.multi_provides.a {
 declare module 'goog:multi_provides.a' {
   import a = ಠ_ಠ.clutz.multi_provides.a;
   export = a;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/multi_provides';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/multi_provides' {
+  import a = ಠ_ಠ.clutz.multi_provides.a;
+  export = a;
+  const __clutz_actual_namespace: 'multi_provides.a';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/multi_provides.js
 declare namespace ಠ_ಠ.clutz.multi_provides.a.b.c {

@@ -9,6 +9,12 @@ declare namespace ಠ_ಠ.clutz.object.literal.exports {
 declare module 'goog:object.literal.exports' {
   import exports = ಠ_ಠ.clutz.object.literal.exports;
   export = exports;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/declare_legacy_namespace_object_literal_export';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/declare_legacy_namespace_object_literal_export' {
+  import exports = ಠ_ಠ.clutz.object.literal.exports;
+  export = exports;
+  const __clutz_actual_namespace: 'object.literal.exports';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/partial/declare_legacy_namespace_object_literal_export.js
 declare namespace ಠ_ಠ.clutz {

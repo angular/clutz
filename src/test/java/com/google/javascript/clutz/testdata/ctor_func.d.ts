@@ -13,4 +13,10 @@ declare namespace ಠ_ಠ.clutz.ctor_func {
 declare module 'goog:ctor_func' {
   import ctor_func = ಠ_ಠ.clutz.ctor_func;
   export = ctor_func;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/ctor_func';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/ctor_func' {
+  import ctor_func = ಠ_ಠ.clutz.ctor_func;
+  export = ctor_func;
+  const __clutz_actual_namespace: 'ctor_func';
 }

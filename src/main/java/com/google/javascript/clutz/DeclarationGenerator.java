@@ -16,7 +16,9 @@ import static org.apache.commons.text.StringEscapeUtils.escapeEcmaScript;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
+import com.google.common.base.StringUtil;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
@@ -256,6 +258,14 @@ class DeclarationGenerator {
    * imported from other goog.modules. See LegacyNamespaceReexportMapBuilder for more details.
    */
   private Map<String, String> legacyNamespaceReexportMap = new LinkedHashMap<>();
+
+  /**
+   * modulePathsEmitted tracks what path-based modules have already been emitted. It maps source
+   * files to the namespaces emitted for them. This allows Clutz to emit markers if a file declares
+   * multiple conflicting, non-nesting namespaces. The marker is later used to report an error on
+   * use (but not on declaration, as the declaration is generally legal).
+   */
+  private final LinkedHashMap<StaticSourceFile, String> modulePathsEmitted = new LinkedHashMap<>();
 
   /** If true, add all the import rename map entries to the output as comments in the .d.ts. */
   private static final boolean PRINT_IMPORT_RENAME_MAP = false;
@@ -1417,21 +1427,114 @@ class DeclarationGenerator {
       return;
     }
     emitGeneratedFromFileComment(sourceFile);
+
+    String previouslyDeclaredNamespace =
+        sourceFile != null ? modulePathsEmitted.get(sourceFile) : null;
+    if (previouslyDeclaredNamespace == null) {
+      modulePathsEmitted.put(sourceFile, name);
+    }
+
+    String importPath = null;
+    // sourceFile may be null for symbols that were discovered in type references by JSCompiler, but
+    // never declared. This can happen for libraries that are unchecked and that are missing
+    // dependencies.
+    if (sourceFile != null) {
+      importPath = StringUtil.stripSuffix(sourceFile.getName(), ".js");
+      // Remove well known artifact prefixes for generated files, add in "google3/". Consumers
+      // import the module based on its logical name (google3/foo/bar), not on its physical location
+      // (blaze-genfiles/foo/bar.js).
+      importPath = importPath.replaceFirst("^(blaze|bazel)-[^/]*/[^/]*/(bin|genfiles)/", "");
+      importPath = "google3/" + importPath;
+    }
+
+    // Emit a "declare module 'goog:name.space' {}" block that allows importing the source by name.
+    // TODO(martinprobst): we should eventually delete this in preference of path based imports (see
+    // below).
     emitNoSpace("declare module '");
     emitNoSpace("goog:" + name);
     emitNoSpace("' {");
-    indent();
     emitBreak();
-    // Use the proper name as the alias name, so the TypeScript language service
-    // can offer it as an auto-import (auto-imports are offered for the exported
-    // name).
-    String alias = getUnqualifiedName(name);
+    indent();
+    emitModuleContents(name, isDefault, emitName, inParentNamespace);
+    if (importPath != null && previouslyDeclaredNamespace == null) {
+      // actual_path is only used to refactor namespace based imports into path based ones, it is
+      // not used during compilation (unlike __clutz_actual_namespace below).
+      emitNoSpace("const __clutz_actual_path: '");
+      emitNoSpace(importPath);
+      emitNoSpace("';");
+      emitBreak();
+    }
+    unindent();
+    emit("}");
+    emitBreak();
+    // If there was no file associated with the namespace, do not attempt to declare a corresponding
+    // path module.
+    if (sourceFile == null) {
+      return;
+    }
+    // Avoid declaring a path based module twice (e.g. for a file containing multiple
+    // goog.provides). This means only the first provide will be importable by path.
+    boolean nestsUnderPrevious = name.startsWith(previouslyDeclaredNamespace + ".");
+    if (previouslyDeclaredNamespace != null && nestsUnderPrevious) {
+      return;
+    }
+    // Emit a "declare module 'path/to/file' {}" block that allows importing the source by path.
+    emitNoSpace("declare module '");
+    emitNoSpace(importPath);
+    emitNoSpace("' {");
+    emitBreak();
+    indent();
+    if (previouslyDeclaredNamespace != null) {
+      // We reached this block because there was a previous declaration in this file, and the
+      // current declaration does not nest under it. This is treated as an error at the use site
+      // when importing by path. Because, as a declaration, it is legal and supported when using
+      // 'goog:' imports, Clutz only emits a marker.
+      Preconditions.checkState(
+          !nestsUnderPrevious,
+          "if previouslyDeclaredNamespace is not null here, the namespace must not"
+              + " nest under the previous one");
+
+      // Emit empty exports to make sure __clutz_multiple_provides below is treated as a local.
+      emitNoSpace("export {};");
+      emitBreak();
+      emitNoSpace("const __clutz_multiple_provides: true;");
+      emitBreak();
+    } else {
+      if (isDefault) {
+        // Special case default modules to convert them into named exports.
+        emitPathModuleContentsDefault(name, emitName, inParentNamespace);
+      } else {
+        emitModuleContents(name, isDefault, emitName, inParentNamespace);
+      }
+      // __clutz_actual_namespace tells tsickle the actual namespace it needs to goog.require()
+      // instead of the module's path.
+      emitNoSpace("const __clutz_actual_namespace: '");
+      emitNoSpace(name);
+      emitNoSpace("';");
+      emitBreak();
+    }
+    unindent();
+    emit("}");
+    emitBreak();
+  }
+
+  private String getUnqualifiedAlias(String qualifiedName) {
+    String alias = getUnqualifiedName(qualifiedName);
 
     // Make sure we don't emit a variable named after a keyword.
     if (RESERVED_JS_WORDS.contains(alias)) {
       alias += "_";
     }
+    return alias;
+  }
 
+  /** Emits the module contents for a module declaration. */
+  private void emitModuleContents(
+      String name, boolean isDefault, String emitName, boolean inParentNamespace) {
+    // Use the proper name as the alias name, so the TypeScript language service
+    // can offer it as an auto-import (auto-imports are offered for the exported
+    // name).
+    String alias = getUnqualifiedAlias(name);
     // workaround for https://github.com/Microsoft/TypeScript/issues/4325
     emit("import " + alias + " = ");
     emitNoSpace(Constants.INTERNAL_NAMESPACE);
@@ -1450,8 +1553,40 @@ class DeclarationGenerator {
       emitNoSpace("export = " + alias + ";");
     }
     emitBreak();
-    unindent();
-    emit("}");
+  }
+
+  /**
+   * Emits the contents for a module declaration for a path based module that uses a default export.
+   * This emits the default export as a (fake) named export and includes information to map it back.
+   */
+  private void emitPathModuleContentsDefault(
+      String name, String emitName, boolean inParentNamespace) {
+    String namespace =
+        Constants.INTERNAL_NAMESPACE
+            + "."
+            + escapeKeywordsInNamespace(inParentNamespace ? getNamespace(emitName) : emitName);
+    String unqualifiedName = getUnqualifiedName(name);
+    String alias = getUnqualifiedAlias(name);
+    emit("import");
+    emit(alias);
+    emit("=");
+    emit(namespace);
+    emitNoSpace(";");
+    emitBreak();
+    emit("export {");
+    emit(alias);
+    if (!unqualifiedName.equals(alias)) {
+      emit("as");
+      emit(unqualifiedName);
+    }
+    emit("};");
+    emitBreak();
+    // Include information allowing tsickle to convert back to a default import.
+    // Emitting the actual name is redundant, but make this a bit safer/easier to check in tsickle.
+    emit("const __clutz_strip_property: ");
+    emitNoSpace("'");
+    emitNoSpace(unqualifiedName);
+    emitNoSpace("';");
     emitBreak();
   }
 

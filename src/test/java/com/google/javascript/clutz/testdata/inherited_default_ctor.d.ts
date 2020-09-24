@@ -13,4 +13,10 @@ declare namespace ಠ_ಠ.clutz.def.ctor {
 declare module 'goog:def.ctor' {
   import ctor = ಠ_ಠ.clutz.def.ctor;
   export = ctor;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/inherited_default_ctor';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/inherited_default_ctor' {
+  import ctor = ಠ_ಠ.clutz.def.ctor;
+  export = ctor;
+  const __clutz_actual_namespace: 'def.ctor';
 }

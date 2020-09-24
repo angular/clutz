@@ -6,4 +6,10 @@ declare namespace ಠ_ಠ.clutz.module$exports$date$like {
 declare module 'goog:date.like' {
   import like = ಠ_ಠ.clutz.module$exports$date$like;
   export = like;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/date_like';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/date_like' {
+  import like = ಠ_ಠ.clutz.module$exports$date$like;
+  export = like;
+  const __clutz_actual_namespace: 'date.like';
 }

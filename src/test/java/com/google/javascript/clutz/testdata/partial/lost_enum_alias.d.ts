@@ -18,4 +18,10 @@ declare namespace ಠ_ಠ.clutz.module$exports$lost$enum$alias {
 declare module 'goog:lost.enum.alias' {
   import alias = ಠ_ಠ.clutz.module$exports$lost$enum$alias;
   export = alias;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/lost_enum_alias';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/lost_enum_alias' {
+  import alias = ಠ_ಠ.clutz.module$exports$lost$enum$alias;
+  export = alias;
+  const __clutz_actual_namespace: 'lost.enum.alias';
 }

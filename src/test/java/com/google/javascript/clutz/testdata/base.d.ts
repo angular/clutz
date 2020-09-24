@@ -35,4 +35,11 @@ declare namespace ಠ_ಠ.clutz.goog {
 declare module 'goog:goog.Uri' {
   import Uri = ಠ_ಠ.clutz.goog.Uri;
   export default Uri;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/base';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/base' {
+  import Uri = ಠ_ಠ.clutz.goog.Uri;
+  export { Uri };
+  const __clutz_strip_property: 'Uri';
+  const __clutz_actual_namespace: 'goog.Uri';
 }

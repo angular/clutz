@@ -19,4 +19,10 @@ declare namespace ಠ_ಠ.clutz.typedefs {
 declare module 'goog:typedefs' {
   import typedefs = ಠ_ಠ.clutz.typedefs;
   export = typedefs;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/type_alias';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/type_alias' {
+  import typedefs = ಠ_ಠ.clutz.typedefs;
+  export = typedefs;
+  const __clutz_actual_namespace: 'typedefs';
 }

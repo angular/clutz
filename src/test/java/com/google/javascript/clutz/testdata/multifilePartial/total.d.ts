@@ -9,6 +9,13 @@ declare namespace ಠ_ಠ.clutz {
 declare module 'goog:default.base.exporter' {
   import exporter = ಠ_ಠ.clutz.module$exports$default$base$exporter;
   export default exporter;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/multifilePartial/default_base_exporter';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/multifilePartial/default_base_exporter' {
+  import exporter = ಠ_ಠ.clutz.module$exports$default$base$exporter;
+  export { exporter };
+  const __clutz_strip_property: 'exporter';
+  const __clutz_actual_namespace: 'default.base.exporter';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/multifilePartial/default_object_exporter.js
 declare namespace ಠ_ಠ.clutz.module$exports$default$object$exporter {
@@ -18,6 +25,12 @@ declare namespace ಠ_ಠ.clutz.module$exports$default$object$exporter {
 declare module 'goog:default.object.exporter' {
   import exporter = ಠ_ಠ.clutz.module$exports$default$object$exporter;
   export = exporter;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/multifilePartial/default_object_exporter';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/multifilePartial/default_object_exporter' {
+  import exporter = ಠ_ಠ.clutz.module$exports$default$object$exporter;
+  export = exporter;
+  const __clutz_actual_namespace: 'default.object.exporter';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/multifilePartial/missing_imported_base.js
 declare namespace ಠ_ಠ.clutz.module$exports$missing$imported$base {
@@ -32,6 +45,12 @@ declare namespace ಠ_ಠ.clutz.module$exports$missing$imported$base {
 declare module 'goog:missing.imported.base' {
   import base = ಠ_ಠ.clutz.module$exports$missing$imported$base;
   export = base;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/multifilePartial/missing_imported_base';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/multifilePartial/missing_imported_base' {
+  import base = ಠ_ಠ.clutz.module$exports$missing$imported$base;
+  export = base;
+  const __clutz_actual_namespace: 'missing.imported.base';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/multifilePartial/named_base_exporter.js
 declare namespace ಠ_ಠ.clutz.module$exports$named$base$exporter {
@@ -42,6 +61,12 @@ declare namespace ಠ_ಠ.clutz.module$exports$named$base$exporter {
 declare module 'goog:named.base.exporter' {
   import exporter = ಠ_ಠ.clutz.module$exports$named$base$exporter;
   export = exporter;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/multifilePartial/named_base_exporter';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/multifilePartial/named_base_exporter' {
+  import exporter = ಠ_ಠ.clutz.module$exports$named$base$exporter;
+  export = exporter;
+  const __clutz_actual_namespace: 'named.base.exporter';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/multifilePartial/named_base_exporter.js
 declare namespace ಠ_ಠ.clutz {

@@ -8,6 +8,12 @@ declare namespace ಠ_ಠ.clutz.module$exports$override {
 declare module 'goog:override' {
   import override = ಠ_ಠ.clutz.module$exports$override;
   export = override;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/override';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/override' {
+  import override = ಠ_ಠ.clutz.module$exports$override;
+  export = override;
+  const __clutz_actual_namespace: 'override';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/partial/override.js
 declare namespace ಠ_ಠ.clutz {

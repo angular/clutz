@@ -7,6 +7,12 @@ declare namespace ಠ_ಠ.clutz.module$exports$module$tsickle$like {
 declare module 'goog:module.tsickle.like' {
   import like = ಠ_ಠ.clutz.module$exports$module$tsickle$like;
   export = like;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/goog_module_export_redefined';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/goog_module_export_redefined' {
+  import like = ಠ_ಠ.clutz.module$exports$module$tsickle$like;
+  export = like;
+  const __clutz_actual_namespace: 'module.tsickle.like';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/goog_module_export_redefined.js
 declare namespace ಠ_ಠ.clutz {

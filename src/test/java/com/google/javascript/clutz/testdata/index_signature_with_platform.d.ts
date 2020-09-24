@@ -45,4 +45,10 @@ declare namespace ಠ_ಠ.clutz.index_signature {
 declare module 'goog:index_signature' {
   import index_signature = ಠ_ಠ.clutz.index_signature;
   export = index_signature;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/index_signature_with_platform';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/index_signature_with_platform' {
+  import index_signature = ಠ_ಠ.clutz.index_signature;
+  export = index_signature;
+  const __clutz_actual_namespace: 'index_signature';
 }

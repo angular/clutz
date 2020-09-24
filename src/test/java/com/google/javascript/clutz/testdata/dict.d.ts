@@ -18,4 +18,10 @@ declare namespace ಠ_ಠ.clutz.dict {
 declare module 'goog:dict' {
   import dict = ಠ_ಠ.clutz.dict;
   export = dict;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/dict';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/dict' {
+  import dict = ಠ_ಠ.clutz.dict;
+  export = dict;
+  const __clutz_actual_namespace: 'dict';
 }

@@ -18,4 +18,10 @@ declare namespace ಠ_ಠ.clutz.nullable {
 declare module 'goog:nullable' {
   import nullable = ಠ_ಠ.clutz.nullable;
   export = nullable;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/nullable';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/nullable' {
+  import nullable = ಠ_ಠ.clutz.nullable;
+  export = nullable;
+  const __clutz_actual_namespace: 'nullable';
 }

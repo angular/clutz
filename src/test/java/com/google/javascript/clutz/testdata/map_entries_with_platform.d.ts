@@ -12,4 +12,11 @@ declare namespace ಠ_ಠ.clutz {
 declare module 'goog:map_entries.Map' {
   import Map = ಠ_ಠ.clutz.module$exports$map_entries$Map;
   export default Map;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/map_entries_with_platform';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/map_entries_with_platform' {
+  import Map = ಠ_ಠ.clutz.module$exports$map_entries$Map;
+  export { Map };
+  const __clutz_strip_property: 'Map';
+  const __clutz_actual_namespace: 'map_entries.Map';
 }

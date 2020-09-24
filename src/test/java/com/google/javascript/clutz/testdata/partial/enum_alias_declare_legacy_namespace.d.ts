@@ -9,4 +9,10 @@ declare namespace ಠ_ಠ.clutz.enum_alias2 {
 declare module 'goog:enum_alias2' {
   import enum_alias2 = ಠ_ಠ.clutz.enum_alias2;
   export = enum_alias2;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/enum_alias_declare_legacy_namespace';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partial/enum_alias_declare_legacy_namespace' {
+  import enum_alias2 = ಠ_ಠ.clutz.enum_alias2;
+  export = enum_alias2;
+  const __clutz_actual_namespace: 'enum_alias2';
 }

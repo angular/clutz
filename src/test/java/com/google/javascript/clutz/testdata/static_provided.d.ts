@@ -8,6 +8,13 @@ declare namespace ಠ_ಠ.clutz.a.b {
 declare module 'goog:a.b.StaticHolder' {
   import StaticHolder = ಠ_ಠ.clutz.a.b.StaticHolder;
   export default StaticHolder;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/static_provided';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/static_provided' {
+  import StaticHolder = ಠ_ಠ.clutz.a.b.StaticHolder;
+  export { StaticHolder };
+  const __clutz_strip_property: 'StaticHolder';
+  const __clutz_actual_namespace: 'a.b.StaticHolder';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/static_provided.js
 declare namespace ಠ_ಠ.clutz.a.b.StaticHolder {

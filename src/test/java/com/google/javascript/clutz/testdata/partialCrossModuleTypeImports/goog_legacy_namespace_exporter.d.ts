@@ -7,6 +7,12 @@ declare namespace ಠ_ಠ.clutz.goog.legacy.namespace.exporter {
 declare module 'goog:goog.legacy.namespace.exporter' {
   import exporter = ಠ_ಠ.clutz.goog.legacy.namespace.exporter;
   export = exporter;
+  const __clutz_actual_path: 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/goog_legacy_namespace_exporter';
+}
+declare module 'google3/third_party/java_src/clutz/src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/goog_legacy_namespace_exporter' {
+  import exporter = ಠ_ಠ.clutz.goog.legacy.namespace.exporter;
+  export = exporter;
+  const __clutz_actual_namespace: 'goog.legacy.namespace.exporter';
 }
 // Generated from src/test/java/com/google/javascript/clutz/testdata/partialCrossModuleTypeImports/goog_legacy_namespace_exporter.js
 declare namespace ಠ_ಠ.clutz {
