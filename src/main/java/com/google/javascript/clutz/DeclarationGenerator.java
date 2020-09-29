@@ -155,7 +155,8 @@ class DeclarationGenerator {
       ImmutableMap.of(
           "goog.log.Logger", "goog.debug.Logger",
           "goog.log.Level", "goog.debug.Logger.Level",
-          "goog.log.LogRecord", "goog.debug.LogRecord");
+          "goog.log.LogRecord", "goog.debug.LogRecord",
+          "goog.log.LogBuffer", "goog.debug.LogBuffer");
 
   private static final String GOOG_BASE_NAMESPACE = "goog";
 
