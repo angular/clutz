@@ -1000,12 +1000,12 @@ declare namespace ಠ_ಠ.clutz {
 // Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
   class Animation implements GlobalEventTarget {
-    constructor (effect ? : AnimationEffectReadOnly | null , timeline ? : AnimationTimeline | null ) ;
+    constructor (effect ? : AnimationEffect | null , timeline ? : AnimationTimeline | null ) ;
     addEventListener < THIS = any > (type : string , listener : EventListener | null | ( (this : THIS , a : GlobalEvent ) => any ) , options ? : boolean | AddEventListenerOptions ) : void ;
     cancel ( ) : void ;
     currentTime : number ;
     dispatchEvent (evt : GlobalEvent ) : boolean ;
-    effect : AnimationEffectReadOnly | null ;
+    effect : AnimationEffect | null ;
     finish ( ) : void ;
     finished : Promise < undefined > ;
     id : string ;
@@ -1024,9 +1024,10 @@ declare namespace ಠ_ಠ.clutz {
 }
 // Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
-  interface AnimationEffectReadOnly {
+  interface AnimationEffect {
     getComputedTiming ( ) : ComputedTimingProperties ;
     timing : AnimationEffectTiming ;
+    updateTiming (timing ? : AnimationEffectTimingProperties | null ) : any ;
   }
 }
 // Generated from externs.zip//web_animations.js
@@ -1081,16 +1082,17 @@ declare namespace ಠ_ಠ.clutz {
   class DocumentTimeline implements AnimationTimeline {
     currentTime : number | null ;
     getAnimations ( ) : Animation [] ;
-    play (effect : AnimationEffectReadOnly ) : Animation ;
+    play (effect : AnimationEffect ) : Animation ;
   }
 }
 // Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
-  class GroupEffect implements AnimationEffectReadOnly {
-    constructor (children : AnimationEffectReadOnly [] , timing ? : AnimationEffectTimingProperties | null ) ;
-    children : AnimationEffectReadOnly [] ;
+  class GroupEffect implements AnimationEffect {
+    constructor (children : AnimationEffect [] , timing ? : AnimationEffectTimingProperties | null ) ;
+    children : AnimationEffect [] ;
     getComputedTiming ( ) : ComputedTimingProperties ;
     timing : AnimationEffectTiming ;
+    updateTiming (timing ? : AnimationEffectTimingProperties | null ) : any ;
   }
 }
 // Generated from externs.zip//web_animations.js
@@ -1120,21 +1122,23 @@ declare namespace ಠ_ಠ.clutz {
 }
 // Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
-  class KeyframeEffectReadOnly implements AnimationEffectReadOnly {
+  class KeyframeEffectReadOnly implements AnimationEffect {
     constructor (target : GlobalElement | null , frames : { [ key: string ]: any } [] | { [ key: string ]: any [] } , options ? : number | AnimationEffectTimingProperties | null ) ;
     getComputedTiming ( ) : ComputedTimingProperties ;
     onsample ? : ( (a : number , b : KeyframeEffect , c : Animation ) => any ) | null ;
     target : GlobalElement | null ;
     timing : AnimationEffectTiming ;
+    updateTiming (timing ? : AnimationEffectTimingProperties | null ) : any ;
   }
 }
 // Generated from externs.zip//web_animations.js
 declare namespace ಠ_ಠ.clutz {
-  class SequenceEffect implements AnimationEffectReadOnly {
-    constructor (children : AnimationEffectReadOnly [] , timing ? : AnimationEffectTimingProperties | null ) ;
-    children : AnimationEffectReadOnly [] ;
+  class SequenceEffect implements AnimationEffect {
+    constructor (children : AnimationEffect [] , timing ? : AnimationEffectTimingProperties | null ) ;
+    children : AnimationEffect [] ;
     getComputedTiming ( ) : ComputedTimingProperties ;
     timing : AnimationEffectTiming ;
+    updateTiming (timing ? : AnimationEffectTimingProperties | null ) : any ;
   }
 }
 // Generated from externs.zip//webassembly.js
