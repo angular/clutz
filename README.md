@@ -1,6 +1,11 @@
 # Clutz - Closure to TypeScript Declarations (`.d.ts`) generator.
 
-[![Build Status](https://circleci.com/gh/angular/clutz.svg?style=svg)](https://circleci.com/gh/angular/clutz)
+> Clutz has been archived, which means the repository is in a read-only state. Clutz will not receive updates, and issues and pull requests will be locked.
+
+> We don’t believe that Clutz satisfies the needs of the open-source community. The use-case it was designed for is very limited, and only works with the full stack of Google TypeScript tooling. Clutz has also proven to be difficult to use: due to the tight integration with Closure Compiler it is only usable when building the latest versions of each. Additionally, many have tried to use it as a general JavaScript to TypeScript migrator and it fails at this. 
+
+> We have updated the default branch to be buildable so that existing users may continue using Clutz as-is.
+
 
 This project uses the
 [Closure Compiler](https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler)
